@@ -1,0 +1,559 @@
+---
+title: "2. praktikum"
+date: 23.02.2022 
+output: 
+  html_document:
+    theme: flatly
+    highlight: tango
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Andmetüübid ja objektitüübid {.tabset .tabset-pills}
+
+## Vaatlused ja tunnused
+
+Tüüpilised andmete saamise viisid on:  
+
+- introspektsioon  
+- intervjuu  
+- küsitlused  
+- (teksti)kogud, korpused, andmebaasid jne    
+- katsed  
+- ... 
+
+Sellel kursusel tegeleme põhiliselt küsitlus- ja andmebaaside andmetega, mida hoitakse tabelkujul ning mille ridades olevaid **vaatlusi** iseloomustatakse teatud tulpades asuvate **tunnuste** abil.  
+
+Näiteks võime iseloomustada inimesi nende pikkuse, kaalu, silmavärvi, hariduse jpm tunnuste põhjal. Sõnu jällegi võib iseloomustada nende graafilise pikkuse, silpide arvu, välte, tähendusklassi, sõnaliigi, sageduse jms tunnuste põhjal.  
+
+**Tunnused**/muutujad aitavad niisiis andmeid kirjeldada ja jagunevad **uuritavateks/sõltuvateks** tunnusteks (see, mida uurime ja mille kohta tahame midagi väita) ja **seletavateks/sõltumatuteks** tunnusteks (need, mille kaudu uuritavat tunnust iseloomustame). Inglise keeles viidatakse neile sageli vastavalt kui *dependent variable* või *response* ja *independent variable* või *predictor*.  
+Näiteks võime uuritava tunnusena käsitleda inimese kaalu ning seletavate tunnustena inimese pikkust, füüsilist aktiivsust (nt minutites nädalas), unetundide arvu jms. Sõnade puhul võib meil olla näiteks hüpotees, et lühemad sõnad on sagedasemad, mispuhul saame uuritavaks tunnuseks võtta sõnasageduse ja seletavaks tunnuseks sõna pikkuse.    
+
+Mis on järgmistes näidetes uuritav ja mis seletav tunnus?   
+
+- Kuidas mõjutavad sugu ja vanus poliitilise partei eelistust?  
+- Kuidas sõltub hinnang oma söögitegemisoskusele programmeerimisoskusest?  
+
+## Tunnuste jagunemine
+
+See, et andmeanalüüs on *kvantitatiivne*, ei tähenda, et kõik andmed ise peaksid tingimata olema arvulised.  Laiemalt jagunevadki tunnused __kvalitatiivseteks__ ja __kvantitatiivseteks__.  
+
+- __Kvalitatiivsed__/mittearvulised:  
+    * __nominaalsel skaalal__: kaks või enam kategooriat, mis teineteist välistavad. Peetakse kõige ebatäpsemaks ja vähem informatiivseks tunnusetüübiks. <br> Nt _mees_/_naine_, _transitiivne_/_intransitiivne_, _nominatiiv_/_genitiiv_/_partitiiv_, _nimi_, _kogumispunkt_, _teema_ jne.  
+    * __ordinaalsel e järjestusskaalal__: kategooriad on mingil alusel järjestatud, aga väärtuste vahe ei pruugi olla ühesugune. <br> Nt _alg-_/_põhi-_/_kesk-_/_kõrgharidus_, _ei nõustu üldse_ / _pigem ei nõustu_ / _pigem nõustun_ / _nõustun täielikult_.  
+- __Kvantitatiivsed__/arvulised:
+    * __intervalli- e vahemikskaalal__: esitab võrdseid erinevusi skaala punktide vahel. <br> Nt _temperatuur_.
+    * __suhteskaalal__: nagu intervalliskaala, aga tähendusliku nullpunktiga. <br> Nt _sõnasagedused_, _sõnade graafilised/silbilised pikkused_, _reaktsiooniaeg_.  
+    * kvantitatiivsed tunnuseid võib jagada ka  
+        - __pidevateks__ e mõõdetavateks (temperatuur _kraadides_, pikkus _sentimeetrites_, reaktsioon _millisekundites_, valuutakurss _dollarites_, vanus _aastates_)  
+        - __diskreetseteks__ e loendatavateks (sõnasagedused korpuses, laste arv peres, külastajate arv etendusel)  
+
+
+Eri skaalal tunnused võimaldavad erineval hulgal tehteid.   
+
+- Kõige piiratumalt saab opereerida nominaalsel skaalal tunnustega: nende väärtusi saab võrrelda ainult kvalitatiivselt (nt kass __ei ole__ koer).   
+- Järjestusskaala tunnuste väärtuseid saab lisaks võrrelda ka sellel alusel, et mingi väärtus on __suurem/rohkem kui__ mingi teine (nt keskharidus tähendab rohkem haridust kui põhiharidus, *pigem nõustun* tähendab rohkem nõustumist kui *pigem ei nõustu*).  
+- Intervalliskaalal tunnustega saab teha kõiki neid võrdlusi, mida nominaalsel ja järjestusskaalal tunnustega (nt 3 kraadi ei ole 2 kraadi ja 3 kraadi on rohkem kui 2 kraadi), ent lisaks saab öelda ka, kui palju (ehk kui mitme intervalli __võrra__) üks väärtus teisest suurem/väiksem on (nt 3 kraadi on 1 kraadi võrra rohkem kui 2 kraadi).  
+- Suhteskaala tunnused võimaldavad kõige rohkem tehteid. Lisaks kõikidele eelnimetatutele saab neid tunnuseid võrrelda ka sellel alusel, __kui mitu korda__ on mingi väärtus teisest väärtusest suurem või väiksem (nt 80-aastane on 4 korda vanem kui 20-aastane, aga 80 kraadi ei ole 4 korda rohkem kui 20 kraadi).  
+
+<center>
+![pilt](scales.JPG){width=50%}  
+<span style="font-size:12px">Levshina 2015: 18</span>
+</center>
+
+<br>
+Tunnuseid on võimalik teisendada ühest klassist teise, ent ainult suunal suhteskaala -> nominaalskaala ehk _ratio_ -> _nominal_!  
+Näiteks sõnasagedus on intervallskaala tunnus, aga võime sõnad jagada ka klassidesse *harvad*, *keskmise sagedusega* ja *sagedased*, mispuhul on tegemist järjestusskaala tunnusega. Vastupidi ei ole aga võimalik tunnuseid teisendada.   
+<br>
+
+
+
+Küsitluses, millele vastasid, olid järgmised küsimused. Millised neist on kvalitatiivsed ja millised kvantitatiivsed? Millisel skaalal tunnused on?  
+
+
+```{r echo = FALSE}
+load("kysimustik_2022.RData")
+dat <- read.delim("kysimustik2021_taiend.txt", fileEncoding = "UTF-8")
+kyssad <- dat[1,]
+```
+
+
+```{r, echo = FALSE}
+a <- t(kyssad)
+dimnames(a)[2] <- ""
+a
+```
+
+<!--
+Nominaalskaala: Q3, Q5, Q8, Q10, Q6?
+Ordinaalskaala: Q7, Q9
+Intervallskaala: Q2
+Suhteskaala: Q4
+-->
+
+
+## Nominaalskaalal tunnused
+
+```{r, echo = F, message = F, fig.height = 10}
+library(ggplot2)
+library(dplyr)
+library(egg)
+library(gridGraphics)
+library(webp)
+library(png)
+glaucus <- read_webp("glaucus.png")
+kaelkirjak <- readPNG("giraffe.png")
+koer <- read_webp("dog.webp")
+
+teema <- theme(panel.background = element_rect(fill = "grey80"),
+               panel.grid = element_line(color = "grey70"),
+               text = element_text(color = "grey30"),
+               axis.text = element_text(color = "grey30"))
+
+p1 <- ggplot(data = kysimustik, aes(x = reorder(oppekava, oppekava, 
+                                                function(x) length(x)))) +
+  coord_flip() +
+  #geom_bar(fill = "#C4961A", color = "#C4961A", alpha = 0.7) +
+  geom_bar(alpha = 0.7, aes(fill = ..count.., color = ..count..), show.legend = F) +
+  scale_fill_gradient(high = "darkorange2", low = "deepskyblue4") +
+  scale_color_gradient(high = "darkorange2", low = "deepskyblue4") +
+  geom_text(stat = "count", aes(label = ..count..), hjust = 1, col = "white") +
+  labs(x = "", y = "Vastajate arv", title = "Millisel õppekaval õpid?") +
+  teema
+
+p2 <- ggplot(data = kysimustik, aes(x = reorder(kogemused_kvant, kogemused_kvant, 
+                                          function(x) length(x)))) +
+  coord_flip() +
+  #geom_bar(fill = "#C4961A", color = "#C4961A", alpha = 0.7) +
+  geom_bar(alpha = 0.7, aes(fill = ..count.., color = ..count..), show.legend = F) +
+  scale_fill_gradient(high = "darkorange2", low = "deepskyblue4") +
+  scale_color_gradient(high = "darkorange2", low = "deepskyblue4") +
+  geom_text(stat = "count", aes(label = ..count..), hjust = 1, col = "white") +
+  labs(x = "", y = "Vastajate arv", title = "Kas sul on varasemaid kogemusi kvantitatiivsete meetoditega?") +
+  teema +
+  theme(aspect.ratio = 1/5)
+
+p3 <- ggplot(data = kysimustik, aes(x = reorder(lemmikjook, lemmikjook, function(x) length(x)))) +
+  coord_flip() +
+  #geom_bar(fill = "#C4961A", color = "#C4961A", alpha = 0.7) +
+  geom_bar(alpha = 0.7, aes(fill = ..count.., color = ..count..), show.legend = F) +
+  scale_fill_gradient(high = "darkorange2", low = "deepskyblue4") +
+  scale_color_gradient(high = "darkorange2", low = "deepskyblue4") +
+  geom_text(stat = "count", aes(label = ..count..), hjust = 1, col = "white") +
+  labs(x = "", y = "Vastajate arv", title = "Kohv või tee?") +
+  teema +
+  theme(aspect.ratio = 1/5)
+
+p4 <- ggplot(data = kysimustik, aes(x = reorder(lemmikloom, lemmikloom, function(x) length(x)))) +
+  coord_flip() +
+  #geom_bar(fill = "#C4961A", color = "#C4961A", alpha = 0.7) +
+  geom_bar(alpha = 0.7, aes(fill = ..count.., color = ..count..), show.legend = F) +
+  scale_fill_gradient(high = "darkorange2", low = "deepskyblue4") +
+  scale_color_gradient(high = "darkorange2", low = "deepskyblue4") +
+  geom_text(stat = "count", aes(label = ..count..), hjust = 1, col = "white") +
+  labs(x = "", y = "Vastajate arv", title = "Vali loom") +
+  teema +
+  annotation_custom(rasterGrob(koer), xmin = 3.5, xmax = 4.5, ymin = 0.5, ymax = 3.5) +
+  annotation_custom(rasterGrob(kaelkirjak), xmin = 2.5, xmax = 3.5, ymin = 0.5, ymax = 3.5) +
+  annotation_custom(rasterGrob(glaucus), xmin = 1.5, xmax = 2.5, ymin = 0.5, ymax = 3.5) +
+  theme(aspect.ratio = 1/4)
+
+ggarrange(p1, p2, p3, p4, ncol = 1)
+```
+
+## Nominaalskaalal tunnused?
+
+```{r, echo = F, fig.height = 3, fig.width = 8}
+ggplot(data = kysimustik, aes(x = reorder(programmeerimisoskus, programmeerimisoskus, function(x) length(x)))) +
+  coord_flip() +
+  #geom_bar(fill = "#C4961A", color = "#C4961A", alpha = 0.7) +
+  geom_bar(alpha = 0.7, aes(fill = ..count.., color = ..count..), show.legend = F) +
+  scale_fill_gradient(high = "darkorange2", low = "deepskyblue4") +
+  scale_color_gradient(high = "darkorange2", low = "deepskyblue4") +
+  geom_text(stat = "count", aes(label = ..count..), hjust = 1, col = "white") +
+  labs(x = "", y = "Vastajate arv", title = "Kirjelda oma programmeerimisoskusi \n(ükskõik mis keeles)") +
+  teema
+  
+```
+
+## Ordinaalskaalal tunnused
+
+```{r echo = F, message = F, fig.width=7, fig.height = 5}
+p6 <- ggplot(data = kysimustik, aes(x = kursuse_labimine)) +
+  coord_flip() +
+  #geom_bar(fill = "#C4961A", color = "#C4961A", alpha = 0.7) +
+  geom_bar(alpha = 0.7, aes(fill = ..count.., color = ..count..), show.legend = F) +
+  scale_fill_gradient(high = "darkorange2", low = "deepskyblue4") +
+  scale_color_gradient(high = "darkorange2", low = "deepskyblue4") +
+  geom_text(stat = "count", aes(label = ..count..), hjust = 1, col = "white", size = 5) +
+  labs(x = "", y = "Vastajate arv", title = "Kui tõenäoline on, et läbid selle kursuse?", caption = "Skaala: 1 (kindlasti kukun läbi) - 5 (kindlasti saan läbi)") +
+  scale_x_discrete(drop = F) +
+  teema +
+  theme(aspect.ratio = 1/3, text = element_text(size = 12), axis.text = element_text(size = 9))
+
+p7 <- ggplot(data = kysimustik, aes(x = soogitegemisoskus)) +
+  coord_flip() +
+  #geom_bar(fill = "#C4961A", color = "#C4961A", alpha = 0.7) +
+  geom_bar(alpha = 0.7, aes(fill = ..count.., color = ..count..), show.legend = F) +
+  scale_fill_gradient(high = "darkorange2", low = "deepskyblue4") +
+  scale_color_gradient(high = "darkorange2", low = "deepskyblue4") +
+  geom_text(stat = "count", aes(label = ..count..), hjust = 1, col = "white", size = 5) +
+  labs(x = "", y = "Vastajate arv", title = "Hinda oma söögitegemisoskusi", caption = "Skaala: 1 (tellin toitu koju) - 5 (meisterkokk)") +
+  scale_x_discrete(drop = F) +
+  teema +
+  theme(aspect.ratio = 1/3, text = element_text(size = 12), axis.text = element_text(size = 9))
+
+ggarrange(p6, p7, ncol = 1)
+```
+
+## Intervalliskaalal tunnused
+
+```{r echo = F, message = F, fig.height = 8, fig.width = 8}
+p8 <- ggplot(data = kysimustik, aes(x = synniaasta)) +
+  coord_flip() +
+  #geom_bar(fill = "#C4961A", color = "#C4961A", alpha = 0.7) +
+  geom_bar(alpha = 0.7, aes(fill = ..count.., color = ..count..), show.legend = F) +
+  scale_fill_gradient(high = "darkorange2", low = "deepskyblue4") +
+  scale_color_gradient(high = "darkorange2", low = "deepskyblue4") +
+  geom_text(stat = "count", aes(label = ..count..), hjust = 1, col = "white") +
+  scale_x_continuous(breaks = sort(unique(kysimustik$synniaasta))) +
+  labs(x = "", y = "Vastajate arv", title = "Mis on sinu sünniaasta?") +
+  teema
+
+p9 <- ggplot(data = kysimustik, aes(x = synniaasta)) +
+  geom_histogram(binwidth = 3,
+                 aes(fill = ..count.., color = ..count..), alpha = 0.7,
+                 show.legend = F) + 
+  #geom_bar(alpha = 0.7, aes(fill = ..count.., color = ..count..), show.legend = F) +
+  scale_fill_gradient(high = "darkorange2", low = "deepskyblue4") +
+  scale_color_gradient(high = "darkorange2", low = "deepskyblue4") +
+  labs(x = "Sünniaasta", y = "Vastajate arv", title = "Histogramm") +
+  teema
+
+p10 <- ggplot(data = kysimustik, aes(x = synniaasta)) +
+  geom_density(fill = "darkorange2", color = "deepskyblue4", alpha = 0.7) +
+  labs(x = "Sünniaasta", y = "Tõenäosustihedus", title = "Tõenäosustihedusgraafik")+
+  teema
+
+p11 <- ggplot(data = kysimustik, aes(x = synniaasta, y = "")) +
+  stat_boxplot(geom = "errorbar", width = 0.5, color = "#C4961A",) +
+  geom_boxplot(fill = "deepskyblue4", color = "darkorange2", alpha = 0.7) +
+  labs(x = "Sünniaasta", y = "", title = "Karpdiagramm") +
+  teema
+
+library(gridExtra)
+grid.arrange(p8, grid.arrange(p9, p10, p11, nrow = 1), ncol = 1, heights = c(0.6,0.4))
+```
+
+
+## Suhteskaalal tunnused
+```{r echo = F, message = F, fig.height = 3}
+p12 <- ggplot(data = kysimustik, aes(x = kaua_opid)) +
+  geom_histogram(binwidth = 3,
+                 aes(fill = ..count.., color = ..count..), alpha = 0.7,
+                 show.legend = F) + 
+  scale_fill_gradient(high = "darkorange2", low = "deepskyblue4") +
+  scale_color_gradient(high = "darkorange2", low = "deepskyblue4") +
+  labs(x = "Õpitud aastaid", y = "Vastajate arv") +
+  teema
+
+p13 <- ggplot(data = kysimustik, aes(x = kaua_opid)) +
+  geom_density(fill = "darkorange2", color = "deepskyblue4", alpha = 0.7) +
+  labs(x = "Õpitud aastaid", y = "Tõenäosustihedus")+
+  teema
+
+p14 <- ggplot(data = kysimustik, aes(x = kaua_opid, y = "")) +
+  stat_boxplot(geom = "errorbar", width = 0.5, color = "#C4961A",) +
+  geom_boxplot(fill = "deepskyblue4", color = "darkorange2", alpha = 0.7) +
+  labs(x = "Õpitud aastaid", y = "") +
+  teema
+
+figs <- ggarrange(p12, p13, p14, nrow = 1, draw = F)
+ggpubr::annotate_figure(figs, top = "Mitu aastat oled käinud ülikoolis?")
+```
+
+
+
+## Objektitüübid ja -klassid
+
+Iga R-is olevat objekti (muutujat, millele on antud mingid väärtused, mis meil töölaual on) iseloomustavad __tüüp__ ja __klass__. 
+
+__Objektitüüp__ (vahel nimetatakse ka andmetüübiks) ütleb meile seda, mis sorti andmetega on tegemist. Põhilised objektitüübid on R-is
+
+- **arv** (*numeric*)  
+    nt `123.456` või `1234`  
+- **tekst** (*character*)  
+    nt `"Tere!"`, `"Number 2"`, `"123.456"`  
+- **tõeväärtus** (*logical*)  
+    nt `TRUE` ja `FALSE`
+
+__Objektiklass__ tähistab andmestruktuuri ehk seda, kuidas andmed objektis on korrastatud. Objektiklasse on küll ka rohkem ja spetsiifilisemaid, aga esialgu võiks meil tulla tegemist 4 põhilise klassiga:
+
+- **vektorid** (*vector*)  
+    nt `1`, `1:10`, `c(1:10)`, `c(1,400,800)`, `"Tere!"`, `c("Tere!", "Head aega!")`, `TRUE`, `c(TRUE, FALSE, TRUE, TRUE)`, `vector("character", length = 10)`  
+- **maatriksid** (*matrix*)   
+    nt `matrix(1:9)`, `matrix(1:9, nrow = 3)`, `matrix(c(TRUE, TRUE, FALSE, FALSE), ncol = 2)`
+- **tabelid** (*data.frame*)  
+    nt `data.frame(nimi = c("Anu", "Mart", "Sipsik"), pikkus = c(145, 160, 30), kaal = c(40, 58, 2))`, `as.data.frame(matrix(1:9, nrow = 3))`
+- **listid** (*list*)   
+    nt `list(1:10)`, `list(1:10, 10:5)`, `list(1:10, "a", list(c(TRUE, FALSE), TRUE))` 
+
+
+Vektorid on ühemõõtmelised objektid, mis võivad sisaldada ainult üht tüüpi elemente, nt ainult arve, ainult teksti või ainult tõeväärtuseid.  
+Maatriksid on kahemõõtmelised (= ridade ja tulpadega) objektid, mis võivad sisaldada ainult üht tüüpi elemente, nt ainult arve, ainult teksti või ainult tõeväärtuseid.   
+Tabelid on kahemõõtmelised objektid, mis võivad veergudes sisaldada erinevat tüüpi elemente (nt tekstivektoreid, arvvektoreid, tõeväärtusvektoreid).  
+Listid on komplekssed, struktureerimata objektid, mis võivad sisaldada erinevat tüüpi elemente, sh tabeleid ja teisi liste, funktsioone jm.    
+
+Kõige rohkem ilmselt peaks tähelepanu pöörama vektoritele ja tabelitele. Tabelite ja maatriksite puhul on oluline märgutada, et R-is peaks tabel olema kindlasti **sümmeetriline**, st igas reas on ühepalju tulpasid ja igas tulbas ühepalju ridu. Selline Exceli-tüüpi tabel, kus ühe ruudulise lehe peal võib olla mitu tabelit, on R-ile raskesti seeditav. Ka erinevad stiliseeritud ja pesastatud tabelid, kus ühes lahtris toimub omakorda jagunemine väiksemateks lahtriteks, võivad tekitada omajagu tüli (vt ka nt [https://www.r-bloggers.com/2020/05/what-it-takes-to-tidy-census-data/](https://www.r-bloggers.com/2020/05/what-it-takes-to-tidy-census-data/?fbclid=IwAR1uOsWBZw2Vuq-mIWuo-epZ9x_1E0i2hlLtY967J3hh3f3ZCRbrrM0vuGg)).  
+Keerulisema struktuuriga objektidega, nagu on R-is list, me täna ei tegele, aga näeme neid ilmselt rohkem siis, kui hakkame mudelite väljundeid vaatama.
+
+
+## Objektitüübid
+
+__Arvud__ (*numeric*), nagu oleme juba näinud, kirjutatakse lihtsalt numbritega. Arvulise väärtusega muutujatega saab teha matemaatilisi tehteid (liita-lahutada jne).  
+```{r, echo=T}
+4 # see trükitakse välja
+a <- 4 # noolega omistatakse objektile väärtusi
+b <- 5
+c <- sqrt((a + b)^4) # ^-märk tähistab siin astendamist, sqrt() on ruutjuure leidmise funktsioon
+c # see trükitakse välja
+```
+
+__Tekst__ (*character*) tuleb kirjutada jutumärkides (kas ühe- või kahekordsetes). Ka numbrid võivad olla tekst (numbrimärgid). Tekstiga matemaatilisi tehteid teha ei saa, küll aga saab näiteks tekstiosi omavahel kombineerida või tekstistringi pikkust pärida.
+```{r, echo=T}
+"Tartu"
+tekst1 <- "Tartu"
+tekst2 <- 'ülikool' # ühekordsed jutumärgid töötavad samaväärselt
+tekst3 <- "100"
+paste(tekst1, tekst2, tekst3, sep= " ") # kleebi kolme objekti väärtused kokku
+nchar(tekst2) # leia objekti tekst2 väärtuse tähemärkide arv
+substr(tekst2, 4, 7) # võta välja objekti tekst2 väärtuse 4-7 tähemärk
+```
+
+<p style="text-align: right;">![](q15.PNG){width=40%}</p>
+<p style="text-align: right;">Küsimus R-i testist</p>
+
+__Tõeväärtus__ (*logical*) on binaarne muutuja, millel on kaks võimalikku väärtust: __TRUE__ ja __FALSE__, need sisestatakse suurtäheliselt ilma jutumärkideta, töötab ka ainult esitähega T/F. Milleks seda vaja on? Näiteks kui me kasutame võrratusi, siis vastuseks on tõeväärtus. Võrratusi läheb meil vaja hiljem, kui meil on näteks suuremast andmestikust vaja leida kindlatele tunnustele vastav alamosa.
+```{r, echo=T}
+1 < 2 # Kas 1 on väiksem kui 2?
+3 == 1+2 # Kas 3 võrdub 1 ja 2 summaga?
+"mina" == "sina" # Kas tekst "mina" on sama mis tekst "sina"?
+```
+
+
+Lisaks on R-is oluline __tundmatu väärtus__ ehk __NA__. Kõigi objektitüüpide hulgas võib olla tundmatuid väärtusi, näiteks kui me ei tea kõikide oma andmestiku katseisikute vanuseid, mõni mõõtmistulemus on läinud untsu või mõni kategooria pole üldse kõikidele vaatlustele kohandatav. Tundmatu väärtusega tehteid tehes on tulemuseks samuti tundmatu väärtus.  
+```{r, echo=T}
+tundmatu <- NA
+3 + NA
+is.na(tundmatu)
+```
+
+Objektide tüüpi saab küsida käsuga `class()`.  
+```{r}
+class(b)
+class(tekst2)
+class(tundmatu)
+```
+
+
+
+
+## Vektor
+
+R-i põhiline objektiklass on __vektor__. Kõik teised objektid koosnevad vektoritest, nende osi saab käsitleda vektoritena.
+
+Vektor on ühemõõtmeline objekt (erinevalt näiteks tabelist), millel võib olla mitu väärtust, ent ei pea. Kõige lihtsam vektor koosnebki ainult ühest elemendist, st tal on üks väärtus. Näiteks kui siestada üks arv või üks sõna, siis see on vektor, millel on üks element:
+
+```{r, echo=T}
+4
+length(4) # käsk `length()` annab vastuseks vektori elementide arvu.
+```
+
+Aga vektoril võib ka rohkem kui üks väärtus olla. Käsk `c()` kombineerib väärtused kokku vektoriks; järjestikuste arvude jada saab luua kooloniga.
+```{r, echo=T}
+minu_vektor <- c(3,6,8,11)
+vek1 <- c(1,2,3,4,5)
+vek2 <- 6:10
+vek3 <- c("nina", "kõrvad", "silmad")
+```
+Proovi nüüd nende vektorite peal käsku `length`.     
+
+
+Ühes vektoris on kõik elemendid sama tüüpi. Vektori tüüpi saab jällegi küsida käsuga `class()`.
+```{r, echo=T}
+class(vek1)
+length(vek1)
+```
+
+<p style="text-align: right;">![](q1.PNG){width=40%} ![](q2.PNG){width=40%}</p>
+<p style="text-align: right;">Küsimused R-i testist</p>
+
+
+Käsk `c()` kombineerib omavahel kokku ka mitu vektorit.  
+```{r, echo=T}
+vek4 <- c(vek1, vek2, 20:30)
+```
+
+
+Vektoritega tehete tegemisel rakendatakse tehet elementide kaupa. Kui vektorid on eri pikkusega, siis lühemat vektorit taaskasutatakse.
+```{r, echo=T}
+vek1 + vek2 # liida 1+6, 2+7 jne
+1:10 * c(3,0) # 1*3, 2*0, 3*3, 4*0 jne
+```
+Ja kui pikem vektor ei jagu täpselt lühemaga, siis lühemat küll taaskasutatakse nii, et kõik pikema vektori elemendid saaksid endale paarilise, aga kõik lühema vektori elemendid ei saa võrdselt kordusi, mille kohta antakse ka hoiatus.  
+```{r, echo=T}
+1:10 * c(3,0,1) # 1*3, 2*0, 3*1 ... 10*3
+```
+
+Vektorist saab üksiku väärtuse või mingi osa kätte __indeksite__ abil. Indeks kirjutatakse vektori nime järele nurkusulgudesse:
+```{r}
+vek5 <- c("kala", "kana", "kaja", "kava", "kaba", "kada", "kaka", "kaua", "kama")
+vek5[3] # vektori kolmas element
+vek5[2:4] # vektori teine, kolmas ja neljas element
+vek5[c(5,1)] # vektori viies ja esimene element
+```
+<p style="text-align: right;">![](q3.PNG){width=40%}</p>
+<p style="text-align: right;">Küsimus R-i testist</p>
+
+
+
+Omamoodi indeksitena saab kasutada ka võrratusi.  
+```{r}
+vek5=="kana" # küsi iga vektori elemendi kohta, kas see võrdub sõnaga "kana"
+vek5[vek5 == "kana"] # küsi vektorist ainult neid elemente, mis võrduvad sõnaga "kana"
+vek4 > 10 # küsi iga vektori elemendi kohta, kas see on suurem kui 10
+vek4[vek4 > 10] # küsi vektorist ainult neid elemente, mis on suuremad kui 10
+```
+
+
+Vektori eritüüp on faktor. __Faktor__ (*factor*) on piiratud hulga väärtustega nominaalne vektor. Miks faktoreid vaja on? 
+```{r}
+vanus <- factor(c("vana","noor","noor"), levels=c("noor","vana"))
+```
+
+1) faktori väärtuseid saab järjestada, see on oluline näiteks ordinaalskaalaga muutujate puhul ("vanem", "keskmine", "noorem"); 
+2) on ökonoomsem, sest iga üksik andmepunkt on tähistatud faktori taseme numbriga, kui taseme nimi koosneb enamasti mitmest tähemärgist. 
+
+Faktori tasemed märgivad faktori unikaalseid väärtusi. Faktori tasemed on alati mingil moel järjestatud, ent vaikimisi tähestiku järjekorras või arvude puhul väiksemast suuremani. Faktori tasemeid saab küsida käsuga `levels()`.
+
+```{r}
+haridus <- factor(c("põhi", "kesk", "põhi", "kesk", "kõrg"))
+arvud <- factor(c(9,3,6,2,1,1,2,2))
+levels(haridus)
+levels(arvud)
+```
+
+<p style="text-align: right;">![](q11.PNG){width=60%}</p>
+<p style="text-align: right;">Küsimus R-i testist</p>
+
+Faktoreid saab ümber järjestada näiteks `factor()`-funktsioonis argumendi `levels` abil.
+
+```{r}
+haridus <- factor(haridus, levels = c("põhi", "kesk", "kõrg"))
+arvud <- factor(arvud, levels = c(9,6,3,2,1))
+levels(haridus)
+levels(arvud)
+```
+Eraldi faktori liik on järjestatud faktor (*ordered factor*), mille puhul on eksplitsiitne ka see, et iga järgmine faktori tase on eelmisest suurem/kõrgem/rohkem/tähtsam.
+
+```{r}
+haridus <- factor(haridus, ordered = TRUE)
+haridus
+```
+
+
+
+## Tabelid
+
+Tabel on kahemõõtmeline objekt: on read ja veerud, aga oluline on see, et igas reas on sama palju veerge ja vastupidi, ehkki lahtrites võib olla ka puuduvaid väärtusi.  
+
+Siin kursusel kasutame kõige rohkem ilmselt tabeleid, mille klass on *data.frame*. Võimalik, et kasutame mingis olukorras ka maatriksit (*matrix*). Maatriksi ja *data.frame*'i vahe R-is on see, et maatriksis saab olla ainult ühte tüüpi andmeid (kas arvud, tekst), aga *data.frame*'is võib iga tulp olla erinevat tüüpi.
+
+R-is saab andmeid ka vektoritest `data.frame()` käsuga tabeliks kokku panna, aga üldjuhul saame *data.frame*'i kujulise objekti nii, et loeme tabelina struktureeritud andmeid failist. Käsuga `read.table()` saab importida R-i tabeleid, mis on näiteks csv- või txt-formaadis, ent erinevate käskudega (eri pakettidest) saab sisse lugeda ka teistest formaatides tabeleid (nt xlsx).
+
+<p style="text-align: right;">![](q5.PNG){width=40%}</p>
+<p style="text-align: right;">Küsimus R-i testist</p>
+
+Kui andmestik on R-is korrastatud ja RData formaadis salvestatud, siis neid andmestikke saab avada käsuga `load()`. Näiteks sellisel kujul on Moodle'is failis *kysimustik_2022.RData* korrastatud vastused küsimustikule, mida eelmises praktikumis täitsite. Lisaks on seal ka varasemate aastate vastused.
+
+```{r, echo=T}
+load("kysimustik_2022.RData")
+```
+
+Selle käsurea rakendamisest justkui ei juhtugi midagi, aga töölauale tekkis objekt nimega **kysimustik**. Nüüd oleks vaja saada natuke aimu, mida see tabel endast kujutab. Selleks proovime käske:
+
+- `dim()`
+- `View()`
+- `head()`  
+- `tail()`  
+- `summary()`  
+- `str()`
+
+```{r, echo=TRUE, eval = FALSE}
+dim(kysimustik) # mitu rida ja mitu tulpa on tabelis?
+View(kysimustik) # vaata tervet andmetabelit
+head(kysimustik) # näita tabeli esimesi ridu
+tail(kysimustik) # näita tabeli viimaseid ridu
+summary(kysimustik) # näita ülevaadet tabeli tunnustest
+str(kysimustik) # näita tabeli struktuuri
+```
+
+
+Mis tüüpi andmed on tabelis? Mis skaalal?
+
+<p style="text-align: right;">![](q8.PNG){width=40%} ![](q9.PNG){width=40%}</p>
+<p style="text-align: right;">![](q4.PNG){width=40%}</p>
+<p style="text-align: right;">Küsimused R-i testist</p>
+
+Tabelist saab selle osi pärida samamoodi *indeksite* abil nagu vektorist, aga nüüd peab arvestama, et nurksulgudes tuleb märkida nii ridade kui ka veergude indeksid. 
+```{r, echo=T, eval = F}
+kysimustik[,5] # küsimustiku 5. tulp
+kysimustik[,1:2] # küsimustiku 1. ja 2. tulp
+
+kysimustik[1,] # küsimustiku 1. rida
+kysimustik[c(1,3,5,7),] # küsimustiku 1., 3., 5. ja 7. rida
+
+kysimustik[3, 5] # küsimustiku 3. rea 5. tulba väärtus
+kysimustik[1:10, 5] # küsimustiku esimese 10 rea 5. tulba väärtused
+```
+
+
+
+Kui me tahame tabelist nime järgi välja võtta ühe terve tulba, siis seda saab ka nii:
+```{r, echo=T}
+kysimustik$lemmikjook
+# või
+kysimustik[,"lemmikjook"]
+```
+See üks tulp on nüüd vektor. Tulba või üksikud väärtused saab suunata ka eraldi uude muutujasse, nende osi omakorda indeksite abil välja võtta jne.
+
+Tabeleid, nagu ka vektoreid, võib lisaks "indekseerida" ka võrratuste abil. 
+
+```{r}
+# tabel
+kysimustik[kysimustik$synniaasta > 1999,] # read, kus sünniaasta väärtus on suurem kui 1999
+
+# vektor
+kysimustik[kysimustik$kogemused_kvant == "Jah",]$kaua_opid # "kaua_opid" tulba väärtused ridadel, kus "kogemused_kvant" väärtus on "Jah"
+```
+
+
+
+## Ülesanded
+
+1. Võta andmestikust `kysimustik` välja mõni intervalliskaalal tunnus (kasuta indeksit).  
+2. Võta andmestikust `kysimustik` välja sama tulp tulbanime järgi (kasuta $-märki).  
+3. Suuna andmestiku `kysimustik` tulp `kogemused_kvant` eraldi objekti nimega `kogemused`. Mis tüüpi objekti saad?    
+4. Korrasta objekti `kogemused` tasemed nii, et esimene tase oleks "Jah" ja teine "Ei".  
+5. Lisa objekti `kogemused` väärtus "Võib-olla" (kasuta funktsiooni `c()`). Mis juhtub? 
+
+
+## Lõpetuseks
+
+Kui sul on tunne, et vajad pikemat sissejuhatust R-i alustesse, siis vaata [sissejuhatava kursuse materjale](https://kodu.ut.ee/~partel/r_andmestrukt.html).
+
+Järgmises praktikumis arvulised andmed ja nende visualiseerimine.
