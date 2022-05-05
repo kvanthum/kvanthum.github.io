@@ -1,0 +1,771 @@
+---
+title: "17. praktikum"
+knit: (function(input_file, encoding) {
+    out_dir <- 'docs';
+    rmarkdown::render(input_file,
+      encoding=encoding,
+      output_file=file.path(dirname(input_file), out_dir, '17-otsustuspuud.html'))})
+date: 25.04.2022
+output: 
+  html_document:
+    theme: flatly
+    highlight: tango
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Tingimuslikud otsustuspuud {.tabset .tabset-pills}
+
+## Tänases praktikumis
+- Tingimuslikud otsustuspuud
+- Otsustuspuude visualiseerimine  
+- Otsustuspuude headuse näitajad  
+
+
+
+## Regressioon vs. otsustuspuud 
+
+**Regressioonimudelite** puhul on võimalik hinnata ühe seletava tunnuse taseme/ühiku muutuse mõju uuritava tunnuse varieerumisele. Selles mõttes on regressioon lähim meetod kontrollitud katse tegemisele, kui tegelikult on kasutada ainult vaatlusandmed. Regressioonimudelid on **parameetrilised** mudelid, mis tähendab, et uute vaatluste väärtuste ennustamiseks piisab kindlate parameetrite hinnangute (nt regressioonikordaja ja selle standardviga) teadmisest. Näiteks lineaarses regressioonis, kus on 1 seletav tunnus, piisab vabaliikmest ja seletava tunnuse koefitsiendist selleks, et mingi kindlusega ennustada kõiki võimalikke väärtusi. Seda aga juhul, kui andmed vastavad kindlale jaotusele ning uuritavat tunnust saab ka päriselt ennustada lineaarse funktsiooni kaudu. Kui tegelikult ei ole uuritav tunnus kirjeldatav seletavate tunnuste lineaarse (st sirgjoonelise) kombinatsiooni kaudu, ei ennusta meie mudel tegelikult uuritava tunnuse väärtuseid populatsioonis kuigi hästi.  
+
+
+Puudused:  
+
+- eeldused lineaarsuse ja jaotuste kohta;  
+- interaktsioonide lisamisel tulemusi raskem interpreteerida;  
+- tundlikud erindite suhtes;  
+- tundlikud puuduvate väärtuste suhtes;  
+- võivad ülesobitada, tulemusi peaks valideerima. 
+
+<br>  
+<br>  
+
+**Otsustuspuud** on **mitteparameetriliste** algoritmide klass. Need ei sobita andmetele kindlat funktsiooni, vaid jõuavad sobiva funktsioonini andmete enda kaudu. Mitteparameetrilised mudelid on seega paindlikumad ning suudavad paremini arvestada korraga eri tunnuste mõjuga erinevates tingimustes. Seepärast sobivad need paremini kirjeldama komplekssemaid uurimisküsimusi, mille puhul praktikas ei pruugi nt lihtne lineaarne ennustusmudel hästi töötada. Mitteparameetrilised mudelid õpivad andmetest, seega mida rohkem on vaatlusandmeid, seda tugevam on mitteparameetrilise mudeli ennustusvõime. 
+
+Otsustuspuud   
+
+- ei eelda andmetelt mingeid jaotusi;  
+- saavad hakkama ebaühtlase andmete jaotumisega;  
+- sobivad hästi, kui on palju seletavaid tunnuseid, nendevahelisi interaktsioone ja korrelatsioone;  
+- tulemused on intuitiivselt tõlgendatavad;  
+- sobivad nii kategoriaalsetele (kahe või enama tasemega) uuritavatele tunnustele kui ka arvulistele uuritavatele tunnustele;  
+- jõuavad ise optimaalse mudelini (ebaolulised tunnused jäävad väljundist välja).  
+
+
+
+## Otsustuspuud
+
+Otsustuspuu tööpõhimõtet ja ka nimetust motiveerib kujutlus puu kasvatamisest altpoolt ülespoole.
+
+<center>
+![](imgs/tree.png)
+<p><i>[https://medium.com/analytics-vidhya/mathematics-behind-decision-tree-73ee2ef82164](https://medium.com/analytics-vidhya/mathematics-behind-decision-tree-73ee2ef82164)/</i></p>
+</center>
+
+
+Otsustuspuu (*decision tree*) algoritm põhineb vaatluste **binaarsel rekursiivsel ositamisel** (*binary recursive partitioning*). See tähendab, et  
+
+- kõikidest seletavatest tunnustest valitakse see, mis kõige selgemini uuritava tunnuse varieerumist seletab, ja **jagatakse** esimeses sõlmes (*root node* ehk nn juursõlm) vaatlused selle põhjalt **kaheks** (tunnuse põhjal sarnased vaatlused grupeeritakse);   
+- seejärel valitakse kummaski tekkinud grupis/sõlmes omakorda tunnused, mis seal kõige selgemini uuritava tunnuse varieerumist seletavad, ja jagatakse vaatlused veel kord kaheks. Selline binaarne jagamine annab puu "oksad";  
+- samasugune rekursiivne ehk **enesest lähtuv** ositamine gruppides jätkub, kuni ükski tunnus ei ole enam uuritava tunnuse seletamisel oluline. "Rekursiivne" tähendabki siin seda, et ühe grupi sisse moodustub üha uusi, spetsiifilisemaid gruppe;   
+- ositamise lõpptulemusena saadakse optimaalsed klassid või jaotused, mis ennustavad uuritava tunnuse väärtusi vastavalt eelmistele jagunemistele. Need on puu "lehed" (*terminal/leaf node*). Puu lehtedes on niisiis andmestiku tegelikud vaatlused/read, milles uuritava tunnuse tegelikud väärtused võivad varieeruda, ent lehe klassiks ennustatakse kategoriaalse uuritava tunnuse puhul kõige sagedamat/tõenäolisemat uuritava tunnuse väärtust selles vaatluste grupis ning arvulise uuritava tunnuse puhul tunnuse keskväärtust. Lehtede põhjal on nõnda võimalik ennustada uuritava tunnuse klasse ka teiste valimite jaoks.      
+
+
+Rekursiooni olemust näitlikustatakse sageli Sierpinski kolmnurga kaudu, kus üht kolmnurka saab jagada lõputult väiksemateks kolmnurkadeks. 
+
+<center>
+![](imgs/Siepinski1D960.gif){width=60%}
+<p><i>Sierpinski kolmnurk</i></p>
+</center>
+
+
+Otsustuspuid on eriti viimase 10 aasta jooksul kasutatud palju ka keeleteaduses. Näiteks uurisid [Ruutma jt (2016)](https://keeljakirjandus.ee/ee/archives/25305) otsustuspuude abil, millest võiks sõltuda eesti murretes see, kas kaassõnad *läbi*, *mööda*, *vastu*, *üle* ja *ümber* paiknevad nimisõna ees (nt *ümber järve*) või järel (*kahe kilo ümber*).  
+
+![](imgs/ruutmaetal.jpg)
+
+Nad leidsid näiteks, et kui suhe, mida kaassõnafraas väljendab, märgib mingit *mõõdet* ehk kvantiteeti või ligikaudsust (*ta oli siis juba __seitsmekümne aasta ümber__*), kasutatakse kaassõna *ümber* eeskätt nimisõna järel, tagasõna ehk postpositsioonina.  
+Kui aga kaassõnafraas väljendab konkreetset ruumisuhet, sõltub kaassõna asend sellest, kas nimisõna, millega see koos esineb, viitab elusale või elutule referendile. Elusatega kasutatakse samuti pigem tagasõna (nt *loomad jooksid __mu ümber__*), elututega pigem eessõna (nt *need pandi __ümber vankri__*).  
+
+
+## CART
+
+Otsustuspuude algoritmides on üht-teist erinevat, nt selles osas, mida kasutatakse vaatluste jagamise kriteerumina.   
+Tuntuim algoritm on ilmselt **CART** (*Classification and Regression Tree*). CART-mudelid jagunevad  
+  
+- **regressioonipuudeks** (*regression tree*)  
+  + uuritav tunnus on arvuline;  
+  + jagunemise aluseks olevad seletavad tunnused ja konkreetsed jagunemiskohad valitakse nn minimaalse ruutvigade summa järgi **sum((y-f)^2^)**, kus *y* on uuritava tunnuse tegelik väärtus mingil andmestiku real ja *f* mingisse ühte puu lehte sattuvate vaatluste keskmine. Mida väiksem on binaarse jagunemise käigus tekkivate gruppide vaatluste erinevus gruppide keskmistest, seda parem;   
+- **klassifitseerimispuudeks** (*classification tree*)  
+  + uuritav tunnus on kategoriaalne;  
+  + jagunemiste määramiseks minimeeritakse nn Gini indeksit, mis näitab kui "puhas" mingi leht on ehk kui erinevad tegelikud väärtused mingi ühe ennustatud klassi alla grupeeritakse. Kui indeks on 0, siis leht täiesti puhas ehk mingisse lõpusõlme ennustatakse ainult ühesuguseid uuritava tunnuse väärtuseid. Kui mingis lehes/lõpusõlmes on võrdselt uuritava tunnuse kõiki väärtuseid, siis on leht ebapuhas. Gini indeksi leidmiseks lahutatakse 1st 1. väärtuse osakaal ruudus + 2. väärtuse osakaal ruudus + … + N-nda väärtuse osakaal ruudus. Näiteks kui uuritaval tunnusel on kaks klassi, mis esinevad lõpusõlmes võrdse tõenäosusega, siis on ühe sõlme Gini indeks `1-(0.5^2 + 0.5^2)=0.5`. Kolme klassi puhul oleks siis Gini indeks `1-((1/3)^2+(1/3)^2+(1/3)^2)=0.67`, nelja klassi puhul `1-((1/4)^2+(1/4)^2+(1/4)^2+(1/4)^2)=0.75` jne. Kui sõlme jääb näiteks kahest uuritava tunnuse klassist ainult üks, siis on Gini indeks `1-(1^2+0^2)=0`.  
+  
+
+<center>
+![Regressioonipuu](imgs/rtree.png){width=40%} ![Klassifitseerimispuu](imgs/ctree.png){width=40%}
+<p><i>https://www.statmethods.net/advstats/cart.html</i></p>
+<p><i>Vaata andmestikke `install.packages("rpart")`, `rpart::cu.summary`</i> ja <i>`rpart::kyphosis`.</i></p>
+</center>
+
+
+Probleeme klassikaliste otsustuspuu algoritmidega:  
+
+- Võivad kergesti **ülesobitada** ja jaguneda nii kaua, kuni puu vastab igale andmestiku nüansile. See tähendab aga ka, et need mudelid pole enam hästi üldistatavad mõne teise valimi jaoks. Selle vältimiseks peaks puid **"trimmima"** (ingl *pruning*).   
+  + Eeltrimmimise puhul tuleb enne puu kasvatamist teha mõned otsused, nt otsustada, et on mingi kindel arv lehti, mis puul võib lõpuks olla, või et igas lehes peab olema kindel hulk vaatlusi. Samuti võib otsustada, et lõpetame puu kasvatamise, kui mingi tingimus on saavutatud, nt kui kõik vaatlused igas lehes on samast klassist.   
+  + Järeltrimmimise puhul vaadatakse, kas mingid alamjagunemised puus annavad kokkuvõttes paremaid tulemusi, kui see, kui asendada need lihtsalt lehega, kus on arvulise uuritava tunnuse puhul tunnuse keskväärtus või kategoriaalse uuritava tunnuse puhul selle sagedasem tase/klass.   
+- Kalduvad sõlmedes **eelistama tunnuseid**, mis viiksid võimalikult suure puuni, st arvulisi tunnuseid ja selliseid kategoriaalseid tunnuseid, millel on rohkem tasemeid, sest need annavad justkui rohkem infot.  
+
+
+## Tingimuslik otsustuspuu
+
+R-is on puumudelite tegemiseks erinevate algoritmidega paketid `rpart`, `tree`, `maptree`, `party`, `partykit` jt.  
+
+Meie vaatame lähemalt natuke uuemat **tingimusliku otsustuspuu** algoritmi (*conditional inference tree*), mis kasutab sõlmedes ositamise alusena *p*-väärtusi (mitte nt mõnd informatsioonikriteeriumit, nagu Gini-indeks). Seletavate tunnuste valik ei ole kallutatud ja puud ei ole ülesobitamise hirmus vaja trimmida. Edaspidi viitame otsustuspuu nimetusega just tingimuslikule otsustuspuule.
+
+
+Kasutame siin paketti `partykit` ja selle funktsiooni `ctree()` (loe dokumentatsiooni [siit](https://cran.r-project.org/web/packages/partykit/vignettes/ctree.pdf) või [siit](https://cran.r-project.org/web/packages/partykit/partykit.pdf)). `partykit` on paketi `party` edasiarendus koos lisavõimalustega visualiseerimiseks.    
+
+```{r, message = F, warning = F}
+# Installi ja laadi pakett
+
+# install.packages("partykit")
+library(partykit)
+```
+
+## Näide 1: kategoriaalne uuritav tunnus
+
+Võtame sama andmestiku `ade_peal.csv`, millel tegime logistilise regressiooni mudelit ning mudeldame nüüd andmestikku otsustuspuude kaudu.
+
+```{r}
+ade_peal <- read.delim("data/ade_peal.csv", encoding = "UTF-8", stringsAsFactors = TRUE)
+ade <- ade_peal[ade_peal$cx == "ade",] # ainult alalütleva käände andmed
+peal <- ade_peal[ade_peal$cx == "peal",] # ainult peal-kaassõna andmed
+
+set.seed(1) # seeme juhusliku valiku tegemise korratavuseks
+juh_id <- sample(x = 1:nrow(peal), # võta ridadelt 1 kuni 1310 juhuslik valim,
+                 size = nrow(ade), # mille suurus oleks sama, mis ade-andmestikul
+                 replace = F) # ära korda ühtegi vaatlust
+
+peal_juhuvalim <- peal[juh_id,] # võta peal-andmestikust ainult juhuslikult valitud read
+dat <- droplevels(rbind(ade, peal_juhuvalim)) # liida kaks andmestikku ridupidi uuesti kokku
+```
+
+
+```{r}
+library(partykit)
+
+# Teeme puumudeli
+puu1 <- ctree(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + LM_pikkus_log + sõnajärg + murderühm, data = dat)
+
+# Visualiseerime mudelit
+plot(puu1)
+```
+
+Vaikimisi sätetega tehakse üsna keerukas puu. Saame paremini sõlmi eraldi vaadata.
+
+```{r}
+plot(puu1[3]) # 3. sõlmest (vasakul sõlm murderühm) edasi jagunemine 
+plot(puu1[2]) # 2. sõlmest (vasakul sõlm TR_liik) edasi jagunemine
+```
+
+
+Võime aga lihtsama tõlgendamise eesmärgil siin puud ka veidi trimmida. Sellega vähendame mudeli täpsust, aga samas vähendame ka ülesobitamise võimalust. Lisame funktsiooni argumendi `minbucket = 200`, millega ütleme, et igas lehes peab olema vähemalt 200 vaatlust (vaikimisi on `minbucket` 7). Ütleme ka argumendiga `alpha = 0.01`, et 1. tüüpi vea tegemise võimalus sõlmedes (tunnuse alusel jagatakse andmeid edasi, ehkki tegelikult on seletava ja uuritava tunnuse vaheline seos juhuslik) võiks olla ainult 1%, ehk olulisusnivoo α = 0,05 asemel kasutame nivood α = 0,01.
+
+```{r}
+puu2 <- ctree(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + LM_pikkus_log + sõnajärg + murderühm, 
+              data = dat,
+              control = ctree_control(minbucket = 200, alpha = 0.01))
+plot(puu2)
+```
+
+- Näeme, et kõige esimese jagunemise jaoks valitakse tunnus **`LM_mobiilsus`**, mis jagab vaatlused kahte klassi selle põhjal, kas kohasõna on liigutatav või staatiline. Enamasti on esimese jagunemise jaoks valitud tunnus üks uuritava tunnusega kõige tugevamalt seotud tunnustest, samas mitte tingimata ise see ainuke tugevasti seotud tunnus.    
+- Järgmise jagunemise jaoks on grupis "liigutatav" valitud tunnus **`TR_liik`** (asesõna ja verbifraas eristuvad *peal*-konstruktsiooni kasutuses liigutatavate kohasõnadega nimisõnafraasist) ning grupis "staatiline" tunnus **`murderühm`** (eristuvad vaatlused, mis tulevad Kesk- või Lõuna-murderühma kõnelejatelt, ja vaatlused, mis tulevad Ranniku- või Saarte-murderühma kõnelejatelt).  
+- Nendes gruppides enam rohkem jagunemisi ei ole. Kõige all on esitatud puu "lehed", mis vaikimisi kuvavad uuritava tunnuse klasside/tasemete esinemise tõenäosused. Näiteks vaatlustele, mille puhul kohasõna on liigutatav ja trajektori (selle, mis millegi peal asub) fraasiliik asesõna või verbifraas (`Node 3`), ennustatakse *peal*-konstruktsiooni esinemise tõenäosuseks ~0.8 ja mitte-esinemise tõenäosuseks ~0.2. Siia vaatluste gruppi kuulub 250 vaatlust (`n = 250`). Kuna *peal* esinemise tõenäosus on suurem kui selle mitte-esinemise tõenäosus, on nendele vaatlustele ennustatud `cx` **klass** "peal".
+ 
+
+Kokku on puul 7 sõlme (lehed kaasa arvatud). Nende info on mudelis listide kujul.
+
+```{r}
+# Kõik 7 jagunemist
+str(puu2, max.level = 1)
+
+# 1. sõlme info: LM_mobiilsus = "liigutatav" ja LM_mobiilsus = "staatiline"
+# See näitab terve puu jagunemisi
+puu2[[1]]
+
+# 7. sõlme info: paremalt 1. lõpuleht
+puu2[[7]]
+
+# 6. sõlme info: paremalt 2. lõpuleht
+puu2[[6]]
+```
+
+Iga sõlme/jagunemise kohta näeme niisiis 
+
+- selle numbrit,  
+- edasisi jagunemisi (kui on),  
+- lõpusõlmedesse/lehtedesse ennustatud klasse (vastavalt sellele, milline uuritava tunnuse tase esineb kõige suurema tõenäosusega),  
+- vaatluste arvu lõpusõlmedes/klassides (`n`)   
+- ning ennustatud klassi veaprotsenti (`err`) ehk nende vaatluste osakaalu, mis jäävad vähemusse. Ehk kui nt 6. sõlme (lõpulehe) ennustatud klass on "ade" ning err = 49.4%, on järelikult sellesse lehte jagatud tegelike vaatluste hulgas "peal" osakaal 0.494 ja "ade" osakaal seega 0.506. See leht ei ole niisiis kuigi stabiilne.
+
+Kui vaatame nüüd uuesti üldpilti, siis näeme, et liigutatavate kohtade hulgas (`LM_mobiilsus = "liigutatav"`) on *peal*-konstruktsiooni esinemise tõenäosus keskmiselt suurem kui staatiliste kohtade hulgas (`LM_mobiilsus = "staatiline"`), ent *peal*-konstruktsiooni esinemist mõjutavad kummaski rühmas veel muud tegurid, mis esinemise tõenäosust tõstavad või langetavad.
+
+Vaatame lähemalt näiteks 1) konteksti, kus *peal*-konstruktsiooni esinemise tõenäosus on kõige suurem (`Node 3`), ning 2) konteksti, kus see on kõige väiksem (`Node 7`).  
+
+**1) _peal_ esinemise tõenäosus on kõige suurem** (79.4%) kontekstis, kus  
+
+- kohasõna viitab liigutatavale objektile (nt *laud*),
+- trajektor on kas asesõna (*see*) või verbifraas (nt *tantsitakse*).  
+
+```{r}
+puu2[[3]]
+# näiteks "tantsitakse laua peal"
+```
+
+Vaatame, kas andmestikus nendele tunnustele vastavate vaatluste arv klapib.  
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+dat %>%
+  filter(LM_mobiilsus == "liigutatav",
+         TR_liik %in% c("asesõna", "verbifraas")) %>%
+  nrow()
+
+```
+
+
+**2) _peal_ esinemise tõenäosus on kõige väiksem** (24%) kontekstis, kus  
+
+- kohasõna viitab staatilisele objektile (nt *heinamaa*),  
+- kõneleja on Ranniku- või Saarte-murderühma kõneleja.  
+
+```{r}
+puu2[[7]]
+# näiteks "lehm on heinamaal"
+```
+
+Vaatame, kas andmestikus nendele tunnustele vastavate vaatluste arv klapib.  
+```{r}
+dat %>%
+  filter(LM_mobiilsus == "staatiline",
+         murderühm %in% c("Ranniku", "Saarte")) %>%
+  nrow()
+```
+
+
+Igas sõlmes võistleb jagunemise tekitamiseks omavahel mitu seletavat tunnust, mille hulgast valitakse *p*-väärtuse alusel ainult 1. Seda, mis tunnused veel sõlmedes kandideerisid, saab vaadata käsuga `sctest.constparty()`.
+
+```{r}
+# Kõikide sõlmede jagunemised
+# sctest.constparty(puu2)
+
+# 1. sõlme jagunemine
+sctest.constparty(puu2)[1]
+```
+
+
+Selline info võib olla informatiivne siis, kui sõlme valitud seletav tunnus oli ainult õige natuke parem kui mõni teine tunnus, mida jagunemiseks ei valitud.
+Esimese sõlme jagunemises näeme, et kõik tunnused peale trajektori liigi (!), kohafraasi pikkuse ja sõnajärje on uuritava tunnusega statistiliselt oluliselt seotud, ent kohasõna mobiilsuse *p*-väärtus oli mitu korda väiksem kui teiste tunnuste *p*-väärtused, seega valiti see esimese jagunemise aluseks. Mida allapoole puus aga liigume, seda väiksemaks jääb jagunemiseks sobivate tunnuste valik.  
+Seda, mis statistikut tunnustevahelise seose hindamiseks kasutatakse, sõltub sellest, mis tüüpi (arvuline/kategoriaalne) on seletav tunnus ja mis tüüpi on uuritav tunnus. Loe soovi korral rohkem nt [siit](https://stats.stackexchange.com/questions/144143/what-is-the-test-statistics-used-for-a-conditional-inference-regression-tree).
+
+Miks siis see `TR_liik` ikkagi siin puus oluliseks osutus, kui ta uuritava tunnuse varieerumisega 1. sõlmes individuaalselt üldse seotud ei ole ning osutus ebaoluliseks ka regressioonis?  
+
+```{r}
+sctest.constparty(puu2)[2]
+```
+
+Puumudelid töötavad n-ö lokaalselt, st iga järgmist olulist tunnust otsitakse eelnevate jagunemiste põhjal saadud gruppides, mitte enam tervest andmestikust. Regressioon jällegi hindab mõjusid n-ö globaalselt, fikseerides küll mingi kindla võrdluskonteksti, ent hinnates kõiki parameetreid sellesama konteksti suhtes.
+Nõnda on puumudelid peamõjude tuvastamisel pisut kehvemad kui regressioonimudelid (näiteks ei saa me siit kuskilt teada, et tegelikult on ka kohafraasi komplekssus tugevalt *peal*- ja käändekonstruktsiooni varieerumisega seotud). Samas võimaldavad need hõlpsamalt leida ning visualiseerida interaktsioone ning tähele tuleb siinjuures panna ka, milliste parameetritega puu oleme ehitanud. Kui lubame näiteks, et lõpusõlmes võib olla ka ainult 50 vaatlust, et minna arvesse, kui uuritava tunnuse suhtes teistest erinev vaatluste klass, leiame jooniselt jälle ka kohasõna komplekssuse, mis mängib olulisemat rolli Kesk- ja Lõuna-murderühma staatiliste kohasõnadega.  
+
+```{r}
+plot(ctree(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + LM_pikkus_log + sõnajärg + murderühm, 
+              data = dat,
+              control = ctree_control(minbucket = 50, alpha = 0.01)))
+```
+
+
+
+## Näide 2: arvuline uuritav tunnus
+
+Ehkki otsustuspuude kasutamine on tavalisem klassifitseerimisprobleemide puhul, saab seda küllalt edukalt kasutada ka regressiooniülesannetes, st mingi arvulise uuritava tunnuse keskväärtuse ennustamise jaoks.
+
+Uurime näiteks puumudelitega uuesti kõigepealt seda, kas sõna äratundmiseks kuluv aeg sõltub sõna pikkusest ja sagedusest.
+
+### Reaktsiooniaeg
+
+```{r}
+ldt <- read.csv("data/ldt.csv")
+puu3 <- ctree(Mean_RT ~ Length + Freq, 
+              data = ldt)
+plot(puu3)
+```
+
+Regressioonipuu visuaalne väljund (vaikimisi karpdiagramm) annab iga lõpliku sõlme kohta uuritava tunnuse ennustatud kvartiiljaotuse selles sõlmes.  
+
+Näeme, et reaktsiooniaega mõjutab eeskätt sõna pikkus: kui sõna on pikem kui 10 tähemärki, siis on reaktsiooniaeg pikem kui siis, kui sõna pikkus on kuni 10 tähemärki. Lühemate sõnade puhul jällegi tekib erinevus lühikeste (<= 7 tm) ja keskmise pikkusega (>7 tm) sõnade vahel. Nendes gruppides omakorda hakkab rolli mängima sõna sagedus: mõlemal juhul on sagedamate sõnade äratundmiseks kuluv aeg lühem.
+
+Mudelist saame kätte ka iga vaatluste grupi ennustatud keskväärtuse.
+```{r}
+# 9. sõlme info
+puu3[[9]]
+```
+
+Arvuliste uuritavate tunnustega näitab iga lehe *n* endiselt sellesse rühma kuuluvate vaatluste arvu, ent *err* sedapuhku jääkide ruutude summat, mis mäletatavasti oli seotud üksikute vaatluste erinevusega grupi keskmisest.  
+```{r}
+# 10 tähemärgist pikemate sõnade reaktsiooniajad
+(pikad_RT <- ldt[ldt$Length > 10,]$Mean_RT)
+
+# 10 tähemärgist pikemate sõnade keskmine reaktsiooniaeg
+(kesk <- mean(pikad_RT))
+
+# Jääkide ruutude summa
+sum((pikad_RT-kesk)^2)
+```
+
+Mida suurem on jääkide ruutude summa, seda erinevamad vaatlused sellesse lehte kuuluvad. Näiteks joonise järgi peaks olema sõlmes 8 jääkide ruutude summa väiksem, kuna karpdiagrammi kuju viitab sellele, et vaatlused on koondunud tihedamalt keskväärtuse ümber.
+
+```{r}
+puu3[[8]]
+```
+
+Konkreetne arv mõistagi sõltub sellest, mis ühikutes on uuritav tunnus. Näiteks kui teisendaksime reaktsiooniaja millisekunditest minutitesse, oleks sõlmede `err` väärtused peaaegu 0. 
+
+```{r}
+ldt %>%
+  mutate(Mean_RT_min = Mean_RT/1000/60) %>%
+  ctree(Mean_RT_min ~ Length + Freq, data = .)
+```
+
+
+### Häältesaak
+
+Vaatame nüüd uuesti ka 2019. a valimiste andmeid.
+
+```{r}
+load("data/kandidaadid.RData")
+puu4 <- ctree(haali_kokku ~ sugu + haridus + sodiaak, 
+              data = kandidaadid, 
+              subset = haridus != "Algharidus")
+plot(puu4)
+```
+
+Kuna häältesaak on tugevalt madalamate väärtuste poole kaldu, siis on parem ka puumudelis kasutada logaritmitud uuritavat tunnust, et vähendada erandlikult palju hääli saanud kandidaatide mõju.
+
+```{r}
+puu5 <- ctree(log(haali_kokku) ~ sugu + haridus + sodiaak, 
+              data = kandidaadid, 
+              subset = haridus != "Algharidus")
+plot(puu5)
+```
+
+Näeme, et kõrgharidusega kandidaatide seas statistiliselt olulist erinevust mees- ja naiskandidaatide häältesaagis ei olnud, aga kesk- ja põhiharidusega kandidaatide seas said naised keskmiselt pisut vähem hääli. Näeme siiski ka, et see erinevus ei ole väga suur. Kandidaadi tähtkuju häältesaagi puhul mingit rolli ei mängi.
+
+```{r}
+puu5
+```
+
+
+Teeme mõned seletavad tunnused juurde ja proovime neid ka mudelisse panna.  
+```{r}
+# Kas kandidaat kasutab meili?
+kandidaadid$kasutab_meili <- as.factor(ifelse(grepl("@", kandidaadid$kontaktandmed), "jah", "ei"))
+
+# Kui pikk on kandidaadi nimi
+kandidaadid$nime_pikkus <- nchar(kandidaadid$nimi)
+
+# Kui vana kandidaat on?
+kandidaadid$vanus <- 2019 -as.numeric(substr(kandidaadid$sunniaeg, 1, 4))
+
+puu6 <- ctree(log(haali_kokku) ~ sugu + haridus + sodiaak + kasutab_meili + 
+                nime_pikkus + vanus, 
+              data = kandidaadid, 
+              subset = haridus != "Algharidus")
+plot(puu6)
+```
+
+Ühelgi lisatud tunnusel ei ole kandidaadi saadud häälesaagiga puumudelis olulist seost.
+
+
+## Oluliste seoste puudumine
+
+Vaatame veel, mis saab siis, kui ühelgi seletaval tunnusel ei ole uuritava tunnuse seletamisel olulist rolli.
+
+```{r}
+load("data/kysimustik_2022.RData")
+
+# Kategoriaalne uuritav tunnus
+puu7 <- ctree(lemmikloom ~ ., data = kysimustik)
+plot(puu7)
+
+# Arvuline uuritav tunnus
+puu8 <- ctree(kaua_opid ~ kogemused_kvant + lemmikjook + kursuse_labimine, 
+              data = kysimustik)
+plot(puu8)
+```
+
+Sel juhul saame lihtsalt uuritava tunnuse jaotuse andmetes.
+
+
+## Visualiseerimine
+
+Pakett `partykit` pakub rea võimalusi otsustuspuude visualiseerimiseks. Vaatame neist paari.
+Põhilised elemendid, mida graafikul saame modifitseerida, on
+
+- `inner_panel`: puu sõlmed, kust jagatakse vaatlused mingi tunnuse alusel kaheks;  
+- `terminal_panel`: puu lehed ehk mudeli lõpusõlmed, kus on klassid, tõenäosused jms.
+
+Neid elemente saavad omakorda muuta erinevad `node`-funktsioonid, nt
+
+- `node_inner()`: üldine sisemiste sõlmede modifitseerimise funktsioon  
+- `node_terminal()`: üldine lõpusõlmede modifitseerimise funktsioon  
+- `node_barplot()`: tulpdiagrammesitus kategoriaalse uuritava tunnuse klassidele
+- `node_boxplot()`: karpdiagrammesitus arvulisele uuritavale tunnusele
+- jne (vt lähemalt [siit](https://www.rdocumentation.org/packages/partykit/versions/1.2-5/topics/panelfunctions))
+
+
+```{r}
+# Teeme visualiseerimise näitlikustamiseks 
+# ühe veidi rohkem trimmitud puu, kus 
+# alpha = 0.01 ja 
+# minimaalne vaatluste arv klassides on 200.
+puu9 <- ctree(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + LM_pikkus_log + sõnajärg + murderühm, 
+              data = dat, 
+              control = ctree_control(alpha = 0.01, 
+                                      minbucket = 200))
+
+plot(puu9)
+```
+
+
+```{r}
+# Kuva puu lehed ilma tulpdiagrammita
+# Tee tekst graafikul väiksemaks ja helehalliks
+# Kuva sisemised sõlmed ilma numbri ja p-väärtuseta
+plot(puu9, 
+     type = "simple", 
+     gp = gpar(fontsize = 9, 
+               col = "darkslategrey"), 
+     inner_panel = node_inner(obj = puu9, 
+                              id = FALSE, 
+                              pval = FALSE))
+
+
+# Tee tekst graafikul väiksemaks ja helehalliks
+# Kuva sisemised sõlmed ilma numbri ja p-väärtuseta
+# Kuva lõpulehed tulpdiagrammina, kus
+# tulbad on üksteise kõrval ja vastupidises järjekorras
+# ning värvitud oranžiks ja halliks.
+plot(puu9, 
+     gp = gpar(fontsize = 8, 
+               col = "darkslategrey"), 
+     inner_panel = node_inner(obj = puu9, 
+                              id = FALSE, 
+                              pval = FALSE), 
+     terminal_panel = node_barplot(obj = puu9, 
+                                   beside = TRUE, 
+                                   reverse = TRUE, 
+                                   fill = c("orange2", 
+                                            "grey35")))
+
+```
+
+
+
+Lisaks `partykit`-paketi enda võimalustele on üsna värskelt välja tulnud ka pakett `ggparty`, mis on tehtud `ggplot2` laiendusena `partykit` paketi objektide visualiseerimiseks. Kui rohkem huvi, tasub selle kohta uurida nt [siit](https://cran.r-project.org/web/packages/ggparty/vignettes/ggparty-graphic-partying.html) või [siit](https://luisdva.github.io/rstats/plotting-recursive-partitioning-trees/).
+
+```{r}
+# install.packages("ggparty")
+library(ggparty)
+
+ggparty(puu9) + 
+  geom_edge() + # "oksad"
+  geom_edge_label(max_length = 5) + # okste tekst lühendada
+  geom_node_label( # sõlmede tekst
+    ids = "inner", # puu sisemistele sõlmedele
+    line_list = list(
+      aes(label = splitvar), # ühel real tunnuse nimi
+      aes(label = paste("N = ", # teisel real kleebi kokku "N = " ja
+                        nodesize))), # vaatluste arv
+    line_gpar = list( # teksti graafilised parameetrid
+      list(size = 13), # tunnuse nime suurus
+      list(size = 10))) + # vaatluste arvu suurus
+  geom_node_label( # sõlmede tekst
+    ids = "terminal", # puu lõpusõlmedele ("lehtedele")
+    aes(label = paste0("Sõlm ", # kleebi kokku "Sõlm ",
+                       id, # sõlme number
+                       ", N = ", # tekst " , N = " ja
+                       nodesize)), # vaatluste arv
+    nudge_y = 0.015, # liiguta teksti natuke kõrgemale
+    nudge_x = 0.02) + # liiguta teksti natuke paremale
+  geom_node_plot( # lõpusõlmede ehk lehtede joonis
+    gglist = list( # siia sisse tulevad kõik ggploti tavalised funktsioonid
+      geom_bar(aes(x = "",
+                   fill = cx),
+               position = "fill",
+               color = "grey50"),
+      theme_minimal(),
+      scale_fill_manual(values = c("grey35",
+                                   "orange2")),
+      labs(x = "", y = ""),
+      scale_y_continuous(breaks = c(0,0.5,1))))
+```
+
+
+
+## Otsustuspuude headuse näitajad
+
+Nii nagu logistilises regressiooniski ennustab otsustuspuu sisuliselt igale teatud omadustega vaatlusele mingi uuritava tunnuse klassi (kat. uuritava tunnusega) või keskväärtuse (arv. uuritava tunnusega), mille põhjalt saab hinnata mudeli sobivust päris andmetega.
+
+### Kategoriaalne uuritav tunnus
+
+
+```{r, message = FALSE, cache = TRUE, warning = FALSE}
+# Visualiseerime puud
+plot(puu2, 
+     gp = gpar(fontsize = 8))
+```
+
+Nagu logistilises regressioonis, saame ka kategoriaalse uuritava tunnusega puumudeli puhul hinnata mudeli headust **klassifitseerimistäpsuse** abil.  
+
+```{r}
+# Mudeli ennustatud klassid
+# Puumudeli puhul saab funktsiooniga predict()
+# kategoriaalse uuritava tunnuse puhul
+# vaikimisi kohe ennustatud klassid, mitte tõenäosused.
+# Klassi kohal olev number näitab selle lehe/lõpusõlme
+# numbrit, kuhu vaatlus on klassifitseeritud.
+enn <- predict(puu2)
+head(enn)
+
+# Vaatluste tegelikud uuritava tunnuse klassid
+teg <- dat$cx
+head(teg)
+
+# Ennustatud ja tegelike klasside risttabel
+(t <- table(teg, enn))
+
+# Klassifitseerimistäpsus
+(klass <- (t["peal", "peal"]+t["ade", "ade"])/sum(t)) # klassifitseerimistäpsus
+# või ka sum(diag(t))/sum(t)
+```
+
+Meie puumudel ennustab ~63% juhtudest vaatlusele õige uuritava tunnuse klassi. See on pisut parem kui ilma seletavate tunnusteta kõikidele vaatlustele lihtsalt sagedamat või suvaliselt üht klassi ennustades (50%).
+
+```{r}
+prop.table(table(dat$cx))
+```
+
+Binaarse uuritava tunnuse puhul saab leida ka **C-indeksi/AUC**, mis hindab mudeli eristusvõimet mitte ennustatud klasside, vaid tõenäosuste põhjal. Kuna nüüd on meil vaja tõenäosusi, lisame funktsiooni `predict()` argumendi `type = "prob"`. See annab meile iga vaatluse jaoks ennustatud "ade" ja "peal" klassi tõenäosused (kokku annavad 1).
+
+```{r}
+head(predict(puu2, type = "prob"))
+```
+
+C-indeksi arvutamiseks vajame sellest tabelist ainult ühe klassi tõenäosusi ("peal").
+
+```{r, message = F, warning = F}
+library(Hmisc)
+
+# Leiame puumudeli ennustatud tõenäosused
+enn_probs <- predict(puu2, type = "prob")[,"peal"]
+head(enn_probs)
+
+# Teisendame uuritava tunnuse tegelikud väärtused
+# samuti tõenäosusteks 0 ("ei") ja 1 ("jah")
+teg_probs <- ifelse(dat$cx == "peal", 1, 0)
+# Sama, mis nt (dat[["cx"]] == "peal") + 0
+
+# C-indeks
+somers2(enn_probs, teg_probs)["C"]
+```
+
+Kuna meie C väärtus on veidi väiksem kui 0.7, võime paigutada mudeli eristusvõime kehva ja rahuldava piirimaile Ilmselt aitaks, kui oleksime oma *p*-väärtuste ja lõpusõlmede vaatluste arvuga natuke heldemad ega trimmiks puud nii rangelt. Teisalt võib see viia selleni, et meie puumudel hakkab ülesobitama ega tööta teistel valimitel eriti hästi.      
+
+Kui uuritaval tunnusel on rohkem kui 2 klassi, on AUC kasutamine pisut keerukam. On pakutud, et sellisel juhul võib leida eraldi AUC-väärtused kõikide tunnuse klasside paaride vahel ning seejärel võtta nende aritmeetiline keskmine. Selleks on R-is eraldi funktsiooon [`multiclass.roc()`](https://www.rdocumentation.org/packages/pROC/versions/1.16.1/topics/multiclass.roc) paketist `pROC`.
+
+
+### Arvuline uuritav tunnus
+
+Arvulise uuritava tunnusega mudeli jaoks vaatame uuesti reaktsiooniaegade andmestikku.  
+
+```{r}
+plot(puu3, gp = gpar(fontsize = 8))
+```
+
+Üheks variandiks hinnata mudeli ligikaudset headust on leida mudeli ennustatud keskväärtuste ja tegelike vaatluste väärtuste vaheline korrelatsioon.
+
+```{r}
+# Leia ennustatud reaktsiooniajad
+enn <- predict(puu3)
+head(enn)
+
+# Tegelikud reaktsiooniajad
+teg <- ldt$Mean_RT
+head(teg)
+
+# Ennustatud ja tegelike väärtuste korrelatsioon
+cor(enn, teg)
+```
+
+Vaikimisi kasutab funktsioon `cor()` mäletatavasti Pearsoni korrelatsioonikordajat, mille kasutamise eelduseks on see, et tunnused on normaaljaotusega ning tunnuste vahel on lineaarne seos. Ehkki puumudelite hindamise puhul seda sageli ignoreeritakse ning lähtutakse Pearsoni kordajast kui ligikaudsest näitajast, võiksime siiski selle kasutamise eeldused üle kontrollida.
+
+```{r message = F}
+# Lineaarne seos?
+ggplot(data = data.frame(enn, teg), 
+       aes(x = teg, y = enn)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth() +
+  ggtitle("Ennustatud ja tegelikud väärtused")
+
+# Normaaljaotusega tunnused?
+par(mfrow=c(1,2))
+hist(teg)
+hist(enn)
+
+shapiro.test(teg)
+shapiro.test(enn)
+
+# Aga logaritmides?
+hist(log(teg))
+hist(log(enn))
+
+shapiro.test(log(teg))
+shapiro.test(log(enn))
+```
+
+Kuna meil ei ole tegemist päris lineaarse seosega ja logaritmimine lähendab normaaljaotusele ainult tegelike reaktsiooniaegade jaotust, siis oleks hea kontrollida mudeli headuse hindamisel seost ka Spearmani korrelatsioonikordajaga.
+
+```{r}
+cor(enn, teg, method = "spearman")
+```
+
+Selleks, et puumudeli (ligikaudset) headust võiks võrrelda ka nt lineaarse regressioonimudeli omaga, võib korrelatsioonikordaja põhjal leida mudeli poolt seletatud varieerumise protsendi **R^2^**.
+
+```{r}
+cor(enn, teg, method = "pearson")^2
+```
+
+
+Teine variant jõuda sellesama Pearsoni-põhise R^2^-ni on lahutada 1st **koguruutude summa** (*Total Sum of Squares*) ja **jääkide ruutude summa** (*Residual Sum of Squares*) jagatis.
+```{r}
+# koguruutude summa (Total Sum of Squares): 
+# seletamata variatsioon andmetes
+TSS <- sum((teg - mean(teg))^2) 
+
+# jääkide ruutude summa (Residual Sum of Squares): 
+# seletamata variatsioon pärast seletavate tunnuste kasutamist
+RSS <- sum((teg - enn)^2)
+
+# R-ruut
+(R2 <- 1-RSS/TSS)
+```
+
+
+## Otsustuspuude valideerimine
+
+Tingimuslikud otsustuspuud on väga head tunnustevaheliste interaktsioonide visuaalseks vaatlemiseks, ent need ei ole kõige stabiilsemad mudelid ning võivad olla tundlikud sisendandmete suhtes. Kõikumised andmestikus võivad anda natuke teistsuguse lõpptulemuse, eriti väiksemate andmestike puhul. 
+
+Asendame näiteks esmalt oma 1444 vaatlusega andmestikus 300 juhuslikul vaatlusel staatilisuse liigutatavusega.
+
+```{r}
+# Teeme testimiseks ühe samasuguse lisaandmestiku
+dat_mod <- dat
+
+set.seed(1)
+# Juhuslikult valitud ridade indeksid konstruktsiooni asendamiseks
+mob <- sample(rownames(dat_mod[dat_mod$LM_mobiilsus == "staatiline",]), 300, replace = FALSE)
+
+# Asenda 300 vaatlusel "staatiline" "liigutatav"-aga
+dat_mod[mob,"LM_mobiilsus"] <- "liigutatav"
+
+# Tee uus puu
+puu_test <- ctree(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + 
+    LM_pikkus_log + sõnajärg + murderühm, 
+                  data = dat_mod, 
+                  control = ctree_control(minbucket = 200, 
+                                          alpha = 0.01))
+
+plot(puu_test, gp = gpar(fontsize = 8))
+```
+
+Nüüd saame puu, milles kõige tugevam seletav tunnus on hoopiski murderühm ja kohasõna liigutatavus saab oluliseks alles puu alumistes hargnemistes.  
+
+Selleks, et ühe puu põhjalt mitte liiga palju järeldada, tuleks mudelit valideerida. Valideerimiseks võib andmestiku jagada jällegi kaheks: treening- ja testandmeteks. Treeningandmetel tehtud mudeli ennustusi saab testida testandmetel funktsiooniga `predict(puumudel, newdata = testandmestik)` ning arvutada nende põhjalt mudeli täpsuse näitajad.
+
+Teeme seda siin ilma puud trimmimata (st jätame määramata argumendid `minbucket` ja `alpha`).  
+
+```{r}
+# Võtame treeningandmestikku 70% originaalandmestiku vaatlustest
+set.seed(100)
+trenn_id <- sample(1:nrow(dat), round(0.7*nrow(dat)), replace = FALSE)
+
+trenn <- dat[trenn_id,]
+test <- dat[-trenn_id,]
+
+puu_trenn <- ctree(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + LM_pikkus_log + sõnajärg + murderühm, 
+                   data = trenn)
+```
+
+
+Mudeli täpsus treeningandmestikul:  
+```{r}
+enn_trenn <- predict(puu_trenn)
+teg_trenn <- trenn$cx
+t_trenn <- table(teg_trenn, enn_trenn)
+# klassifitseerimistäpsus
+(klass_trenn <- (t_trenn["peal","peal"]+t_trenn["ade", "ade"])/sum(t_trenn))
+
+
+# library(Hmisc)
+enn_probs_trenn <- predict(puu_trenn, type = "prob")[,"peal"]
+teg_probs_trenn <- ifelse(trenn$cx == "peal", 1, 0)
+somers2(enn_probs_trenn, teg_probs_trenn)["C"]
+```
+
+Mudeli täpsus testandmestikul:  
+```{r}
+enn_test <- predict(puu_trenn, newdata = test)
+teg_test <- test$cx
+t_test <- table(teg_test, enn_test)
+# klassifitseerimistäpsus
+(klass_test <- (t_test["peal","peal"]+t_test["ade","ade"])/sum(t_test))
+
+
+# library(Hmisc)
+enn_probs <- predict(puu_trenn, newdata = test, type = "prob")[,"peal"]
+teg_probs <- ifelse(test$cx == "peal", 1, 0)
+somers2(enn_probs, teg_probs)["C"]
+```
+
+Antud juhul sobib mudel enam-vähem kirjeldama ka testandmestikku, ent kui headuse näitajad test- ja treeningandmestiku vahel on väga erinevad, siis võib proovida mudelit erinevate parameetrite abil trimmida (vt `control = ctree_control()`).
+
+
+Teine variant ennustustes kindlamaks saamiseks on kasutada nn **ansamblimeetodeid** (*ensemble methods*) nagu juhumetsad, millest räägime järgmises praktikumis.
+
+
+## Kordamisküsimused
+
+#### 1. Millised alljärgnevatest tunnusetüüpidest saavad olla otsustuspuu uuritavaks tunnuseks?
+
+a) Arvuline tunnus
+b) Kahe tasemega kategoriaalne tunnus
+c) Enam kui kahe tasemega kategoriaalne tunnus
+
+
+
+#### 2. Milline väide on õige?
+
+a) Mida erinevamaid väärtusi puu lehtedesse ennustatakse, seda parem otsustuspuu mudel.  
+b) Puu trimmimine teeb mudeli konkreetsetele andmetele sobivamaks.  
+c) Arvulise uuritava tunnuse puhul ennustatakse puu lehtedes uuritava tunnuse keskväärtust.  
+d) Kategoriaalse uuritava tunnuse puhul ennustatakse puu lehtedes tunnuse sagedaimat/tõenäolisemat klassi.  
+
+
+<br>
+<br>
+
+
+
+## Järgmisel korral
+
+- Juhumetsad (*random forests*)

@@ -1,0 +1,835 @@
+---
+title: "14. praktikum"
+knit: (function(input_file, encoding) {
+    out_dir <- 'docs';
+    rmarkdown::render(input_file,
+      encoding=encoding,
+      output_file=file.path(dirname(input_file), out_dir, '14-logistilised1.html'))})
+date: 13.04.2022
+output: 
+  html_document:
+    theme: flatly
+    highlight: tango
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Logistilise regressiooni mudelid {.tabset .tabset-pills}
+
+## Tänases praktikumis
+
+- Tõenäosus, šanss, šansisuhe    
+- Sissejuhatus logistilisse regressiooni  
+
+
+Logistiline regressioon seletab ühe tunnuse muutumist sõltuvalt teis(t)e tunnus(t)e muutumisest, kui **sõltuvaks muutujaks/uuritavaks tunnuseks on kategoriaalne tunnus**.  
+
+Logistilise regressiooni mudel näeb välja sarnane lineaarse regressioonimudeli omaga. Funktsiooni `lm()` asemel kasutame funktsiooni `glm()`, kuna logistiline regressioon on üks mudel nn **üldistatud lineaarsete mudelite** (_**g**eneralized **l**inear **m**odels_) perest. Üldistatud lineaarseid mudeleid seob omavahel eeskätt see, et need ei eelda, et mudeli jäägid oleksid normaaljaotusega, ning nad võimaldavad luua erinevate funktsioonide abil justkui lineaarse seose tunnuste vahel, mille vahel tegelikult lineaarset seost ei ole (sellest natuke hiljem).  
+
+Logistilise regressiooni mudelit saab teha näiteks nii:  
+
+```{r}
+load("data/kysimustik_2022.RData")
+
+# Kas vastus lemmikjoogi kohta sõltub lemmikloomast ja sünniaastast?
+m.jook <- glm(lemmikjook ~ lemmikloom + synniaasta, data = kysimustik, family = "binomial") 
+# family = "binomial" ütleb, et teeme nn binomiaalset (binaarse uuritava tunnusega) logistilist regressiooni
+summary(m.jook)
+```
+
+Kuna aga mudeli parameetrite hinnangud tulbas `Estimate` ei ole enam mingites andmestikus olevates originaalühikutes, vaid hindavad mingi sündmuse toimumise tõenäosust, tuleb enne mudelitest rääkimist teha kõigepealt selgeks mõisted tõenäosus, šanss ja šansisuhe/šansside suhe.
+
+
+## Tõenäosus
+
+Tõenäosus (*p*) on 0 ja 1 vahele jääv arv, mis iseloomustab sündmuse toimumise võimalikkust teatud tingimustel. Tõenäosus leitakse sündmuse toimumiseks soodsate/oodatud võimaluste arvu jagamisel kõikide võimaluste arvuga. 
+
+<center>
+![](imgs/dice.PNG){width=50%}
+<p><i>[https://www.mathswithmum.com/dice-probability/](https://www.mathswithmum.com/dice-probability/)</i></p>
+</center>
+
+Mis on tõenäosus, et veeretame täringul silmade arvu 3?
+
+- Täringul on 6 tahku. Igal tahul on erinev arv. Kõikide võimaluste arv on seega 6.
+- 3 silma on ainult ühel tahul, soodsate võimaluste arv on seega 1.
+- Tõenäosus, et veeretame täringul silmade arvu 3, on seega 1/6 = 0.1666667.
+- Tõenäosus, et me ei veereta täringul silmade arvu 3, on seega 5/6 = 0.8333333 ehk 1 - 0.1666667.
+
+Mis on tõenäosus, et veeretame täringul paarisarvu silmi?
+
+- Kõikide võimaluste arv on endiselt 6.
+- Paarisarv silmi (2, 4, 6) on kolmel tahul. Soodsate võimaluste arv on seega 3.
+- Tõenäosus, et veeretame täringul paarisarvu silmi, on seega 3/6 = 0.5.
+- Tõenäosus, et veeretame täringul paaritu arvu silmi, on samuti 3/6 = 0.5 ehk 1 - 0.5.
+
+
+
+Vaatame kursusel osalejate küsimustiku andmestikust tunnust `kogemused_kvant` ja oletame siinjuures, et saame kasutada empiirilisi andmeid seni kursusel osalenute kohta selleks, et ennustada tulevaste kursusel osalejate oskusi ja eelistusi.
+
+```{r}
+(tab <- table(kysimustik$kogemused_kvant))
+```
+
+Kogemuse omamise **tõenäosuse (*p*)** leidmiseks jagame kogemust omajate (= soodsate võimaluste) arvu kõikide vastajate arvuga ehk 44/(21+44).
+
+```{r}
+(p_Jah <- tab[["Jah"]]/sum(tab))
+```
+
+Kogemuse omamise tõenäosus andmestikus on ~0.68.  
+Kogemuse mitteomamise tõenäosus on 1 - kogemuse omamise tõenäosus ehk 1-0.6769231=0.3230769.  
+
+
+```{r}
+(p_Ei <- 1-p_Jah)
+# VÕI
+(p_Ei <- tab[["Ei"]]/sum(tab))
+```
+
+Kogemuse mitteomamise tõenäosus andmestikus on seega ~0.32.
+
+Sündmuse toimumise (kogemuse omamise) ja sündmuse mittetoimumise (kogemuse mitteomamise) tõenäosused annavad liites kokku 1.
+
+Kui võrdleksime tee- ja kohvijoomise tõenäosust, võiksime määrata, et sündmuse toimumine on teejoomine ja sündmuse mittetoimumine seega kohvijoomine. Teoreetiliselt ei ole oluline, et tegemist on just kohvijoomisega, vaid sisuliselt vaatleme tee joomise ja tee mittejoomise tõenäosusi.    
+
+```{r}
+(p_Tee <- prop.table(table(kysimustik$lemmikjook))["Tee"])
+(p_Kohv <- prop.table(table(kysimustik$lemmikjook))["Kohv"])
+```
+
+
+
+## Šanss
+
+**Šanss** (*odds*) *P = p/(1-p)* on sündmuse toimumise tõenäosuse ja sündmuse mittetoimumise tõenäosuse suhe ning näitab **mitu korda rohkem** sündmus toimub kui ei toimu.
+
+Kui kvantmeetodite kogemuse omamise tõenäosus on 0.68 ja mitteomamise tõenäosus on 0.32, siis **kogemuse omamise šanss** on 0.68/0.32 = ~ 2.125. 
+
+Kogemust omatakse eeldatavasti niisiis **2.125 korda rohkem** kui ei omata.  
+
+Kui teejoomise tõenäosus on 0.46 ja tee mittejoomise tõenäosus (= kohvijoomise tõenäosus) on 0.54, siis on **teejoomise šanss** 0.46/0.54 = 0.85.
+
+```{r}
+(P_Tee <- p_Tee/p_Kohv)
+```
+
+Teed juuakse **0.85 "korda rohkem"** kui ei jooda.  
+Teisisõnu: teed juuakse vähem kui kohvi. 
+
+Kui šanss oleks 1, siis on sündmuse toimumise ja mittetoimumise tõenäosused võrdsed (nt teed ja kohvi juuakse ühepalju).  
+
+
+Sama tulemuseni jõuame tegelikult siis, kui jagame tõenäosuste asemel absoluutarvud: kogemust omavate arv / kogemust mitteomavate arv või teejoojate arv / mitteteejoojate arv. Ehk kui tõenäosuse leidmiseks jagame soodsate võimaluste arvu kõikide võimaluste arvuga, siis šansi leidmiseks jagame soodsate võimaluste arvu ebasoodsate võimaluste arvuga.
+
+```{r}
+# Kogemuse omamise šanss
+44/21
+# Teejoomise šanss
+30/35
+```
+
+
+Šansid jäävad 0 ja lõpmatuse vahele.
+
+- Kui **P > 1**, siis sündmuse toimumise tõenäosus > sündmuse mittetoimumise tõenäosus.
+- Kui **P < 1**, siis sündmuse toimumise tõenäosus < sündmuse mittetoimumise tõenäosus.
+- Kui **P = 1**, siis on sündmuse toimumise ja mittetoimumise tõenäosused võrdsed (0.5).
+
+
+**Kontrollküsimus**: mida tähendab, kui sündmuse toimumise šanss on 0.5 (näiteks "šanss, et kroonaviirusesse nakatub naisterahvas on 0.5", kui võrreldakse meeste ja naiste nakatumist)?
+
+
+Šansse (***P***) saab lihtsalt teisendada tõenäosusteks (***p***) ja vastupidi. 
+Kui *P = p/(1-p)*, siis *p = P/(1+P)*.
+
+<table style="width:100%; border:1px solid">
+    <tr style="background-color: #dddddd; border:1px solid">
+        <th>**Tõenäosus (*p*)**</th>
+        <th>**Šanss (*P*)**</th>
+        <th>**Logit (log(*P*))**</th>
+    </tr>
+    <tr>
+        <td>0.001 (sündmus toimub väga väikese tõenäosusega)</td>
+        <td>0.001</td>
+        <td>-6.91</td>
+    </tr>
+    <tr>
+        <td>0.01</td>
+        <td>0.01</td>
+        <td>-4.6</td>
+    </tr>
+    <tr>
+        <td>0.05</td>
+        <td>0.05</td>
+        <td>-2.94</td>
+    </tr>
+    <tr>
+        <td>0.1</td>
+        <td>0.11</td>
+        <td>-2.2</td>
+    </tr>
+    <tr>
+        <td>**0.5** (sündmuse toimumise ja mittetoimumise tõenäosused on võrdsed)</td>
+        <td>**1**</td>
+        <td>**0**</td>
+    </tr>
+    <tr>
+        <td>0.75</td>
+        <td>3</td>
+        <td>1.1</td>
+    </tr>
+    <tr>
+        <td>0.9</td>
+        <td>9</td>
+        <td>2.2</td>
+    </tr>
+    <tr>
+        <td>0.95</td>
+        <td>19</td>
+        <td>2.94</td>
+    </tr>
+    <tr>
+        <td>0.99</td>
+        <td>99</td>
+        <td>4.6</td>
+    </tr>
+    <tr>
+        <td>0.999 (sündmus toimub väga suure tõenäosusega)</td>
+        <td>999</td>
+        <td>6.91</td>
+    </tr>
+</table> 
+
+<br>
+<br>
+
+**Logit** ehk *šansi logaritm* on - nagu nimigi ütleb - logaritmitud šanss. Selle kaudu hinnatakse logistilises regressioonis uuritava tunnuse ennustatud väärtust mingi seletavate tunnuste kombinatsiooni korral. Kui tõenäosus võib varieeruda nullist üheni [0,1] ja šanss nullist lõpmatuseni [0,∞], siis šansi logaritm miinus lõpmatusest pluss lõpmatuseni [-∞,∞]. See on oluline omadus logistilise regressiooni mudelis!
+
+
+### Võtame veel ühe näite.
+
+Oletame, et meil on kaks üliõpilast. Ühel on prillid ja teisel ei ole.
+
+Ilma prillideta üliõpilane A hilineb iga 10 loengu kohta 7 loengusse. See tähendab, et ainult 3 loengusse 10st jõuab üliõpilane õigel ajal.
+
+1. Mis on tema loengusse hilinemise tõenäosus?
+```{r}
+(p_A_hilineb <- 7/10)
+```
+
+2. Mis on tema loengusse mittehilinemise tõenäosus?
+```{r}
+(p_A_eihiline <- 1-p_A_hilineb)
+```
+
+3. Mis on tema loengusse hilinemise šanss?
+```{r}
+7/3
+# VÕI
+p_A_hilineb/p_A_eihiline
+```
+
+Prillideta üliõpilane A hilineb loengusse **2,3 korda** rohkem kui jõuab õigeks ajaks.
+
+
+Seevastu prillidega üliõpilane B hilineb iga 10 loengu kohta ainult 1 loengusse. See tähendab, et 9 loengusse 10st jõuab üliõpilane õigel ajal.
+
+1. Mis on tema loengusse hilinemise tõenäosus?
+```{r}
+(p_B_hilineb <- 1/10)
+```
+
+2. Mis on tema loengusse mittehilinemise tõenäosus?
+```{r}
+(p_B_eihiline <- 1-p_B_hilineb)
+```
+
+3. Mis on tema loengusse hilinemise šanss?
+```{r}
+1/9
+# VÕI
+p_B_hilineb/p_B_eihiline
+```
+
+Prillidega üliõpilane B hilineb loengusse **~0,1 korda rohkem** kui jõuab õigeks ajaks? Mida see tähendab?
+
+Kui korrutada mis tahes arvu läbi ühest väiksema arvuga, siis saame esialgsest arvust igal juhul väiksema väärtuse.
+
+```{r}
+5*0.9
+5*0.7
+5*0.5
+5*0.3
+5*0.1
+```
+
+Seega kui öelda, et üliõpilane jõuab õigeks ajaks 9 loengusse ja hilineb sellest **0.1111111 korda rohkem**, siis tähendab see tegelikult seda, et ta hilineb vähem kui ei hiline.
+
+```{r}
+9*0.1111111
+```
+
+Kui see arv ümardada, saame uuesti üliõpilase B loengusse hilinemise kordade arvu.
+
+Kui šanss on väiksem kui 1, siis sündmuse toimumise tõenäosus on väiksem kui sündmuse mittetoimumise tõenäosus. 
+Teisisõnu: kuna prillidega üliõpilase loengusse hilinemise šanss on 0.1, võime järeldada, et üliõpilase loengusse hilinemise tõenäosus on väiksem kui tõenäosus jõuda loengusse õigel ajal. 
+
+## Šansisuhe
+
+**Šansside suhte** (*odds ratio*) mõistet kasutatakse selleks, et võrrelda uuritava tunnuse mingi sündmuse toimumise šansse (*odds*) erinevates gruppides. St võrreldakse mõlemal juhul seda, et sündmus toimub (vastandina šansile, mis võrdleb toimumist mitte-toimumisega).
+
+- Kui šansisuhe on **> 1**, siis on 1. rühmas sündmuse toimumise šansid suuremad kui 2. rühmas.
+- Kui šansisuhe on **< 1**, siis on 1. rühmas sündmuse toimumise šansid väiksemad kui 2. rühmas.
+- Kui šansisuhe on **= 1**, siis on mõlemas rühmas šansid võrdsed.
+
+Kui tahame nüüd teada, **kui mitu korda** kõrgem on prillideta üliõpilase loengusse hilinemise šanss prillidega üliõpilase omast, peamegi leidma šansisuhte.
+
+Šansisuhe ei ole midagi muud kui kahe šansi jagatis.
+
+```{r}
+# Prillideta üliõpilase A
+# loengusse hilinemise šanss
+P_A <- p_A_hilineb/p_A_eihiline
+
+# Prillidega üliõpilase B
+# loengusse hilinemise šanss
+P_B <- p_B_hilineb/p_B_eihiline
+
+
+# Kahe üliõpilase loengusse hlinemise
+# šansside suhe
+P_A/P_B
+
+```
+
+Prillideta üliõpilase šanss loengusse hilineda on **21 korda kõrgem** kui prillidega üliõpilase šanss loengusse hilineda.
+
+![](imgs/props_odds_or.png)
+
+Aga miks need prillid üldse olulised on?
+
+Põhimõtteliselt oleksime siin võinud rääkida ka lihtsalt üliõpilasest A ja üliõpilasest B. Kui aga paneme selle näite nüüd logistilise regressiooni konteksti ja kujutame ette, et meil on hulga rohkem üliõpilasi, kelle kohta on andmed nende hilinemiste ja prillikandmise kohta, siis oleks loengusse hilinemine kategoriaalne uuritav tunnus väärtustega `hilineb` ja `ei_hiline` ning prillikandmine kategoriaalne seletav tunnus väärtustega `kannab` ja `ei_kanna`. 
+
+Logistilises regressioonis hinnatakse seletava tunnuse mõju uuritava tunnuse ühe taseme esinemise tõenäosusele šansi logaritmi kaudu. Teisisõnu saaksime hinnata logistilise regressiooni mudeliga seda, kuidas üliõpilaste loengusse **hilinemise šansi logaritm** muutub vastavalt sellele, kas tegemist on prillikandjaga või mitte. 
+
+Šansisuhet aga kasutame siis, kui tõlgendame logistilise regressiooni koefitsiente, mis näitavad, **mitu logaritmitud korda** šansisuhe seletava tunnuse muutumise korral muutub. 
+
+
+```{r}
+
+# Prillide kandmise mõju hilinemisele 1 loengu põhjal
+
+df <- data.frame(nimi = c("Mari", "Jüri", "Ants", "Toomas", "Kertu",
+                          "Peeter", "Sille", "Marianne", "Juhan", "Oskar",
+                          "Tuuli", "Reelika", "Annika", "Rauno", "Joosep",
+                          "Imre", "Sille", "Tauri", "Germo", "Norman"),
+                 prillid = c(rep("Jah", 10), rep("Ei", 10)),
+                 hilines = c(rep("Jah", 1), rep("Ei", 9), rep("Jah", 7), rep("Ei", 3)))
+
+logmod <- glm(factor(hilines) ~ prillid, 
+              data = df, 
+              family = "binomial")
+summary(logmod)
+
+```
+
+Näiteks kui
+
+- prillideta üliõpilaste grupis on tõenäosus loengusse hilineda 0,7 ja tõenäosus mitte hilineda 0,3 ning šanss hilineda seega 0,7/0,3=2,33333,    
+- prillidega üliõpilaste grupis on tõenäosus loengusse hilineda 0,1 ja tõenäosus mitte hilineda 0,9 ning šanss hilineda seega 0,1/0,9=0,11111,  
+- siis kui kasutaksime logistilist regressiooni selleks, et uurida, kuidas mõjutab loengusse hilinemist prillikandmine, kusjuures prillikandmise baastase on "Ei",  
+- näitab mudeli vabaliikme väärtus hilinemise **šansi logaritmi** prillideta üliõpilaste seas,  
+- koefitsient šansi muutust logaritmitud kordades (ehk **logaritmitud šansisuhet**), kui vaatame prillikandjate gruppi: mitu (logaritmitud) korda muutub šanss loengusse hilineda, kui muudame seletava tunnuse taset?    
+
+```{r}
+exp(logmod$coefficients[1]) # prillideta üliõpilaste loengusse hilinemise šanss
+exp(logmod$coefficients[2]) # prillideta üliõpilaste loengusse hilinemise šansi ja prillidega üliõpilaste loengusse hilinemise šansi suhe/jagatis (mitu korda "rohkem" hilinevad prillidega üliõpilased?)
+exp(logmod$coefficients[1] + logmod$coefficients[2])# prillidega üliõpilaste loengusse hilinemise šanss
+```
+
+<center>
+![](imgs/logreg_valjund.jpg){width=80%}
+</center>
+
+## Logistiline regressioon
+
+Logistilise regressiooni puhul on uuritav tunnus **kategoriaalne** ja selle varieerumist seletatakse ühe või enama kategoriaalse või arvulise tunnuse kaudu. Logistiline regressioon on olemuselt **klassifitseerimismeetod** ning seda saab kasutada, kui uurimisküsimust saab püstitada vähemalt ühel moel järgnevatest:   
+
+- milline oleks uuritava tunnuse ennustatav tase/klass seletavate tunnuste mingite väärtuste korral?  
+- milliste seletavate tunnuste väärtuste korral oleks uuritava tunnuse ennustatav klass X?  
+
+
+Või siis täpsemalt tõenäosuste kaudu:
+
+- milline oleks uuritava tunnuse taseme/klassi ennustatav tõenäosus seletavate tunnuste mingite väärtuste korral?  
+- milliste seletavate tunnuste väärtuste korral oleks uuritava tunnuse ennustatav klass tõenäolisemalt X?
+
+
+Sõltuvalt sellest, kas kategoriaalsel tunnusel on kaks või enam taset, nimetatakse analüüsimeetodit vastavalt kas **binomiaalseks** või **multinomiaalseks** logistiliseks regressiooniks. 
+
+- Millest sõltub see, kas vastaja eelistab kohvi või teed? <- Binomiaalne regressioon.
+- Millest sõltub see, kas vastajale meeldivad koerad, kaelkirjakud või molluskid? <- Multinomiaalne regressioon. 
+
+Siin räägime põhiliselt binomiaalsest logistilisest regressioonist, kus on kahe tasemega uuritav tunnus. See on aluseks ka multinomiaalsele regressioonile.  
+
+
+Kahe tasemega uuritava tunnuse saab taandada vastanduseks **sündmus toimub** vs. **sündmust ei toimu**, midagi esineb vs. midagi ei esine, midagi on vs. midagi ei ole jne. 
+See uuritava tunnuse tase, mis esindab sündmuse toimumist, saab väärtuseks arvu 1, ning teine, mis esindab sündmuse mittetoimumist, saab väärtuseks arvu 0. Vaikimisi määratakse sündmuse toimumiseks (1) see tunnuse tase, mis on tähestikulises järjekorras **tagapool**. Näiteks tee- ja kohvijoomise eelistuste uurimise puhul oleks teejoomine sündmuse toimumine ja kohvijoomine seega sündmuse mittetoimumine (võib ka vastupidi). 
+
+```{r}
+levels(kysimustik$lemmikjook)
+```
+
+
+
+Logistilise regressiooniga võib hinnata näiteks  
+
+- teejoojate (vs. kohvijoojate) esinemise tõenäosust kvantitatiivsete meetodite kursusel sõltuvalt nende lemmikloomast ja ülikoolis õpitud aastate arvust;  
+- grippi haigestumise (vs. mittehaigestumise) tõenäosust sõltuvalt vanusest, vaktsineeritusest ja tegevusalast;  
+- konstruktsiooni *laua peal* esinemise (vs. *laual* esinemise) tõenäosust sõltuvalt tegusõnast, millega konstruktsioon koos esineb, ja sõnade pikkusest;  
+- näidendi tragöödiaks klassifitseerimise (vs. komöödiaks klassifitseerimise) tõenäosust sõltuvalt sellest, kui sagedasti seal esineb sõna *vaenlane* ja kui palju tegelasi on keskmiselt korraga ühes stseenis koos.  
+
+
+### Lineaarne vs. logistiline regressioon
+
+<table style="width:100%; border:1px solid">
+    <tr style="background-color: #dddddd; border:1px solid">
+        <th style="width:50%">Lineaarne regressioon</th>
+        <th style="width:50%">Logistiline regressioon</th>
+    </tr>
+    <tr valign = "top", style="border:1px solid">
+        <td>Lineaarses regressioonis on meil mingi <b>arvuline uuritav tunnus</b>, mille <b>keskväärtust</b> hinnatakse seletavate tunnuste lineaarkombinatsiooni abil.</td>
+        <td>Logistilises regressioonis on meil kahe (või enama) tasemega <b>kategoriaalne uuritav tunnus</b>, mille <b>ühe taseme esinemise tõenäosuse keskväärtust</b> hinnatakse seletavate tunnuste lineaarkombinatsiooni abil. Seda tõenäosust väljendab <b>šansi logaritm</b>.</td>
+    </tr>
+    <tr valign = "top", style="border:1px solid">
+        <td>Lineaarse regressiooni mudel:<br>
+        <b>Y = A + B1 * x1 + B2 * x2 + ...</b></td>
+        <td>Logistilise regressiooni mudel:<br>
+        <b>log(p/(1-p)) = A + B1 * x1 + B2 * x2 + ...</b></td>
+    </tr>
+    <tr valign = "top", style="border:1px solid">
+        <td>kus 
+            <ul>
+                <li><b>A</b> on vabaliige, mis näitab <b>uuritava tunnuse väärtust</b> siis, kui arvuliste seletavate tunnuste väärtused on 0 ja/või kui kategoriaalsete seletavate tunnuste väärtused on nende baastaseme väärtused</li>
+                <li><b>x1</b> ja <b>x2</b> on seletavad tunnused</li>
+                <li><b>B1</b> ja <b>B2</b> on seletavate tunnuste regressioonikordajad, mis näitavad muutust <b>uuritavas tunnuses</b> siis, kui vastav arvuline seletav tunnus kasvab ühe ühiku võrra või kui muutub kategoriaalse seletava tunnuse tase/klass</li>
+                <li><b>Y</b> on uuritav tunnus</li>
+            </ul>
+        </td>
+        <td>kus  
+            <ul>
+                <li><b>A</b> on vabaliige, mis näitab <b>sündmuse toimumise šansi logaritmi</b>, siis, kui arvuliste seletavate tunnuste väärtused on 0 ja/või kui kategoriaalsete seletavate tunnuste väärtused on nende baastaseme väärtused</li>
+                <li><b>x1</b> ja <b>x2</b> on seletavad tunnused</li>
+                <li><b>B1</b> ja <b>B2</b> on seletavate tunnuste regressioonikordajad, mis näitavad logaritmitud muutust <b>šansis</b> (kordades) siis, kui vastav arvuline seletav tunnus kasvab ühe ühiku võrra või kui muutub kategoriaalse seletava tunnuse tase/klass</li>
+                <li><b>p</b> on ühe uuritava tunnuse taseme esinemise ehk sündmuse toimumise tõenäosus, <b>1-p</b> on teise taseme esinemise ehk sündmuse mittetoimumise tõenäosus ja <b>p/(1-p)</b> on sündmuse toimumise tõenäosuse ja sündmuse mittetoimumise tõenäosuse suhe ehk <b>šanss</b>. <br><b>log(p/(1-p))</b> on <b>šansi logaritm (ehk logit)</b></li>
+            </ul>
+        </td>
+    </tr>
+    <tr valign = "top", style="border:1px solid">
+        <td>Näiteks<br>
+        <b>Reaktsiooniaeg</b> = 762 + 19 * sõna pikkus + (-21) * log1p(sõna sagedus)</td>
+        <td>Näiteks<br>
+        <b>Loengusse hilinemise šansi logaritm</b> = 0.8473 + (-3.0445) * prillide kandmine (0/1)</td>
+    </tr>
+</table> 
+
+<br>
+<br>
+
+Logistilise regressiooni aluseks on tegelikult samuti lineaarse regressiooni mudel ning seetõttu tuleb kategoriaalse uuritava tunnuse tasemed kodeerida ümber 0-ks ja 1-ks. Kuna lineaarse regressiooni arvuline uuritav tunnus võib teoreetiliselt saada väärtusi miinus lõpmatusest pluss lõpmatuseni, kategoriaalsel tunnusel on aga skaala alati piiratud 0 ("sündmus ei toimu") ja 1-ga ("sündmus toimub"), tuleb regressioonivõrrandi vasak pool n-ö ära petta. Selleks kasutataksegi šansi logaritmi, kuna ka see võib muutuda miinus lõpmatusest pluss lõpmatuseni.
+
+```{r}
+# Tõenäosused 0.000001-st kuni 0.999999-ni
+p <- seq(0.000001,
+         0.999999,
+         0.000005)
+
+# Nende tõenäosuste šansid
+P <- p/(1-p)
+head(P)
+
+# Nende šansside logaritmid
+P_log <- log(P)
+head(P_log)
+
+
+plot(x = P_log, y = p, main = "Tõenäosuste ja šansi logaritmide suhe")
+```
+
+
+Mida lähemal 0-le on tõenäosus, seda lähemal miinus lõpmatusele on šansi logaritm. Mida lähemal 1-le on tõenäosus, seda lähemal pluss lõpmatusele on šansi logaritm. 
+
+
+Miks siis ikkagi logistiline regressioon ja mitte lineaarne? Näide.
+
+Lisame näiteks prillidega ja prillideta üliõpilaste tabelisse tulba, milles on nende keskmine hinne. Tahame teada, kas üliõpilase hilinemise tõenäosust saab ennustada nt tema keskmise hinde põhjal ülikoolis.  
+
+```{r}
+# Järjesta tabel tulba "hilines" järgi
+df <- df[order(df$hilines == "Jah"),]
+
+# Määra "seeme" juhuslike väärtuste korratavuseks
+set.seed(12)
+# Lisa tabelisse tulp keskmise hindega
+df$keskmine <- c(rnorm(12,4,0.4), rnorm(8,3,0.2))
+
+head(df)
+```
+
+
+```{r, warning = F, message = F}
+library(ggplot2)
+
+# Loome graafikule tegelikel vaatlustel
+# põhineva aluskihi, milles hilinemine
+# on konverteeritud tõenäosusteks 1 ja 0.
+
+(aluskiht <- ggplot(data = df, 
+                   aes(y = ifelse(hilines == "Jah", 1, 0),
+                       x = keskmine)) +
+  geom_point(alpha = 0.15) + # suurenda andmepunktide läbipaistvust
+  labs(x = "Keskmine hinne",
+       y = "Hilinemise tõenäosus",
+       title = "Lineaarne vs. logistiline regressioon",
+       color = "") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))) # joonda pealkiri keskele
+```
+
+Jooniselt näeme andmepunktide järgi, et nendel, kes hilinesid (y-teljel väärtus 1), oli üldjuhul madalam keskmine hinne kui neil, kes ei hilinenud (y-teljel väärtus 0).
+
+Tõmbame nüüd läbi punktide lineaarse regressioonijoone ja logistilise regressioonijoone.  
+
+```{r, warning=F, message = F}
+aluskiht +
+  geom_smooth(method = "lm",
+              aes(color = "lineaarne"), 
+              se = F) +
+  geom_smooth(method = "glm",
+              aes(color = "logistiline"),
+              method.args = list(family = "binomial"), 
+              se = F)
+```
+
+Kui käsitleda uuritava tunnuse tasemeid sündmuse toimumisena ja mittetoimumisena, saab sündmuse toimumine tõenäosuseks 1 ja mittetoimumine tõenäosuse 0. Nagu jooniselt näha, ennustaks tavaline lineaarne regressioon, et uuritava tunnuse väärtus (üliõpilane on hilineja või ei ole) võib ulatuda põhimõtteliselt miinus lõpmatusest kuni lõpmatuseni. Logistiline funktsioon aga sobitub andmetega oluliselt paremini ega välju kunagi 0 ja 1 vahemikust.
+
+### Logaritmimisest R-is
+
+Vaikimisi logaritmimise funktsioon R-is on `log(arv)`, mis teisendab arvud Euleri arvu *e* astmeteks. *e* väärtus on umbes 2,71828. See tähendab, et kasutatakse *naturaallogaritmi alusel e*.  
+
+```{r}
+(arvud <- c(1, 2, 8, 10, 100, 500, 1000))
+(arvud_log <- log(arvud))
+```
+Arvu 1 saame niisiis väljendada hoopis nii, et see on see arv, mis saadakse, kui võtta arv 2.71828 astmesse 0. Arv 100 on see arv, mis saadakse, kui võtta arv 2.71828 astmesse 4.6 jne.  
+
+```{r}
+2.71828^0
+2.71828^4.6051702 # tuleb natuke ümardada
+```
+R-is on naturaallogaritmi pöördtehte ehk alusega *e* astendamise jaoks funktsioon `exp(logaritmitud_arv)`.  
+
+```{r}
+exp(0)
+exp(4.6051702)
+```
+Logaritmimisel võib põhimõtteliselt aga ka ise valida, mille astmeteks arvusid teisendada, see ei pea tingimata olema Euleri arv. Näiteks võib arvusid teisendada kahe astmeteks, kümne astmeteks, saja astmeteks jne.
+
+```{r}
+log(100, base = 2) # ka funktsioon log2()
+log(100, base = 10) # ka funktsioon log10()
+log(100, base = 100)
+```
+Nende tagasiteisenduseks aga mingit eraldi funktsiooni ei ole ning sel juhul tuleb "käsitsi" astendada. 
+
+```{r}
+2^6.643856
+10^2
+100^1
+```
+
+
+```{r, echo = F}
+arvud <- c(1, 4, 8, 15, 30, 70, 100, 200, 500, 900, 2000, 10000)
+df <- data.frame(arv = arvud,
+                 log = log(arvud))
+ggplot(df, aes(x = arv, y = log)) +
+  geom_text(aes(label = arv)) +
+  labs(x = "arv", y = "arvu logaritm") +
+  scale_y_continuous(breaks = seq(0, 10, 2))
+
+```
+
+Nagu y-teljelt näeme, on logaritmitud sageduste erinevus palju väiksem kui logaritmimata sageduste erinevus. Näiteks arv 10000 on arvust 100 sada korda suurem (10000/100=100), aga logaritm arvust 10000 on arvu 100 logaritmist ainult kaks korda suurem (log(10000)/log(100)=2).
+
+
+
+## Ühe seletava tunnusega mudel
+
+Selleks, et natuke paremini aru saada, mis logistilise regressiooni mudelis täpselt ikkagi toimub, laadime andmestiku `ade_peal.RData`. See kujutab endast selle kursuse tarbeks veidi manipuleeritud varianti keeleteaduse andmestikust, mida on kasutatud artiklis Klavan, Jane, Maarja-Liisa Pilvik & Kristel Uiboaed. 2015. The Use of Multivariate Statistical Classification Models for Predicting Constructional Choice in Spoken, Non-Standard Varieties of Estonian. SKY Journal of Linguistics, 28, 187−224. Artiklis uuriti Eesti murrete korpuse andmete põhjal, millest sõltub see, kas kõneleja kasutab kohatähenduses alalütlevat käänet ehk *adessiivi* (nt *laual*) või kaassõna *peal* (nt *laua peal*).  Tegemist on niisiis binaarse (st kahe erineva väärtusega) uuritava tunnusega.  
+
+```{r}
+ade_peal <- read.delim("data/ade_peal.csv", encoding = "UTF-8", stringsAsFactors = TRUE)
+```
+
+Vaatame, mis tunnused andmestikus on:  
+
+```{r}
+summary(ade_peal)
+```
+
+Andmestikus on 2032 vaatlust ja 13 tunnust:  
+
+- **`TR_liik`**: trajektoriks (*Trajector*) nimetatakse siin kontekstis seda, **mis** millegi peal on (nt _**lamp** on laua peal_, _heinamaal **tantsiti**_). Eristatakse kolme erinevat kategooriat: *asesõna* (nt *mina*, *te*, *see*), nimisõnafraasi (nt *lamp*) ja verbifraasi (nt *tantsiti*).  
+- **`tegusõna`**: tegusõna, mis kohasuhtega seotud on, nt *olema*, kui miski *on* millegi peal, *käima*, kui miski *käib* millegi peal jne. Tegusõna võib ka puududa (`NA`).    
+- **`tegusõna_klass`**: tähendusklass, kuhu tegusõna kuulub. Eristatakse liikumisverbe (nt *käima*, *minema*, *sõitma*, *jooksma*), olemisverbe (nt *olema*), paiknemisverbe (nt *istuma*, *seisma*), tegevusverbe (nt *kündma*, *peksma*, *purjetama*) ja ilma tegusõnata lauseid.   
+- **`LM_lemma`**: orientiiriks ehk LM-iks (*Landmark*) nimetatakse siin kontekstis seda, **mille peal** miski on (nt _lamp on **laua** peal_, _**heinamaal** tantsiti_). Orientiiri lemma tähistab fraasi põhisõna sõnaraamatuvormi (nt lauses *Lehm ammub suurel laial heinamaal* on orientiiri fraas ise *suurel laial heinamaal*, aga lemma ainult *heinamaa*).  
+- **`LM_mobiilsus`**: tähistab seda, kas orientiiri (nt *laud* või *heinamaa*) saab hõlpsalt liigutada või mitte. Liigutatavad on näiteks *pall*, *õlg*, *surnuvanker*, *hobune*, staatilised jällegi näiteks *uulits*, *heinamaa*, *veranda*, *maantee*.  
+- **`LM_komplekssus`**: tähistab seda, kas orientiirifraasi peasõna on lihtsõna (nt *maa*) või liitsõna (nt *heina+maa*).  
+- **`LM_pikkus`**: tähistab orientiiri**fraasi** pikkust silpides. Näiteks fraasi *suu-rel lai-al hei-na-maal* pikkus on 7 silpi, fraasi *lau-a peal* pikkus on 2 silpi (kaassõna *peal* ei loeta silpide arvu sisse).  
+- **`LM_pikkus_log`**: tähistab orientiirifraasi logaritmitud pikkust silpides. Kasutatud on logaritmi alusel kaks (`log2()`), mis tähendab seda, et kõik pikkused on teisendatud arvu 2 astmeteks. Näiteks logaritm alusel 2 pikkusest 2 on 1 (`log2(2)`), sest `2^1=2`; logaritm alusel 2 pikkusest 8 on 3 (`log2(8)`), sest `2^3=8` jne. Logaritmimine vähendab erandlikult pikkade fraaside mõju ja teeb pikkuste jaotust natuke ühtlasemaks.  
+- **`sõnajärg`**: tähistab seda, kas lauses on eespool trajektor (nt *lehm on heinamaal*) või orientiir (nt *heinamaal on lehm*). Tunnuse väärtused on vastavalt tr_lm ja lm_tr.  
+- **`cx`**: tähistab meie **uuritavat tunnust** ehk konstruktsiooni. Uuritava tunnuse väärtused võivad olla kas *ade* (alalütlev kääne) või *peal* (kaassõna *peal*).  
+- **`murre`**: tähistab murdeala, mille kõnelejalt vaatlus on andmestikku sattunud. Sellel tunnusel on tervelt 10 erinevat väärtust: *Ida*, *Lääne*, *Ranna*, *Kirde*, *Saarte*, *Kesk*, *Tartu*, *Mulgi*, *Võru*, *Seto*.  
+- **`murderühm`**: siin on murdeid natuke suuremateks rühmadeks jagatud. Tartu, Võru, Seto ja Mulgi murre moodustavad rühma *Lõuna*, ranna- ja kirdemurre moodustavad rühma *Ranniku*, lääne-, kesk- ja idamurre moodustavad rühma *Kesk* ning saarte murre on jäetud siin eraldi rühmaks *Saarte*.   
+- **`kõneleja`**: see tunnus sisaldab unikaalset kõneleja koodi, mis moodustub failinimest, kihelkonna nimest ning kõneleja id-st faili sees (nt *KJ*, *KJ1*, *KJ2* vmt).  
+
+
+<center>
+![](imgs/kaart.png){width=80%}
+</center>
+
+### Andmete esmane kirjeldamine
+
+
+Andmestikus on meid huvitav tunnus tulbas nimega `cx`. Sellel kategoorial on kaks taset - *ade* ja *peal* - mis tähistavad vastavalt seda, kui kohasuhet väljendatakse käändega (*laual*), ja seda, kui kohasuhet väljendatakse kaassõnaga (*laua peal*).  
+
+```{r}
+(tab <- table(ade_peal$cx))
+```
+Siin on meil tasakaalustamata valim, mis tähendab seda, et kategooriaid ei esine andmestikus võrdselt: *peal*-konstruktsioon on oluliselt sagedam. 
+
+
+```{r}
+# Kaassõna esinemise tõenäosus
+(p_peal <- tab[["peal"]]/sum(tab)) # NB! väike p-täht
+
+# Kaassõna esinemise šanss
+(P_peal <- p_peal/(1-p_peal)) # NB! suur p-täht
+```
+```{r}
+# Kaassõna mitte-esinemise tõenäosus
+(p_ade <- tab[["ade"]]/sum(tab))
+
+# Kaassõna mitte-esinemise šanss
+(P_ade <- p_ade/(1-p_ade))
+```
+
+Ainult esinemissageduse põhjalt saame öelda ainult seda, et *peal*-konstruktsiooni kasutamine on murretes üldiselt tõenäolisem. Selleks aga, et kahe alternatiivse konstruktsiooni kasutuse kohta midagi sisukamat öelda, vajame lisaks mingeid teisi tunnuseid, mis võimalikku varieerumist murretes aitaksid seletada.
+
+Vaatame näiteks kõigepealt, kas kohakonstruktsiooni ja mõne teise kategoriaalse tunnuse vahel on mingi seos. Enne mudeldamist võime muidugi teha ükshaaval tunnustega tabeleid, jooniseid ja graafikuid.  
+
+```{r}
+prop.table(table(ade_peal$cx, ade_peal$LM_mobiilsus), 2)
+```
+```{r}
+ggplot(data = ade_peal) +
+  geom_bar(aes(x = LM_mobiilsus, fill = cx),
+           position = "fill")
+```
+
+```{r}
+(t <- chisq.test(ade_peal$cx, ade_peal$LM_mobiilsus))
+```
+```{r}
+vcd::assocstats(table(ade_peal$cx, ade_peal$LM_mobiilsus))$cramer
+```
+
+Ehkki *peal*-konstruktsioon tundub olevat nii liigutatavate kui ka staatiliste "kohtadega" (orientiiridega) sagedam, on staatiliste kohtade puhul kaassõna kasutus oluliselt vähem tõenäoline (nt *heinamaa peal*) kui liigutatavate kohtadega (nt *laua peal*).  
+
+
+
+### Logistilise regressiooni mudel
+
+Teeme nüüd lihtsal logistilise regressiooni mudeli, et kontrollida, kas kohakonstruktsiooni valikut saab seletada koha/orientiiri liigutatavuse kaudu. Tegelikkuses on mudeli kasutamine kasulikum muidugi pigem siis, kui vaadata mitme seletava tunnuse mõju uuritava tunnuse varieerumisele.
+
+```{r}
+# Logistilise regressiooni mudel
+m.glm <- glm(cx ~ LM_mobiilsus, data = ade_peal, family = "binomial")
+```
+
+Mudelist ülevaate saamiseks kasutame jällegi käsku `summary()`.
+
+```{r}
+summary(m.glm)
+```
+
+### Kuidas regressioonimudeli tulemust lugeda?
+
+Kuna regressioonimudel hindab uuritava tunnuse **ühe taseme esinemise tõenäosust** šansi logaritmi kaudu, siis peame kõigepealt vaatama, mida peab R sündmuse toimumiseks. Vaikimisi on selleks uuritava tunnuse tähestikulises järjekorras teine tase.
+
+```{r}
+levels(ade_peal$cx)
+contrasts(ade_peal$cx)
+```
+
+Sündmuse toimumine (1) on niisiis *peal*-konstruktsiooni kasutus ja mittetoimumine käändekonstruktsiooni kasutus. Mudel ennustab seega tõenäosust, et mingis seletavate tunnuste poolt määratud kontekstis kasutatakse kohasuhte väljendamiseks *peal*-kaassõna konstruktsiooni. Antud juhul siis tahame näha, kas *peal*-konstruktsiooni kasutus kasvab või kahaneb, kui vaatame liigutatavate kohtade (nt *laud*) asemel staatilisi kohti (nt *tänav*).
+
+Läheme nüüd uuesti mudeli väljundi juurde.
+
+**1. Vabaliikme `(Intercept)` koefitsient** `r m.glm$coefficients[[1]]` näitab *peal*-konstruktsiooni esinemise **šansi logaritmi** (*logit*) tunnuse `LM_mobiilsus` baastaseme korral ehk sellises kontekstis, kus kohasõna on mõtteliselt hõlpsasti liigutatav (nt *laud*). Logaritmitud šansi saab teisendada tavaliseks šansiks astendamise funktsiooniga `exp()`. Ehk kui logaritm alusel *e* (Euleri arv, umbes 2,71828) šansist on `r m.glm$coefficients[[1]]`, siis šanss on *e* astmes `r m.glm$coefficients[[1]]`. Vaikimisi kasutatakse niisiis naturaallogaritmi.    
+
+```{r}
+# peal-cx esinemise šanss kontekstis,
+# kus kohasõna referent on mobiilne, liigutatav
+(P_liigut <- exp(m.glm$coefficients[["(Intercept)"]]))
+# või
+(P_liigut <- exp(1.46353))
+```
+
+Šanss, et mingi liigutatava koha puhul kasutatakse kohasuhte väljendamiseks *peal*-konstruktsiooni, on ~4.32. Kuna šanss on > 1, võime tõlgendada seda ka nii, et **tõenäosus** *peal*-cx kasutamiseks liigutatavate kohtade korral on suurem kui 0.5. Selle tõenäosuse saab šansi kaudu ka välja arvutada.
+
+```{r}
+(p_liigut <- P_liigut/(1+P_liigut))
+```
+
+*peal*-cx esinemise tõenäosus juhul, kui kohasõna referent on liigutatav objekt, on `r p_liigut`.
+
+Kui seletav tunnus oleks arvuline, mitte kategoriaalne, väljendaks vabaliige sündmuse toimumise logaritmitud šanssi (hüpoteetilises) kontekstis, kus arvulise tunnuse väärtus oleks 0.  
+
+**2. Seletava tunnuse koefitsient** `r m.glm$coefficients[[2]]` näitab sündmuse toimumise šansi muutust **logaritmitud kordades** 1-ühikulise või ühe taseme muutuse puhul vastava seletava tunnuse väärtuses. Teisisõnu näitab see koefitsient **logaritmitud šansisuhet** ehk seda, mitu logaritmitud korda suurem on sündmuse toimumise šanss seletava tunnuse uue taseme korral. **Plussmärgiga koefitsiendid lisavad sündmuse toimumise šanssi (ühtlasi ka tõenäosust), miinusmärgiga vähendavad**. Negatiivne koefitsient siin viitab seega sellele, et sündmuse toimumise šanss väheneb seletava tunnuse taseme muutmisel.
+
+Astendame esmalt selle koefitsiendi, et saada logaritmitud kordade asemel tegeliku kordade arvu.
+```{r}
+# šansside suhe
+# (peal-cx esinemise šanss staatiliste kohtade puhul/
+# peal-cx esinemise šanss liigutatavate kohtade puhul)
+(P_suhe <- exp(m.glm$coefficients[["LM_mobiilsusstaatiline"]]))
+```
+
+Seletava tunnuse astendatud koefitsient näitab siin niisiis, et kontekstis, kus kohasõna on staatiline (<i>lehm ammub <b>heinamaa</b> peal</i>), on *peal*-cx kasutamine ~0.28 korda "suurem" kui kontekstis, kus kohasõna viitab liigutatavale referendile (<i>lehm ammub <b>laua</b> peal</i>). See, et šansisuhe on < 1, näitab, et see arv, **mida** suhte arvutamisel jagame, on väiksem kui see arv, **millega** jagame. Seega peaks uue seletava tunnuse taseme korral (`LM_mobiilsus = "staatiline"`) *peal*-cx kasutamise šanss olema väiksem kui baastaseme korral (`LM_mobiilsus = "liigutatav"`).
+
+Kontrollime, kas see on nii.  
+Teame juba *peal*-cx esinemise šanssi kontekstis, kus kohasõna viitab liigutatavale referendile. Selle saime kätte vabaliikme astendamise kaudu ja see on salvestatud objekti `P_liigut`.  
+Leiame nüüd *peal*-cx esinemise šansi kontekstis, kus kohasõna viitab staatilisele referendile. Selleks liidame vabaliikme ja seletava tunnuse koefitsiendid ning astendame tulemuse.
+
+```{r}
+# peal-cx esinemise šanss kontekstis,
+# kus kohasõna viitab staatilisele referendile
+(P_staat <- exp(m.glm$coefficients[["(Intercept)"]] + m.glm$coefficients[["LM_mobiilsusstaatiline"]]))
+```
+
+See, et šanss staatilise kohaga kontekstis on ikkagi > 1, näitab, et *peal*-konstruktsiooni kasutus on ka staatiliste kohtadega tõenäolisem, aga mitte enam nii palju tõenäolisem kui alalütleva käände kasutus. Näiteks *heinamaa peal* võiks esineda u 1.22 korda rohkem kui *heinamaal*, aga *laua peal* esineks tervelt 4.3 korda rohkem kui *laual*.  
+
+Nüüd leiame šansisuhte ja šansisuhte logaritmi.
+```{r}
+P_staat/P_liigut
+log(P_staat/P_liigut)
+```
+Saime sama tulemuse mis mudelist.
+
+Arvulise seletava tunnuse puhul väljendaks koefitsient sündmuse toimumise šansi muutust logaritmitud kordades 1-ühikulise muutuse puhul vastava seletava tunnuse väärtuses (nt kui silpide arv kasvab 1 silbi võrra, kui vanus kasvab 1 aasta võrra vmt).   
+
+Kui räägime ainult šansi **logaritmist**, võime lihtsalt öelda, et koefitsiendid tõstavad šansi logaritmi koefitsiendi väljendatud arvu **VÕRRA**.   
+Tavalisest **šansist** rääkides aga peame ütlema, et koefitsiendid tõstavad šanssi astendatud koefitsiendi väljendatud arv **KORDI**.
+
+Üldiselt pole šansi ja šansisuhte terminite kasutamine tingimata vajalik, kui rääkida lihtsalt uuritava tunnuse ühe väärtuse esinemise tõenäosuse suurenemisest või vähenemisest ja mitte arvutada seda, kui mitu korda mingid šansid parajasti muutuvad.
+
+Muutuse suuna ütlevad ära koefitsientide ees olevad märgid ning kui šansisuhe kasvab, kasvavad ka sündmuse toimumise šansid ja tõenäosus ja vastupidi.
+
+**3. Std. Error, z value ja Pr(>|z|)**. Waldi Z-statistiku (`z value`) väärtus on koefitsient (`Estimate`) jagatud standardveaga (`Std. Error`) ja see testib seda, kas koefitsient võiks olla vähemalt sama ekstreemse suurusega (s.t nullist erinev) ka populatsioonis, juhul kui kehtib nullhüpotees. Selle statistilist olulisust näitab *p*-väärtus (`Pr(>|z|)`), mis ütleb meile ühtlasi seda, kas antud tunnuse väärtus on statistiliselt oluliselt erinev tunnuse baastaseme väärtusest (uuritava tunnuse ennustamisel). Olulisuse nivoo on vaikimisi endiselt 0.05 ning tärnikeste tõlgendamine käib samamoodi nagu lineaarses regressioonis. Kui mingi koefitsiendi standardviga on väga suur, siis võib vastava parameetri hinnangut pidada ebamääraseks ning see võib isegi ainult natuke üksteisest erinevates valimites kõvasti varieeruda. Üldjuhul ei ole väga suure standardveaga koefitsiendid statistiliselt olulised ehk ei saa piisava kindlusega väita, et muutus mingis tunnuses tooks kaasa statistiliselt olulise muutuse sündmuse esinemise šanssides.   
+Selles mudelis on muutus seletavas tunnuses statistiliselt oluline, mis tähendab, et on oluline erinevus *peal*-konstruktsiooni kasutamise šanssides kontekstis, kus kohasõna viitab liigutatavale referendile, ja kontekstis, kus see viitab staatilisele referendile.  
+
+**4. _Null deviance_** näitab, kui suur oleks uuritava tunnuse varieerumise seletamata osa mudelis, kus ei ole ühtegi seletavat tunnust. Selle vabadusastmete arv (*degrees of freedom*) on enamasti vaatluste arv (*n*) - 1. **_Residual deviance_** näitab, kui suur on see seletamata osa, kui mudelis on need seletavad tunnused, mis seal parajasti on. Selle vabadusastmete arv sõltub mudelisse kaasatud tunnuste arvust ja kategoriaalsete tunnuste puhul ka tasemete arvust. Selles mudelis tuleb hinnata ainult ühe tunnuse ühe taseme mõju, seega lahutatakse n-st 1+1. Mida väiksem *Residual deviance* *Null Deviance*'ist on, seda parem, sest seda rohkem meie mudelisse lisatud seletavatel tunnustel uuritava tunnuse varieerumisega pistmist on.  
+
+**5. AIC ehk Akaike Information Criterion** võimaldab hinnata mudeli headust võrdluses teiste mudelitega (väiksem arv on parem). Arvestab valimi suuruse ja mudelisse kaasatud parameetrite arvuga (nagu *adjusted R2* lineaarse regressiooni mudelis). Kui näiteks teeksime veel ühe mudeli, kuhu lisaksime ühe seletava tunnuse juurde, aga AIC väärtus ei läheks oluliselt väiksemaks, siis ei pruugi meie lisatud tunnusel olla uuritava tunnuse varieerumise seletamisel kuigi suur roll ja peaksime valima lihtsama (= vähemate seletavate tunnustega) mudeli.  
+
+
+### Sõnastame uuesti tulemused
+
+- *peal*-konstruktsiooni kasutus on kohasuhete väljendamisel murretes üldiselt tõenäolisem kui käändekonstruktsiooni kasutus.  
+- *peal*-konstruktsiooni kasutamise šansid koos liigutatavatele objektidele viitavate kohasõnadega (nt *laud*) on `exp(1.46353)=4.321186`.  
+- *peal*-konstruktsiooni kasutamise šansid koos staatilistele objektidele viitavate kohasõnadega (nt *heinamaa*) "kasvavad" `exp(-1.25867)=0.2840315` **korda**. Teisisõnu: staatiliste kohtadega *peal*-konstruktsiooni kasutamise šansid kahanevad.  
+- *peal*-konstruktsiooni kasutamise šansid koos staatilistele objektidele viitavate kohasõnadega (nt *heinamaa*) on `exp(1.46353-1.25867)=1.227353`. Võiksime leida selle väärtuse põhimõtteliselt ka esialgsete (logaritmimata) šansside läbikorrutamisel (logaritmimata) šansisuhtega: `4.321186*0.2840315=1.227353`.    
+
+
+Järeldus: kohasõna referendi staatilisus vähendab *peal*-konstruktsiooni kasutamise tõenäosust.
+
+**Miks?** Eesti keeles on kaassõnu peetud palju konkreetsemate suhete väljendajateks kui käändeid, millel on sageli palju funktsioone ning mis seetõttu väljendavad sagedamini abstraktseid suhteid. On pakutud, et suured, staatilised kohad tunduvad kõnelejale abstraktsemad ja seetõttu sallivad käändekonstruktsioone rohkem kui väiksed, liigutatavad objektid, mis on kõnelejale konkreetsemad ning eelistavad seetõttu kaassõnakonstruktsioone (vt nt Bartens 1978; Ojutkangas 2008; Lestrade 2010).    
+
+## Kordamisküsimused
+
+#### 1. Töörahulolu küsitlusele vastas 40 meest, kellest 30 olid oma tööga rahul. Kui suur on šanss, et küsitlusele vastanud mees ei ole oma tööga rahul?
+
+a) 0.25  
+b) 0.33  
+c) 0.75  
+
+#### 2. Samale küsitlusele vastas 50 naist, kellest samuti 30 olid oma tööga rahul. Milline on meeste ja naiste tööga mitterahulolu šansside suhe?
+
+a) 0.5  
+b) 0.625  
+c) 1  
+d) 1.25  
+
+
+#### 3. Millises vahemikus võivad olla tõenäosused, šansid ja šansside suhe?
+
+a) tõenäosus [0,1], šanss [-∞,∞], šansside suhe [-∞,∞]  
+b) tõenäosus [0,1], šanss [0,∞], šansside suhe [0,∞]  
+c) tõenäosus [0,1], šanss [0,∞], šansside suhe [-∞,∞]  
+d) tõenäosus [-1,1], šanss [0,1], šansside suhe [0,∞]  
+
+#### 4. Millised on õiged väited?
+
+a) Logistilises regressioonis loeb R vaikimisi sündmuse toimumiseks uuritava tunnuse tähestiku järjekorras tagapool olevat taset.  
+b) Logistilises regressioonis loeb R vaikimisi sündmuse toimumiseks uuritava tunnuse tähestiku järjekorras eespool olevat taset.  
+c) Seletava tunnuse baastasemeks loeb R vaikimisi tähestiku järjekorras tagapool olevat taset.  
+d) Seletava tunnuse baastasemeks loeb R vaikimisi tähestiku järjekorras eespool olevat taset.  
+
+#### 5. Logistilise regressioonimudeli vabaliige väljendab
+
+a) uuritava tunnuse väärtust juhul, kui ühtegi seletavat tunnust mudelis ei ole.  
+b) uuritava tunnuse ennustatava taseme šanssi juhul, kui kõikide arvuliste seletavate tunnuste väärtused on 0 ja kõikide kategoriaalsete seletavate tunnuste väärtused on nende baastasemel.  
+c) uuritava tunnuse ennustatava taseme šansi logaritmi juhul, kui kõikide arvuliste seletavate tunnuste väärtused on 0 ja kõikide kategoriaalsete seletavate tunnuste väärtused on nende baastasemel.  
+d) logaritmitud tõenäosust, et uuritav tunnus on seletavate tunnuste kasvades ühe ühiku võrra oma baastasemel.  
+
+#### 6. Tehes andmestikust `ade_peal` logistilise regressiooni mudeli, kus *peal*-konstruktsiooni esinemist seletatakse orientiiri/kohasõna komplekssuse kaudu, saame alloleva väljundi. Seletava tunnuse baastase on lihtsõna ning hinnatav parameeter liitsõnalisus. Kas liitsõna kohasõnana (nt *karja+maa*) kasvatab või kahandab *peal*-konstruktsiooni kasutamise šansse?
+```{r, echo = F}
+m2.glm <- glm(cx ~ LM_komplekssus, data = ade_peal, family = "binomial")
+```
+```{r, echo = F}
+summary(m2.glm)
+```
+
+a) Ei ole võimalik öelda, sest enne peab kindlasti astendama.  
+b) Liitsõnaliste kohasõnadega on *peal*-konstruktsiooni kasutamise šanss väiksem kui lihtsõnaliste kohasõnadega, sest koefitsient on < 0.  
+c) Liitsõnaliste kohasõnadega on *peal*-konstruktsiooni kasutamise tõenäosus suurem kui lihtsõnaliste kohasõnadega, sest koefitsient on < 0.  
+d) Liitsõnaliste kohasõnadega on *peal*-konstruktsiooni kasutamise tõenäosus väiksem kui lihtsõnaliste kohasõnadega, sest koefitsient on < 1.  
+e) See ei ole statistiliselt oluline, nii et selle hindamisel ei ole mõtet.  
+
+#### 7. Kui suur on eelmises näites oleva mudeli põhjal šanss, et *peal*-konstruktsiooni kasutatakse koos liitsõnalise (LM_komplekssusliitsõna) kohasõnaga (nt *karjamaa peal*)?
+
+a) -1.133  
+b) 0.322  
+c) 0.658  
+d) 2.044  
+
+#### 8. cx ~ LM_mobiilsus mudeli AIC on 2501. cx ~ LM_komplekssus mudeli AIC on 2592. Kumb mudel seletab asesõna kasutamise varieerumist paremini?
+
+a) Ei ole võimalik öelda.  
+b) cx ~ LM_komplekssus, sest selle AIC on suurem.  
+c) cx ~ LM_mobiilsus, sest selle AIC on väiksem.  
+
+
+## Järgmisel korral
+
+- Mitme seletava tunnusega logistilise regressiooni mudel   
+- Interaktsioonidega logistilise regressiooni mudel   
+- Mudelite võrdlemine ja optimaalse mudeli leidmine  
+- Mudeli mõjude visualiseerimine  
+- (Mudeli headuse näitajad)

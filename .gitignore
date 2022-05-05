@@ -43,3 +43,6 @@ vignettes/*.pdf
 
 # Images
 /imgs/
+
+# Files
+*_files/

@@ -9,10 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Maarja-Liisa Pilvik, Pärtel Lippus (Tartu Ülikool)" />
 
 
-<title>Kvantitatiivse andmeanalüüsi alused humanitaarteadlastele ja rakendustarkvara R (FLFL.00.009)</title>
+<title>11. praktikum</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -237,6 +236,100 @@ window.buildTabsets = function(tocID) {
     </style>
 
 
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -347,60 +440,826 @@ pre code {
 
 
 
-<h1 class="title toc-ignore">Kvantitatiivse andmeanalüüsi alused
-humanitaarteadlastele ja rakendustarkvara R (FLFL.00.009)</h1>
-<h4 class="author">Maarja-Liisa Pilvik, Pärtel Lippus (Tartu
-Ülikool)</h4>
-<h4 class="date">kevad 2022</h4>
+<h1 class="title toc-ignore">11. praktikum</h1>
+<h4 class="date">4.04.2022</h4>
 
 </div>
 
 
+<div id="lineaarse-regressiooni-mudelid-1" class="section level1 tabset tabset-pills">
+<h1 class="tabset tabset-pills">Lineaarse regressiooni mudelid 1</h1>
+<div id="tänases-praktikumis" class="section level2">
+<h2>Tänases praktikumis</h2>
+<ul>
+<li>Lineaarne regressioon
+<ul>
+<li>arvulise seletava tunnusega</li>
+<li>kategoriaalse seletava tunnusega</li>
+</ul></li>
+<li>ANOVA</li>
+<li>Post-hoc test (Tukey HSD)</li>
+</ul>
+<p>Kasutame vanu tuttavaid andmestikke:</p>
+<ul>
+<li><code>ldt.csv</code></li>
+<li><code>DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt</code></li>
+<li><code>kandidaadid.RData</code></li>
+</ul>
+</div>
+<div id="seletav-tunnus-arvuline" class="section level2">
+<h2>Seletav tunnus arvuline</h2>
+<ul>
+<li>Lineaarne regressioon seletab ühe arvulise tunnuse muutumist
+sõltuvalt teis(t)e tunnus(t)e muutumisest.</li>
+<li>Kahe arvulise tunnuse puhul on see sama mis korrelatsioon, aga kui
+korrelatsiooni puhul me ei ütle, kumb tunnus teise muutuse põhjustab,
+siis lineaarses mudelis on <strong>sõltuv tunnus y</strong> ja
+<strong>seletav tunnus x</strong>.</li>
+<li>Sõltuv tunnus <strong>peab</strong> olema arvuline tunnus.</li>
+<li>Seletav tunnus võib olla arvuline või ka nominaalne kategoriaalne
+tunnus (faktor)</li>
+</ul>
+<div id="mudeli-eeldused" class="section level3">
+<h3>Mudeli eeldused</h3>
+<p>Nagu t-testigi puhul, on lineaarse regressiooni eelduseks, et</p>
+<ul>
+<li>mõõtmised on üksteisest sõltumatud</li>
+<li>mudeli jäägid on normaaljaotusega</li>
+<li>mudeli jääkide dispersioon on homoskedastiline</li>
+<li>mudeli jääkides ei ole autokorrelatsiooni <br><br></li>
+<li>ja lisaks, et seos on lineaarne</li>
+</ul>
+</div>
+<div id="näide-1-kas-lühemaid-sõnu-tuntakse-kiiremini-ära" class="section level3">
+<h3>Näide 1: Kas lühemaid sõnu tuntakse kiiremini ära?</h3>
+<p>Kasutame eelmisest korrast tuttavat Levshina õpiku andmestikku
+<code>ldt</code>. Eelmisel korral leidsime, et sõnade äratundmise
+keskmise reaktsiooniaja ja sõna pikkuse vahel oli positiivne
+korrelatsioon. Proovime sama lineaarse regressioonimudeliga testida.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>ldt <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;data/ldt.csv&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Mean_RT<span class="sc">~</span>Length, <span class="at">data=</span>ldt, <span class="at">xlab=</span><span class="st">&quot;Sõna pikkus (tähemärkides)&quot;</span>, <span class="at">ylab=</span><span class="st">&quot;Keskmine reaktsiooniaeg (ms)&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">lm</span>(Mean_RT<span class="sc">~</span>Length, <span class="at">data=</span>ldt, <span class="at">subset=</span>Mean_RT <span class="sc">&lt;</span> <span class="dv">1200</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(m, <span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="kas-mudeli-eeldused-on-täidetud" class="section level3">
+<h3>Kas mudeli eeldused on täidetud?</h3>
+<ul>
+<li>Iga sõna esineb andmestikus ühe korra, rühma keskmised
+reaktsiooniajad.</li>
+<li>Kas tunnused on normaaljaotusega? Testime!
+<ul>
+<li>sõna pikkus on</li>
+<li>reaktsiooniaeg on, kui logaritmida</li>
+<li>reaktsiooniaeg on normaaljaotusega ka siis, kui välja jätta 3 eriti
+suurt väärtust :)</li>
+</ul></li>
+</ul>
+</div>
+<div id="sõltuv-ja-seletav-tunnus" class="section level3">
+<h3>Sõltuv ja seletav tunnus</h3>
+<p>Kui korrelatsiooni puhul me testisime seda, kas kahe arvulise tunnuse
+vahel on seos, siis nüüd otsime põhjuslikku seost. Kahe arvulise tunnuse
+puhul on see tegelikult sõnastuslik küsimus, aga siiski tasuks läbi
+mõelda, kumb tunnus võiks põhjustada teise muutumist:</p>
+<ul>
+<li>Kas see, kui kiiresti sõna ära tuntakse võib mõjutada seda, mitu
+tähemärki sõnas on?</li>
+<li>Kas sõna pikkus võib mõjutada seda, kui kiiresti see ära
+tuntakse?</li>
+</ul>
+<p>Lineaarse mudeli saab käsuga <code>lm()</code>, mida kasutasime juba
+regressioonijoone joonistamiseks.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ldt2 <span class="ot">&lt;-</span> ldt[ldt<span class="sc">$</span>Mean_RT <span class="sc">&lt;</span> <span class="dv">1200</span>,]</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">lm</span>(Mean_RT<span class="sc">~</span>Length, <span class="at">data=</span>ldt2)</span></code></pre></div>
+<p>Mudelist ülevaate saamiseks kasutame käsku <code>summary()</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m)</span></code></pre></div>
+</div>
+<div id="kas-mudeli-jäägid-on-normaaljaotusega" class="section level3">
+<h3>Kas mudeli jäägid on normaaljaotusega?</h3>
+<p>Mudeli jäägid (<em>residuals</em>) on see osa uuritava tunnuse
+väärtustest, mis jääb mudelis kirjeldavate tunnuste kaudu seletamata.
+See on siis iga mõõtmispunkti kaugus regressioonijoonest. Lineaarse
+mudeli eeldus on, et mudeli jäägid on normaaljaotusega. Testime:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(<span class="fu">residuals</span>(m))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="672" /></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shapiro.test</span>(<span class="fu">residuals</span>(m))</span></code></pre></div>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  residuals(m)
+## W = 0.98574, p-value = 0.3801</code></pre>
+</div>
+</div>
+<div id="kuidas-mudelit-lugeda" class="section level2">
+<h2>Kuidas mudelit lugeda?</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = Mean_RT ~ Length, data = ldt2)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -259.247  -63.097   -0.795   53.320  224.378 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  547.379     35.950  15.226  &lt; 2e-16 ***
+## Length        30.242      4.261   7.096 2.29e-10 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 99.96 on 95 degrees of freedom
+## Multiple R-squared:  0.3465, Adjusted R-squared:  0.3396 
+## F-statistic: 50.36 on 1 and 95 DF,  p-value: 2.289e-10</code></pre>
 <ol style="list-style-type: decimal">
-<li><a href="kvanthum.github.io/1-sissejuhatus.html">Sissejuhatus</a><br />
-</li>
-<li><a href="kvanthum.github.io/2-andmetyybid_objektityybid.html">Andmetüübid
-ja objektitüübid</a><br />
-</li>
-<li><a href="kvanthum.github.io/3-arvulised.html">Arvulised andmed ja
-nende visualiseerimine</a><br />
-</li>
-<li><a href="kvanthum.github.io/4-kategoriaalsed.html">Kategoriaalsed
-andmed ja nende visualiseerimine</a><br />
-</li>
-<li><a href="kvanthum.github.io/5-ggplot2.html">Pakett
-<code>ggplot2</code> andmete visualiseerimiseks</a></li>
-<li><a href="kvanthum.github.io/6-tidyverse.html">Pakett
-<code>tidyverse</code> andmete töötlemiseks</a></li>
-<li><a href="kvanthum.github.io/7-valim_hypoteesid.html">Valim ja
-populatsioon. Hüpoteesid ja tõenäosus</a><br />
-</li>
-<li><a href="kvanthum.github.io/8-parameetrilised_mitteparameetrilised.html">Parameetrilised
-ja mitteparameetrilised testid</a></li>
-<li><a href="kvanthum.github.io/9-arvuliste_seosed.html">Arvuliste
-tunnuste vahelised seosed</a></li>
-<li><a href="kvanthum.github.io/10-mittearvuliste_seosed.html">Mittearvuliste
-tunnuste vahelised seosed</a><br />
-</li>
-<li><a href="kvanthum.github.io/11-lineaarsed1.html">Lineaarse
-regressiooni mudelid (1)</a></li>
-<li><a href="kvanthum.github.io/12-lineaarsed2.html">Lineaarse
-regressiooni mudelid (2)</a></li>
-<li><a href="kvanthum.github.io/13-lineaarsed_sega.html">Lineaarse
-regressiooni segamudelid</a></li>
-<li><a href="kvanthum.github.io/14-logistilised1.html">Logistilise
-regressiooni mudelid (1)</a><br />
-</li>
-<li><a href="kvanthum.github.io/15-logistilised2.html">Logistilise
-regressiooni mudelid (2)</a></li>
-<li><a href="kvanthum.github.io/16-logistilised3_sega.html">Logistilise
-regressiooni mudelid (3) ja logistilise regressiooni
-segamudelid</a><br />
-</li>
-<li><a href="kvanthum.github.io/17-otsustuspuud.html">Tingimuslikud
-otsustuspuud</a></li>
-<li><a href="kvanthum.github.io/18-juhumetsad.html">Juhumetsad</a></li>
+<li>Kas mudel on oluline? Mudeli väljundi viimane rida annab mudeli
+üldise p-väärtuse, mis on 2.289e-10 ehk 2.289 * 10 ^ -10 ehk
+0.0000000002289. Niisiis mudel on oluline tasemel p&lt;0.001***. See
+tähendab, et tõenäosus juhuslikult selline tulemus saada on väga väike
+ja võime hüljata 0-hüpoteesi.</li>
+<li>Kui hea mudel on? Eelviimane rida, R<sup>2</sup> (R-squared) näitab
+<strong>protsentuaalselt, kui palju uuritava tunnuse
+varieerumisest</strong> mudel kirjeldab. Antud juhul 0.3464513 ehk võib
+öelda, et sõna pikkus kirjeldab 35% reaktsiooniaja varieerumisest.</li>
+<li><em>Estimate</em> ehk mudeli prognoos näitab, kui palju kirjeldava
+tunnuse muutudes uuritav tunnus muutub.
+<ul>
+<li>Esimene rida <strong>(Intercept)</strong> ehk
+<strong>vabaliige</strong> ütleb, mis on <em>uuritava tunnuse
+väärtus</em> siis, <em>kui seletava tunnuse väärtus on 0</em>.</li>
+<li>Teine rida <strong>(slope)</strong> ehk <strong>kalle</strong>
+ütleb, kui palju <em>uuritav tunnus muutub</em> siis, <em>kui seletava
+tunnuse väärtus muutub ühe ühiku võrra</em>.</li>
+</ul></li>
 </ol>
+<p>Vaatame joonist uuesti natuke lähemalt:
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAAA5FBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZmYAZpAAZrY6AAA6AGY6OgA6Ojo6OmY6ZmY6ZpA6ZrY6kNtmAABmADpmOgBmOjpmZjpmZmZmZpBmZrZmkLZmkNtmtrZmtttmtv+QOgCQOjqQZgCQZjqQZmaQkDqQkGaQkJCQkLaQkNuQtraQttuQ2/+2ZgC2Zjq2kDq2kGa2kJC2tpC2tra2ttu225C229u22/+2///bkDrbkGbbtmbbtpDbtrbb25Db27bb29vb2//b/7bb/9vb////AAD/tmb/25D/27b/29v//7b//9v///+qVWJwAAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO3dDZvTRpfmcTk0u/QGlpdpQoZMwzxkdnaTmDAhS+I0GWAHmgbr+3+fVenFli3ZLpWk0jlH/991zTzYuG3dLXNHJZWkJAUABEmmXgAA0IoCBYBAFCgABKJAASAQBQoAgShQAAhEgQJAIAoUAAJRoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgChQAAlGgABCIAgWAQBQoAASiQAEgEAUKAIEoUAAIRIECQCAKFAACUaAAEIgCBYBAFCgABKJAASAQBQoAgShQAAhEgQJAIAoUAAJRoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgChQAAlGgABCIAgWAQBQoAASiQAEgEAUKAIEoUAAIRIECQCAKFAACUaAAEIgCBYBAFCgABKJAASAQBQoAgShQAAhEgQJAIAoUAAJRoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgChQAAlGgABCIAgWAQBQoAASiQAEgEAUKAIEoUAAIRIECQCAKFAACUaAAEIgCBYBAFCgABKJAASAQBQoAgShQAAhEgQJAIAoUAAJRoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgChQAAlGgABCIAgWAQBQoAASiQAEgEAUKAIEoUAAIRIECQCAKFAACUaAAEIgCBYBAFCgABKJAASAQBQoAgShQAAhEgQJAIAoUAAJRoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgChQAAlGgABCIAgWAQBQoAASiQAEgEAUKAIEoUAAIRIECQCAKFAACUaAAEIgCBYBAFCgABKJAASAQBQoAgShQAAhEgQJAIAoUAAJRoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgChQAAlGgABCIAgWAQBQoAASiQAEgEAUKAIEoUAAIRIECQCAKFAACUaAAEIgCBYBAFCgABKJAASAQBQoAgShQAAhEgQJAIAoUAAJRoAAQiAIFgEAUKAAEkl2gCQAMZviKGvwdBzT1bxuALYN31NBvOKQR/oMBYLYoUAAIRIECQCAKFAACUaAAEIgCBYBAFGjPF2pgKYylLIQRa8KiEP1rpEC1s5SFMGJRoO0oUO0sZSGMWBRoOwpUO0tZCCMWBdqOAtXOUhbCiEWBtqNAtbOUhTBiUaDtKFDtLGUhjFgUaDsKVDtLWQgjFgXajgLVzlIWwohFgbYztZIBTIwCBYBAFCgABKJAASAQBQoAgShQAAhEgQJAIAq05ws1sBTGUhbCiMU80HYUqHaWshBGLAq0HQWqnaUshBGLAm1HgWpnKQthxKJA21Gg2lnKQhixKNB2FKh2lrIQRiwKtB0Fqp2lLIQRiwJtR4FqZykLYcSiQNtRoNpZykIYsSjQdqZWMoCJUaAAEIgCBYBAFCgABKJAASAQBQoAgShQAAhEgfZ8oQaWwljKQhixmAfajgLVzlIWwohFgbajQLWzlIUwYlGg7ShQ7SxlIYxYFGg7ClQ7S1kIIxYF2o4C1c5SFsKIRYG2o0C1s5SFMGJRoO0oUO0sZSGMWBRoOwpUO0tZCCMWBdrO1EoG5EiSWf7jokAB9JWUpl6O6ChQAD0lyVwblAIF0E+SzLZBKVAA/VCgQ77j0G84pNmtX2B0STLfBqVAAfRCgQ76jkO/4ZCYB6qdpSxWwhgsUOaBtqNAtbOUxUoYCnTQjx76DYdEgWpnKYuZMAb70zcIBdrzhRpYCmMpi5kwxgq0SxQKtOcLNbAUxlIWO2FM9qdXGAq05ws1sBTGUhZDYUz2p08cCrTnCzWwFMZSFlNhjNQnBXoUBaqdpSyEEajjlAIKtOcLNbAUxlIWwghEgR5jZCUDGAcFegwFCuAICvQYChTAMRxEOoICBXAMBXoEBQrgKCbSH0aBAjiOUzkPokABnOJ/VgAF2vOFGlgKYykLYcTicnbtKFDtLGUhjFgUaDsKVDtLWQgjFgXajgLVzlIWwohFgbajQLWzlIUwYlGg7ShQ7SxlIYxYFGg7ClQ7W1lspZl6CQZEgbajQLWzk8XQRdxzdpKkFOghFKh2ZrJ0OmFQAzNBHAq0namVDMW6XbICUlGgwAQoUBsoUCC+jpfthVQUKBAfBWoEBQrER4EaQYEC8VGgRlCgwAToTxso0J4v1MBSGCtZ7BWolRwOF1Q+gALVzkwWa/1pZ81wS4/DKFDt7GQx1p921kyn/7RRoD1fqIGlMLay2Eoz9RIMo9vOFQq05ws1sBTGUhbCSESBHkGBamcpC2EE6jjBjALt+UINLIWxlIUwAlGgx1Cg2lnKQhiBKNBjKFDtLGUhjEAU6DFGVjKAkXAQ6QgKFMAxFOgRFCiAo5hIfxgFCuA4TuU8iAIFcIr/OWIUKAAEokABIBAF2vOFGlgKYykLYcTivvDtKFDtLGUhjFgUaDsKVDtLWQgjFgXajgLVzlIWwohFgbajQLWzlIUwYlGg7ShQ7SxlIYxYFGg7ClQ7S1kIIxYF2o4C1c5SFsKIRYG2o0C1s5SFMGJRoO1MrWQAE6NAASBQ3AK9Ok+S+38M/YkdUKAAhhOpQN9efPNnmq7yq+wtfhn6I/1RoACGE6dAs+bMCvTzeXGdUtelE6FAAQwnSoG65sxaM6/R9fMkeTj0Z3qjQAEMJ0qBZs15+2PqqvNOml7n/38iFCiA4cQo0Kw53X5Ptx36LE2/PppwDM88UO0sZSGMWKLmgZaVuSqOH1Gg0VkKYykLYcSSWKDL4vARBRqdpTCWshBGLIEFWu4CdSP52x+H/lBfFKh2lrIQRixRBeqq81m1C9RtiCo4iDTPb4MClrIQRixRBer2fp69+Uc+gl//mhQ9Og0KVDtLWQgjlqwCzcbwuYfFn6bbAKVA1bOUhTBiySrQ8hyk2x/zAn0w2R5QClQ/S1kII5awAk3Xb598/yb736//dP/N0B/YBQWqnaUshBFLWoFKYWolA5gYBQoAgShQAAgUZR7oj092fS9/Ij0AnBTpTKRdCk7lBICTKFAACBRlH+iX95XfXiSLy/cfhv5MbxQogOFEP4j0+Ty5HPoj/TEPVDtLWQgjluB5oKsp7ypHgWpnKQthxBJcoNkmKFdjistSGEtZCCOW4ALlgsrRWQpjKQthxPIM8+nTJFugFGhclsJYykIYsbzCfPo0RYEWt+icCAWqnaUshBHrdJhPudhD+PX7Xye9ICgFqp2lLIQR60SYT2V9TjORnqPwkVkKYykLYcQ6GmbTnqdeGPbRjWf2CnThNQ90fXU3e+3dy+1o/+3j7IlbT2vD/+YzJxeOAlXOUhbCiHU4TL09j74w+KMbz3x9fHfr3lOv85CKa9hnzsoDTu7OdLvbr81nPBbO0koGENWnvfoUezm7TX9WR5w2bbm5J13zGZ+Fo0ABBGm0Zyq1QN2g343016/O3a3o0vzYfXL/jzS9eV5di6T5jM/CUaAAumtrzzRSgb48+7nbe6w2nXhdbIK6Rn1Y/N2y+FPzGa+Fo0ABdNQculeiXFD5eccD77UfKP94vZ08Wp7J1HzGa+EoUACdHGzPNNpR+G7nHjVPl1/VNjKXeaU2n/FaOAoUgL9j7ZlG2wLtVqDXjTH5qnagqPhz8xmvhaNAAfg6UZ+R9oGuOp58lBfizYvzJLl1WXumVOzybD7jtXDMA1XOUhbCiJWHOdmeaayj8FfnydlP773fwg3JVzvzQK+3FVwePWo+07IoR+y/pvEzJ/6exzzu/Tj7H1HL0+tx8Zyc5en3OCmPG51+fTqwliH8j0++S+pODeizAv1u98WuI7cbo64um8+0LMoR+y9p/MiJv+cxj3s/TpJ+Py/qcf6coOXp9zgpNj49Xp8OrPmGXW8qV0yRd3M8v7xMyg3NbJSePPiQZgN793cPW5/xWTjfuMP/XiZkKYylLISRKd/wPDF0r0Qp0PqpnPnpnB4FWjbidXmmZq2En2wngu4+47NwFKhylrIQRqBq5O758hgF2tmydsnQZXmw6OaiKMvFZXWMvvmMx8JRoMpZykIYcarjRuoLdFOIm3JcX32blWU2aN8cf28+c3rhKFDlLGUhjCy1o+66C3TVVqAbzWnzI0yk1/9tqLEUxlIWwgiye7am7gKtTVHaKdNc87ymMU7lVP5t2GUpjKUshBFjf8qnkAItqq3rUfid+84V+0CzZ6q9omW7Np/xWjjNKxnACHwmzB8iskBda94p2vGqeLU7MF/s5rx5VPyp+YzXwlGgALYOX2jJy8gF+thNWeo6jam4nvLZm3IeaHU90PwCoVfn1eZm8xmfhaNAgTHUZpcr0q89U6H7QIuTi0rFQL22FVtuvzaf8Vk4hesYEG/vBB0derdnKrZA07+qe3rcL3d0VrM+k7M/0kPPeCycrjUMqLDd3pl6Sbz1HLpXpBZo+uWVm+R5783mibV7IrlXu7Z985nTC6dnBQNa1A9wTL0sfoZpz1RwgY5Dy/oFFFFWoIO1Zyr1KPxomAeqnaUsVsLs/uueemlO8Bu6654HOh4KVDtLWayEUVSgvhufUgo0cBrTaChQ7SxlsRJGS4F2GLoLKVBxKFDtLGWxEkZFgXY76k6BtqNAtbOUxUwY+f3Z9biR6AJd/wdD+KgshbGUxUwY4QUacNRdVIF+/eeP9Yc3FxxEistSGEtZ7ISR3J9Bk5ZkFeijO9sGXf/KUfjYLIWxlMVQGKn9GTrlU1iBJpsG/ezOv7xNgUZlKYylLKbCCKzPHmdriipQd+W5okHX7upKyYOPjZfEIm4dAxjFkOcbHRblIFLVoG/dFUI6XPpjeBQoMANx2jONdRQ+b9D/cpufix+G/rxOKFDAuoEutOQl0jSm/FbvmftTbn6mFChgXcT2TOPNA10vk+IK8tOiQAHD4rZnGnEi/Xp7n6MJUaCAVTGH7pWIZyK9FNCgFChg0wTtmUa4GtOWu3z8gqsxTcBSGEtZCDOYodtTyDzQxpVAuR7oFCyFsZSFMMMYYehOgR5YOApUOUtZCDOEUYbuQgpUHApUO0tZCNPbWDs+KdB2FKh2lrIQpp8Rj7pToO0oUO0sZSFMH6MedadA21Gg2lnKQphgY89ZElKg3JVTBEthLGUhTJgIE+Yp0AMLR4EqZykLYULEmDDvf3HT0SfSK72tMQB5opxu1OXy+uwDBaBCpHPdO93giQIFoECsc9273WKUAgUgXdRLJFOgB1GggDoxL7S0e7zb4+WDL0Drs3//+GTr+8muakeBArpEvkydyAL9fK5tGhOA6cW/RrLEAt3rTw0FaqppLYWxlMVUGP+pk/6muEayxAJdZUty76f3Gx+G/kxvFKh2lrIYCtNl6qSnaa4wL/EgUn5T46E/JgwFqp2lLHbCdJo66WOK2xuV5BXo10fJ4pehPyYMBaqdpSxmwnTrnNOma0+nU5ZIBTrdXs9dFKh2lrKYCTNogU7bnk6XKJGG8BTolCyFsZTFSpiOx12OmXDoXuefI9ZBpGdDf0wYClQ7S1mshBmsQGW0pyPkcnYlOWN4ClQ7S1mshBmmQOW0ZyqtQN1E0MXT90N/UgAKVDtLWayEGaBAhQzdN0QVqMYLKgPw1bc/hbVnFxQogH56Faji9kwjFShXpAcsC+5PaUP3zricHYC+wvpTe3umFCiAIXSuTwPtmVKgAOJTP3SvxCvQL68zv093IaYcBQpMzkp7pvEK9OrbcifJ4nLoD+yCeaDaWcoyzzAq2lPUPNDMy9o8hweT3dCDAtXPUpYZhtEydBdWoO6Kyov7r1//9sJdm37Ca4NSoNpZyjK7MEraM5VWoO6WHuV25zrbFp3w4qAUqHaWsswrjJ72TKUV6LK+1bmcchOUAtXOUpY5hVFVn8IKdP28vtGZbY7eln9b4xl9tXWxlGU2YZS1ZyqsQHevZjfpte0oUO0sZZlHGC3HjXboL9D11d0kSe5efjzyzDt3TGpx/48OC0eBKmcpyxzCaGzPVFiBhgzhN7eSP/vz0DPrzdyoh/4LR4EqZymL+TBK2zMVVqABB5E2bZlUbdt8ZrmdWurdoKa+sYBgKofunUUp0Ous46oTkK4SjxskuSuIulOW1q/Oy3ZsPuMa1Y3eb553mBhFgQIxzKI901gT6d3G4tlP79+//+3CayL9anPR5etyg7P1mTubd/fdBKVAgdHNpT3TWAW6fl47lfP0HtDaTtPyj81nstqsnrn2n1lKgQLjmsfQvRLpXPjtAZ+Fx6nw2ej8zqlnKFBAnlm1ZxrzcnZ///jkyZPvf/d5i+vGmLz5zO4Q3ve28xQoMJq5tWcq9ILKK9eIN26S563LQ8/kh5Xyg0gvfPYKVAtHgQKjmNfQvSKyQN3ofLUz67P5TNacF8neM41FOWL/NY2fOfH3POZx78fZ/4hanh6PP31y/ydnefo+9v/3nw7s0Bt2uCJ9VpffbYLkB9+bz6TFBCbn/qHtz+SI/Zc0fuTE3/OYx70fJ0m/nxf02BWopOXp+9j/3386sPY37HJF+uKYvRuef3HHnu60PZMWFxn1fs9q4XzjDv97mZClMJay2AhTDd1NhKlMWBStb9jpivR5XZbHjK7zWfLNZ4r+fPChrNTBDyLN89uggKUsFsJsd3waCLMlrEA7XpF+WTssVBxibz7jjiGVtXmVeF/fiQLVzlIW9WF2DhtpD7NDVoF2vSJ9/dSiYgJT85n65E//eUwUqHaWsugOs3/UXXWYfbIKtOvFRFaNumx95lnb608sHAWqnKUsmsM05ywpDtMkqkA7X86uvnW5amxvrhoF2jLN/tDCUaDKWcqiNkzrjE+tYVqJKtDOF1TOOnbzkmJ43nyGIbw/S2EsZdEZ5tCEeZVhDtFdoPkwv9hKvdpMBN17xu1XLVvz2v96dqZWMhDdLE83OkLkED5vx7M35RSlh+3PLOvTmLiYCDA62rNB5EGk+iT5qm0bz7h5TJVD53I2F44CBcJQny2iFGjnK9Kn6V/VHTw252k2ntleZNT/NskUKBCC9mwXZyJ91yvSZ768+jZJFvfeHHvm3eP8rpxvmj99cOEoUKCreV5oyUucAu14RfrxUKBAR7TnEZHOhe92RfrxUKBAF7TncbGuxtTpivTjYR6odpayiA/TaeguPUwnouaBCkKBamcpi/AwHTc+ZYfpiAJtR4FqZymL5DDdh+6Cw3RHgbajQLWzlEVsmKCj7lLDBBFSoMVpm/Up7znfq3cOjwLVzlIWoWECjxvJDBOIAj2wcBSocpaySAwTftRdYJhwUgr08d17f7r/v+seBRqVpTCWsogL02vCvLQwvQgpUHEoUO0sZREWpueUT1lheqJA21Gg2lnKIilM/wnzgsL0R4G2M7WSgWFwrnuwuAV6dV7c3X0yFCiwh/bsIVKBvr1wR96La3r6Xj1+DBQoUEd79hOnQFf51KXP51PPYqJAgS2G7r1Fuy981pp5jbor23neQnMEFChQoj0Pctt5vq8c/LObT63yi4C66ryzezvN6ChQwKE9D6tO+PF77eCf3nimvKlceR9Nn7tyjoYCBRi6H7U9ZdLrxYN/fOOZsjJXxfEjHQVqqmkthbGUZaIwI7WnlTVTP+nc59WDf37jmbIyl8XhIwo0OkthLGWZIsx4255W1ozUAi13gXrdF340FKh2lrLEDzPm0N3Imtm97pHHywdfgMYzrjqfVbtA/e4LPxYKVDtLWSKHGXnHp5E1I7BA3d7Pszf/yEfw61/97gs/EgpUO0tZYoYZ/7iRkTUjsUCrC4I+LP403QYoBaqepSzxwsQ46m5kzUgs0PIcpNsf8wKd8r7GFKh2lrJEChNpzpKVNSPvIFJm/fbJ92+y//36T/ffDP2BXVCg2lnKEiNMvCmfVtaMyAKVggLVzlKW8cPEnDBvZs2Im0i//vv177Vh+9+vnsqfxgRox+lGgaSdyrk7dV7HRHpANc7W7EPWxUQoUCAq2jOWkQv0ryeZ786Txf98UrlQcVtjQCvaM6KRC7S6hvIuBWciASoxdI9r7CH8sqU/z7giPTAG2jO2sQt0/fr169+yIfxPrzfeD/2JHVCgMIv2nED8g0iTYh6odpayDBlm+qH7PNfMBPNAp0SBamcpy3BhJm/PdK5rZoozkdb/If8o/Dy/DQpYyjJQGAntmc51zUQZwv/zzvbnzYWCaUzz/DYoYCnLEGGmH7pX5rlm4uwDvbNtUHdBUAo0LkthLGXpH0ZMe6ZzXTORDiJtGvTzhbuuHQUalaUwlrL0DCOpPdO5rplYt/QoGnT90s0DnfCCoBSodpay9AkjZ+hemeeaiXIQqWrQt+68pLM/hv7EDihQ7SxlCQ8jrj3Tua6ZOEfh8wb9L7f5ufhh6M/rhALVzlKWwDAS2zOd65qJdUX658VZnPen3PxMja1kzJHQ+pyrWPNA1+6k+MXl0B/WFQUKzWhPaaJNpHcNemfy85EoUKgl77gRYp6J9FJAg1KgUIr2FGncAv36+O7Wt24Qn//pnvx5oMDo/G8cQXtKNXKBPmq7nrKGM5GAkXnfuoyhu2AUKDAF35vn0p6icV/4ni/UwFIYK1nqGxSHX6WpPa2smZy0eaBSUKDaWcniUaDKhu5W1kyOAm1HgWpnJMvuPq22V+hqz9TMminILtD3HrOZ1ld3s2/W3cvtS98+zp649bT2s+9enCfJosvZTRSodkaynChQde2ZmlkzBWkFuv5tc1/4u9/6HETa3A+5uoVndTJosnhWvefL6vv30H/hKFDljGQ5VqDKhu4VI2umIKxAr3dvD3+6QGv3k79dXAjv+fbHywat3THZu0EpUO2MZDlcoDrbMzWzZgqyCvTzbn8m908N4d30J3fi/PrVedmOq+wJN3r/z4uqUt2butH7TVati198F44CVc5Klvb+VNueqZ01k5NVoCtXmr89Shb/8uqiNgY/bLXZSr0u+jLbAC1LMuvW4k/Za+4Ur176b4JSoNpZydJSoEqH7hUrayYnqkDd8Pth3nPP8t67fWoDdFuX1R+zzc2yLd0b5A283LzmelOlpxeOAlXOTJb9/tTdnqmhNeOIKtByo3GV16hr01OboLW6bFpGKVBgZPX+VN+esxWpQN2AvOw5j7q7PjImL99sbwh/eq9AuXAUKMQo61P50N2i1rllB145+Gc3nik7L9uudIP37NGpMXw+Sr9xkzxv7V2COT+q9Kx61+Ig0guPnQKbhaNAIQvtKU777LJDrx380xvPZKN2V6Blc242IQ9zo/NVGeLsz/rzSe2y9jcXSctrdhbliP3X8JjH8R9/+iRreXic1Hm9Ph1YyxsWuyu3PepRoN9tQtRenBforc3JSTfVjZYObX8mR+y/hMc8jvzYbXlKWh4eNyrD5/XpwFresNxdWeyrvD454i4mzbvh+Rd3stFmj+n6X+8+djNKyx9fbcL432tp+LhAEIbuQu0UqMerB//85lNud2XWell1fvPmPx+dPIiUF2h5FOl6f5a8G7jnP+/688GHsmQ5iARNaE+x9jZBT7988AVoee46H4lXp2OePG9oWdtIbRxiLydFuVIu/+LK/xLN3nFNNa2lMBaybOrTQpgNI2FEFmj69iLf/XnhN+Cun1rUnNJUzCetz4byn8dEgWqnPkt941N9mDojYWQWaOXtkydPP5x8i9XRAi2eWdVKc+V9LicFqp3uLHtTPnWH2WMkjOwC9VPfumyWY7NAj02831s4ClQ5zVkaez41h2mwEkbgQaSuPp9vd2puzqDfVOTmYD5DeE+WwqjN0nbcSG2YNlbCSC3QL69f//4xXZ8ewKd5I94pjiKVB4iySq0OPa02z1St2ThSf2ThKFDldGY5cLamzjAHmAnTpT+jFejVt0lefF8fnXncgcO149mbcoqS2/R0B/AXbga9O3Gz2Bhd1qcxcTWmYyyF0Zjl4KQljWEOshOmQ3/GKtDi7ht5gXptLW4nyZcTmm5qd5gv2rJ+z/lD53I2F44CVU5dlmNTPtWFOcZSGN/6jFWgrg/P/v28nAvqc+mPv6qL2FfnaW7PfH9QPrO9y4f3tUQoUPV0ZTlxoSVdYU6YZ5goBepG5JfZJqPbd+lzPVDny6ts0L+492b7THFXzvo9ON89zu/K+ab50wcXztJKhnCcb2RflAJd5sPuokC7XP54eBQoIqE9ZyFGgZa35SgLtLws6DQoUMTANZLnIkaBlhewKwvU43J246FAMT7acz4oUGBItOesMIQHBsPQfW5iHUR6uCnQFQeRYBPtOT9RCvS6nENf3pvT+/LHw2MeqHZis4S0p9gwIeYZJkqB5idi/uwKdP1rp3nvg6NAtZOZJXDoLjNMoHmGiXMmUv20S+8Lf4yBAtVOYpbgobvEMMHmGSbSufDb0y4Tn4uJjIYC1U5clj47PsWF6WOeYaJdzu7mhbseU6fzLkdAgWonK0vPo+6ywvQ0zzAiL6g8HgpUO0lZeh91lxSmt3mGiVKgL89+HvpTAlGg2onJMsScJTFhhjDPMBEn0ktAgWonJMswUz6FhBnGPMNEPJVTAgpUOwlZBpswLyHMYOYZJtIWqLoCBdpxtiZqouwDnfTszR0UKHqhPbEjzlH4q/Pk7Kf3Q39SAAoU4WhP7IsyhP/xyXf1my1zOTvow9AdLSIdREooUGhGe6JVlAJ9fHfXPQoUitCeOIQzkYBjGLrjCAq05ws1sBQmcpZx29PSiplpGAq05ws1sBQmZpbRtz0trZiZhqFAe75QA0thomWJMXS3tGJmGoYC7flCDSyFiZQlzo5PSytmpmEo0J4v1MBSmBhZoh02srRiZhqGAu35Qg0shRk9S8yj7pZWzEzDUKA9X6iBpTAjZ4k7Z8nSiplpGAq05ws1sBRmzCzRZ3xaWjEzDUOB9nyhBpbCjJZlignzllbMTMNQoABnayIQBYrZoz0RKl6Bfnn9+veP6frD0J/XCQWKPZzrjh5iFejVt8Vl7L4+Ovtj6E/sgALFDtoTvUQq0JfVdUC/PlC/k2MAACAASURBVJr0Dp0UKLZoT/QVp0BXWXue/ft5VqDr50ly++PQn+mNAkWJoTsGEKVAP58nyWW28emuRO8a9NnQn+mNAkWO9sQgohToMr8rZ1Gg6fWUt+hkHqh2Q2QR056WVsxMw0S6L7zb71kWaLY5Ot0YngLVrn8WMfVpa8XMNEykm8q56iwLtHw0DQpUu55ZBLVnamvFzDQMBdrzhRpYCtMni7jjRpZWzEzDMITv+UINLIUJzyKtPVNbK2amYWIdRHq4KdAVB5FisxQmMIvA9kxtrZiZholSoNflHHpXoNmfNUxjmue3QYGQLOKG7hVLK2amYaIUqJv7ufjZFej610THRPp5fhsU6J5FanumtlbMTMPEORPp66NkS8WpnPP8NijQMYvg9kxtrZiZhol0LrzbBi1xMRFEInboDjOiXc7u5oW7HtPi/puhP68TCnQ+aE+MjwsqwyLaE1FQoDCHoTtioUBhDO2JeGIV6N8/Ptn6Xv6ZSNCJ9kRUcQrUXRC0RsG58FCIoTtii3ZB5a4Fur66m73y7uV2Y/Xmxbk7jF+bBfWu8czJhWMeqHKHsyhsT0srZqZhohSou6PHvZ/eb3jcmXPTuWdV2V6Vzyx+KJ9Yv6wK+aH/wlGgyh3IorA9U1srZqZhIl2Nqev1Q2rbrOWJn9fbDdjyVPrl9hnvBqVAtWvLonbobmnFzDRMpOuBdjx90536ubjMqvfVedmO7hl3DtO7i2oPgOtYN3q/ed7h7FAKVLtmFq3tmdpaMTMNE/GCyh2sNvtJr8tN0FW1Keo2Zx+Wryk3a5f+m6AUqHZ7WRS3Z2prxcw0TKQhfLcCLa/AXPtj7ZnqgszLzTMdblNHgWpXz6J26F6xtGJmGibWQaROlwDNOnKvEbON2OoieFWXUqDeLIXZZtHenqmtFTPTMFEKtOsY/roxJq935LKo450hvG8/U6DalVkMtGdqa8XMNEy0ifSLp++93yLfYs2nfd66LJ6pV2q5PesOK+UHkV50uEQzBapdnsVGfdpaMTMNE+kgUreJ9G50vtqZB1rfCVCV6c1FsvOalkU5Yv81POYxj3nc/XE6sGEK9LvdF7cVaD6Bybl/aPszOWL/JTzmMY953P1xOrCWAn18d9e94wVaXL7eDc+/uJON3J7OtgJdbcIsLr0XbvC4iMjK0B1mxCjQrvICLXd5Xhez5FsK1PXngw9lyQ5+EAni0J6QR2KBusPqm8NCxSH2ZoG6/QLlU1f+13eiQJVSP+UTNkkt0M0x96Ium0fhWyY2+SwcBaoR7QmhRBboqq1A9+qyvk268j6XkwLVh/aEXOMWaDGDvvNR+HpdrqoB+96ZSK3H5U8vnG9cU02rOExj6K44SxNhpJqwKAYo0M/n25cU25vNc+FHHsLP89sgTcvGp9osbQgjlZQCfeymLHWdxpQ34p1ig/NqOxF092pM7mp2ZWte+1/PjgLVo33orjPLAYQRqjbT8+QrB//sAd7DtePZm3KK0vZ6oG/q1wNd1qcxcTGRYxSGOXjUXWGWwwgj0t5k+ROvHfzTh3iT7ST5g1ekr+8YOHQuZ3PhKFANjhw3UpflGMJItO0VrxcP/vGDvMtf1T09Nudp/tW4J9LzvY71WTgKVLzjR911ZTmBMALVj9b4vHrwzx/mbb68+jYry3tvts+03JXzcf7Mm+ZPH1w4ClS2kxPmFWU5jTACiSzQ9dsfn2x9773FODQKVDSPKZ9qsvggjDy7E4Y8Xj74ArQ8d7V7Y/iOd0gaEAUql9+EeR1ZPBFGHokFer27UBoKFHFxrjtkkFigbsbR/d/fb3wY+jO9UaAi0Z6QQmCBuglHvvcdHhkFKg/tCUnkHUTqfl/40VCgwjB0hzDyCrTzfeHHQ4GKQntCni79GWsfqO+56mOjQOWgPSFTh/6MU6DZGN73ZPWRUaBSUJ+Qy7c+Y80D/XyePJhs8nwd80BF6NGe4rL0QRiphFzObsPdw/2W/+XsRkOBTq/fcSNZWXoijFTCCvQzZyJNSVKYvkN3SVl6I4xUsgp0rz8p0MjEhBlgx6eYLEMgjFSyCnSZJIun71WdiTTPb8OohpnyKSPLQAgjlagCrd3CfWoU6FSGOuouIctgCCOVtAJVN5F+nt+GsQw4Z2nyLEOyFMZ/5o8GogpU45lIlr4ME4cZ9mxNVoxIXeaeayCqQHfu4T4tCjS2oSfMs2Ik6nT2owayCjTbBPW/bdGozKxgHTjdaB66XX/DlDjzQLMGPetw56LxzG79TogLLc0GBTrkOzae+fr47t38d6voTCT0RHvOR8drEJsSaxqTton06IP2nBUKdNB3bDxDgc4KQ/e5oUAHfceh33BIc1u98dGe80OBDvqOQ7/hkOa2eiOjPedpvv05SYGu/0P+EN7UFyFOmDhDd1aMQPYKVNQ80K//vDMJ9OZCwT5QK1+EXIwwsTY+WTESWetPYQX66M62Qde/qjiIZOab4IweJuLQnRUjkrH+lFagyaZBP19kv+XbFGhU44aJe9SdFSOUpfoUVqDr50nZoOuX7tc84e2RKNChxT5uxIqRap5hYp0LnzfoW3dl+rM/hv7EDijQQU1w1J0VI9U8w0Q7Fz65819u83Pxw9Cf1wkFOqBJJi2xYqSaZ5hI05hcgzr3p9z8TCnQ4Uw15ZMVI9U8w8SaB7peus3Py6E/rCsKdBATnq3JipFqnmGiTaR3DXpn8ouCmlrJU+F8I6AU8UyklwIalALti/YEtsYtUHcl0I1v3SCe64FqxoWWgB0jF+j+hey4nJ1itCewhwKFF9oTaOJydjiNoTvQigLFKbQncAAF2vOFGvQJI609WTFSzTNM3AK9Op/4ZCQKtBOBQ3dWjFTzDBOpQN/mF1Fe5YeQFr8M/ZH+KNAO5LVnyoqRa55h4hToKj/y/vl86oPwFKg3ke2ZsmLkmmeYKAXqmjNrzbxG3WVFHg79md4oUC8Ch+6Vea8YyeYZJkqBZs15+2NxTbs0vc7//0QoUA9y2zOd94qRbZ5hIl2R3u33dNuhz/LJ9Qom0s/z25AKb890xitGvHmGiXRPpPIQkutRCjQ67zCCh+6Vea4YDeYZJmKBLovDRxRodJ5h5LdnOs8Vo8M8w8Qr0HIXqBvJ357sqnamVvKgVLQnIEysu3I+q3aBug1RBQeR5kXB0B2QKNZR+LM3/8hH8Otfk6JHp0GBtqA9gUBRCrS6qt3D4k/TbYBSoA20JxAuzplIxTlItz/mBfrAYw9odRfPpNxeXe1eULScif/uRfa+iy4n11Ogu6hPoI9YtzV+++T7N9n/fv2n+2983qR+JeZDBbp+udenPgtHgW7RnkBPQi9nd52cLtBlY4vUY+Eo0BLHjYD+hBbo6vCRplW5E/VzeWm8m+cdLvDEPNCC3vY0vmIUm2eYeAX65fXr3z+m6w9eb7I8ONn+Oimnka42R6OW/pugFGiquT1T2ytGt3mGiVWgV98W17H7+ujM45jP+vmhyfZfH1Wbm8vNdmeHy5NQoNqH7mZXjHrzDBOpQF9WFwLdFuAx2asOVOJ2a5MC9bYNo7w9U7MrxoB5hol2QeXk7N/PyxM6T5/JmVXis5vH2Q/d+7nxF9VP7wzhfafmz7pA9bdnanPF2DDPMNEuqHyZbVa6/ZrFeZ0nrJLFd+UB9vv1ti0vjJdzM53yg0gvfCq5WrjZFqj2oXvF3IoxY55hohRocfp7UaBeA+7aDKWdclzVf/bmonrJ2YEDTskR+69p/MyJv9f2uGpPKcvD4/yBrOXp9bh4Ts7y9Hvs/+8/HVjzDcvtxrJAPa7G5LZSF08/FluXtSPseztQb8rTle4fervkiP2XNH7kxN9re/xJ2PLwuP5IyPL0epw/J2h5+j32//efDqz5huUVQMsC9bgeaK0oV/V70O1uvG4n1y8uvRfON+7wv5eJuC3PTX0aYGbFOISRasKiGKBAa+q7TOt7QIv+fPAhTb+4I/yDH0QywsiOT0AokUP4utV2DL/zk+4YUlmbV/53Sp5VgdKewMhiFGg5ebMs0FW369ldbwt0Vd8fWh/O+89jmk+BWjnqDkgWpUCvyzn0rkCvOwy4y58tW7Mxgn9W+7PnuZxzKVDaE4ghSoHmR9V/dgWaX5C+0y2RtkW5O/avF+g1BVpHewKRRCnQnct7epzKWdui3D0gX6tJhvDtGLoD8cQp0PoV5j0uJpJta5ZHhda1W9Atd6q3ukddmnep7/XsrBco7QnEFKlA3Zz4b93Wp9cF6fMh/2U2XH93se3G7MmdY+3L+jQmLiaSHmlPjWEOsZSFMGKJmgfa8OXUTtDiHkqF2mB+Z+dpfbfAoXM5mwtntkCPDd3VhTnCUhbCiCWkQL/+n7ZXXP2Pk333uTrPffHD5qn9+aPb3QL+R6WsFujxobuyMEdZykIYsaQU6KPmSZbrlz7T3tdv3dXsbj39sHkmK9D9gfq7x+e+ewWqhbNYoCd3fGoKc4qlLIQRS0yBNg6Pu2sodTiVc2AGC9TjuJGeMKdZykIYseQU6F6DXrm9m7cp0IH4HXVXEsaLpSyEEUtIgbpD5Ytagxa3cn/QZSL9sEwVqPeUTw1hfFnKQhixpBToboPml0D2v/bcCAwVaIcpn/LD+LOUhTBiiSnQvEF/Kf5YDN89bso5HisF2m3CvPAwnVjKQhix5BTopkHz4ft2VtI0TKxkztYEhIgwkb5o0Hz47nNP+FEZKFDaExAjQoG689kX/+t82qNHJe0FSnsCkkS5Iv2y452LxqO6QBm6A8LEuR7ocvKjRyXFBUp7AuLEuZiIa9BvKNBwtCcgUazrgS6nPIFzS2WBMnQHhIp1OTshDapwHugA7SknTH+WshBGLCHzQNd/v678dpEkZz8Vf/59sqPx2gp0mG1PIWEGYSkLYcQSUqA790La4mpMXgYbuksIMxRLWQgjFgV6YOH0FOiAOz6nDzMcS1lMhXH/sKdehuEIKdDaEL6OIfwpwx42muU3WwM7Yapto6mXYyhCClQcFQU6+FF3O99rW1nshNmOLqdekoFQoO0UFOgIc5bMfK1TW1nMhKnvn5t6WYZBgbaTXqDjzPi08q12LGUxE4YCHfKjh37DIYku0NEmzFv5VjuWslgJs3uIeOqlGQQF2k7w6uV0IyhlsEC9UaAi0J7QiwId9B2HfsMhyVy91Cc0o0AHfceh33BIAlcv7Qnt5tufFOi0uNASDKBAh3zHod9wSLLWL+0JG2bbnxToZGhP2DHX/qRA+74wTNyhu6XvtaUspsLYqk/mgbaTUaCxNz5n+c3WgDBSUaDtBBToBEN3S19tS1kIIxYF2m7qAp3mqLulr7alLIQRiwJtN22BTnXcyNJX21IWwohFgbab8Pcy4VF3S19tS1kIIxYF2m6q38u0E+YtfbUtZSGMWBRou2l+L1NP+bT01baUhTBiUaDtJvi9TN2eqa2vtqUshBGLAm0XeyVzrjtgGQU6ItoTsI0CHQvtCZhHgY6CoTswBxToCGhPYB4o0KHRnsBsUKCDYugOzAkF2vOFdVLb09IMPUtZCCMW80Dbjfh7kdqeqa2vtqUshBGLAm032u9FcH3a+mpbykIYsSjQduP8XkS3Z2rrq20pC2HEokDbjfB7UXDcyNJX21IWwohFgbYb/Pcivz1TW19tS1kIIxYF2m7Y34uK9kxtfbUtZSGMWBRouwF/LwqG7hVLX21LWQgjFgXabrDfi572TG19tS1lIYxYFGi7YeKqak8Ao6FAu1I0dAcwLgq0G9oTwIbQAl0/Tzae1f/i83n5eJXseOi5cL2WjvYEUCe0QL8+ai9Q9/xEBcrQHcAeoQV6nbQX6DKZqEBpTwANQgt0tTdyL103hvTli+94vm9YXNoTQBuhBbpMvvmz+WwxsN8v0KxVb3/0fN+A6V0Ghu6WZuhZykIYsZTPA10/b+vE7Nlv/q1RoFmrLn7xfePOvxf97Zna+mpbykIYsZQXaFaKLYNyN65vju2X3jtA066/FxPtmdr6alvKQhixlBdoNip/dvM4G67f+3n75OfzrCkbBdplAN/p92Jg6F6x9NW2lIUwYikv0FWy+K48vH6/asdiWL9foNmz/gP4zgXq/8aiWfpqW8pCGLGUF+iyNkGp2r5c5k25X6BHj8AnR+y/pvEzn47/PY953Ptx9j+ilqfX4+I5OcvT73Hi/fp0YAO8oTsPafE0K86bF0m1h/O6+MOqMbH+yAZocsT+Sxo/cuLveczj3o+TpN/Pi3qcPydoefo99v/3nw5sgDes1WJWmPmEpuypfFN0r0Cv/aeAFgt3aumqHZ/D/14mZCmMpSyEEcs7jMgCrXEbo64xq4mhuwXacQ/oqbi1w0bz/DYoYCkLYcQyU6CuMR/WenO3QD+fdzkEnx6Pa+eoO4A4xBdovu8zK8pypL5boKsuc0Cdg3FpTwCd6SjQvSuHVK3ZeQR/IK6hKZ8AIhJfoPkm54EC7TyCb41LewIII7JAayPz4oD8gQLtPIJvxqU9AQQTWaDZlmV5Mab1cm+e0s4+0GXXEfxeXIbuAPoQWaD5RPrLbHD+7iLZ68h6gbqrM7Vc9O7owtWWjvYE0I/IAnWboPvD9VK9QKvJ9V0Wrlq6U+05z0ltCljKQhixtM8D/XxR1ufih92/qBdo92NIZVyPofs8vw0KWMpCGLG0F2i6fuuuZnfr6Ye95/cKtNN5nGkR12voPs9vgwKWshBGLPUFOpLyMp8+Lxx/YaKxFMZSFsKIRYG2ywvU74VjL0pElsJYykIYsSjQdhP+XiZkKYylLIQRiwJtR4FqZykLYcSiQNtRoNpZykIYsSjQdhSodpayEEYsCrSdqZUMYGIUKAAEokABIBAFCgCBKFAACESBAkAgChQAAlGgPV+ogaUwlrIQRizmgbajQLWzlIUwYlGg7ShQ7SxlIYxYFGg7ClQ7S1kIIxYF2o4C1c5SFsKIRYG2o0C1s5SFMGJRoO0oUO0sZSGMWBRoOwpUO0tZCCMWBdqOAtXOUhbCiEWBtjO1kgFMjAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgCrTnCzWwFMZSFsKIxTzQdhSodpayEEYsCrQdBaqdpSyEEYsCbUeBamcpC2HEokDbUaDaWcpCGLEo0HYUqHaWshBGLAq0HQWqnaUshBGLAm1HgWpnKQthxKJA21Gg2lnKQhixKNB2plYygIlRoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESB9nyhBpbCWMpCGLGYB9qOAtXOUhbCiEWBtqNAtbOUhTBiUaDtKFDtLGUhjFgUaDsKVDtLWQgjFgXajgLVzlIWwohFgbajQLWzlIUwYlGg7RIAGNDgHTX0Gw5p6l82AFsG76ih33AS8xyPKGApC2HEmjCMjV8j3wahLGUhjFgUaE98G4SylIUwYlGgPfFtEMpSFsKIRYH2xLdBKEtZCCMWBdoT3wahLGUhjFgUaE98G4SylIUwYlGgPfFtEMpSFsKIRYH2xLdBKEtZCCMWBdoT3wahLGUhjFgUaE98G4SylIUwYlGgPfFtEMpSFsKIRYH2xLdBKEtZCCMWBdoT3wahLGUhjFgUaE98G4SylIUwYlGgPfFtEMpSFsKIRYH2xLdBKEtZCCMWBdoT3wahLGUhjFgUaE98G4SylIUwYlGgAKAPBQoAgShQAAhEgQJAIAoUAAJRoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgChQAAlGgABCIAgWAQBQoAASiQAEgEAUKAIEoUAAIRIECQCAKFAACUaAAEIgCBYBAFCgABKJAASAQBQoAgShQAAhkoEBvXpwnyeL+H1Mvx2C+Pvrmz6mXYQDrV3eTJLllZMW8fezCPP049XIM5/N58mzqZehv/TzZmCKO/gK9Oi9+e4sfpl6SgWRfCQsFWq2XJHkw9aL0t/lnujDQOYWvj6ZpnIG5GBRoD9fT/v6Gt14mFgq0tl6SO1MvTF9Tb+aMYWkjS/17RoF25/4DdJYNEt9dmKid8t+q/iT5enmTFitm8cvUi9PTKsvgRu//mYW5bWMUf23kPwariVNoL9BV9Y12xfNw6qXp720+8NVfoNeb7U63YpRvgmYRyv8GZP9dUP9fg1wx8jVQoMuJ/7EoL9DtV9vtE1e/cXCTbeEk9y8MFOhy+69T/4rJElT/CZh6g2cgbj/7v1mIkgWZ9sulvECz/5BWv79al6rlhoqXRg4ibdTWkX5LC61T/HfAxH8Lsi/XtMMb5QV6XRseGvhurxYPPlo5Cr9hqUCzLBbWTbZJ/dDGxnRWAM9u3Ayzez9PswD6C3Sz49PAF+KLKxprBXqtfh9oZf3qXP93LK3GvQb+vbh/9IvvymPw9yf5r7TyAq1/Ca5NHEUyV6Bmjrss83mgl1MvxgCW+RoxUaDL2iymScY5FKg4tgrUTWu1sQGa/1u9dal/b0T5D8VCgbopHvkEs5sXyTT//ClQcUwVqJHTAjLrf737+Hyq7ZwhVfukLRRobXizmuaLRoGKY6lA8y2EX6ZeiuG4eWbat6ermZMWCrTGfdUmyEOBimOoQG8snIa0Q/8e3c0/GWMF6vJM8O9feYEaOwqfs1Og7noiZzaibEzzz3Q425MCrPx7qUyzAaW/QC3NA82ZKdCVuxKT9j2G+7SPc1bJLtVhdlCgAYydiZSzUqAvTf3zrFCgUk2zRa28QI2dC58zUqArO7s/68N27eMcWwVaWzMT7Z1WXqDmrsaUWinQbEvtGxvXos//2zzxZJkxWNgHmq2ZcnVMNd9Ye4FW1500cz1QIwWq/2h1TT4Z63LK6dpjsFCgmzUz2WVntReovSvS2yjQ3ZGi9i69qd03Qvs00A0LBeo2QafdG6G+QNO/uCeSPPV7YBgo0OJCrTk70wpMFGj6uVozE/3711+g5u7KaaFA67f6slCg1V057XzLrBRoui7vl/phmo83UKAAMA0KFAACUaAAEIgCBYBAFCgABKJAASAQBQoAgShQAAhEgQJAIAoUAAJRoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgChQAAlGgABCIAgWAQBQoAASiQAEgEAUKAIEoUAAIRIECQCAKFAACUaAAEIgCBYBAFCgABKJAASAQBQoAgShQAAhEgQJAIAoUAAJRoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgChQAAlGgABCIAgWAQBQoAASiQAEgEAUKAIEoUAAIRIECQCAKFAACUaAAEIgCBYBAFCgABKJAASAQBYr41m8fnydJcuv7P7bPXZ0nt55+/HqRPOv/9s+Tb/5M06+Pktsfa0/vPwZ6o0AR3ZVrz8LtqkI/V88tfun9/hQoYqFAEdt1UuOazlluKrV/x1GgiIUCRWRZjyVnP7sme//qvCrMrPN+SG9enCdnfw75QRQoxkWBIrJVbSvTDdz77/M8gALF6ChQRLas7+bM2vTOWB9EgWJ0FCgi2ynQbBO0LND128dJktz7uai4fDfm+tW3SbK4vzlU/+XVXXeU6d7Pu2+Yv8dN9tOLBx+2P1wrzOxxcudj43H2P9WSZG9R/tWV+4hbTz+MEBwGUaCILNvofNh89uaiPIh0lvel68D/Wx2Yf7b5wdYDTa5Ay4P4RSHuFWjZl43HLQW6mQvQtohAAwWKyFxJPdjfwnNHlurH5V3JbRQ1t6o983DvDf/78/pLdwu06svG42aB1pZivF2zsIQCRWx5Ey7+50/1El1mzzzNRtXuuLwb0+cFurjMnnlZ9qUrt7x3313sbYLmm41uw/Vq+8PbAt30ZeNxs0CzJTt7kz28eT7IdCrYR4Eius1E+mqPpyuwssvKP7maK6eIlseZrjeHm7KXfFOf7PR5Mxlq+8ObAl0vq75sPG4W6LLa8CzfATiBAkV867fVHk+32ZnuHIxf5hucrkDLcfrmAE8lK8L9Aq2KcPPDmwLd9mXjcesW6O3a2aXAKRQopvHu1ePtAaHldp9jcVy+7Qh57svfP54njQKtXlBsptYK9B/Za6tK3H/c/IzrYufC/2b0Dk8UKKZz8yKpNhk3U5uKLmudYlRcgqR+Amj1gjs7f9wWaK76y/3HLZ+x3GwYM48JPihQTKnYn1nf5bg51HN4itHRAi1+eFOg/+3RZuN2/3HLZ+QHsZjHBG8UKOJa7s4Qyh/6bIEW24+37n3/0/9r7gM9uAV65+P1pm73H7fvJnj7ggaFNwoUce2dvLnK+7TWqpvdmC1TjIq9ly0HkQ7uAy0Ord+pfm7n8eH9rL+9aMzWB9pQoIhrdxJSWWJtR+F3y632xHVzCF+7KN6z/QLdXLBk/3HtpNLiAie1PQn7JQ20okARl5ugdLaZK7QqyrBtHuihAr151CzQsn7LKt07lbO6/NP+4+22qHvLcuO0HLhToPBCgSKy/GDQ/Tcfq+mgeWXVz0S63Xqe+rLo3eIwz85l64s3/CNdt56JtJ1Tuv84PyXqwcfi5zbTmDZnO412lSgYQoEitqukbrN/cv9c+LY5mrtnx6ebF9w63/vhnasxlVu1+49rH/ovj3anMe0f6AfaUaCI7vPFtgl/KJ9rXo1p/wDPy80czee7B/LdofeyXovr2Tdu6VEM2vcfZ6Vc9u7D+sZp+U6/jP5rgAEUKCbw7kVxZc/aOT/V9UDLRy1HyPMX3MoG+te74+t87pIr5VuXmx/eLVC3qfmw8Tjz5eV5/pnbv3r34jypnaQPHEWBQrvaPFAgLgoU2lGgmAwFCu0oUEyGAoV2FCgmQ4FCOwoUk6FAoR0FislQoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgChQAAlGgABCIAgWAQBQoAASiQAEgEAUKAIEoUAAIRIECQCAKFAACUaAAEIgCBYBAFCgABKJAASAQBQoAgShQAAhEgQJAIAoUAAJRoAAQiAIFgEAUKAAEokABIBAFCgCBKFAACESBAkAgZO1oIAAAADpJREFUChQAAlGgABCIAgWAQBQoAASiQAEgEAUKAIEoUAAIRIECQCAKFAACUaAAEIgCBYBAFCgABPr/yOi8mhQiNXUAAAAASUVORK5CYII=" width="672" style="display: block; margin: auto;" /></p>
+<p>Vabaliige on y telje väärtus, kui x on 0, kalle on y väärtuse muutus,
+kui x on 1. See, et tegelikult andmed x-teljel 0 ja 1 punkte ei läbi (ei
+saagi läbida, sest ühegi sõna pikkus ei saa olla 0), ei oma tähtsust.
+Kuna tegemist on <em>lineaarse</em> regressiooniga, siis me võime
+vabaliikme ja kalde väärtuste põhjal tuletada ükskõik millise punkti
+väärtused.</p>
+<ul>
+<li>Kuna suhe on lineaarne, siis eeldame, et kirjeldava tunnuse kasvades
+näiteks 5 ühiku võrra kasvab sõltuv tunnus samuti 5*regressioonikorda
+võrra.</li>
+<li>Mudeli võib kirja panna y = A + Bx</li>
+<li>Reaktsiooniaeg = 547 + 30 * sõna pikkus</li>
+</ul>
+</div>
+<div id="harjutus" class="section level2">
+<h2>Harjutus</h2>
+<div id="harjutus-e-näide-2-kas-doktoritööde-maht-on-aastatega-kahanenud" class="section level3">
+<h3>Harjutus e Näide 2: Kas doktoritööde maht on aastatega
+kahanenud?</h3>
+<ol style="list-style-type: decimal">
+<li><p>Loeme sisse tabeli eesti keele eriala doktoritööde
+bibliograafiaga failist
+<code>DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt</code>. Kuna see on
+tabulatsioonidega eristatud tabelifail, siis võib selle lugemiseks
+kasutada <code>read.table()</code> alamkäsku <code>read.delim()</code>.
+Funktsioon on sama, argumentide vaikeväärtused on veidi erinevad,
+mistõttu tabulatsioonidega eristatud väljadega ja päisereaga andmestiku
+puhul peab vähem argumente lisama. Siiski kui tahame, et teksti
+sisaldavad tulbad loetaks kohe sisse faktoritena, siis alates R
+versioonist 4 peaks lisama argumendi stringsAsFactors = T.</p></li>
+<li><p>Kontrollime mudeli eeldusi:</p></li>
+</ol>
+<ul>
+<li>Sõltumatute tunnuste eeldus kehtib: mõõtmised on sõltumatud, iga
+rida andmestikus on üks iseseisev dissertatsioon, korduvaid autoreid või
+korduvaid väitekirju ei esine.</li>
+<li>kas lehekülgede arv ja ilmumisaasta on normaaljaotusega? Kontrollime
+qqnorm ja Shapiro testiga.</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li><p>Mis võiks olla uuritav tunnus, mis kirjeldav? Sõnastame
+hüpoteesid.</p></li>
+<li><p>Teeme lineaarse mudeli.</p></li>
+<li><p>Kas mudeli jäägid on normaaljaotusega?</p></li>
+<li><p>Vaatame mudeli väljundit.</p></li>
+</ol>
+<ul>
+<li>Kas võime 0-hüpoteesi ümber lükata? Kas mudel on oluline?</li>
+<li>Kui palju lehekülgede arvu varieeruvusest väitekirja kaitsmise aasta
+seletab?</li>
+<li>Kuidas tõlgendada mudeli prognoositavaid väärtusi?</li>
+</ul>
+<ol start="7" style="list-style-type: decimal">
+<li>Teeme joonise ka</li>
+</ol>
+<hr />
+<p>Vaatame veel korraks mudeli koefitsiente.</p>
+<pre><code>##  (Intercept)        aasta 
+## -4081.123532     2.138998</code></pre>
+<p>Miks mudeli vabaliige (Intercept) on negatiivne? Sest mudel arvestab
+seda lõikumisena 0-punktis ja seletava tunnuse <em>aasta</em> mõõdetud
+väärtused on 0-punktist väga kaugel. Kui eeldada lineaarset suhet, siis
+mudeli järgi oli aastal 0 doktoritööde maht -4081 lehekülge. Eeldades
+lineaarset kasvu, hindaks see mudel, et kasvades iga aastaga 2.139
+lehekülje võrra, jõudis tööde maht 1994. aastaks 184 leheküljeni ja
+2022. aastaks 244 leheküljeni.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lk<span class="sc">~</span>aasta, <span class="at">data=</span>dokt, <span class="at">main=</span><span class="st">&quot;Eesti keele doktoritööde maht&quot;</span>, <span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">2020</span>), <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">4700</span>, <span class="dv">500</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(mudel)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="672" /></p>
+<p>Tegelikult ei peaks muidugi vaatama mudelit tegelike andmete
+muutumispiirkonnast väljaspool. Põhimõtteliselt oleks ka võimalik mitte
+mudelile vabaliiget jätta või siis teisendada andmeid nii, et 0 oleks
+näiteks esimene vaadeldav aasta, kust meil on mõõtmisi (st aasta 1994,
+kui toimusid esimesed doktoritööde kaitsmised).</p>
+</div>
+</div>
+<div id="seletav-tunnus-nominaalne" class="section level2">
+<h2>Seletav tunnus nominaalne</h2>
+<ul>
+<li>Lineaarse regressiooni mudeli seletavaks tunnuseks võib olla ka
+nominaalne tunnus ehk faktor.</li>
+<li>Faktori puhul valitakse üks tase baastasemeks.</li>
+<li>Teiste tasemete väärtust hinnatakse baastaseme suhtes.</li>
+<li><strong>Baastase</strong> on mudeli <em>vabaliige</em> ehk
+<em>intercept</em> ning iga teise taseme kohta arvutatakse erinevus
+baastasemest.</li>
+<li>Erinevus arvulise kirjeldava tunnusega mudelist on see, et kui
+arvulise tunnuse puhul on üks <em>kalde kordaja</em> (<em>slope</em>),
+siis <strong>nominaalsel tunnusel on iga baastasemest erineva taseme
+kohta eraldi kordaja</strong>. Arvulise tunnuse puhul saab kalde kordaja
+tunnuse väärtusega läbi korrutades välja arvutada kalde väärtuse igas
+skaalalpunktis. Nominaalse tunnuse puhul rakendatakse vastava taseme
+kalde kordajat binaarselt TRUE/FALSE väärtustega.</li>
+</ul>
+</div>
+<div id="kahe-tasemega-faktor" class="section level2">
+<h2>Kahe tasemega faktor</h2>
+<div id="näide-3-kas-kandidaadi-sugu-mõjutab-häältesaaki" class="section level3">
+<h3>Näide 3: Kas kandidaadi sugu mõjutab häältesaaki?</h3>
+<p>Võtame valimistulemuste andmestiku ja vaatame alustuseks kahe
+tasemega faktorit: kas sugu mõjutab häältesaaki? Me oleme juba t-testiga
+teinud kindlaks, et meeskandidaadid said keskmiselt rohkem hääli kui
+naiskandidaadid, kuigi efekti suurus oli väga väike.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/kandidaadid.RData&quot;</span>)</span></code></pre></div>
+<p>Kas mudeli eeldused on täidetud?</p>
+<ul>
+<li>Mäletatavasti tunnus haali_kokku ei ole normaaljaotusega, aga kui
+see logaritmida, siis vastab normaaljaotuse tunnustele. Kuna kandidaate
+oli rohkem kui 30, siis võiks ka normaaljaotuse eeldust ignoreerida, aga
+kui logaritmimine aitab normaalajotust saavutada, siis võiks seda ikkagi
+teha.</li>
+<li>Mõõtmised on sõltumatud: iga kandidaat on individuaalne isik ja
+esindatud andmestikus ühe reaga.</li>
+</ul>
+<p>Sõltuva ja sõltmatu tunnuse määramisel ei ole siin ilmselt vaja
+pikalt mõelda, sest juba tehniliselt kui me tahame kasutada lineaarset
+mudelit, siis uuritav tunnus peab olema arvuline. Ja kui oleks võimalus,
+et kandidaadi sugu võiks mõjutada see, kui palju ta hääli sai, siis
+peaksime valima hoopis logistilise regressioonimudeli, millest tuleb
+juttu umbes üle-ülejärgmises praktikumis :)</p>
+<p>Milline tase valida baastasemeks? Mõnel juhul on lihtne ja selge, et
+üks väärtus on kuidagi moodi vaikimisi väärtus ja teised väärtused on
+markeeritud. Aga ka siis, kui meil pole mingit sisulist või
+ideoloogilist eelistust, peame valima ühe taseme baastasemeks.</p>
+<p>Kahetasemelise faktori puhul ei ole mudeli väljundi tõlgenduse
+seisukohast väga suurt vahet, mis on baastase, aga sellest sõltub, mis
+on vabaliige ehk <em>intercept</em>. Vaikimisi on baastase faktori
+esimene tase ja kui me pole nominaalse tunnuse tasemete järjekorda
+faktorina eksplitsiitselt määranud, siis enamasti on see lihtsalt
+tähestikulises järjekorras.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sugu.lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(haali_kokku)<span class="sc">~</span>sugu, <span class="at">data=</span>kandidaadid)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sugu.lm)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = log(haali_kokku) ~ sugu, data = kandidaadid)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.0875 -1.1053  0.0254  1.0231  5.0573 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.08749    0.05773  88.120   &lt;2e-16 ***
+## sugunaine   -0.23767    0.10018  -2.372   0.0178 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.564 on 1097 degrees of freedom
+## Multiple R-squared:  0.005104,   Adjusted R-squared:  0.004197 
+## F-statistic: 5.628 on 1 and 1097 DF,  p-value: 0.01785</code></pre>
+<p>Muus osas on nominaalse faktoriga mudeli väljund sama nagu arvuilse
+sõltumatu tunnuse puhul:</p>
+<ul>
+<li>mudeli üldist olulisust näitab p-väärtus viimasel real, mis ütleb,
+kui tõenäone on sellist tulemust saada juhuslikult. p = 0.01785 &lt;
+<em>ɑ</em>, seega võib mudelit oluliseks pidada.</li>
+<li>mudeli üldist headust nätab R-ruut eelviimasel real, mis ütleb, mitu
+protsenti uuritava tunnuse varieerumisest seletav(ad) tunnused
+kirjeldab. Seos on võrdlemisi nõrk, R-ruut on 0.005 ehk sugu kirjeldab
+ainult 0.5% häältesaagi varieerumisest, 99,5% ulatuses sõltub see
+millestki muust.</li>
+</ul>
+<p>AGA nüüd on vabaliikmeks ehk mõtteliseks 0-punktiks faktori baastase.
+St esimene rida <em>(Intercept)</em> ütleb, mis on häältesaagi väärtus
+juhul, kui sugu on baastasemel ehk “mees” ning teine rida ehk
+<em>slope</em> ütleb seda, kui palju see muutub siis, kui faktori tase
+on “naine”.</p>
+</div>
+</div>
+<div id="kuidas-tulemust-tõlgendada" class="section level2">
+<h2>Kuidas tulemust tõlgendada?</h2>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sugu.lm)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = log(haali_kokku) ~ sugu, data = kandidaadid)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.0875 -1.1053  0.0254  1.0231  5.0573 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.08749    0.05773  88.120   &lt;2e-16 ***
+## sugunaine   -0.23767    0.10018  -2.372   0.0178 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.564 on 1097 degrees of freedom
+## Multiple R-squared:  0.005104,   Adjusted R-squared:  0.004197 
+## F-statistic: 5.628 on 1 and 1097 DF,  p-value: 0.01785</code></pre>
+<p>Mudel annab prognoositud väärtused: meeste häälesaak on 5.08749
+ühikut ja naiste oma on meeste omast -0.23767 võrra erinev. Ühikud on
+üldiselt samad mudeli sisendiks olnud ühikud, ehk hääled, AGA siin peab
+meeles pidama, et kui normaliseerimise eesmärgil sai uuritav tunnus
+logaritmitud, siis mudeli prognoositud väärtustest algse ühiku kätte
+saamiseks peame tegema logaritmimise pöördtehte ehk astendama:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Meeste häältesaak on vabaliikme väärtus</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(sugu.lm<span class="sc">$</span>coefficients[<span class="dv">1</span>])</span></code></pre></div>
+<pre><code>## (Intercept) 
+##    161.9826</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Naiste väärtuse saamiseks tuleb koefitsiendid kokku liita</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(sugu.lm<span class="sc">$</span>coefficients[<span class="dv">1</span>]<span class="sc">+</span>sugu.lm<span class="sc">$</span>coefficients[<span class="dv">2</span>])</span></code></pre></div>
+<pre><code>## (Intercept) 
+##    127.7179</code></pre>
+<p>Teeme selguse mõttes sama mudeli ka ilma logaritmimata uuritava
+tunnusega, see küll eirab mudeli normaaljaotuse eeldust, aga on
+oluliselt lihtsam tõlgendada:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>sugu.lm2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(haali_kokku<span class="sc">~</span>sugu, <span class="at">data=</span>kandidaadid)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sugu.lm2)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = haali_kokku ~ sugu, data = kandidaadid)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+##  -542.2  -442.7  -344.1   -91.2 19627.9 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   543.16      47.28  11.488   &lt;2e-16 ***
+## sugunaine     -98.08      82.04  -1.195    0.232    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1281 on 1097 degrees of freedom
+## Multiple R-squared:  0.001301,   Adjusted R-squared:  0.0003907 
+## F-statistic: 1.429 on 1 and 1097 DF,  p-value: 0.2322</code></pre>
+<p>Nüüd võime koefitsientide põhjal öelda, et mehed said keskmiselt 543
+häält ja naised 98 häält vähem ehk keskmiselt 445 häält. Ja saame mudeli
+prognoositud väärtusi otse võrrelda aritmeetiliste keskmiste
+väärtustega:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(kandidaadid<span class="sc">$</span>haali_kokku, kandidaadid<span class="sc">$</span>sugu, mean)</span></code></pre></div>
+<pre><code>##     mees    naine 
+## 543.1567 445.0795</code></pre>
+</div>
+<div id="mitme-tasemega-faktor" class="section level2">
+<h2>Mitme tasemega faktor</h2>
+<div id="näide-4-kas-haridus-mõjutab-häältesaaki" class="section level3">
+<h3>Näide 4: Kas haridus mõjutab häältesaaki?</h3>
+<p>Proovime nüüd testida seletavat tunnust, millel oleks rohkem kui kaks
+taset. Näiteks kandidaatide haridus:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(kandidaadid<span class="sc">$</span>haridus)</span></code></pre></div>
+<pre><code>## 
+##                      Algharidus Keskharidus (sh keskeriharidus) 
+##                               1                             265 
+##                     Kõrgharidus                     Põhiharidus 
+##                             819                              14</code></pre>
+<p>Haridusel on kandidaatide andmestikus 4 taset, aga kuna algharidusega
+kandidaate on ainult 1, siis ilmselt oleks mõistlik jätta see kandidaat
+analüüsist välja, sest üks mõõtmispunkt on liiga vähe, et seost
+kirjeldada.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>haridus.lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(haali_kokku)<span class="sc">~</span>haridus, <span class="at">data=</span>kandidaadid, <span class="at">subset =</span> haridus <span class="sc">!=</span> <span class="st">&quot;Algharidus&quot;</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(haridus.lm)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = log(haali_kokku) ~ haridus, data = kandidaadid, 
+##     subset = haridus != &quot;Algharidus&quot;)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.3599 -1.0568  0.0468  0.9530  4.6607 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)         4.35993    0.09282  46.971   &lt;2e-16 ***
+## haridusKõrgharidus  0.88651    0.10679   8.302    3e-16 ***
+## haridusPõhiharidus -1.02977    0.41437  -2.485   0.0131 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.511 on 1095 degrees of freedom
+## Multiple R-squared:  0.07314,    Adjusted R-squared:  0.07144 
+## F-statistic:  43.2 on 2 and 1095 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Mudeli väljund ütleb meile et:</p>
+<ul>
+<li>mudel on erinev juhuslikust, oluline, p&lt;0.001</li>
+<li>seos on endiselt võrdlemisi nõrk, kuigi tugevam, kui soo puhul:
+mudel kirjeldab 7% häältesaagi varieerumisest.</li>
+<li>Mudeli prognoosi osa, koefitsientide tabel toob välja kirjeldava
+tunnuse võrdlused baastaseme ja teiste tasemete vahel. Siin võiks
+vaadata nii esimest tulpa <em>Estimate</em> ehk mudeli hinnang väärtuse
+suurusele ja viimast tulpa p-väärtus ehk hinnang taseme hinnangu
+olulisusele.
+<ul>
+<li>Esimesel real on <em>intercept</em> ehk baastase, siin mudelis
+keskharidus, mille väärtus on 4.36 logartimitud häält ehk 78.25 häält.
+Siin real p &lt;0.001*** ei ole eriti tähenduslik (tähendab, et on
+nullist erinev);</li>
+<li>Teisel real on kõrgharidusega kandidaatide erinevus keskharidusega
+kandidaatide häältesaagist ehk 4.36. Kui see oleks algsetes ühikutes,
+siis võiksime öelda, et see rühm sai nii palju rohkem hääli, aga kuna me
+logaritmisime väärtused enne modelleerimist, siis peame kõigepealt
+prognoositud tulemuse kokku arvutama ja siis astendama (käsuga
+<code>exp()</code>): kõrgharitute logaritmitud häältesaak oli 4.36 +
+0.89 = 5.25 ehk 189.89. Ja see erinevus keskharidusega kandidaatidest on
+oluliselt erinev p&lt;0.001.</li>
+<li>Kolmandal real on põhiharidusega kandidaatide erinevus
+Keskharidusega kandidaatidest, mis on jällegi 4.36 + -1.03 = 3.33 ehk
+27.94 häält. See erinevus on ka oluliselt erinev juhuslikust tasemel
+p&lt;0.05.</li>
+<li>Mudel otseselt mittebaastasemete erinevust ei võrdle, sest kõigi
+tasemete hinnatavad väärtused on esitatud ja selle kaudu on teada, kas
+tasemete hulgas leidub mõni, mis on teistest erinev, mille põhjal
+otsustada, kas faktoril üldiselt on mõju või ei ole.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="anova" class="section level2">
+<h2>ANOVA</h2>
+<p><strong>ANalysis Of VAriance ehk dispersioonanalüüs</strong></p>
+<p>ANOVA võrdleb rühmade hajuvust valimi üldise hajuvusega. R-is on
+ANOVA seotud lineaarse mudeliga, selle saab, kui lineaarne mudel anda
+käsu <code>anova()</code> sisendiks. Mõnes mõttes see on lihtsalt
+alternatiivne viis seost kirjeldada, selle kaudu saab anda ühe
+üldhinnangu kategoriaalse faktori olulisusele, samas kui lineaarne mudel
+annab iga taseme võrdluse baastasemega.</p>
+<ul>
+<li>Võimaldab hinnata faktori üldist mõju uuritavale tunnusele</li>
+<li>Kui faktoril on kaks taset, siis on tulemus sarnane t-testile</li>
+<li>Kui tasemeid on rohkem, siis osutab faktori üldisele mõjule, aga
+mitte sellele, milliste faktori tasemete vahel erinevus on
+<ul>
+<li>ANOVA ütleb seda, kas faktori tasemete hulgas leidub mõni tase, mis
+on teistest oluliselt erinev, aga ei ülte, mitu või milline,</li>
+<li>ja kui kolme- või enamatasemeline faktor on oluline, peame lisaks
+tegema <em>post-hoc</em> testi, kui tahame välja selgitada, milliste
+tasemete vahel tegelikult erinevused on ja milliste tasemete vahel ei
+ole.</li>
+</ul></li>
+</ul>
+</div>
+<div id="anova-faktor-2-tasemega" class="section level2">
+<h2>ANOVA, faktor 2 tasemega</h2>
+<div id="näide-3b-sugu-ja-häältesaak-anovaga" class="section level3">
+<h3>Näide 3b: Sugu ja häältesaak ANOVAga</h3>
+<p>Anova testi tegemiseks paneme lihtsalt lineaarse mudeli väljundi
+<code>summary()</code> käsu asemel <code>anova()</code> käsu sisse:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>sugu.lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(haali_kokku)<span class="sc">~</span>sugu, <span class="at">data=</span>kandidaadid)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(sugu.lm)</span></code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: log(haali_kokku)
+##             Df  Sum Sq Mean Sq F value  Pr(&gt;F)  
+## sugu         1   13.77 13.7696  5.6281 0.01785 *
+## Residuals 1097 2683.88  2.4466                  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p><strong>Kuidas väljundit lugeda?</strong></p>
+<ul>
+<li>Tabelis on rida iga faktori kohta (siin üks faktor: sugu) ja lõpuks
+rida mudeli jääkide kohta.</li>
+<li>Iga faktori puhul hinnatakse rühmadevahelist dispersiooni valimi
+üldise populatsiooniga, millest kokku tuleb ANOVA statistik F.</li>
+<li>F väärtuse statistiline olulisus sõltub vabadusastmetest. Faktori
+vabadusasmed on tasemete arv miinus üks, ehk soo puhul 2-1=1; Valimi
+vabadusastmete arv on mõõtmiste arv miinus võrreldavate konditsioonide
+arv ehk 1099 (kandidaati) - 2 (mehed/naised) = 1097.</li>
+</ul>
+<p>Kahe tasemega faktori puhul on tulemus võrdlemisi sarnane
+t-testiga.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(<span class="fu">log</span>(haali_kokku)<span class="sc">~</span>sugu, <span class="at">data=</span>kandidaadid)</span></code></pre></div>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  log(haali_kokku) by sugu
+## t = 2.4084, df = 756.57, p-value = 0.01626
+## alternative hypothesis: true difference in means between group mees and group naine is not equal to 0
+## 95 percent confidence interval:
+##  0.04394483 0.43138548
+## sample estimates:
+##  mean in group mees mean in group naine 
+##            5.087489            4.849824</code></pre>
+</div>
+</div>
+<div id="anova-faktor-3-tasemega" class="section level2">
+<h2>ANOVA, faktor 3 tasemega</h2>
+<div id="näide-4b-haridus-ja-häältesaak" class="section level3">
+<h3>Näide 4b: Haridus ja häältesaak</h3>
+<p>Nüüd näide rohkem kui kahe tasemega faktorist: kandidaatide
+andmestikus haridus on 4 taset, või kui ainult ühe mõõtmisega
+põhiharidus välja visata, siis on 3 taset. Ainult üks mõõtmine on
+endiselt liiga vähe. Aga kolme rühmaga enam t-testi teha ei saa.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>haridus.lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(haali_kokku)<span class="sc">~</span>haridus, <span class="at">data=</span>kandidaadid, <span class="at">subset =</span> haridus <span class="sc">!=</span> <span class="st">&quot;Algharidus&quot;</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(haridus.lm)</span></code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: log(haali_kokku)
+##             Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## haridus      2  197.27  98.637  43.202 &lt; 2.2e-16 ***
+## Residuals 1095 2500.07   2.283                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<ul>
+<li>Anova tulemuse põhjal võime öelda, et haridusel on oluline
+üldefekt.</li>
+<li>See tähendab, et “leidub vähemalt üks rühm, mille keskmine on
+teistest oluliselt erinev”.</li>
+<li>Artiklis saab ANOVA tulemuse teksti sees kirja panna nii: <br> F(2,
+1095) = 43.202, p &lt; 0.001</li>
+<li>Kuna siin on rohkem kui 2 rühma, siis selleks, et otsustada, kes
+kellest erines, peaks tegema <em>post-hoc</em> testi.</li>
+</ul>
+</div>
+</div>
+<div id="post-hoc-test" class="section level2">
+<h2>Post-hoc test</h2>
+<p>Iga kord, kui me teeme mõne statistilise testi, on teatav võimalus,
+et me saame olulise tulemuse juhuslikult. Sama andmestiku peal veidi
+erinevate kombinatsioonidega sama testide tegemisel kõik juhuslikud
+efektid kasvavad. Samas, kui oleme ANOVA testiga teada saanud, et rohkem
+kui kahe tasemega faktoril on oluline üldefekt, tahaks me teada,
+milliste faktori tasemete vahel erinevus oli. Selleks peaks faktori
+tasemeid paari kaupa testima, aga tulemuste tõlgendamisel arvestama
+kordustega. Seda nimetatakse <em>post-hoc</em> testimiseks.</p>
+<div id="bonferroni-parandus" class="section level3">
+<h3>Bonferroni parandus</h3>
+<p>Üks võimalus oleks korrata lineaarset mudelit nii mitu korda, nagu on
+tarvis kõigite tasemete võrdlemiseks, muutes iga testi korral vastavalt
+faktori baastaset. Seejärel tulemuste tõlgendamisel jagatakse
+usaldusnivoo korduste arvuga. Seda nimetatakse Bonferroni paranduseks
+(<em>Bonferroni correction</em>). Näiteks kui meil on 3 faktori taset,
+siis kõigi võrdluste saamiseks peame kordama testi 2 korda ja langetama
+<em>ɑ</em> taset vastavalt 0.05/2 = 0.025.</p>
+<p>Näites 4 saime teada, et keskharidusega (baastase) kandidaatide
+häältesaak oli oluliselt erinev kõrgharidusega (p&lt;0.001) ja
+põhiharidusega (p&lt;0.05) kandidaatidest:</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(haridus.lm)</span></code></pre></div>
+<p>ning ANOVA testi põhjal võime öelda, et haridus on oluline faktor
+[F(2, 1095) = 43.202, p &lt; 0.001], sest leidub vähemalt üks
+haridustase, mille puhul keskmine häältesaak on teistest erinev:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(haridus.lm)</span></code></pre></div>
+<p>siis me ei tea, kas kõrghariduse ja põhiharidusega kandidaatide
+häältesaak omavahel ka erinevad on.</p>
+<p>Kordame lihtsalt lineaarset mudelit muudetud baasväärtusega. Sellks
+võib andmestikus muuta ära baasväärtuse käsuga <code>relevel()</code>
+(või lihtsalt käsuga <code>factor()</code>), aga kui me ei taha
+andmestikku muuta, võib ainult <code>lm()</code> käsu sees muuta faktori
+baastaset käsuga <code>C()</code>. Lisaks, kuna ühe haridustaseme
+jätsime välja, tuleks kasutada käsku <code>droplevels()</code>, mis
+eemaldab faktoritasemed, mida ei esine.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>haridus.lm1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(haali_kokku)<span class="sc">~</span><span class="fu">C</span>(<span class="fu">droplevels</span>(haridus), <span class="at">base=</span><span class="dv">1</span>), <span class="at">data=</span>kandidaadid[ kandidaadid<span class="sc">$</span>haridus <span class="sc">!=</span> <span class="st">&quot;Algharidus&quot;</span>,])</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>haridus.lm2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(haali_kokku)<span class="sc">~</span><span class="fu">C</span>(<span class="fu">droplevels</span>(haridus), <span class="at">base=</span><span class="dv">3</span>), <span class="at">data=</span>kandidaadid[ kandidaadid<span class="sc">$</span>haridus <span class="sc">!=</span> <span class="st">&quot;Algharidus&quot;</span>,])</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(haridus.lm1)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = log(haali_kokku) ~ C(droplevels(haridus), base = 1), 
+##     data = kandidaadid[kandidaadid$haridus != &quot;Algharidus&quot;, ])
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.3599 -1.0568  0.0468  0.9530  4.6607 
+## 
+## Coefficients:
+##                                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                        4.35993    0.09282  46.971   &lt;2e-16 ***
+## C(droplevels(haridus), base = 1)2  0.88651    0.10679   8.302    3e-16 ***
+## C(droplevels(haridus), base = 1)3 -1.02977    0.41437  -2.485   0.0131 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.511 on 1095 degrees of freedom
+## Multiple R-squared:  0.07314,    Adjusted R-squared:  0.07144 
+## F-statistic:  43.2 on 2 and 1095 DF,  p-value: &lt; 2.2e-16</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(haridus.lm2)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = log(haali_kokku) ~ C(droplevels(haridus), base = 3), 
+##     data = kandidaadid[kandidaadid$haridus != &quot;Algharidus&quot;, ])
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.3599 -1.0568  0.0468  0.9530  4.6607 
+## 
+## Coefficients:
+##                                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                         3.3302     0.4038   8.246 4.64e-16 ***
+## C(droplevels(haridus), base = 3)1   1.0298     0.4144   2.485   0.0131 *  
+## C(droplevels(haridus), base = 3)2   1.9163     0.4073   4.705 2.86e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.511 on 1095 degrees of freedom
+## Multiple R-squared:  0.07314,    Adjusted R-squared:  0.07144 
+## F-statistic:  43.2 on 2 and 1095 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Nüüd saame mudeli väljunditest välja noppida kõikide paaride
+võrdluste p-väärtused. Kuna kordasime testi 2 korda, siis peame
+usaldusnivood langetama poole võrra, mis tähendab seda, et
+harjumuspäraste p-väärtuste saamiseks hoopis korutame need korduste
+arvuga:</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(haridus.lm1)<span class="sc">$</span>coefficients[<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>] <span class="sc">*</span><span class="dv">2</span></span></code></pre></div>
+<pre><code>## C(droplevels(haridus), base = 1)2 C(droplevels(haridus), base = 1)3 
+##                      5.993082e-16                      2.619409e-02</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(haridus.lm2)<span class="sc">$</span>coefficients[<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>] <span class="sc">*</span><span class="dv">2</span></span></code></pre></div>
+<pre><code>## C(droplevels(haridus), base = 3)1 C(droplevels(haridus), base = 3)2 
+##                      2.619409e-02                      5.721540e-06</code></pre>
+<p>Ja lõpetuseks veel, kui <em>e</em> astmetega komakohtade arvutamine
+tundub tüütu, võib R-i sundida teisendama:</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span>(<span class="fu">summary</span>(haridus.lm1)<span class="sc">$</span>coefficients[<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>] <span class="sc">*</span><span class="dv">2</span>, <span class="at">scientific =</span> F)</span></code></pre></div>
+<pre><code>## C(droplevels(haridus), base = 1)2 C(droplevels(haridus), base = 1)3 
+##        &quot;0.0000000000000005993082&quot;        &quot;0.0261940889199223300721&quot;</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span>(<span class="fu">summary</span>(haridus.lm2)<span class="sc">$</span>coefficients[<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>] <span class="sc">*</span><span class="dv">2</span>, <span class="at">scientific =</span> F)</span></code></pre></div>
+<pre><code>## C(droplevels(haridus), base = 3)1 C(droplevels(haridus), base = 3)2 
+##                   &quot;0.02619408892&quot;                   &quot;0.00000572154&quot;</code></pre>
+<p>Siit nüüd saame välja lugeda, et erinevused on:</p>
+<ul>
+<li>1 (kesk) ja 2 (kõrg) p = 0.0000000000000005993082</li>
+<li>1 (kesk) ja 3 (põhi) p = 0.02619408892</li>
+<li>2 (kõrg) ja 3 (põhi) p = 0.00000572154</li>
+</ul>
+<p>Või siis selle asemel et lihtsalt korduste arvuga p-väärtuseid läbi
+korrutada, võib kasutada käsku <code>p.adjust()</code></p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">p.adjust</span>(<span class="at">p =</span> <span class="fu">summary</span>(haridus.lm1)<span class="sc">$</span>coefficients[<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>], <span class="at">n=</span><span class="dv">2</span>, <span class="at">method=</span><span class="st">&quot;bonferroni&quot;</span>)</span></code></pre></div>
+<pre><code>## C(droplevels(haridus), base = 1)2 C(droplevels(haridus), base = 1)3 
+##                      5.993082e-16                      2.619409e-02</code></pre>
+<p>Ja teisendame tavaliseks komakohtadega arvuks:</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span>(<span class="fu">p.adjust</span>(<span class="at">p =</span> <span class="fu">summary</span>(haridus.lm1)<span class="sc">$</span>coefficients[<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>], <span class="at">n=</span><span class="dv">2</span>, <span class="at">method=</span><span class="st">&quot;bonferroni&quot;</span>), <span class="at">scientific =</span> F)</span></code></pre></div>
+<pre><code>## C(droplevels(haridus), base = 1)2 C(droplevels(haridus), base = 1)3 
+##        &quot;0.0000000000000005993082&quot;        &quot;0.0261940889199223300721&quot;</code></pre>
+</div>
+</div>
+<div id="tukey-hsd" class="section level2">
+<h2>Tukey HSD</h2>
+<p>Teine võimalus on kasutada <em>Tukey Honest Significant
+Differences</em> testi, mis teeb kõigi kombinatsioonide võrdlused ja
+korrigeerib p-väärtuseid vastavalt.</p>
+<p>R-is on Tukey testi sisendiks anova test. Anova testi tegemiseks on
+R-is mitu eri süntaksit, üks variant on panna lineaarne mudel anova käsu
+sisse, nagu me varem tegimegi.</p>
+<ul>
+<li>anova(lm(y~x))</li>
+<li>summary(aov(y~x))</li>
+</ul>
+<p>Need annavad täpselt sama tulemuse. Kuid Tukey testi sisendiks peab
+kasutama käsku aov().</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>haridus.anova <span class="ot">&lt;-</span> <span class="fu">aov</span>(<span class="fu">log</span>(haali_kokku)<span class="sc">~</span>haridus, <span class="at">data=</span>kandidaadid, <span class="at">subset =</span> haridus <span class="sc">!=</span> <span class="st">&quot;Algharidus&quot;</span>)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(haridus.anova)</span></code></pre></div>
+<pre><code>##               Df Sum Sq Mean Sq F value Pr(&gt;F)    
+## haridus        2  197.3   98.64    43.2 &lt;2e-16 ***
+## Residuals   1095 2500.1    2.28                   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">TukeyHSD</span>(haridus.anova)</span></code></pre></div>
+<pre><code>##   Tukey multiple comparisons of means
+##     95% family-wise confidence level
+## 
+## Fit: aov(formula = log(haali_kokku) ~ haridus, data = kandidaadid, subset = haridus != &quot;Algharidus&quot;)
+## 
+## $haridus
+##                                                   diff        lwr         upr
+## Kõrgharidus-Keskharidus (sh keskeriharidus)  0.8865119  0.6358934  1.13713034
+## Põhiharidus-Keskharidus (sh keskeriharidus) -1.0297743 -2.0022493 -0.05729919
+## Põhiharidus-Kõrgharidus                     -1.9162861 -2.8721144 -0.96045787
+##                                                 p adj
+## Kõrgharidus-Keskharidus (sh keskeriharidus) 0.0000000
+## Põhiharidus-Keskharidus (sh keskeriharidus) 0.0349434
+## Põhiharidus-Kõrgharidus                     0.0000085</code></pre>
+<p>Tukey testi väljund annab paarikaupa võrdluses:</p>
+<ul>
+<li>kahe taseme vahelise vahelise erinevuse</li>
+<li>usaldusvahemiku (<em>lwr</em> ja <em>upr</em>)</li>
+<li>korrigeeritud p-väärtuse</li>
+</ul>
+</div>
+<div id="kordamisküsimused" class="section level2">
+<h2>Kordamisküsimused</h2>
+<p>Kordamisküsimuste testi saad teha moodlis, seal näed peale vastamist
+ka õigeid vastuseid ja kommentaare. Testi võib teha mitu korda.
+Küsimustik on ainult kordamiseks mõeldud ja vastuseid ei hinnata ega
+arvestata kursuse soorituse hindamisel.</p>
+<div id="lineaarse-mudeli-eeldused-on" class="section level4">
+<h4>1. Lineaarse mudeli eeldused on:</h4>
+<ol style="list-style-type: lower-alpha">
+<li>mõõtmised on üksteisest sõltumatud</li>
+<li>mõõtmisi peab olema vähemalt 30</li>
+<li>väärtused peavad olema logaritmitud</li>
+<li>mudeli jäägid on normaaljaotusega</li>
+</ol>
+</div>
+<div id="vaata-näites-1-esitatud-lineaarset-mudelit-sõnade-äratundmise-reaktsiooniaja-ja-sõna-pikkuse-seosest" class="section level4">
+<h4>2. Vaata Näites 1 esitatud lineaarset mudelit sõnade äratundmise
+reaktsiooniaja ja sõna pikkuse seosest:</h4>
+<pre><code>##             Estimate Std. Error   t value     Pr(&gt;|t|)
+## (Intercept) 547.3792  35.949589 15.226300 3.130610e-27
+## Length       30.2416   4.261484  7.096495 2.289494e-10</code></pre>
+</div>
+<div id="estimate-tulbas-on-mudeli-hinnang-reaktsiooniaja-kestuse-kohta" class="section level4">
+<h4>Estimate tulbas on mudeli hinnang reaktsiooniaja kestuse kohta</h4>
+<ol style="list-style-type: lower-alpha">
+<li>esimesel real väärtus siis, kui sõna pikkus on 0 tähemärki ja teisel
+real siis, kui tähemärke on 1</li>
+<li>esimesel real keskmine ja teisel real see, kui palju sõna pikkus
+mõjutab</li>
+<li>esimesel real keskmine ja teisel real siis, kui tähemärke on 1</li>
+<li>esimesel real väärtus siis, kui sõna pikkus on 0 tähemärki ja teisel
+real ühe tähemärgi efekt</li>
+</ol>
+</div>
+<div id="vaata-veel-mudeli-väljundit.-mis-võiks-olla-reaktsiooniaeg-kui-sõnas-on-26-tähemärki" class="section level4">
+<h4>3. Vaata veel mudeli väljundit. Mis võiks olla reaktsiooniaeg, kui
+sõnas on 26 tähemärki</h4>
+<ol style="list-style-type: lower-alpha">
+<li>547.38 + 26 * 30.24 = 1333.66 millisekundit</li>
+<li>26 * 547.38 + 26 * 30.24 = 1.501814^{4} millisekundit</li>
+<li>547.38 + 30.24 = 577.62 millisekundit</li>
+<li>nii pikka sõna ei ole</li>
+</ol>
+</div>
+<div id="nominaalse-seletava-tunnusega-lineaarse-mudeli-lõikepunkt-intercept-on" class="section level4">
+<h4>4. Nominaalse seletava tunnusega lineaarse mudeli lõikepunkt
+(Intercept) on</h4>
+<ol style="list-style-type: lower-alpha">
+<li>uuritava tunnuse väärtus siis, kui seletava tunnuse väärtus on
+0</li>
+<li>uuritava tunnuse väärtus, kui ükski seletava tunnuse tasemetest ei
+kehti</li>
+<li>uuritava tunnuse väärus kõige sagesasema seletava tunnuse taseme
+korral</li>
+<li>uuritava tunnuse väärtus seletava tunnuse baastaseme korral</li>
+</ol>
+</div>
+<div id="mudeli-headust-näitab" class="section level4">
+<h4>5. Mudeli headust näitab</h4>
+<ol style="list-style-type: lower-alpha">
+<li>p-väärtus</li>
+<li>R-ruut</li>
+<li>seletava tunnuse p-väärtus</li>
+<li>seletava tunnuse efekti suurus</li>
+</ol>
+</div>
+<div id="artiklis-kus-raporteeritakse-anova-testi-tulemusi-on-tekstis-kirjas-f2-16727.532-p0.001.-kuidas-seda-tõlgendada" class="section level4">
+<h4>6. Artiklis, kus raporteeritakse ANOVA testi tulemusi, on tekstis
+kirjas: F(2, 167)=27.532; p&lt;0.001. Kuidas seda tõlgendada?</h4>
+<ol style="list-style-type: lower-alpha">
+<li>Andmestikus oli 170 mõõtmist, seletaval tunnusel 3 rühma, vähemalt
+üks oli teistest erinev</li>
+<li>Andmestikus oli 170 mõõtmist, seletaval tunnusel 3 rühma, mis
+üksteisest erinesid</li>
+<li>Andmestikus oli 167 mõõtmist, seletaval tunnusel 2 rühma, mis
+üksteisest erinesid</li>
+<li>P-väärtus on väike, aga seal ei ole rohkem sisukat
+informatsiooni</li>
+</ol>
+</div>
+<div id="post-hoc-test-on" class="section level4">
+<h4>7. Post-hoc test on:</h4>
+<ol style="list-style-type: lower-alpha">
+<li>alternatiiv t-testile, kui on rohkem kui kaks rühma</li>
+<li>kordustestid, mida peab alati tegema, kui on rohkem kui kaks
+rühma</li>
+<li>kordustestid kõikide faktori tasemete võrdlemiseks</li>
+<li>kordustestid rohkem kui kahe tasemega faktori olulisuse
+kontrollimiseks</li>
+</ol>
+</div>
+</div>
+<div id="järgmisel-korral" class="section level2">
+<h2>Järgmisel korral</h2>
+<ul>
+<li>Mitme tunnusega lineaarsed mudelid</li>
+<li>Interaktsioonid</li>
+<li>Mudelite võrdlemine ja optimaalse mudeli leidmine</li>
+</ul>
+</div>
+</div>
 
 
 

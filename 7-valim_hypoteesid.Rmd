@@ -1,0 +1,516 @@
+---
+title: "7. praktikum"
+knit: (function(input_file, encoding) {
+    out_dir <- 'docs';
+    rmarkdown::render(input_file,
+      encoding=encoding,
+      output_file=file.path(dirname(input_file), out_dir, '7-valim_hypoteesid.html'))})
+date: 14.03.2022
+output: 
+  html_document:
+    theme: flatly
+    highlight: tango
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Valim ja populatsioon. Hüpoteesid ja tõenäosus. {.tabset .tabset-pills}
+
+## Tänases praktikumis
+
+**Tänased teemad:**  
+
+- Valim ja populatsioon  
+- Kirjeldav ja järeldav statistika  
+- Hüpoteesid ja tõenäosus  
+- Jaotused: normaaljaotus  
+- Hüpoteeside testimine: parameetrilised testid  
+
+
+Kasutame jätkuvalt andmestikku `kysimustik_2022.RData`.
+
+```{r}
+load("data/kysimustik_2022.RData")
+```
+
+
+
+## Valim ja populatsioon
+
+**Populatsiooni** ehk **üldkogumi** moodustavad uurimisobjekti kõik esindajad. Enamasti on populatsioon nii suur ja raskesti kättesaadav, et ei ole võimalik uurida kogu populatsiooni.
+
+**Valim** on mingite kriteeriumite alusel tehtud valik uurimisobjektidest, mis uuringus vaatluse alla võetakse ja mille omadusi kogu populatsioonile laiendatakse.
+
+**Kõikne uuring**: mõõdetakse kõik objektid üldkogumis (nt rahvaloendus).
+
+- **Üldkogum** ehk **populatsioon**: objektide hulk, kelle/mille kohta soovitakse järeldusi teha.
+- Plussid:
+    + täpne info.
+- Miinused:
+    + töömahukas,
+    + kallis,
+    + mahukuse tõttu võivad kumuleeruda vead,
+    + piiratud sisu.
+
+
+**Valikuuring**: vaadeldakse osa (valimit) üldkogumi objektidest, järeldus terviku kohta tehakse selle osa põhjal.
+
+- **Valim**: osa üldkogumist, mida uuritakse/mõõdetakse.
+- Plussid:
+    + väiksem maksumus,
+    + suurem kiirus,
+    + operatiivsus (saab korraldada vastavalt vajadustele),
+    + suurem täpsus.
+- Miinused:
+    + jääb sisse juhuslik viga, mis on tingitud valimi juhuslikkusest.
+
+
+## Valimi moodustamine
+
+Valimi põhjal saadud tulemused peaksid olema võimalikult lähedased neile, mida võiksime saada kogu üldkogumit mõõtes.
+
+- Näiteks kui uurida leibkondade elujärge, peavad olema valimisse kaasatud kõik leibkonnatüübid.
+
+Valimi suuruse määrab ülesanne, mida tahetakse lahendada.
+ 
+**Lihtne juhuvalim**: igal üldkogumi objektil on võrdne tõenäosus sattuda valimisse.
+
+- Parim variant, aga võib olla liiga töömahukas.
+
+**Kihtvalim**: üldkogum jagatakse mingi tunnuse alusel kihtideks, igas kihis rakendadakse mingit valikumeetodit (nt juhuvalikut). Valim vastab selle valitud tunnuse alusel üldkogumis valitsevale proportsioonile.
+
+**Esindusvalim**: valim koostatakse nii, et erinevate võimalike tunnuste proportsioonid on võrdsed.
+
+- Näiteks inimese pikkust uurides võetakse valimisse sama arv mehi ja naisi, noortest vanadeni, igast uuritava üldkogumi piirkonnast jne;
+- lihtsam kui juhuvalik;
+- on oht, et mingid olulised tunnused jäävad arvestamata.
+
+**Mugavusvalim**: valimisse kaasatakse need objektid, mida on lihtne küsitleda/mõõta.
+
+- Kõige halvem variant;
+- kõige kergemini saadav;
+- mõnikord ainuke võimalik variant.
+
+
+## Hüpoteeside testimine
+
+### Kirjeldav vs. järeldav statistika
+
+**Kirjeldavas** andmeanalüüsis kasutatakse meetodeid valimi kirjeldamiseks ja näitlikustamiseks. Kirjeldava statistikana võib valimi kohta välja tuua näiteks keskmised väärtused või andmetes esinenud väärtuste sagedused.<br>
+**Järeldavas (tõestavas)** andmeanalüüsis on meetodid, mis kasutavad valimist saadud tulemusi üldkogumi kohta käivate otsuste ja prognooside tegemiseks. Enamasti kasutatakse tõenäosuslikke teste, et hinnata valimi kuulumist mingisse populatsiooni.
+
+Sageli ei ole uurija huvitatud keskmise taseme arvulisest väärtusest, vaid pigem sellest, kas üldkogumi keskväärtus rahuldab mingit teatud tingimust.
+
+### Statistiline hüpotees
+
+Selleks tuleb sõnastada statistiline hüpotees.
+
+- Väide: naised ja mehed on tööturul ebavõrdses olukorras.
+- Statistiline hüpotees: naiste ja meeste keskmine palk ei ole võrdne.
+<br>
+<br>
+- Väide: mahlapakkides ei ole nii palju mahla kui lubatud.
+- Statistiline hüpotees: keskmine mahla kogus pakendis erineb lubatust.
+
+
+Statistiline hüpotees esitatakse alati hüpoteeside paarina.
+
+- keskmine mahla kogus pakis = 1 liiter (nullhüpotees)
+- keskmine mahla kogus pakis ≠ 1 liiter (sisukas/alternatiivne hüpotees)
+<br>
+<br>
+- naiste keskmine palk = meeste keskmine palk
+- naiste keskmine palk ≠ meeste keskmine palk
+
+Need hüpoteesid on üksteist välistavad, st alati peab üks neist kehtima ja korraga saab kehtida ainult üks.
+
+### Nullhüpotees H0 ja sisukas hüpotees H1
+
+Nullhüpotees väidab tavaliselt üldkogumi vastavust teatud standardile. See on väide üldkogumi parameetri kohta ja kehtib nii kaua, kuni seda pole ümber lükatud. Parameeter tähendab siinjuures mingit populatsiooni iseloomustavad näitajat (nt Eesti meeste keskmine pikkus), mille väärtust me sageli ei tea.
+
+**Nullhüpoteesi ei saa tõestada!**
+
+Sisukas hüpotees on väide üldkogumi parameetri kohta, mis on tõene siis, kui nullhüpotees osutub valeks.
+
+H0: väide, mida eeldatakse üldkogumis kehtivat<br>
+H1: tõestamist vajav hüpotees
+
+
+## Tõenäosus hüpoteeside vastuvõtmisel ja vead
+
+Uurime enamasti populatsiooni, ent mõõdame üldjuhul valimit. Mingi parameetri hinnang valimis on **statistik**. Statistikameetodite abil ei saa väiteid tõestada absoluutselt kindlasti, alati jääb teatav eksimise võimalus ja juhuslikkusest tulenev eksimus.
+
+```{r, echo=FALSE}
+library(knitr)
+tab = matrix(c("I tüüpi viga",  "Kõik hästi", "Kõik hästi", "II tüüpi viga"), ncol=2, byrow=T)
+rownames(tab) <- c("Lükkad H0 tagasi", "Võtad H0 vastu")
+colnames(tab) <- c("H0 on tõene", "H0 on vale")
+kable(tab)
+```
+
+*p*-väärtus ehk **olulisuse tõenäosus** on see, mida statistilistes testides otsuse langetamiseks kasutatakse. Olulisuse tõenäosus on eksimise risk nullhüpoteesi kummutamisel ja sisuka hüpoteesi vastuvõtmisel. Tõenäosust hindame skaalal 0 -- 1.
+
+*α* (alfa) ehk **olulisuse nivoo** on maksimaalne lubatud eksimise tõenäosus sisuka hüpoteesi tõestamisel. Maksimaalse vea valib otsustaja, tavaline on **_α_ = 0,05**, mis tähendab, et tõenäosus eksida on väiksem kui 5%, mis pööratuna lubab väita rohkem kui 95% kindlusega, et sisukas hüpotees kehtib. Olenevalt andmetest ja testist võib _α_ aga olla ka 0.1 või 0.001.
+
+Kui kohtleme p-väärtust liiga leebelt ja seame _α_ liiga suureks, siis on oht teha I tüüpi viga ja kuulutada oluliseks efekte, mis tegelikult on juhuslik varieerumine. Kui kohtleme liiga rangelt ja seame _α_ liiga väikseks, siis on oht magada maha olulisi erinevusi ja pidada neid juhuslikuks vareerumiseks.
+
+Alternatiivne definitsioon: olulisuse tõenäosus on tõenäosus, et nullhüpoteesi korral saab saadud tulemuse juhuslikult.
+
+Reegel:
+
+- kui *p* < *α*, siis on tõestatud sisukas hüpotees H1;
+- kui *p* > *α*, siis jäädakse nullhüpoteesi juurde, pole võimalik midagi muud tõestada.
+
+### Näide
+
+Näiteks _kujutame ette_, et uurime, kas _eesti keele sõnade keskmine pikkus erineb ingliskeelsete sõnade pikkusest_ (sest nt eesti keeles on ju rohkem morfoloogiat, ulatuslik sõnamoodustussüsteem jne). Nullhüpotees oleks sel juhul, et mingit erinevust kahe keele sõnade pikkuses ei ole, ning sisukas hüpotees, et erinevus on olemas (ega ole juhuslik).  
+
+Võtame selle teadasaamiseks mõlema keele tekstikorpustest välja kõikide nendes esinevate unikaalsete sõnavormide nimekirjad ning leiame kummagi keele kohta sõnade keskmise pikkuse (tähemärkides). Oletame, et lepiksime sellega, kui 5-s juhuslikus valimis 100st (antud juhul sõnade nimekirjade paaris) oleks eesti- ja ingliskeelsete sõnade keskmise pikkuse erinevus oluliselt teistugune kui meie nimekirjade põhjal, aga samas 95-s valimis oleks see meie omale sarnane. *α* on seega 0,05.  
+
+Kui nüüd kahe grupi keskmisi võrdleva testi *p*-väärtus oleks 0,03, siis tõenäosus, et saame nii suure (= nullist erineva) statistiku väärtuse JA ikkagi kehtib nullhüpotees (= seost ei ole / seos on juhuslik), on 3%. Kuna *p* < *α*, võtame vastu sisuka ehk alternatiivse hüpoteesi selle kohta, et eestikeelsete ja ingliskeelsete sõnade pikkused on keskmiselt erinevad, ning hülgame nullhüpoteesi, mille kohaselt kahe keele sõnade keskmised pikkused on samasugused.
+
+## Ühe- ja kahepoolsed hüpoteesid
+
+**Kahepoolne hüpotees**: uurijad tahavad näidata lihtsalt keskmise erinevust nende valitud konstandist/teisest keskmisest.
+
+- H0: keskmine = a VÕI keskmine1 = keskmine2
+- H1: keskmine ≠ a VÕI keskmine1 ≠ keskmine2
+
+Kui aga teooriast on teada, milline see erinevus peaks olema, siis saab kontrollida **ühepoolset hüpoteesi**.
+
+- H0: keskmine > a VÕI keskmine1 > keskmine2
+- H1: keskmine < a VÕI keskmine1 < keskmine2
+
+
+### Näiteid: t-test (keskmiste võrdlemine)
+
+
+Meil on küsimustikule vastanute seas nii kohvi- kui teejoojaid. Testime, kas nad kuuluvad samasse üliõpilaste populatsiooni näiteks õppimisaja poolest. Hüpoteesid on järgnevad:
+
+
+H0: kohvijoojate õppimisaeg = teejoojate õppimisaeg<br>
+H1: kohvijoojate õppimisaeg ≠ teejoojate õppimisaeg
+
+Kas need hüpoteesid on ühe- või kahepoolsed?
+
+```{r}
+t.test(kaua_opid ~ lemmikjook, data = kysimustik, var.equal = T)
+```
+  
+Vaatame esialgu lihtsalt *p*-väärtust, mis on `r round(t.test(kaua_opid ~ lemmikjook, data = kysimustik, var.equal = T)$p.value, 3)`. Nagu kiri testis ütleb, siis on alternatiivne hüpotees ehk H1 see, et keskmiste erinevus populatsioonis ei ole 0. Kuna vaikimisi on *α* väärtus enamasti 0.05 ja seega *p* > *α*, siis me alternatiivset hüpoteesi vastu võtta ei saa ja peame jääma nullhüpoteesi juurde, mille kohaselt kohvijoojate õppimisaeg ei erine teejoojate õppimisajast.
+
+Sama näeme ka karpdiagrammilt.  
+
+```{r, echo =F}
+boxplot(kaua_opid ~ lemmikjook, data = kysimustik)
+```
+```{r}
+# ggplotiga
+library(ggplot2)
+ggplot(data = kysimustik) +
+  geom_boxplot(aes(x = lemmikjook, y = kaua_opid))
+```
+
+
+Teine näide: kas üliõpilased, kellel on varasemaid kogemusi kvantitatiivsete meetoditega, on keskmiselt kauem ülikoolis õppinud kui need, kellel kogemusi ei ole?
+
+H0: kogemuseGA õppimisaeg = kogemuseTA õppimisaeg<br>
+H1: kogemuseGA õppimisaeg > kogemuseTA õppimisaeg
+
+
+```{r,results = 'hold'}
+t.test(kaua_opid ~ kogemused_kvant, data = kysimustik, alternative = "less", var.equal=T)
+boxplot(kaua_opid ~ kogemused_kvant, data = kysimustik)
+```
+
+NB! Ühepoolse hüpoteesi testimiseks peaksime me eelnevalt konkreetsest valimist sõltumatult teadma, et kvantitatiivsete meetodite kogemustega üliõpilased ei saa olla vähem aega ülikoolis õppinud kui ilma kogemusteta üliõpilased, sest ühepoolse testiga me seda võimalust üldse ei testi.
+Peale selle peab ühepoolse testi puhul `y~x` süntaksit kasutades teadma, mis on faktori `x` tasemed. Argument **`alternative = "less"`** tähendab, et järjekorras 1. tase ehk baastase < alternatiivtase. Vaatame igaks juhuks üle, mis on tasemete järjekord:
+```{r}
+levels(kysimustik$kogemused_kvant)
+```
+
+```{r, echo=F}
+test.p.vaartus <- (t.test(kaua_opid ~ kogemused_kvant, data = kysimustik, alternative = "less", var.equal=T)$p.value)
+```
+
+Kuna "Ei" on baastase, võrdleb test argumendiga `alternative = "less"` seda, kas "Ei" grupis ehk kvantmeetodite kogemuseTA üliõpilaste seas oleks keskmine õpinguaeg **lühem** kui "Jah" grupis.
+Kuna *p*-väärtus on `r test.p.vaartus`, siis saame vastu võtta alternatiivse ehk sisuka hüpoteesi ning tõdeda, et kvantmeetodite kogemuseta üliõpilaste ülikoolis õpitud aeg on keskmiselt lühem kui kogemustega üliõpilastel.
+
+Kui seame oma hüpoteesid valesti, siis ühepoolse testiga võime teha valesid järeldusi:
+```{r}
+t.test(kaua_opid ~ kogemused_kvant, data = kysimustik, alternative = "greater", var.equal=T)
+```
+Sellise ühepoolse testi tulemus, et kogemusteTA rühma õppimiseg **ei ole pikem** kui kogemusteGA rühmal ei tähenda automaatselt, et rühmad ei ole erinevad ja et nad kuuluvad samasse populatsiooni, sest kogemusteTA rühma õppimisaeg võib ka olla lühem kui kogemusteGA rühmal. Seega, kui meil ei ole kindlat põhjust kasutada ühepoolset testi, siis peaks alati valima pigem kahepoolse.
+
+## Jaotused, normaaljaotus
+
+Jaotus (ingl *distribution*) näitab seda, kuidas andmepunktid on skaalal jaotatud.
+
+```{r, echo=FALSE, fig.align = 'center', fig.height = 8, fig.width = 12}
+par(mfrow=c(2,3))
+plot(function(x)dunif(x, min=-3, max=3), -3,3, main="Ühtlane jaotus")
+plot(function(x)dnorm(x), -3,3, main="Normaaljaotus")
+plot(function(x)df(x,3,100), 0,4, main="Asümmeetriline")
+plot(function(x)df(x,1,10)/3, 0.2,3, main="J-jaotus")
+plot(function(x)(dnorm(x, mean=3, sd=1)+dnorm(x, mean=-3, sd=1))/2, -6,6, main="Kahetipuline jaotus")
+plot(function(x)-dnorm(x), -3,3, main="U-jaotus")
+```
+Joonise kood Keith Johnson 2008, Quantitative methods in linguistics, lk 14-15.
+
+ - **ühtlase jaoutse** puhul on kõiki väärtuseid võrdne hulk;
+ - **normaaljaotuse** kõige sagedasem väärtus on keskmine ja väärtused jagunevad selle ümber ühtlaselt mõlemale poole;
+- **asümmeetrilise jaotuse** tipp ehk sagedaseim väärtus ei ole keskmine ja tipust allapoole ja ülespoole jäävad servad ei ole sümmeetrilised;
+- **J-jaotuse** puhul on kõige sagedasem väärtus ühes skaala otsas ja väärtuste sagedus langeb skaala teise otsa poole liikudes;
+- **Kahetipulises jaotuses** on kaks sagedasemat väärtust;
+
+### Normaaljaotus
+
+Normaaljaotus e Gaussi jaotus iseloomustab tunnust, mille puhul suur hulk väärtusi koonduvad keskmise ümber, keskmisest oluliselt erinevaid väärtusi on vähe ning need jaotuvad keskmisest ühtlaselt mõlemale poole. Vt Galtoni seemnesorteerija, mis genereerib normaaljaotusega hunnikuid: <https://en.wikipedia.org/wiki/Bean_machine>
+
+**Miks normaaljaotus nii hea on?**
+
+- Langevad kokku keskmine ja mediaan.
+- Keskmisest ühe standardhälbe kaugusel on 68% vaatlustest, kahe standardhälbe kaugusel 95% vaatlustest ja kolme standardhälbe kaugusel 99% vaatlustest.
+
+```{r, echo=FALSE}
+par(mfcol=c(1,1))
+plot(function(x)dnorm(x), -3,3, main="Normaaljaotus", xlab = "Standardhälve", ylab = "(Suhteline) sagedus", ylim=c(-0.02, 0.5))
+polygon(x=c(-3,3,3,-3), y=c(0,0,0.05,0.05), border = F, col=rainbow(1, start = 0.6, alpha=0.2))
+text(x=0, y=0.015, "3 sd 99% andmetest", col="black")
+arrows(y0=0, y1=0, x0=-3, x1=3,code = 3)
+polygon(x=c(-2,2,2,-2), y=c(0,0,0.24,0.24), border = F,col=rainbow(1, start = 0.4, alpha=0.2))
+text(x=0, 0.065, "2 sd 95% andmetest", col="black")
+arrows(y0=0.05, y1=0.05, x0=-2, x1=2,code = 3)
+polygon(x=c(-1,1,1,-1), y=c(0,0,0.4,0.4), border = F, col=rainbow(1, start=0.2, alpha=0.2))
+text(x=0, 0.28, "1 sd\n68% andmetest", col="black")
+arrows(y0=0.24, y1=0.24, x0=-1, x1=1,code = 3)
+```
+
+**...sest see on kirjeldatav kahe arvuga**
+
+Kui me teame teame **keskmist** ja **standardhälvet**, siis me võime tuletada kõigi teiste punktide väärtused.
+<br><br>
+Näiteks kui meil on (hüpoteetiliselt) klassitäis lapsi (ütleme nt 32 last), kelle keskmine pikkus on 150 cm ja standardhälve on 10 cm, 
+
+- siis on üsna tõenäone, et nad jäävad vahemikku 120-180 cm (st 3 standardhälvet kummalegi poole keskmist) 
+- ja tõenäoselt mitte rohkem kui 5 last on lühemad kui 140 cm ja mitte rohkem kui 5 last pikemad kui 160 cm (68% jäävad ±1 standardhälbe piiresse, seega 100-68=32% jäävad sellest välja, sellest pooled ehk 16% jäävad sellest allapoole ning sama palju sellest ülespoole, 32-st 16% on 5.12).
+
+Näiteks: genereerime vektori 32 väärtusega, mis on normaaljaotusega, keskmine 1.5 ja standardhälve 0.1
+```{r}
+pikkus <- rnorm(n=32, mean=1.5, sd=0.1)
+summary(pikkus)
+```
+```{r}
+sd(pikkus)
+```
+NB! Kuna rnorm() genereerib väärtused juhuslikult, siis on tulemus iga kord erinev!
+
+```{r, fig.align = 'center'}
+hist(pikkus)
+```
+
+Juhuslik valim ei pruugi alati ideaalselt normaaljaotusega olla. Näiteks kui korrata seda käsku 10 korda, siis tulemus on iga kord veidi erinev ja mitte alati päris sümmeetriline: 
+```{r, fig.align = 'center', fig.height = 6, fig.width = 12}
+par(mfrow=c(2,5))
+for(i in 1:10) hist(rnorm(32 ,1.5, 0.1), xlim=c(1.2, 1.8), breaks = 10)
+```
+
+
+Aga mida suurem valim, seda rohkem läheneb normaaljaotusele. Genereerime mitu eri suurusega valimit samast jaotusest:
+```{r, fig.align = 'center', fig.height = 6, fig.width = 12}
+par(mfrow=c(2,5))
+for(i in 1:10) hist(rnorm(2^i ,1.5, 0.1), xlim=c(1.2, 1.8), main=paste(2^i, "punkti"))
+```
+
+
+
+## Normaaljaotuse testimine
+
+
+Kuna paljud statistilised testid (t-test, anova, lineaarne regressioon) eeldavad, et andmed on normaaljaotusega, siis peaks enne testi kasutamist veenduma, et eeldus on täidetud.
+<br><br>
+Jaotuse normaalsuse testimiseks on võimalik:
+
+- vaadata histogrammi ja visuaalselt hinnata (`hist()`)
+- võrrelda tegelikku ja teoreetilist kvantiilide jaotust (`qqnorm()` ja `qqline()`)
+- kasutada normaaljaotuse testi (Shapiro-Wilki, Kolmogorovi–Smirnovi test)
+
+### Histogramm
+
+Histogrammi vaadates näeb (enam-vähem), kas jaotus on sümmeetriline. See ei ole mingi lollikindel test, aga annab esmase ülevaate.
+```{r}
+hist(pikkus)
+```
+```{r}
+# ggplotiga
+ggplot(data = as.data.frame(pikkus)) +
+  geom_histogram(aes(x = pikkus), bins = 6)
+```
+
+
+### Kvantiilide võrdlemine
+
+Üks võimalus on võrrelda andmete kvantiiljaotust. Kas teoreetiline ja tegelik jaotus lähevad kokku?
+```{r}
+qqnorm(pikkus)
+qqline(pikkus)
+```
+```{r}
+# ggplotiga
+ggplot(data = as.data.frame(pikkus), 
+       aes(sample = pikkus)) +
+  geom_qq() +
+  geom_qq_line()
+```
+
+
+### Shapiro-Wilki test
+
+Shapiro testi **nullhüpotees** on, et valim **on** pärit **normaaljaotusega** populatsioonist. Tulemus on *p*-väärtus, mis on tõenäosuslik hinnang, et nullhüpotees kehtib. Kuna **pikkus** on juhuslikult genereeritud, siis on väärtused iga kord erinevad, aga näiteks kui *p* = `r shapiro.test(pikkus)$p`, siis võib öelda, et `r round(shapiro.test(pikkus)$p*100)`% tõenäosusega on tegu normaaljaotusega. Tulemuse tõlgendamisel on tavaliselt *α* = 0.05 ehk et kui on *p* > 0.05, võib otsustada, et on normaaljaotus, kui on *p* < 0.05, siis ei ole. 
+
+```{r}
+shapiro.test(pikkus)
+```
+
+Tasub tähele panna, et *p*-väärtuse tõlgendamine selles testis käib seega mõnes mõttes teistpidi kui teistes testides, millega järgmistel kordadel tegeleme, kui tahame näha võimalikult väikseid p-väärtusi. *p*-väärtuse tõlgendamine tuleneb otseselt nullhüpoteesist.
+
+
+## Normaaljaotuse testimine (2. näide)
+
+Oletame, et tahame vaadata, kas ülikoolis õpitud aastate arv erineb nende hulgas, kel on kvantitatiivsete meetoditega varasemaid kogemusi, ja nende hulgas, kellel ei ole. Uuritav tunnus on arvuline ja seletav/grupeeriv kategoriaalne, seega on esimesed kaks eeldust täidetud. Samuti on täidetud valimi juhuslikkuse nõue. Testime nüüd normaaljaotust.  
+
+### Histogramm
+
+Histogrammi vaadates näeb (enam-vähem), kas jaotus on sümmeetriline. See ei ole mingi lollikindel test, aga annab esmase ülevaate.
+```{r, eval=F}
+hist(kysimustik$kaua_opid)
+```
+
+Normaaljaotuse puhul peaks kõige kõrgem tulp jääma joonise keskele ning tulpade kõrgus kahanema enam-vähem ühtlaselt mõlema skaala äärmuse suunas. Sellel joonisel ei ole seega väga tõenäoliselt tegu normaaljaotusega. 
+
+### Kvantiilide võrdlemine
+
+Üks võimalus on võrrelda andmete kvantiiljaotust. Kas teoreetiline ja tegelik jaotus lähevad kokku?
+```{r, eval=F}
+library(ggplot2)
+ggplot(data = kysimustik, 
+       aes(sample = kaua_opid)) +
+  geom_qq() +
+  geom_qq_line()
+```
+
+Vasakul, y-teljel näeme tegelikke kvantiile: ehkki mõõtmiste skaala on `r min(kysimustik$kaua_opid)` -- `r max(kysimustik$kaua_opid)` aastat, jääb suurem osa andmepunkte `r paste(quantile(kysimustik$kaua_opid, probs = c(0.25,0.75)), collapse =" ja ")` vahele. Sellise jagunemise puhul eeldaks normaaljaotus (qq-joonel), et 95% andmetest jääks keskmisest +-2 standarhälbe kaugusele (x-teljel) ehk et andmepunktide skaala ulatus oleks antud juhul ülemisest otsast palju väiksem ning ulatuks alumises otsas palju kaugemale (miinuspoolele).
+
+```{r}
+# Tegelikud kvantiilid
+quantile(kysimustik$kaua_opid)
+```
+```{r}
+# Tegelike andmete keskmine
+mean(kysimustik$kaua_opid)
+# Tegelike andmete standardhälve
+sd(kysimustik$kaua_opid)
+```
+
+
+Milline võiks kvantiiljaotus välja näha, kui andmed oleksid normaaljaotusega? Genereerime meie andmestiku keskmise ja standardhälbega hulga juhuslikke arve:
+```{r}
+set.seed(1)
+pseudo_kaua_opid <- rnorm(n = length(kysimustik$kaua_opid), 
+             mean = mean(kysimustik$kaua_opid), 
+             sd = sd(kysimustik$kaua_opid))
+
+```
+(Käsk `set.seed` annab juhuslike arvude genereerimisele kindla "seemne", siis saame käsku korrates sama tulemuse.)
+
+
+Selline näeks siis välja kvantiiljaotuse graafik, kui sama keskmise ja standardhälbega sama suur andmestik oleks normaaljaotusega.
+```{r}
+qqnorm(pseudo_kaua_opid)
+qqline(pseudo_kaua_opid)
+```
+
+
+### Shapiro-Wilki test
+
+Shapiro-Wilk'i test hindab *tõenäosust, et valim on pärit normaaljaotusega populatsioonist*. Testi nullhüpotees on, et valim **on** pärit normaaljaotusega populatsioonist. Tulemuse tõlgendamisel on tavaliselt *α* = 0.05 ehk et *p* > 0.05, võib otsustada, et on normaaljaotus (me ei saa nullhüpoteesi ümber lükata), kui *p* < 0.05, siis ei ole (on alust vastu võtta alternatiivne hüpotees: valim ei ole pärit normaaljaotusega populatsioonist). 
+
+```{r, eval=F}
+shapiro.test(kysimustik$kaua_opid)
+```
+
+Nagu ka joonistelt juba näha oli, ei ole ülikoolis käidud aastate arv normaaljaotusega: *p*-väärtus on `r shapiro.test(kysimustik$kaua_opid)$p.value` ehk on `r shapiro.test(kysimustik$kaua_opid)$p.value*100`-protsendiline tõenäosus, et saaksime sama suure (enamasti see tähendab lihtsalt, et nullist erineva) statistiku väärtuse juhul, kui nullhüpotees ikkagi kehtib. See on väga väike tõenäosus, seega hülgame nullhüpoteesi.
+
+### Kui ei ole normaalajaotus, mis siis saab?
+
+- Ürita andmeid normaliseerida VÕI
+- kasuta mitteparameetrilist testi.
+
+Enamasti, kui  andmed on paremale kallutatud (*right-skewed*) ehk väikeseid väärtusi on rohkem kui suuri ning mood ja mediaan on seega väiksemad kui aritmeetiline keskmine (mida tuleb ette tihti, kui mõõdame millegi kestust, pikkust vms suurust), siis võib jaotuse normaliseerida see, kui andmed logaritmida. Logaritmimine on astendamise pöördtehe ehk kui astendades leiame mingi väärtuse $a^b=c$, siis logaritmides leiame hoopis astendaja $log_{a}c=b$. Näiteks $2^3=8$ (ehk `2*2*2=8`)ja $log_28=3$. Mingeid väärtusi logaritmides teisendame need seega mingi kokkulepitud väärtuse (nt *`e`*, 10, 2 vm) astendajateks ning vähendame seeläbi suurte erinevuste mõju väärtuste vahel.
+
+```{r}
+# Võtame nt 2 arvu: 10 ja 100.
+# Teine on esimesest 10 korda suurem.
+100/10
+
+# Kui mõlemat logaritmida,
+# on erinevus ainult kahekordne.
+log(100)/log(10)
+```
+
+Logaritmimiseks on R-is niisiis käsk `log()`, mis vaikimisi kasutab kokkulepitud väärtuse ehk alusena (valemis $a$) Euleri arvu *`e`*, mis on `2.71828`. Võib kasutada ka funktsiooni `log2()`, mille alus on 2, `log10()`, mille alus on 10, või kui andmetes on väärtus 0, siis `log1p()`. Viimane liidab igale väärtusele 1 juurde. Seda seepärast, et logaritm mis tahes alusel arvust 0 on negatiivne lõpmatus, millega pole midagi pihta hakata. **Logaritmida saab ainult positiivseid arve!**
+
+```{r}
+log(0)
+```
+
+Vaatame nüüd ülikoolis õpitud aastate logaritmitud väärtuste jaotust. Kui õpitud aastate mediaanväärtus on `r median(kysimustik$kaua_opid)`, siis selle logaritm oleks `r log(median(kysimustik$kaua_opid))`, sest `2.71828^``r log(median(kysimustik$kaua_opid))` on `r 2.71828^log(median(kysimustik$kaua_opid))`.  
+
+```{r, eval=F}
+hist(log(kysimustik$kaua_opid))
+
+qqnorm(log(kysimustik$kaua_opid))
+qqline(log(kysimustik$kaua_opid))
+
+shapiro.test(log(kysimustik$kaua_opid))
+```
+
+Kas logaritmimine aitas meil saavutada uuritava tunnuse normaaljaotuse?
+
+ - kui *p* > 0.05, siis jääme nullhüpoteesi juurde, mille kohaselt andmed on normaaljaotusega.
+ - Kui *p* < 0.05, lükkame nullhüpoteesi ümber ja järeldame, et andmed **ei ole normaaljaotusega**.
+
+Aga peale selle, et üritada andmeid normaliseerida, tasuks kontrollida, palju andmeid oligi.  Parameetriliste testide puhul peaks normaaljaotuse nõudesse rangemalt suhtuma juhul, kui mõõtmisi on vähem kui 30. Kui mõõtmisi on alla 30 ja andmed ei ole normaaljaotusega ka normaliseerides, siis peaks valima mitteparameetrilise testi. Kui andmeid on rohkem, siis võib ka mitte normaaljaotusega andmestikuga parameetrilist testi teha.
+
+```{r}
+length(kysimustik$kaua_opid)
+```
+
+
+
+
+## Lõpetuseks
+
+### Harjutusi
+
+Proovime `kysimustik` andmestiku peal:
+
+- Millistelt tunnustelt võiks üldse normaaljaotust eeldada?
+- Vaata nende tunnuste histogrammi, qq-graafikut ja tee Shapiro test.
+- Kas andmed on normaaljaotusega?
+
+
+### Järgmisel korral
+
+
+Gruppidevaheliste erinevuste hindamine (arvuline sõltuv tunnus ~ kategoriaalne seletav tunnus):  
+
+- parameetrilised testid (kui eeldused on täidetud)
+  * t-test (kaks rühma)
+- mida teha, kui ei ole normaaljaotus? (logaritmimine)
+- mitteparameetrilised testid (kui pole normaaljaotus)
+  * Wilcoxoni test (kaks rühma)
+  

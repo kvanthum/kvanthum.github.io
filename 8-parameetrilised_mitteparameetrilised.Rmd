@@ -1,0 +1,545 @@
+---
+title: "8. praktikum"
+knit: (function(input_file, encoding) {
+    out_dir <- 'docs';
+    rmarkdown::render(input_file,
+      encoding=encoding,
+      output_file=file.path(dirname(input_file), out_dir, '8-parameetrilised_mitteparameetrilised.html'))})
+date: 16.03.2022
+output: 
+  html_document:
+    theme: flatly
+    highlight: tango
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Parameetrilised ja mitteparameetrilised testid {.tabset .tabset-pills}
+
+## Tänases praktikumis
+
+
+**Tänased teemad:**  
+
+
+- Hüpoteeside testimine: parameetrilised testid
+  * t-test (kaks rühma)
+- Hüpoteeside testimine: mitteparameetrilised testid
+  * Wilcoxoni astaksummatest (= Manni-Whitney U-test) (kaks rühma)
+- Efekti suuruse hindamine
+
+Kasutame andmestikke `kysimustik_2022.RData` ja `kandidaadid.RData`
+
+```{r}
+load("data/kysimustik_2022.RData")
+load("data/kandidaadid.RData")
+```
+
+## Parameetrilised testid
+
+Parameetrilisteks testideks nimetatakse statistilisi teste, mis eeldavad, et uuritavad andmed on mingi kindla jaotusega. 
+
+Näiteks normaaljaotus on parameetriline jaotus, kuna selle puhul piisab paari parameetri (keskväärtuse ja standardhälbe) hindamisest, et määrata võrdlemisi täpselt kogu populatsiooni. Teades neid paari parameetrit, võib vastata mistahes küsimusele tunnuse jaotuse kohta.
+
+### Sobiva testi valik
+
+- Kas **uuritav** tunnus on arvuline või nominaalne?
+- Kui **uuritav** tunnus on nominaalne, siis mitu taset tal on?
+- Kui **uuritav** tunnus on arvuline, siis kas ta on normaaljaotusega?
+- Kas andmepunktid on üksteisest sõltumatud, st mis tahes kaks vaatlust ei ole omavahel seotud (nt pärit samalt katseisikult)?
+- Kas **seletav** tunnus on arvuline või nominaalne?
+- Kui **seletav** tunnus on nominaalne, siis mitu taset tal on?
+- Kas on mitu seletavat tunnust?
+
+
+<center><img src = "imgs/data_test.jpg"></center>
+
+
+<br>
+<br>
+Kahe grupi keskmiste võrdlemiseks sobib nt t-test, aga seda teatud tingimustel.  
+
+## T-testi eeldused
+
+T-test sobib siis, kui:
+
+- uuritav tunnus on arvuline;
+- seletav tunnus kategoriaalne ning sellel on kaks taset (jagab uuritava tunnuse väärtused sisuliselt kahte rühma);
+    + aritmeetilise keskmise võrdlemine kahes grupis (kas kaks gruppi on samast populatsioonist) või võrdlemine mingi konstandiga (kui teame mingit populatsiooni parameetrit, nt kõikide Tabasalu meeste keskmist pikkust, Tammsaare teoste keskmist sõnade pikkust, komplekssust vmt, siis saame kontrollida, kas meie valim pärineb samast populatsioonist);
+- uuritav tunnus on normaaljaotusega või kummaski grupis on vaatluste arv > 30;
+- valim on juhuslik st uuritavad subjektid on valimisse valitud juhuslikult;
+    + sealjuures võib tegu olla sõltumatute mõõtmistega või sõltuvate kordusmõõtmistega.
+
+
+### Sõltumatud mõõtmised
+
+**Mida tähendab 'sõltumatud mõõtmised'?**
+
+- soorituskatse, kus iga katseisiku kohta on üks sooritus/mõõtmine;
+- korpusel põhinevad mingi keelenähtuse sagedused, iga teksti kohta üks;
+- arheoloogilised leiud, kõik ühest leiukohast / igast leiukohast üks;
+- värsside arv ühe autori luuletustes / igalt autorilt üks näide;
+
+**Mõõtmised ei ole rühma sees sõltumatud, kui...**
+
+- soorituskatses iga katseisik vastab mitmele küsimusele;
+- korpuses, kus on mitu erinevat teksti ja igas tekstis on mitu lauset, mingit iga lause puhul mõõdetud tunnust;
+- üliõpilaste eksamitulemused erinevatel kursustel, kui (osaliselt) samad üliõpilased osalevad mitmel kursusel...
+- ...
+
+Kordusmõõtmistega test:
+
+- Rühma sees on mõõtmised sõltumatud, aga võrreldavate rühmade vahel on kokku kuuluvad mõõtmiste paarid. Näiteks soorituskatse, kus testitakse sooritust kahes erinevas tingimuses, erinevatel ajahetkedel jne.
+- Nt katseisikute rühma kehatemperatuuri on mõõdetud enne ja pärast ravimi manustamist.
+- Nt ühe klassi keeleoskust on testitud enne ja pärast keelekursust
+- ...
+
+**Mida teha, kui mõõtmised ei ole sõltumatud?**
+
+Lihtsam ja klassikalisem variant on arvutada iga indiviidi kohta vaadeldavate kategooriate keskmine väärtus. Alternatiiv oleks kasutada sellist testi, mis ei eelda sõltumatuid mõõtmisi, nt segamudelit (neist 13. praktikumis).
+
+### Normaaljaotus
+
+Alati tasuks vaadata andmete jaotust. Kindlasti ei ole mõtet teha t-testi, kui jaotus on ühtlane. Jaotuse kontrollimiseks võiks kasutada nii visualiseerimist kui normaaljaotuse testi (`hist`, `qqnorm`+`qqline`, `shapiro.test`). 
+
+Kui ei ole normaaljaotus, võiks proovida normaliseerimist. Paremale kallutatud (ingl *skewed right*) asümmeetrilise jaotuse korral tasuks proovida logaritmimist (`log`). Kui mõõtmiste hulgas on väärtust 0, siis käsk `log1p`, mis lisab kõigile väärtustele +1. (Negatiivseid väärtuseid logaritmida ei saa, nii et kui neid on, siis enne logaritmimist tasuks reskaleerida andmed miinimumväärtuse suhtes.) 
+
+Kui andmed ei allu normaliseerimisele, siis kui on >30 mõõtmist, võib ikkagi t-testi teha, kui on vähem, siis peaks mitteparameetrilise testi valima.
+
+## Ühe valimiga t-test
+
+Ühe valimiga testi teeme siis, kui teame mingit populatsiooni parameetrit (t-testi puhul aritmeetilist keskmist) ja tahame teada, kas meie valim kuulub selle parameetriga iseloomustatavasse populatsiooni. Siia sobiks eelmise praktikumi mahlapakinäide, kus küsime, kas liitristes mahlapakkides (valim) on ka tegelikult lubatud liiter mahla (poplulatsioon).
+
+Proovime hüpoteetilise näite peal. Näiteks oletame, et me teame, et mingis vanuses on koolilaste pikkus keskmiselt poolteist meetrit ja siis on meil üks klassitäis lapsi ja tahame kontrollida, kas nad pikkuse poolest sobituvad sellesse vanuserühma:
+```{r}
+# 32 last keskmise pikkusega 1.5 meetrit
+# ja standardhälbega 0.1 meetrit.
+pikkus <- rnorm(32, 1.5, 0.1)
+
+# mu tähistab parameetrit, mille osas
+# valimit testime. Antud juhul on see
+# pikkuse aritmeetiline keskmine 1.5 meetrit.
+t.test(pikkus, mu = 1.5)
+```
+
+Testist saame sisuka/alternatiivse hüpoteesi kohta lugeda, et *alternative hypothesis: true mean is not equal to 1.5* (keskmine ei võrdu 1.5-ga), mis tähendab omakorda, et nullhüpotees on, et selle populatsioon keskmine pikkus, kust meie valim pärit on, on (enam-vähem) võrdne 1.5 meetriga. Kuna *p*-väärtus on kõvasti suurem kui 0.05, siis peame jääma nullhüpoteesi juurde ning saame kinnitust, et jah, meie klassi 32 last kuuluvad sellesse populatsiooni, kelle keskmine pikkus on 1.5 meetrit.
+
+## Ühe või kahe sabaga test?
+
+**Alternatiivne hüpotees** võib olla sõnastatud üldiselt, et üks rühm on teisest erinev. Seda nimetatakse **kahe sabaga** (*two-tailed*) testiks. Aga alternatiivne hüpotees võib olla ka suunatud, st et ühe rühma väärtus on kõrgem kui teisel. Seda nimetatakse **ühe sabaga** (*one-tailed*) testiks. Seda on oluline arvestada, sest sellest sõltub, kui palju meil on eksimisvabadust.
+
++ Ühe sabaga (*one-tailed*) testi teeme siis, kui meil on kindlad teadmised selle kohta, et üks rühm on suurem kui teine ja vastupidist võimalust ei ole. Kogu 5% eksimisvabadust (*⍺* = 0.05) pannakse selle peale, et X on suurem kui Y ning vastupidist võimalust ei kontrollita. Seega kui tegelikult Y on suurem kui X, siis ühe sabaga testiga me sellele kinnitust ei saa.
++ Kahe sabaga (*two-tailed*) testi teeme siis, kui üks rühm võib olla teisest nii suurem kui väiksem ja mõlemat võimalust on vaja kontrollida. Kahe sabaga testi puhul jagatakse vastavalt ka eksimisvõimalus kahe alternatiivse võimaluse vahel ja seega on *p*-väärtus kahe sabaga testil poole suurem.
++ Hüpoteesid peaks sõnastama ja valiku ühe või kahe sabaga testi vahel tegema lähtuvalt eelnevatest teadmistest andmete olemuse kohta, mitte lähtuvalt tulemusest.  
++ Ühe sabaga testi kasuks peaks otsutama siis, kui see mingil välisel põhjusel on õigustatud, mitte selleks, et saavutada võimalikult suurt *p*-väärtust.
++ T-testi argument `alternative = c("two.sided", "less", "greater")`.
+
+Näiteks me teame, et lasteaias neid samu lapsi mõõdeti ja siis nende keskmine pikkus oli 1.3 meetrit ja me taham teada, kas nad on oluliselt kasvanud. Me teame, et lühemaks jääda nad ei saa, seega võime teha ühe sabaga testi ja küsida, kas mõõdetud laste pikkus on oluliselt pikem kui 1.25 (see on siis H1):
+
+```{r}
+t.test(pikkus, mu = 1.3, alternative = "greater")
+```
+
+
+## Kahe valimiga t-test
+
+
+Kui meil on üks seletav tunnus, millel on kaks taset, ja tahame teha t-testi, et võrrelda, kas kahe grupi keskmised erinevad, peame vaatama, kuidas andmed on korrastatud.
+
+- Kaks tulpa, ühe rühma andmed ühes ja teise rühma andmed teises tulbas: `t.test(x, y)`
+- Ühes tulbas uuritav tunnus, teises tulbas rühmitav tunnus: `t.test(y~x)`
+
+```{r}
+head(kysimustik[,c("kaua_opid", "kogemused_kvant")])
+```
+
+Kuna meil ei ole otseselt alust oletada, et eelnevate kogemustega üliõpilased on kauem ülikoolis käinud või vastupidi, siis teeme kahepoolse testi. Kuna tegu ei ole kordusmõõtmistega, kasutame testi sõltumatute valimitega varianti, mille puhul    
+**H0**: Kogemustega ja kogemusteta üliõpilaste keskmine ülikoolis õpitud aastate arv ei erine.  
+**H1**: Kogemustega ja kogemusteta üliõpilaste keskmine ülikoolis õpitud aastate arv on erinev.
+
+```{r}
+t.test(kysimustik$kaua_opid ~ kysimustik$kogemused_kvant)
+```
+
+*p*-väärtus on < 0.05, seega peame hülgama nullhüpoteesi ja võtma vastu alternatiivse hüpoteesi, mille kohaselt kvantmeetodite kogemustega ja kogemusteta üliõpilaste ülikoolis õpitud aastate keskmised on erinevad.  
+
+T-statistiku väärtus üksinda ei ütle meile eriti midagi, sest see ei ole samades ühikutes kui uuritav tunnus. Nullhüpoteesi kehtivuse korral (kui kahe grupi keskmised on täpselt võrdsed) on t-statistiku väärtus 0. Selle, kui kaugele *t* väärtus võib 0-st kummaski suunas minna, määrab vabadusastmete arv ([*df*](https://blog.minitab.com/blog/statistics-and-quality-data-analysis/what-are-degrees-of-freedom-in-statistics)) ja olulisusnivoo (*⍺*). Kui nt statistiku suurus on `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$statistic` ja *p*-väärtus `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$p.value`, siis tõenäosus, et saame sellise statistiku väärtuse nii suure valimiga, on `r round(t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$p.value*100, 1)`%, eeldusel, et kehtib nullhüpotees ja gruppide vahel pole mingit erinevust. 
+
+Kahepoolne test ei testi otseselt, kas ühe või teise grupi keskmine on teisest oluliselt suurem/väiksem, ent seda, mille alusel test erinevuse leiab, näeb väljundi lõpust, kus on antud kahe grupi keskmised: kogemusteta üliõpilaste **logaritmitud** ülikoolis õpitud aastate keskmine on 1.06 ja kogemustega üliõpilaste **logaritmitud** ülikoolis õpitud aastate keskmine 1.88. Kontrollime:
+
+```{r}
+mean(kysimustik[kysimustik$kogemused_kvant == "Ei", "kaua_opid"])
+mean(kysimustik[kysimustik$kogemused_kvant == "Jah", "kaua_opid"])
+```
+
+*95 percent confidence interval* väljundis näitab, et 95-s juhuslikus valimis 100-st jääks nende kahe grupi keskmiste vahe ehk `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$estimate[1]-t.test(log(kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$estimate[2]` näidatud vahemikku `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$conf.int[1]` ja `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$conf.int[2]` vahele. Kui kahe grupi keskmised üksteisest oluliselt ei erineks, siis jääks usaldusvahemikku ka väärtus 0 (nulli saab ju siis, kui lahutada ühest keskmisest teine keskmine, mis on sama suur kui esimene).
+
+Vaikimisi teeb R sellise t-testi, milles ta eeldab, et kahe grupi hajuvus ei ole võrdne ehk dispersioonid ei ole võrdsed (*Welch Two Sample t-test*), mis on tihtipeale tõsi.
+
+```{r}
+var(kysimustik[kysimustik$kogemused_kvant == "Ei","kaua_opid"])
+var(kysimustik[kysimustik$kogemused_kvant == "Jah","kaua_opid"])
+```
+
+Dispersioonide erinevust saab kontrollida F-testiga (R-is `var.test()`), kus F-statistik on kahe grupi dispersioonide jagatis. 
+```{r}
+var.test(kysimustik$kaua_opid ~ kysimustik$kogemused_kvant)
+```
+
+Kui F-statistiku väärtus on 1, siis on dispersioonid võrdsed. Mida rohkem F-statistik 1-st erineb, seda erinevamad on kahe grupi dispersioonid. Juhul, kui esimese grupi dispersioon on väiksem kui teise grupi oma, siis jääb väärtus 0 ja 1 vahele (mida lähemale 0-le, seda erinevamad dispersioonid teineteisest on). Kui esimese grupi dispersioon on suurem kui teise grupi oma, siis jääb väärtus 1 ja lõpmatuse vahele. Teisisõnu: F = 0.5 ja F = 1.5 ei näita ühesuurust erinevust gruppide dispersioonides.  
+Kui *p* > 0.05, siis jääb kehtima nullhüpotees, et kahe dispersiooni suhe/jagatis on 1. Kui *p* < 0.05, siis peab vastu võtma alternatiivse hüpoteesi, mille kohaselt dispersioonid ei ole võrdsed (ja peaks tegema Welchi t-testi).  
+
+Dispersiooni peaks kontrollima sama andmestikuga, millega t-testi teeme, st KUI oleksime jaotuse normaliseerimiseks andmed logaritminud, siis peaks ka dispersiooni testi sisendis logaritmima: 
+
+```{r}
+var.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant)
+```
+
+Logaritmitud uuritava tunnusega on gruppide dispersioon sarnane (*p* > 0.05), nii et saab teha võrdsete dispersioonidega t-testi (`var.equal = TRUE`).
+
+```{r}
+t.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant, 
+       var.equal = TRUE)
+```
+
+## Kuidas t-testi tulemust raporteerida
+
+```{r}
+(tulemus <- t.test(kysimustik$kaua_opid ~ kysimustik$kogemused_kvant))
+```
+
+Artikli tekstis tuleks lisaks **p-väärtusele** kirja panna ka **statistiku t väärtus** ja **vabadusastmete arv**. Näiteks APA stiilis võiks see välja näha nii:
+"T-test näitas, et rühmad on erinevad: t (`r round(tulemus$parameter, 1)`) = `r round(tulemus$statistic, 1)`; p = `r round(tulemus$p.value, 3)`."
+
+Tihtipeale on ka kombeks p-väärtust näidata kategooriates suurem kui 0.05 (mitteoluline), väiksem kui 0.05, 0.01 või 0.001. Üldiselt üle kolme komakoha ei ole kombeks esitada.
+
+On olemas ka pakette, mis testi tulemust sõnastada aitavad, näiteks:
+```{r, warning=FALSE}
+library(report)
+report(tulemus) # käsu sisendiks on siis t-test
+```
+
+
+## Harjutus 1  
+
+Proovime t-testi tegemise läbi veel ühe näite peal.
+
+Andmestikus `kandidaadid.RData` on viimaste, 2019 märtsis toimunud riigikogu valimiste tulemused.
+
+1. Laeme andmestiku ja vaatame, mis see endast kujutab
+```{r, eval=F}
+load("kandidaadid.RData")
+str(kandidaadid)
+```
+
+2. Vaatame deskriptiivseid statistikuid: kui palju oli kandidaatide hulgas mehi ja naisi ja kui palju nad keskmiselt hääli said? Tulbas *sugu* on kandidaadi sugu ning tulbas *haali_kokku* on igale kandidaadile antud kogu häälte arv.
+```{r}
+# Käsuga table() saad vaadata sugude sagedust
+# Käsuga tapply(arvuline_tunnus, rühmitav_tunnus, FUN) saad vaadata keskmist häältesaaki sooti
+```
+
+3. Kas lisaks sellele, et mehi oli kandidaatide hulgas rohkem, anti neile ka rohkem hääli? Kas me võime selle kontrollimiseks kasutada t-testi? Kas t-testi eeldused on täidetud?
+
+```{r, eval=F, echo=T}
+hist(kandidaadid$haali_kokku)
+qqnorm(kandidaadid$haali_kokku)
+qqline(kandidaadid$haali_kokku)
+shapiro.test(kandidaadid$haali_kokku)
+```
+
+5. Sõnasta hüpoteesid. Kas ühe- või kahepoolne hüpotees?
+
+6. Kas dispersioonid on võrdsed?
+```{r, eval=F}
+var.test(kandidaadid$haali_kokku ~ kandidaadid$sugu)
+```
+
+7. Tee t-test. Kas Student või Welch? Kas ühe- või kahepoolne?
+```{r, eval=F, echo=F}
+t.test(log(haali_kokku)~sugu, 
+       data=kandidaadid, 
+       var.equal = TRUE)
+```
+
+8. Mis järelduse teeme?
+
+
+
+
+## Usaldusvahemik
+
+
+Valimit iseloomustavad karakteristikud (nt keskmine, mediaan, keskmiste erinevus vmt) ei pruugi kehtida ka populatsiooni ehk üldkogumi kohta.  
+
+Sellepärast on parem üldkogumit kirjeldada mingi vahemiku kaudu, millesse valimi karakteristik mingi tõenäosusega paigutub. Seda vahemikku nimetatakse __usaldusvahemikuks__.
+
+Usaldusvahemiku arvutamine sõltub konkreetsest statistikust, nt 2 grupi keskmiste erinevuse hindamise puhul t-testis sõltub selle erinevuse usaldusvahemik meie valimi mahust, andmete varieeruvusest ja __usaldusnivoost__, mis määrab ära tõenäosuse, millega mingi parameeter teatud vahemikus paikneb. Usaldusnivoo on 1-olulisusnivoo ehk 1-*α* (*α* on tavaliselt 0.05). 
+
+Nt 95% usaldusnivoo puhul jääks populatsiooni parameeter testi erinevate valimitega korrates 95-protsendilise tõenäosusega meie saadud usaldusvahemikku. Teisisõnu: 100st ühesuurusest valimist 95 puhul saame statistiku väärtuse, mis jääb meie valimi usaldusvahemikku.
+Kui usaldusvahemik sisaldab väärtust 0 ja testi nullhüpotees on, et mingi parameeter võrdub 0-ga, siis on ka *p*-väärtus suur ja nullhüpotees ("seosed on juhuslikud") jääb kehtima.
+
+<!-- Olulisusnivoo määras ära tõenäosuse, millega on lubatud 1. liiki viga ehk 0-hüpoteesi ümberlükkamine, kui tegelikult kehtib 0-hüpotees. Usaldusnivoo määrab seega ära tõenäosuse, millega ei lükata ümber õiget nullhüpoteesi.-->
+
+Vaatame uuesti testide väljundeid ning seekord pöörame tähelepanu usaldusvahemikule.  
+```{r}
+var.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant)
+```
+
+F-testi alternatiivne hüpotees on, et kahe grupi dispersioonide erinevus ei ole võrdne **1**-ga, ja nullhüpotees seega, et kahe grupi dispersioonide erinevus on võrdne **1**-ga. Seega peab nullhüpoteesi juurde jääma juhul, kui usaldusvahemik sisaldab väärtust 1. Antud juhul vastab see tõele: 95 valimis 100-st on F-statistik ehk kahe grupi dispersioonide jagatis 0.45 ja 2.62 vahel, hõlmates ka varianti F = 1, mispuhul dispersioonid on võrdsed. Seda, et usaldusvahemikku jääb väärtus, mille suhtes testi tehakse, näitab ka see, et testi *p*-väärtus on suur.
+
+```{r}
+t.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant)
+```
+
+T-testi alternatiivne hüpotees on, et kahe grupi keskmiste erinevus ei ole võrdne **0**-ga, ja nullhüpotees seega, et kahe grupi keskmiste erinevus on võrdne **0**-ga. Seega peab nullhüpoteesi juurde jääma juhul, kui usaldusvahemik sisaldab väärtust 0. Siin see paika ei pea: usaldusvahemik jääb -1.03 ja -0.095 vahele ega jäta võimalust, et 95-l juhul 100-st võiks keskmiste erinevus olla ka 0 (erinevust ei oleks). Seega on ka *p*-väärtus väike ning nullhüpoteesi seose juhuslikkusest peab hülgama.
+
+## Mõju suurus
+
+__Statistiline olulisus__ (*significance*) näitab tõenäosust, et seos või efekt, mille me avastasime, on saadud juhuslikult ja kehtib nullhüpotees. Nt *p* = 0.05 näitab, et tõenäosus, et meie leitud seos on juhuslik ja tegelikkuses seost ei eksisteeri, on 5%.  
+Kuna seost või efekti peegeldab arvuliselt mingi teststatistik, näitab *p*-väärtus teisisõnu tõenäosust, et saaksime sellise statistiku väärtuse vaid juhuse läbi.
+
+__Mõju suurus__ (*effect size*) näitab, kui suur on ühe teguri mõju teisele. 
+
+Statistiline olulisus sõltub mõju suurusest ja valimi suurusest.
+
+*p* < 0.05 ei tähenda tingimata, et meie leitud seos on ka sisuliselt tähtis. *p* > 0.05 omakorda ei tähenda, et teguril ei ole tegelikkuses mingit mõju.
+
+Väike mõju suurel arvul isenditel võib olla statistiliselt oluline. Suur mõju väiksel arvul isenditel ei pruugi olla statistiliselt oluline. 
+
+T-test ütleb ainult seda, kui tõenäone on, et kahe rühma vahelised erinevused on juhuslikud. Seega, kui t-testi tulemus soovitab hüljata 0-hüpoteesi, saame me küll öelda, et rühmad on üksteisest oluliselt erinevad, aga mitte seda, kui palju nad erinevad.
+
+Mõju suurust (*efect size*) saab hinnata näiteks Coheni *d* abil. Selle leidmiseks on käsk paketis `effsize`. Kuna tegime t-testi logaritmitud häältesaagiga, kasutame ka siin enne tildet logaritmitud tunnust.  
+
+
+```{r, warning=FALSE}
+#install.packages("effsize")
+library(effsize)
+cohen.d(log(haali_kokku) ~ sugu, data=kandidaadid)
+```
+
+Kui *d* väärtus on positiivne, siis on esimese grupi keskmine suurem kui teise grupi oma. Kui negatiivne, on esimese grupi keskmine väiksem kui teise oma.
+Siin on *d* positiivne, seega on meeste (logaritmitud) häälesaak keskmiselt pisut suurem kui naiste oma. Mõju suurus on aga väga väike (*negligible*).
+
+Üldiselt räägitakse skaalast, kus    
+
+*|d|* <= 0.2: olematu mõju  
+0.2 < *|d|* <= 0.5: väike mõju  
+0.5 < *|d|* <= 0.8: keskmine mõju  
+0.8 < *|d|*: suur mõju  
+
+NB! Pakett `effsize` arvutab Coheni *d*-statistikut võrdsete dispersioonidega. Kui tahame statistikut olukorras, kus dispersioonid ei ole võrdsed (teeme Welchi t-testi), peame kasutama mõne teise paketi funktsioone. Coheni *d* arvutamiseks sobib näiteks ka paketi `report` funktsioon `report_effectsize()`. Näiteks kui logaritmitud häältesaagi dispersioon ei oleks meeste ja naiste seas ühtaoline, peaksime tegema t-testi ilma argumendita `var.equal = TRUE` ning mõju suuruse leidma funktsiooniga `report_effectsize(t.test(log(haali_kokku) ~ sugu, data = kandidaadid, var.equal = F))`.  
+
+## Mitteparameetrilised testid
+
+
+- T-test sobib rangelt võttes ainult normaaljaotusega arvulistele tunnustele, ehkki on näidatud, et see annab adekvaatseid tulemusi ka mittenormaaljaotustega.
+- Kui normaaljaotuse nõue on rikutud (tunnus kas pole üldse normaaljaotusega või ei ole seda ühel või teisel põhjusel meie valimis), ükski transformatsioon (nt logaritmimine) ei aita ja meil on vähe andmeid (rühma n < 30), peab kasutama mitteparameetrilisi teste. Mitteparameetrilise jaotuse puhul ei saa vähese arvu parameetritega mingit jaotust identifitseerida.
+- Mitteparameetrilisi teste on eriti soovitatav kasutada siis, kui
+    + tunnusel on erindid, mida pole võimalik välja jätta,
+    + tegemist on järjestustunnustega,
+    + on alust arvata, et mediaan kirjeldab tunnust paremini kui aritmeetiline keskmine (nt palkade jaotus).
+
+Mitteparameetrilised testid on nt **Wilcoxoni astaksummatest** (*rank sum test*), tuntud ka kui Manni-Whitney U-test, ja Wilcoxoni astakmärgitest (*signed rank test*). Esimene on alternatiiv sõltumatute mõõtmistega t-testile, teine sõltuvate mõõtmistega t-testile.  
+
+## Kuidas valida t- või U-testi vahel?
+
+<table style="width:100%; border:1px solid">
+    <tr style="background-color: #dddddd; border:1px solid">
+        <th>Eeldused</th>
+        <th>t-test</th>
+        <th>U-test</th>
+    </tr>
+    <tr>
+        <td>Juhuslikud valimid</td>
+        <td>Jah</td>
+        <td>Jah</td>
+    </tr>
+    <tr>
+        <td>Sõltumatud vaatlused</td>
+        <td>Jah</td>
+        <td>Jah</td>
+    </tr>
+    <tr>
+        <td>Vähemalt ...skaalal tunnus</td>
+        <td>intervall-</td>
+        <td>järjestus-&nbsp;&nbsp;&nbsp;</td>
+    </tr>
+    <tr>
+        <td>Normaaljaotus (või n>30)</td>
+        <td>Jah</td>
+        <td>Ei</td>
+    </tr>
+    <tr>
+        <td>Mõlema grupi hajuvus sarnane</td>
+        <td>Jah (Studenti t-test)<br>Ei (Welchi t-test)</td>
+        <td>Ei</td>
+    </tr>
+    <tr>
+        <td>Tegeleb...</td>
+        <td>keskmistega</td>
+        <td>mediaanidega</td>
+    </tr>
+</table> 
+
+
+
+Selles mitteparameetriliste testide peres on kaks sarnast testi, mõlemad R-is käsuga `wilcox.test()`.
+
+<table style="width:100%; border:1px solid">
+    <tr style="background-color: #dddddd; border:1px solid">
+        <th>Wilcoxon Rank Sum Test<br>(ka Manni-Whitney U-test)</th>
+        <th>Wilcoxon Signed Rank Test</th>
+    </tr>
+    <tr>
+        <td><strong>astak</strong>summatest</td>
+        <td><strong>astak</strong>märgitest</td>
+    </tr>
+    <tr>
+        <td>sõltumatud valimid (`paired=FALSE`)</td>
+        <td>sõltuvad valimid (`paired=TRUE`)</td>
+    </tr>
+    <tr>
+        <td>nullhüpotees: tõenäosus, et juhuslikult ühest grupist võetud väärtus on suurem/väiksem kui teisest grupist juhuslikult võetud väärtus, on 0,5.</td>
+        <td>nullhüpotees: 1. ja 2. mõõtmise erinevused jaotuvad sümmeetriliselt 0 ümber</td>
+    </tr>
+</table> 
+
+
+Vaatleme nüüd uuesti mitteparameetrilise testiga ülikoolis õpitud aastate erinevust kahes grupis. Kuna mitteparameetriline test ei eelda normaaljaotust, pole siin õpitud aastate arvu vaja logaritmida.  
+
+```{r}
+wilcox.test(kysimustik$kaua_opid ~ kysimustik$kogemused_kvant, 
+            exact = FALSE, conf.int = TRUE)
+```
+
+Näeme, et alternatiivhüpotees on, et *true location shift is not equal to 0*. Põhimõtteliselt tähendab see seda, et ühe grupi jaotus oleks teisest x-teljel paremal või vasakul. Ehkki sagedasti tõlgendatakse seda kui kahe valimi mediaanide erinevust, on see rangelt võttes pigem mediaan kahe valimi erinevusest (võivad ka kattuda). 
+Kuna *p*-väärtus on < 0.05, siis saame selle sisuka hüpoteesi vastu võtta ja tõdeda veel kord, et kvantmeetodite kogemustega ja kogemusteta üliõpilaste ülikoolis õpitud aastate arv erineb.
+
+Statistiku väärtus leitakse järgmiselt.  
+Kõigepealt järjestatakse kõik uuritava tunnuse väärtused väiksemast suuremani.
+
+```{r}
+# võtame andmestikust välja ainult kahe tulba andmed.
+kysimus1 <- kysimustik[,c("kogemused_kvant", "kaua_opid")]
+
+# järjestame andmed uuritava tunnuse ehk õpitud aastate järgi
+kysimus1 <- kysimus1[order(kysimus1$kaua_opid),]
+```
+
+Seejärel määratakse uuritava tunnuse väärtustele astakud ehk sisuliselt järjekorranumbrid: kõige väiksem väärtus saab astakuks e järjekorranumbriks 1, sellest järgmine 2 jne. Kui mitu väärtust on ühesugused, saavad need kõik ühesugused astakud. Näiteks siin on kohe alguses 5 üliõpilast, kes on õppinud ülikoolis ainult 1 aasta. Seega ei saa nad järjekorranumbreid 1, 2, 3, 4 ja 5 ega 1, 1, 1, 1, 1 vmt vaid kõik ühtmoodi (1+2+3+4+5)/5 = 3.
+```{r}
+# lisame andmetesse uue tulba, kus on
+# uuritava tunnuse astakud
+kysimus1$astak <- rank(kysimus1$kaua_opid)
+head(kysimus1, 10)
+tail(kysimus1, 10)
+```
+
+Edasi leitakse nende ridade astakute summa, kus **seletava** tunnuse lahtris on selle tunnuse (vaikimisi tähestiku) järjekorras esimesena tulev väärtus.
+
+```{r}
+levels(kysimus1$kogemused_kvant)
+(ei_summa <- sum(kysimus1[kysimus1$kogemused_kvant == "Ei", "astak"]))
+```
+
+Kui "Ei" vastanute ülikoolis õpitud aastate arv on väike, on need ka järjekorras eespool, nende astakud madalamad ja astakute summa seega väiksem.
+
+Järgmiseks leiame kõikide nende vastanute arvu, kellel ei ole kvantitatiivsete meetoditega kogemusi, korrutame selle arvu läbi sellest arvust ühe võrra suurema arvuga ning jagame tulemuse kahega. Lõpuks lahutame saadud arvu astakute summast.
+
+```{r}
+(n_ei <- table(kysimus1$kogemused_kvant)["Ei"])
+(W_U <- ei_summa - (n_ei*(n_ei + 1)/2))
+```
+
+Mida lähemal on W-statistik 0-le, seda selgem erinevus kahe grupi vahel on. W teoreetilised väärtused ulatuvad 0-st (täielik erinevus gruppide vahel, kõik ühe grupi väärtused järjestatud tabeli ühes otsast ja teise grupi väärtused teises otsas) kuni kummagi kategooria vaatluste arvu korrutiseni (kaht gruppi ei joonistu välja, kategooriate vaatlused paiknevad järjestatud tabelis omavahel kõik läbisegi). Siin oleks W maksimaalne väärtus niisiis 17*31 ehk
+```{r}
+table(kysimustik$kogemused_kvant)[1] * table(kysimustik$kogemused_kvant)[2]
+```
+
+
+
+## Mõju suurus
+
+Mitteparameetrilise testi mõju suuruse hindamiseks saab kasutada Cliffi delta statistikut paketist `effsize`.
+
+```{r}
+cliff.delta(kysimustik$kaua_opid ~ kysimustik$kogemused_kvant)
+```
+
+Negatiivne delta näitab, et teises grupis (antud juhul "Jah" vastanute hulgas) on uuritaval tunnusel suuremad väärtused kui esimeses grupis. Teisisõnu: kvantmeetodite kogemusega üliõpilased on kauem ülikoolis õppinud. Cliffi delta absoluutväärtus näitab põhimõtteliselt kahe tõenäosuse vahet P(y > x) - P(y < x): **tõenäosus**, et juhuslikult 2. grupist valitud vaatlus on suurem kui juhuslikult 1. grupist valitud vaatlus, **miinus tõenäosus**, et juhuslikult 2. grupist valitud vaatlus on väiksem kui juhuslikult 1. grupist valitud vaatlus.
+
+```{r}
+head(kysimustik[,c("kaua_opid", "kogemused_kvant")])
+```
+
+Peaksime võrdlema kõiki võimalikke paare. Nt esimese "Jah" vastanu õpitud aastaid (10 aastat) kõikide "Ei" vastanutega (2, 4 jne aastat õppinutega), seejärel teise "Jah" vastanu õpitud aastaid (6 aastat) kõikide "Ei" vastanutega jne. Sisuliselt on kõiki võimalikke kombinatsioone 31("Jah" vastanuid)*17("Ei" vastanuid) ehk 527. Tabelis oleks seega nt 31 rida ja 17 tulpa, 1. reas 10-2, 10-4 jne, 2. reas 6-2, 6-4 jne.
+
+```{r}
+# Teeme kõikidest võimalikest "Jah" ja "Ei" kombinatsioonidest tabeli
+# ning lahutame "Jah" õpitud aastatest "Ei" õpitud aastad.
+(out <- outer(kysimustik[kysimustik$kogemused_kvant == "Jah", "kaua_opid"],
+      kysimustik[kysimustik$kogemused_kvant == "Ei", "kaua_opid"],
+      "-"))
+```
+
+Nüüd leiame nende kombinatsioonide osakaalu kõikidest võimalikest, kus tulemus on positiivne (ehk 2. grupi väärtus on suurem kui 1. grupi oma), nende kombinatsioonide osakaalu, kus tulemus on negatiivne, ning lahutame positiivse osakaalust negatiivse osakaalu. Osakaalusid saame tõlgendada tõenäosustena.
+
+```{r}
+p_y_suurem <- length(out[out > 0])/sum(length(out))
+p_x_suurem <- length(out[out < 0])/sum(length(out))
+(delta <- p_y_suurem - p_x_suurem)
+```
+
+Kuna tegemist on tõenäosuste erinevusega, saab Cliffi delta **absoluutväärtus** olla 0 ja 1 vahel. Mida lähemal 0-le, seda väiksem mõju (tõenäosus, et ühest grupist juhuslikult valitud väärtus on suurem kui teisest grupist juhuslikult valitud väärtus on sama suur kui tõenäosus, et see on väiksem), mida lähemal 1-le, seda suurem mõju.
+
+R-is on Cliffi delta skaala määratud nii:
+|d| < 0.147 "negligible"
+|d| < 0.33 "small"
+|d| < 0.474 "medium"
+|d| >= 0.474 "large"
+
+(Vaata näiteks `?effsize::cliff.delta`.)
+
+## Harjutus 2
+
+Esimeses harjutuses vaatasime t-testiga, kas riigikogu valimistel oli meeste ja naiste häältesaak erinev. 
+
+1. Kontrollime jaotust:
+```{r, eval=FALSE}
+hist(kandidaadid$haali_kokku)
+# Logaritmitud väärtustega histogramm:
+hist(log(kandidaadid$haali_kokku))
+shapiro.test(log(kandidaadid$haali_kokku))
+```
+Ja meenutuseks kordame parameetrilist t-testi logaritmitud väärtustega:
+```{r, eval=F}
+t.test(log(haali_kokku) ~ sugu, kandidaadid)
+```
+
+Leiame mõju suuruse logaritmitud andmetel:
+```{r, eval=F}
+cohen.d(log(haali_kokku) ~ sugu, kandidaadid)
+```
+
+2. Kuna andmed siiski ei olnud ju normaaljaotusega, teeme wilcoxoni testi. Kuna mitteparameetriliselt testil ei ole nõudmisi jaotusele, siis logaritmida pole tarvis, teeme testi tavaliste väärtuste peal.
+```{r, eval=F}
+wilcox.test(haali_kokku ~ sugu, kandidaadid)
+```
+Kuna test põhineb astakutel, saab see hakkama nii normaaljaotust üldjoontes siiski jälgivate andmetega kui ka tugevalt paremale või vasakule kaldu olevate andmetega.
+
+
+3. Leiame mõju suuruse logaritmimata andmetel.
+```{r, eval=FALSE}
+cliff.delta(haali_kokku ~ sugu, kandidaadid)
+```
+
+4. Võrdleme t-testi ja wilcoxoni testi tulemusi ja efekti suurust. 
+
+
+## Järgmisel korral
+
+- Arvuliste tunnuste vahelised seosed
+

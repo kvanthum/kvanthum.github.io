@@ -1,0 +1,482 @@
+---
+title: "11. praktikum"
+knit: (function(input_file, encoding) {
+    out_dir <- 'docs';
+    rmarkdown::render(input_file,
+      encoding=encoding,
+      output_file=file.path(dirname(input_file), out_dir, '11-lineaarsed1.html'))})
+date: 4.04.2022
+output: 
+  html_document:
+    theme: flatly
+    highlight: tango
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lineaarse regressiooni mudelid 1 {.tabset .tabset-pills}
+
+## Tänases praktikumis
+
+- Lineaarne regressioon
+    + arvulise seletava tunnusega
+    + kategoriaalse seletava tunnusega
+- ANOVA
+- Post-hoc test (Tukey HSD)
+
+Kasutame vanu tuttavaid andmestikke: 
+
+- `ldt.csv`
+- `DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt`
+- `kandidaadid.RData`
+
+
+## Seletav tunnus arvuline
+
+- Lineaarne regressioon seletab ühe arvulise tunnuse muutumist sõltuvalt teis(t)e tunnus(t)e muutumisest. 
+- Kahe arvulise tunnuse puhul on see sama mis korrelatsioon, aga kui korrelatsiooni puhul me ei ütle, kumb tunnus teise muutuse põhjustab, siis lineaarses mudelis on **sõltuv tunnus y** ja **seletav tunnus x**. 
+- Sõltuv tunnus **peab** olema arvuline tunnus.
+- Seletav tunnus võib olla  arvuline või ka nominaalne kategoriaalne tunnus (faktor)
+
+### Mudeli eeldused
+
+Nagu t-testigi puhul, on lineaarse regressiooni eelduseks, et
+
+- mõõtmised on üksteisest sõltumatud
+- mudeli jäägid on normaaljaotusega
+- mudeli jääkide dispersioon on homoskedastiline
+- mudeli jääkides ei ole autokorrelatsiooni
+<br><br>
+- ja lisaks, et seos on lineaarne
+
+
+### Näide 1: Kas lühemaid sõnu tuntakse kiiremini ära?
+
+Kasutame eelmisest korrast tuttavat Levshina õpiku andmestikku `ldt`. Eelmisel korral leidsime, et sõnade äratundmise keskmise reaktsiooniaja ja sõna pikkuse vahel oli positiivne korrelatsioon. Proovime sama lineaarse regressioonimudeliga testida.
+
+```{r, fig.align = 'center'}
+ldt <- read.csv("data/ldt.csv")
+plot(Mean_RT~Length, data=ldt, xlab="Sõna pikkus (tähemärkides)", ylab="Keskmine reaktsiooniaeg (ms)")
+m <- lm(Mean_RT~Length, data=ldt, subset=Mean_RT < 1200)
+abline(m, col="red")
+```
+
+### Kas mudeli eeldused on täidetud?
+
+- Iga sõna esineb andmestikus ühe korra, rühma keskmised reaktsiooniajad.
+- Kas tunnused on normaaljaotusega? Testime!
+    + sõna pikkus on
+    + reaktsiooniaeg on, kui logaritmida
+    + reaktsiooniaeg on normaaljaotusega ka siis, kui välja jätta 3 eriti suurt väärtust :)
+
+### Sõltuv ja seletav tunnus
+
+Kui korrelatsiooni puhul me testisime seda, kas kahe arvulise tunnuse vahel on seos, siis nüüd otsime põhjuslikku seost. Kahe arvulise tunnuse puhul on see tegelikult sõnastuslik küsimus, aga siiski tasuks läbi mõelda, kumb tunnus võiks põhjustada teise muutumist: 
+
+- Kas see, kui kiiresti sõna ära tuntakse võib mõjutada seda, mitu tähemärki sõnas on?
+- Kas sõna pikkus võib mõjutada seda, kui kiiresti see ära tuntakse?
+
+Lineaarse mudeli saab käsuga `lm()`, mida kasutasime juba regressioonijoone joonistamiseks.
+```{r}
+ldt2 <- ldt[ldt$Mean_RT < 1200,]
+m <- lm(Mean_RT~Length, data=ldt2)
+```
+
+Mudelist ülevaate saamiseks kasutame käsku `summary()`
+```{r, echo=T, eval=F}
+summary(m)
+```
+
+### Kas mudeli jäägid on normaaljaotusega?
+
+Mudeli jäägid (*residuals*) on see osa uuritava tunnuse väärtustest, mis jääb mudelis kirjeldavate tunnuste kaudu seletamata. See on siis iga mõõtmispunkti kaugus regressioonijoonest. Lineaarse mudeli eeldus on, et mudeli jäägid on normaaljaotusega. Testime:
+```{r}
+hist(residuals(m))
+shapiro.test(residuals(m))
+```
+
+
+## Kuidas mudelit lugeda?
+
+```{r, echo=T}
+summary(m)
+```
+
+1. Kas mudel on oluline? Mudeli väljundi viimane rida annab mudeli üldise p-väärtuse, mis on 2.289e-10 ehk 2.289 * 10 ^ -10 ehk `r format(2.289e-10, scientific = F)`. Niisiis mudel on oluline tasemel p<0.001***. See tähendab, et tõenäosus juhuslikult selline tulemus saada on väga väike ja võime hüljata 0-hüpoteesi.
+2. Kui hea mudel on? Eelviimane rida, R^2^ (R-squared) näitab **protsentuaalselt, kui palju uuritava tunnuse varieerumisest** mudel kirjeldab. Antud juhul `r summary(m)$r.squared` ehk võib öelda, et sõna pikkus kirjeldab `r round(summary(m)$r.squared*100)`% reaktsiooniaja varieerumisest.
+3. *Estimate* ehk mudeli prognoos näitab, kui palju kirjeldava tunnuse muutudes uuritav tunnus muutub. 
+    + Esimene rida **(Intercept)** ehk **vabaliige** ütleb, mis on *uuritava tunnuse väärtus* siis, *kui seletava tunnuse väärtus on 0*.
+    + Teine rida **(slope)** ehk **kalle** ütleb, kui palju *uuritav tunnus muutub* siis, *kui seletava tunnuse väärtus muutub ühe ühiku võrra*.
+
+Vaatame joonist uuesti natuke lähemalt:
+```{r, fig.align = 'center', echo=F}
+plot(Mean_RT~Length, data=ldt2, xlab="Sõna pikkus", ylab="Keskmine reaktsioonikiirus", xlim=c(0, 5), ylim=c(530,750), axes=F, pch=16)
+abline(m, col="red")
+abline(v=c(0:5), lty=2)
+abline(h=round(m$coefficients[1]+(m$coefficients[2]*0:5)), lty=2)
+axis(side=1, at=c(0:5))
+axis(side=2, at=round(m$coefficients[1]+(m$coefficients[2]*0:5)), las=2)
+box()
+```
+
+Vabaliige on y telje väärtus, kui x on 0, kalle on y väärtuse muutus, kui x on 1. See, et tegelikult andmed x-teljel 0 ja 1 punkte ei läbi (ei saagi läbida, sest ühegi sõna pikkus ei saa olla 0), ei oma tähtsust. Kuna tegemist on *lineaarse* regressiooniga, siis me võime vabaliikme ja kalde väärtuste põhjal tuletada ükskõik millise punkti väärtused.
+
+- Kuna suhe on lineaarne, siis eeldame, et kirjeldava tunnuse kasvades näiteks 5 ühiku võrra kasvab sõltuv tunnus samuti 5*regressioonikorda võrra.
+- Mudeli võib kirja panna y = A + Bx
+- Reaktsiooniaeg = 547 + 30 * sõna pikkus
+
+
+## Harjutus
+
+### Harjutus e Näide 2: Kas doktoritööde maht on aastatega kahanenud?
+
+1) Loeme sisse tabeli eesti keele eriala doktoritööde bibliograafiaga failist `DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt`. Kuna see on tabulatsioonidega eristatud tabelifail, siis võib selle lugemiseks kasutada `read.table()` alamkäsku `read.delim()`. Funktsioon on sama, argumentide vaikeväärtused on veidi erinevad, mistõttu tabulatsioonidega eristatud väljadega ja päisereaga andmestiku puhul peab vähem argumente lisama. Siiski kui tahame, et teksti sisaldavad tulbad loetaks kohe sisse faktoritena, siis alates R versioonist 4 peaks lisama argumendi stringsAsFactors = T.
+
+```{r, echo=F}
+dokt <- read.delim("data/DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt", stringsAsFactors = T)
+```
+2) Kontrollime mudeli eeldusi:
+
+- Sõltumatute tunnuste eeldus kehtib: mõõtmised on sõltumatud, iga rida andmestikus on üks iseseisev dissertatsioon, korduvaid autoreid või korduvaid väitekirju ei esine.
+- kas lehekülgede arv ja ilmumisaasta on normaaljaotusega? Kontrollime qqnorm ja Shapiro testiga.
+
+3) Mis võiks olla uuritav tunnus, mis kirjeldav? Sõnastame hüpoteesid. 
+
+4) Teeme lineaarse mudeli.
+
+```{r, echo=F}
+mudel <- lm(lk~aasta, data=dokt)
+```
+
+5) Kas mudeli jäägid on normaaljaotusega?
+
+6) Vaatame mudeli väljundit.
+
+- Kas võime 0-hüpoteesi ümber lükata? Kas mudel on oluline?
+- Kui palju lehekülgede arvu varieeruvusest väitekirja kaitsmise aasta seletab? 
+- Kuidas tõlgendada mudeli prognoositavaid väärtusi?
+
+7) Teeme joonise ka
+
+```{r, echo=F, eval=F}
+plot(lk~aasta, data=dokt, main="Eesti keele doktoritööde maht")
+abline(mudel)
+```
+
+***
+
+Vaatame veel korraks mudeli koefitsiente. 
+
+```{r, echo=F}
+mudel$coefficients
+```
+
+
+Miks mudeli vabaliige (Intercept) on negatiivne? Sest mudel arvestab seda lõikumisena 0-punktis ja seletava tunnuse *aasta* mõõdetud väärtused on 0-punktist väga kaugel. Kui eeldada lineaarset suhet, siis mudeli järgi oli aastal 0 doktoritööde maht `r round(mudel$coefficients["(Intercept)"])` lehekülge. Eeldades lineaarset kasvu, hindaks see mudel, et kasvades iga aastaga `r round(mudel$coefficients["aasta"],3)` lehekülje võrra, jõudis tööde maht 1994. aastaks `r round(mudel$coefficients["(Intercept)"] + 1994*mudel$coefficients["aasta"])` leheküljeni ja 2022. aastaks `r round(mudel$coefficients["(Intercept)"] + 2022*mudel$coefficients["aasta"])` leheküljeni.
+
+```{r}
+plot(lk~aasta, data=dokt, main="Eesti keele doktoritööde maht", xlim=c(0, 2020), ylim=c(-4700, 500))
+abline(mudel)
+```
+
+Tegelikult ei peaks muidugi vaatama mudelit tegelike andmete muutumispiirkonnast väljaspool. Põhimõtteliselt oleks ka võimalik mitte mudelile vabaliiget jätta või siis teisendada andmeid nii, et 0 oleks näiteks esimene vaadeldav aasta, kust meil on mõõtmisi (st aasta 1994, kui toimusid esimesed doktoritööde kaitsmised). 
+
+
+## Seletav tunnus nominaalne
+
+- Lineaarse regressiooni mudeli seletavaks tunnuseks võib olla ka nominaalne tunnus ehk faktor. 
+- Faktori puhul valitakse üks tase baastasemeks.
+- Teiste tasemete väärtust hinnatakse baastaseme suhtes. 
+- **Baastase** on mudeli *vabaliige* ehk *intercept* ning iga teise taseme kohta arvutatakse erinevus baastasemest. 
+- Erinevus arvulise kirjeldava tunnusega mudelist on see, et kui arvulise tunnuse puhul on üks *kalde kordaja* (*slope*), siis **nominaalsel tunnusel on iga baastasemest erineva taseme kohta eraldi kordaja**. Arvulise tunnuse puhul saab kalde kordaja tunnuse väärtusega läbi korrutades välja arvutada kalde väärtuse igas skaalalpunktis. Nominaalse tunnuse puhul rakendatakse vastava taseme kalde kordajat binaarselt TRUE/FALSE väärtustega.
+
+## Kahe tasemega faktor
+### Näide 3: Kas kandidaadi sugu mõjutab häältesaaki?
+
+Võtame valimistulemuste andmestiku ja vaatame alustuseks kahe tasemega faktorit: kas sugu mõjutab häältesaaki? Me oleme juba t-testiga teinud kindlaks, et meeskandidaadid said keskmiselt rohkem hääli kui naiskandidaadid, kuigi efekti suurus oli väga väike.
+
+```{r}
+load("data/kandidaadid.RData")
+```
+Kas mudeli eeldused on täidetud?
+
+- Mäletatavasti tunnus haali_kokku ei ole normaaljaotusega, aga kui see logaritmida, siis vastab normaaljaotuse tunnustele. Kuna kandidaate oli rohkem kui 30, siis võiks ka normaaljaotuse eeldust ignoreerida, aga kui logaritmimine aitab normaalajotust saavutada, siis võiks seda ikkagi teha.
+- Mõõtmised on sõltumatud: iga kandidaat on individuaalne isik ja esindatud andmestikus ühe reaga.
+
+Sõltuva ja sõltmatu tunnuse määramisel ei ole siin ilmselt vaja pikalt mõelda, sest juba tehniliselt kui me tahame kasutada lineaarset mudelit, siis uuritav tunnus peab olema arvuline. Ja kui oleks võimalus, et kandidaadi sugu võiks mõjutada see, kui palju ta hääli sai, siis peaksime valima hoopis logistilise regressioonimudeli, millest tuleb juttu umbes üle-ülejärgmises praktikumis :)
+
+Milline tase valida baastasemeks? Mõnel juhul on lihtne ja selge, et üks väärtus on kuidagi moodi vaikimisi väärtus ja teised väärtused on markeeritud. Aga ka siis, kui meil pole mingit sisulist või ideoloogilist eelistust, peame valima ühe taseme baastasemeks.
+
+Kahetasemelise faktori puhul ei ole mudeli väljundi tõlgenduse seisukohast väga suurt vahet, mis on baastase, aga sellest sõltub, mis on vabaliige ehk *intercept*. Vaikimisi on baastase faktori esimene tase ja kui me pole nominaalse tunnuse tasemete järjekorda faktorina eksplitsiitselt määranud, siis enamasti on see lihtsalt tähestikulises järjekorras.
+
+
+```{r}
+sugu.lm <- lm(log(haali_kokku)~sugu, data=kandidaadid)
+summary(sugu.lm)
+```
+
+Muus osas on nominaalse faktoriga mudeli väljund sama nagu arvuilse sõltumatu tunnuse puhul: 
+
+- mudeli üldist olulisust näitab p-väärtus viimasel real, mis ütleb, kui tõenäone on sellist tulemust saada juhuslikult. p = 0.01785 < *ɑ*, seega võib mudelit oluliseks pidada.
+- mudeli üldist headust nätab R-ruut eelviimasel real, mis ütleb, mitu protsenti uuritava tunnuse varieerumisest seletav(ad) tunnused kirjeldab. Seos on võrdlemisi nõrk, R-ruut on 0.005 ehk sugu kirjeldab ainult 0.5% häältesaagi varieerumisest, 99,5% ulatuses sõltub see millestki muust.
+
+AGA nüüd on vabaliikmeks ehk mõtteliseks 0-punktiks faktori baastase. St esimene rida *(Intercept)* ütleb, mis on häältesaagi väärtus juhul, kui sugu on baastasemel ehk "mees" ning teine rida ehk *slope* ütleb seda, kui palju see muutub siis, kui faktori tase on "naine".
+
+## Kuidas tulemust tõlgendada?
+
+```{r}
+summary(sugu.lm)
+```
+
+
+Mudel annab prognoositud väärtused: meeste häälesaak on 5.08749 ühikut ja naiste oma on meeste omast -0.23767 võrra erinev. Ühikud on üldiselt samad mudeli sisendiks olnud ühikud, ehk hääled, AGA siin peab meeles pidama, et kui normaliseerimise eesmärgil sai uuritav tunnus logaritmitud, siis mudeli prognoositud väärtustest algse ühiku kätte saamiseks peame tegema logaritmimise pöördtehte ehk astendama:
+```{r}
+# Meeste häältesaak on vabaliikme väärtus
+exp(sugu.lm$coefficients[1])
+# Naiste väärtuse saamiseks tuleb koefitsiendid kokku liita
+exp(sugu.lm$coefficients[1]+sugu.lm$coefficients[2])
+```
+
+Teeme selguse mõttes sama mudeli ka ilma logaritmimata uuritava tunnusega, see küll eirab mudeli normaaljaotuse eeldust, aga on oluliselt lihtsam tõlgendada:
+```{r}
+sugu.lm2 <- lm(haali_kokku~sugu, data=kandidaadid)
+summary(sugu.lm2)
+```
+Nüüd võime koefitsientide põhjal öelda, et mehed said keskmiselt `r round(sugu.lm2$coefficients[1])` häält ja naised `r abs(round(sugu.lm2$coefficients[2]))` häält vähem ehk keskmiselt `r round(sugu.lm2$coefficients[1] + sugu.lm2$coefficients[2])` häält. Ja saame mudeli prognoositud väärtusi otse võrrelda aritmeetiliste keskmiste väärtustega:
+```{r}
+tapply(kandidaadid$haali_kokku, kandidaadid$sugu, mean)
+```
+
+
+## Mitme tasemega faktor
+### Näide 4: Kas haridus mõjutab häältesaaki?
+
+Proovime nüüd  testida seletavat tunnust, millel oleks rohkem kui kaks taset. Näiteks kandidaatide haridus:
+```{r}
+table(kandidaadid$haridus)
+``` 
+Haridusel on kandidaatide andmestikus 4 taset, aga kuna algharidusega kandidaate on ainult 1, siis ilmselt oleks mõistlik jätta see kandidaat analüüsist välja, sest üks mõõtmispunkt on liiga vähe, et seost kirjeldada.
+
+```{r}
+haridus.lm <- lm(log(haali_kokku)~haridus, data=kandidaadid, subset = haridus != "Algharidus")
+summary(haridus.lm)
+```
+
+Mudeli väljund ütleb meile et:
+
+- mudel on erinev juhuslikust, oluline, p<0.001
+- seos on endiselt võrdlemisi nõrk, kuigi tugevam, kui soo puhul: mudel kirjeldab 7% häältesaagi varieerumisest.
+- Mudeli prognoosi osa, koefitsientide tabel toob välja kirjeldava tunnuse võrdlused baastaseme ja teiste tasemete vahel. Siin võiks vaadata nii esimest tulpa *Estimate* ehk mudeli hinnang väärtuse suurusele ja viimast tulpa p-väärtus ehk hinnang taseme hinnangu olulisusele.
+  + Esimesel real on *intercept* ehk baastase, siin mudelis keskharidus, mille väärtus on `r round(haridus.lm$coefficients[1],2)` logartimitud häält ehk `r round(exp(haridus.lm$coefficients[1]),2)` häält. Siin real p <0.001*** ei ole eriti tähenduslik (tähendab, et on nullist erinev);
+  + Teisel real on kõrgharidusega kandidaatide erinevus keskharidusega kandidaatide häältesaagist ehk `r round(haridus.lm$coefficients[1],2)`. Kui see oleks algsetes ühikutes, siis võiksime öelda, et see rühm sai nii palju rohkem hääli, aga kuna me logaritmisime väärtused enne modelleerimist, siis peame kõigepealt prognoositud tulemuse kokku arvutama ja siis astendama (käsuga `exp()`): kõrgharitute logaritmitud häältesaak oli `r round(haridus.lm$coefficients[1],2)` + `r round(haridus.lm$coefficients[2],2)` = `r round(haridus.lm$coefficients[1],2)+ round(haridus.lm$coefficients[2],2)` ehk `r round(exp(haridus.lm$coefficients[1]+ haridus.lm$coefficients[2]),2)`. Ja see erinevus keskharidusega kandidaatidest on oluliselt erinev p<0.001.
+  + Kolmandal real on põhiharidusega kandidaatide erinevus Keskharidusega kandidaatidest, mis on jällegi `r round(haridus.lm$coefficients[1],2)` + `r round(haridus.lm$coefficients[3],2)` = `r round(haridus.lm$coefficients[1],2)+ round(haridus.lm$coefficients[3],2)` ehk `r round(exp(haridus.lm$coefficients[1]+ haridus.lm$coefficients[3]),2)` häält. See erinevus on ka oluliselt erinev juhuslikust tasemel p<0.05.
+  + Mudel otseselt mittebaastasemete erinevust ei võrdle, sest kõigi tasemete hinnatavad väärtused on esitatud ja selle kaudu on teada, kas tasemete hulgas leidub mõni, mis on teistest erinev, mille põhjal otsustada, kas faktoril üldiselt on mõju või ei ole.
+
+
+## ANOVA 
+
+**ANalysis Of VAriance ehk dispersioonanalüüs**
+
+ANOVA võrdleb rühmade hajuvust valimi üldise hajuvusega. R-is on ANOVA seotud lineaarse mudeliga, selle saab, kui lineaarne mudel anda käsu `anova()` sisendiks. Mõnes mõttes see on lihtsalt alternatiivne viis seost kirjeldada, selle kaudu saab anda ühe üldhinnangu kategoriaalse faktori olulisusele, samas kui lineaarne mudel annab iga taseme võrdluse baastasemega.
+
+- Võimaldab hinnata faktori üldist mõju uuritavale tunnusele
+- Kui faktoril on kaks taset, siis on tulemus sarnane t-testile
+- Kui tasemeid on rohkem, siis osutab faktori üldisele mõjule, aga mitte sellele, milliste faktori tasemete vahel erinevus on
+    + ANOVA ütleb seda, kas faktori tasemete hulgas leidub mõni tase, mis on teistest oluliselt erinev, aga ei ülte, mitu või milline,
+    + ja kui kolme- või enamatasemeline faktor on oluline, peame lisaks tegema *post-hoc* testi, kui tahame välja selgitada, milliste tasemete vahel tegelikult erinevused on ja milliste tasemete vahel ei ole.
+    
+    
+## ANOVA, faktor 2 tasemega
+### Näide 3b: Sugu ja häältesaak ANOVAga
+
+Anova testi tegemiseks paneme lihtsalt lineaarse mudeli väljundi `summary()` käsu asemel `anova()` käsu sisse:
+
+```{r}
+sugu.lm <- lm(log(haali_kokku)~sugu, data=kandidaadid)
+anova(sugu.lm)
+```
+
+**Kuidas väljundit lugeda?**
+
+- Tabelis on rida iga faktori kohta (siin üks faktor: sugu) ja lõpuks rida mudeli jääkide kohta.
+- Iga faktori puhul hinnatakse rühmadevahelist dispersiooni valimi üldise populatsiooniga, millest kokku tuleb ANOVA statistik F.
+- F väärtuse statistiline olulisus sõltub vabadusastmetest. Faktori vabadusasmed on tasemete arv miinus üks, ehk soo puhul 2-1=1; Valimi vabadusastmete arv on mõõtmiste arv miinus võrreldavate konditsioonide arv ehk 1099 (kandidaati) - 2 (mehed/naised) = 1097.
+
+
+Kahe tasemega faktori puhul on tulemus võrdlemisi sarnane t-testiga.
+
+```{r}
+t.test(log(haali_kokku)~sugu, data=kandidaadid)
+```
+
+## ANOVA, faktor 3 tasemega
+### Näide 4b: Haridus ja häältesaak
+
+Nüüd näide rohkem kui kahe tasemega faktorist: kandidaatide andmestikus haridus on 4 taset, või kui ainult ühe mõõtmisega põhiharidus välja visata, siis on 3 taset. Ainult üks mõõtmine on endiselt liiga vähe. Aga kolme rühmaga enam t-testi teha ei saa.
+
+```{r}
+haridus.lm <- lm(log(haali_kokku)~haridus, data=kandidaadid, subset = haridus != "Algharidus")
+anova(haridus.lm)
+```
+
+
+- Anova tulemuse põhjal võime öelda, et haridusel on oluline üldefekt. 
+- See tähendab, et "leidub vähemalt üks rühm, mille keskmine on teistest oluliselt erinev".
+- Artiklis saab ANOVA tulemuse teksti sees kirja panna nii: <br>
+F(2, 1095) = 43.202, p < 0.001
+- Kuna siin on rohkem kui 2 rühma, siis selleks, et otsustada, kes kellest erines, peaks tegema *post-hoc* testi.
+
+
+## Post-hoc test
+
+Iga kord, kui me teeme mõne statistilise testi, on teatav võimalus, et me saame olulise tulemuse juhuslikult. Sama andmestiku peal veidi erinevate kombinatsioonidega sama testide tegemisel kõik juhuslikud efektid kasvavad. Samas, kui oleme ANOVA testiga teada saanud, et rohkem kui kahe tasemega faktoril on oluline üldefekt, tahaks me teada, milliste faktori tasemete vahel erinevus oli. Selleks peaks faktori tasemeid paari kaupa testima, aga tulemuste tõlgendamisel arvestama kordustega. Seda nimetatakse *post-hoc* testimiseks.
+
+### Bonferroni parandus
+
+Üks võimalus oleks korrata lineaarset mudelit nii mitu korda, nagu on tarvis kõigite tasemete võrdlemiseks, muutes iga testi korral vastavalt faktori baastaset. Seejärel tulemuste tõlgendamisel jagatakse usaldusnivoo korduste arvuga. Seda nimetatakse Bonferroni paranduseks (*Bonferroni correction*). Näiteks kui meil on 3 faktori taset, siis kõigi võrdluste saamiseks peame kordama testi 2 korda ja langetama *ɑ* taset vastavalt 0.05/2 = 0.025.
+
+Näites 4 saime teada, et keskharidusega (baastase) kandidaatide häältesaak oli oluliselt erinev kõrgharidusega (p<0.001) ja põhiharidusega (p<0.05) kandidaatidest:
+```{r, eval=F}
+summary(haridus.lm)
+```
+ning ANOVA testi põhjal võime öelda, et haridus on oluline faktor [F(2, 1095) = 43.202, p < 0.001], sest leidub vähemalt üks haridustase, mille puhul keskmine häältesaak on teistest erinev:
+```{r, eval=F}
+anova(haridus.lm)
+```
+siis me ei tea, kas kõrghariduse ja põhiharidusega kandidaatide häältesaak omavahel ka erinevad on. 
+
+Kordame lihtsalt lineaarset mudelit muudetud baasväärtusega. Sellks võib andmestikus muuta ära baasväärtuse käsuga `relevel()` (või lihtsalt käsuga `factor()`), aga kui me ei taha andmestikku muuta, võib ainult `lm()` käsu sees muuta faktori baastaset käsuga `C()`. Lisaks, kuna ühe haridustaseme jätsime välja, tuleks kasutada käsku `droplevels()`, mis eemaldab faktoritasemed, mida ei esine.
+
+```{r}
+haridus.lm1 <- lm(log(haali_kokku)~C(droplevels(haridus), base=1), data=kandidaadid[ kandidaadid$haridus != "Algharidus",])
+haridus.lm2 <- lm(log(haali_kokku)~C(droplevels(haridus), base=3), data=kandidaadid[ kandidaadid$haridus != "Algharidus",])
+summary(haridus.lm1)
+summary(haridus.lm2)
+```
+
+Nüüd saame mudeli väljunditest välja noppida kõikide paaride võrdluste p-väärtused. Kuna kordasime testi 2 korda, siis peame usaldusnivood langetama poole võrra, mis tähendab seda, et harjumuspäraste p-väärtuste saamiseks hoopis korutame need korduste arvuga:
+```{r}
+summary(haridus.lm1)$coefficients[2:3, "Pr(>|t|)"] *2
+summary(haridus.lm2)$coefficients[2:3, "Pr(>|t|)"] *2
+```
+
+Ja lõpetuseks veel, kui *e* astmetega komakohtade arvutamine tundub tüütu, võib R-i sundida teisendama:
+```{r}
+format(summary(haridus.lm1)$coefficients[2:3, "Pr(>|t|)"] *2, scientific = F)
+format(summary(haridus.lm2)$coefficients[2:3, "Pr(>|t|)"] *2, scientific = F)
+```
+
+Siit nüüd saame välja lugeda, et erinevused on:
+
+- 1 (kesk) ja 2 (kõrg) p = 0.0000000000000005993082
+- 1 (kesk) ja 3 (põhi) p = 0.02619408892
+- 2 (kõrg) ja 3 (põhi) p = 0.00000572154
+
+Või siis selle asemel et lihtsalt korduste arvuga p-väärtuseid läbi korrutada, võib kasutada käsku `p.adjust()`
+
+```{r}
+p.adjust(p = summary(haridus.lm1)$coefficients[2:3, "Pr(>|t|)"], n=2, method="bonferroni")
+```
+Ja teisendame tavaliseks komakohtadega arvuks:
+```{r}
+format(p.adjust(p = summary(haridus.lm1)$coefficients[2:3, "Pr(>|t|)"], n=2, method="bonferroni"), scientific = F)
+```
+
+## Tukey HSD
+
+Teine võimalus on kasutada *Tukey Honest Significant Differences* testi, mis teeb kõigi kombinatsioonide võrdlused ja korrigeerib p-väärtuseid vastavalt.
+
+R-is on Tukey testi sisendiks anova test. Anova testi tegemiseks on R-is mitu eri süntaksit, üks variant on panna lineaarne mudel anova käsu sisse, nagu me varem tegimegi. 
+
+ - anova(lm(y~x))
+ - summary(aov(y~x))
+
+Need annavad täpselt sama tulemuse. Kuid Tukey testi sisendiks peab kasutama käsku aov(). 
+
+
+```{r}
+haridus.anova <- aov(log(haali_kokku)~haridus, data=kandidaadid, subset = haridus != "Algharidus")
+summary(haridus.anova)
+```
+
+```{r}
+TukeyHSD(haridus.anova)
+```
+
+Tukey testi väljund annab paarikaupa võrdluses:
+
+- kahe taseme vahelise vahelise erinevuse
+- usaldusvahemiku (*lwr* ja *upr*)
+- korrigeeritud p-väärtuse
+
+
+
+## Kordamisküsimused
+
+Kordamisküsimuste testi saad teha moodlis, seal näed peale vastamist ka õigeid vastuseid ja kommentaare. Testi võib teha mitu korda. Küsimustik on ainult kordamiseks mõeldud ja vastuseid ei hinnata ega arvestata kursuse soorituse hindamisel.
+
+#### 1. Lineaarse mudeli eeldused on:
+
+a) mõõtmised on üksteisest sõltumatud
+b) mõõtmisi peab olema vähemalt 30
+c) väärtused peavad olema logaritmitud
+d) mudeli jäägid on normaaljaotusega
+
+
+#### 2. Vaata Näites 1 esitatud lineaarset mudelit sõnade äratundmise reaktsiooniaja ja sõna pikkuse seosest:
+```{r, echo = F}
+summary(m)$coefficients
+```
+#### Estimate tulbas on mudeli hinnang reaktsiooniaja kestuse kohta
+
+a) esimesel real väärtus siis, kui sõna pikkus on 0 tähemärki ja teisel real siis, kui tähemärke on 1
+b) esimesel real keskmine ja teisel real see, kui palju sõna pikkus mõjutab
+c) esimesel real keskmine ja teisel real siis, kui tähemärke on 1
+d) esimesel real väärtus siis, kui sõna pikkus on 0 tähemärki ja teisel real ühe tähemärgi efekt
+
+#### 3. Vaata veel mudeli väljundit. Mis võiks olla reaktsiooniaeg, kui sõnas on 26 tähemärki
+
+a) `r round(summary(m)$coefficients[1,1],2)` + 26 \* `r round(summary(m)$coefficients[2,1], 2)` = `r round(summary(m)$coefficients[1,1] + 26 * summary(m)$coefficients[2,1], 2)` millisekundit
+b) 26 \* `r round(summary(m)$coefficients[1,1], 2)` + 26 \* `r round(summary(m)$coefficients[2,1], 2)` = `r round(26 * summary(m)$coefficients[1,1] + 26 * summary(m)$coefficients[2,1], 2)` millisekundit
+c) `r round(summary(m)$coefficients[1,1], 2)` + `r round(summary(m)$coefficients[2,1], 2)` = `r round(summary(m)$coefficients[1,1] + summary(m)$coefficients[2,1], 2)` millisekundit
+d) nii pikka sõna ei ole
+
+
+#### 4. Nominaalse seletava tunnusega lineaarse mudeli lõikepunkt (Intercept) on
+
+a) uuritava tunnuse väärtus siis, kui seletava tunnuse väärtus on 0
+b) uuritava tunnuse väärtus, kui ükski seletava tunnuse tasemetest ei kehti
+c) uuritava tunnuse väärus kõige sagesasema seletava tunnuse taseme korral
+d) uuritava tunnuse väärtus seletava tunnuse baastaseme korral
+
+
+#### 5. Mudeli headust näitab
+
+a) p-väärtus
+b) R-ruut
+c) seletava tunnuse p-väärtus
+d) seletava tunnuse efekti suurus
+
+#### 6. Artiklis, kus raporteeritakse ANOVA testi tulemusi, on tekstis kirjas: F(2, 167)=27.532; p<0.001. Kuidas seda tõlgendada?
+
+a) Andmestikus oli 170 mõõtmist, seletaval tunnusel 3 rühma, vähemalt üks oli teistest erinev
+b) Andmestikus oli 170 mõõtmist, seletaval tunnusel 3 rühma, mis üksteisest erinesid
+c) Andmestikus oli 167 mõõtmist, seletaval tunnusel 2 rühma, mis üksteisest erinesid
+d) P-väärtus on väike, aga seal ei ole rohkem sisukat informatsiooni
+
+#### 7. Post-hoc test on:
+
+a) alternatiiv t-testile, kui on rohkem kui kaks rühma
+b) kordustestid, mida peab alati tegema, kui on rohkem kui kaks rühma
+c) kordustestid kõikide faktori tasemete võrdlemiseks
+d) kordustestid rohkem kui kahe tasemega faktori olulisuse kontrollimiseks
+
+
+## Järgmisel korral
+
+- Mitme tunnusega lineaarsed mudelid
+- Interaktsioonid
+- Mudelite võrdlemine ja optimaalse mudeli leidmine

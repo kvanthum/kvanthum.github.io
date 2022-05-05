@@ -1,0 +1,512 @@
+---
+title: "13. praktikum"
+knit: (function(input_file, encoding) {
+    out_dir <- 'docs';
+    rmarkdown::render(input_file,
+      encoding=encoding,
+      output_file=file.path(dirname(input_file), out_dir, '13-lineaarsed_sega.html'))})
+date: 11.04.2022
+output: 
+  html_document:
+    theme: flatly
+    highlight: tango
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lineaarse regressiooni segamudelid {.tabset .tabset-pills}
+
+## Tänases praktikumis
+
+- Segamudelid
+  + juhusliku vabaliikmega
+  + juhusliku kaldega
+  + ANOVA ja post-hoc testid segamudelitega
+
+Andmestikud:
+
+- `creaky_data_r_course.txt` (Moodle'is)
+- välteandmestik (loeme otse DataDOI-st)
+
+## Segamudelid
+
+### Segamudelid: fikseeritud ja juhuslikud faktorid
+
+Kui seni oleme tegelenud mudelitega, mis eeldavad sõltumatuid mõõtmisi, siis segamudel arvestab sellega, et osa mõõtmisi võib tulla korduvatelt subjektidelt.
+
+- *Fikseeritud faktoril* on teada kindel hulk tasemeid, mille mõju kaudu me otseselt seletame uuritava tunnuse varieerumist.
+- *Juhuslikul faktoril* võib olla määramata hulk tasemeid ja meie valimis on nendest juhuslik valik, millel võib ka olla mõju uuritava tunnuse varieerumisele ja millega tuleb seetõttu arvestada, ent mis ei seleta ise otseselt uuritava tunnuse varieerumist ega paku uurijale omaette huvi.
+- Juhuslik faktor on enamasti "müra", mis tuleks välja filtreerida. Juhuslikud faktorid võimaldavad korrigeerida regressioonimudeli fikseeritud mõjude koefitsiente, arvestades sellega, et iga üksik subjekt võib olla järjekindlalt teistest pisut erinev.
+
+
+## Juhuslik vabaliige ja kalle
+
+__Juhuslik vabaliige__ (*random intercept*) tähendab seda, et lisaks keskmisele vabaliikmele korrigeeritakse seda iga juhusliku faktori taseme jaoks (nt iga indiviidi jaoks algaks koefitsientide võrdlemine natuke erinevalt baastasemelt).
+
+__Juhuslik kalle__ (*random slope*) tähendaks, et lisaks fikseeritud faktori efektile korrigeeritakse seda efekti vastavalt iga juhusliku faktori tasemele (nt iga indiviidi kohta). 
+
+
+
+## Näide 1: Kõneleja häälekõrgus ja sugu
+
+
+Failis `creaky_data_r_course.txt` on andmestik, mis on kogutud TÜ eesti keele spontaanse kõne foneetilisest korpusest, seda on kasutatud artiklis Aare, K., & Lippus, P. (2017). Some gender patterns in Estonian dyadic conversations. J. E. Abrahamsen, J. Koreman, & W. van Dommelen (Toim), Nordic Prosody. Proceedings of the XIIth Conference, Trondheim 2016 (lk 29–38). Peter Lang. https://doi.org/10.13140/RG.2.2.17105.94568
+
+Selles uurimuses on vaadatud mitmeid üldiseid häälelaadi kirjeldavaid parameetreid seoses kõneleja soo ja vanuse ning vestluspartneri vastavate tunnustega. Korpus, mille põhjal on uurimus tehtud, sisaldab kahe kõneleja vaheliste vestluste salvestusi. Iga vestlus kestab umbes pool tundi ja iga vestluse iga osaleja kohta on salvestuse põhjal mõõdetud tema hääle põhitooni keskmist kõrgust (hertsides), põhitooni ulatust (pooltoonides), kui palju ta selle vestluse jooksul rääkis (% salvestuse ajast) ja kui palju tema hääl sel ajal kärises (% kõneldud ajast).
+
+```{r}
+dat <- read.delim("data/creaky_data_r_course.txt", stringsAsFactors = T)
+str(dat)
+```
+
+### Testime häälekõrguse varieerumist
+
+Üldiselt häälekõrgust võiks kõige rohkem seletada kõneleja sugu: meeste häälekurrud on paksemad kui naistel ja üldiselt meeste hääle kõrgus kõnelemisel jääb 75-150 Hz ja naistel 150-300 Hz vahemikku. Lisaks sõltub hääle kõrgus mingil määral vanusest. Meie andmestik sisaldab küll ainult täiskasvanud kõnelejate andmeid, nii et väga suur muutus, mis murdeeas toimub, siin ei kajastu, aga häälekõrgus muutub siiski mingil määral ka täiskasvanuea jooksul. Ja viimaks, mõnevõrra võiks mõjutada kõneleja häälekõrgust see, kellega ta räägib, sest vestluses kohandame end oma vestluspartneri suhtes. Kõneleja ja vestluspartneri tunnustest saaksime testida:
+
+1) tema sugu (meie andmestikus 2 taset), 
+2) tema vanus (pidev tunnus), 
+3) vestluspartneri sugu (2 taset),
+4) vestluspartneri vanus (pidev tunnus).
+
+
+Kas lineaarse mudeli eeldused on täidetud?
+
+- Ei uuritav tunnus ega kirjeldavad arvulised tunnused ei ole normaaljaotusega, siin ei aita ka logaritmimine, aga andmestikus on üle 30 mõõtmispunkti, nii et väga selle pärast ka muretsema ei pea.
+- Iga vestluse iga osaleja kohta on andmestikus üks mõõtmispunkt, mis justkui tähendaks, et mõõtmised on sõltumatud. Üldiselt on igas vestluses osalejad erinevad, aga on üksikuid koruvaid osalejaid. Kuna neid ei ole väga palju, siis me võiksime kasutada tavalist lineaarset mudelit ja kui tahame väga hoolega järgida sõltumatute mõõtmiste nõuet, siis võiksime valida korduvate osalejate salvestustest ühe ja ülejäänud kordused andmestikust eemaldada. Vaatame üle, palju on korduvaid osalejaid:
+
+```{r}
+table(table(dat$SP1_ID))
+```
+79 osalejat esineb andmestikus ainult ühe korra ja 9 osalejat osales mitu korda, kolm neist lausa neli korda.
+
+Miks see korduvate mõõtmispunktide küsimus on üldse oluline? Selle pärast, et lisaks fikseeritud faktoritele (sugu, vanus) võib kõneleja häälekõrgust mõjutada (õigemini: **mõjutab**) tema individuaalne eripära. Kuna meil on andmestikus mõned korduvad kõnelejad, siis võib nende individuaalne efekt mõjutada fikseeritud faktorite mõju.
+
+Kõneleja isikut me ei saa fikseeritud faktorina mudelisse lisada, sest meil on valimis juhuslikud 88 indiviidi (8 miljardist inimesest või 1 miljonist eestlasest). Pealegi me nii väga ei tahagi konkreetse indiviidi efekti määratleda, me lihtsalt tahame selle olemasoluga arvestada.
+
+
+### Testime kõigepealt tavalise lineaarse mudeliga
+
+Kuna lineaarne mudel on tundlik hälbivadte väärtuste suhtes ja meil on andmestikus ainult üksikud üle 70-aastased, siis jätame need välja.
+
+```{r, eval=F}
+lm0 <- lm(f0_mean ~ 1, data = dat, subset = SP1_age < 70)
+# lisame 1. tunnusena kõneleja soo
+lm1 <- lm(f0_mean ~ SP1_gender, data = dat, subset = SP1_age < 70)
+anova(lm0, lm1)
+# see oli oluline, lisame teise tunnusena kõneleja vanuse
+lm2 <- lm(f0_mean ~ SP1_gender + SP1_age, data = dat, subset = SP1_age < 70)
+anova(lm1, lm2)
+# see oli ka oluline, nüüd lisame soo ja vanuse interaktsiooni
+lm3 <- lm(f0_mean ~ SP1_gender * SP1_age, data = dat, subset = SP1_age < 70)
+anova(lm2, lm3)
+# see oli jälle oluline, nüüd lisame vestluspartneri soo
+lm4 <- lm(f0_mean ~ SP1_gender * SP1_age + SP2_gender, data = dat, subset = SP1_age < 70)
+anova(lm3, lm4)
+```
+
+Siit edasi võiks testida a) vestluspartneri soo interaktsiooni kõneleja sooga, b) kõneleja vanusega või c) lisada vestluspartneri vanuse peamõju, aga ükski neist võimalustest ei tee mudelit paremaks; veel võiks testida, kas mudelit teeb paremaks see, kui mõni mudelist lm4 midagi vahetada vestluspartneri vanuse vastu. Proovi seda!
+
+
+Parim mudel on siiski see:
+```{r}
+lm4 <- lm(f0_mean ~ SP1_gender * SP1_age + SP2_gender, data = dat, subset = SP1_age < 70)
+summary(lm4)
+```
+
+```{r, eval = F}
+ggeffects::ggpredict(lm4)
+sjPlot::plot_model(lm4, type = "pred")
+sjPlot::plot_model(lm4, type = "int")
+```
+
+
+
+### Sama segamudeliga
+
+Installime ja aktiveerime paketi `lme4`, kus tuleb segamudeli käsk lmer(). Lisaks oleks hea installida ka paket `lmerTest`, mis lisab mudeli väljundile p-väärtused (vaikimis on segamudeli väljund ilma p-väärtusteta).
+
+```{r, warning=FALSE, message=FALSE}
+# install.packages("lme4", "lmerTest")
+library(lme4)
+library(lmerTest)
+```
+Segamudelis peab olema vähemalt üks juhuslik faktor. Lisame juhusliku kõneleja efekti vabaliikmele (random intercept).
+```{r}
+sm4 <- lmer(f0_mean ~ SP1_gender * SP1_age + SP2_gender + (1|SP1_ID), 
+            data = dat, subset = SP1_age < 70)
+```
+
+
+### Kas mudel muutus juhusliku faktori lisamisest?
+
+Võrdleme ainult fikseeritud faktoritega mudelit ja lisatud juhusliku mõjuga mudelit: 
+```{r}
+anova(sm4, lm4)
+```
+
+Segamudel on oluliselt erinev. Vaatame nüüd mudeli väljundit käsuga `summary()`:
+
+```{r, echo=F}
+summary(sm4)
+```
+
+Mudeli väljund on üldiselt väga sarnane tavalise lineaarse mudeli väljundile. Mudeli üldist olulisust ei ole küll eraldi real välja toodud, aga on mudeli jääkide jaotus (residuals). Et nullhüpotees hüljata, peaks mudeli jäägid läbima nulli.
+
+Väljundi lõpus on fikseeritud efektide korrelatsioonimaatriks, mille jälgimine võiks aidata multikollineaarsust vältida.
+
+Kõige huvitavam osa on segamudeli väljundis fikseeritud efektide koefitsientide tabel. Selle lugemine ja tõlgendamine on põhimõtteliselt sama nagu tavalise lineaarse mudeli puhul. Kui varasemates näidetes meil on olnud logaritmitud tunnuseid, siis siin on tõlgendamine seda lihtsam, et kõik tunnused on algsetes ühikutes:
+
+- vabaliige (intercept) on siis keskmine põhitoon siis, kui kõigi seletavade tunnuste väärtus on 0 või nad on baastasemel. See tähendab siis, et kõneleja keskmine põhitoon võiks olla 222 Hz, kui ta on naine ja vanus on 0. See ei tähenda muidugi, et see oleks põhitooni väärtus sündides, sest meie andmestikus on ainult täisealised, aga kui eeldada lineaarset seost, siis võime ka 0-punkti leida.
+- Kõneleja soo efekt tähendab seda, et baastasemega võrreldes on meeste hääl -110 ehk 222 - 110 = 112 Hz.
+- Kõneleja vanuse efekt tähendab seda, et võrreldes vabaliikmega langeb põhitoon -0.5 Hz aasta kohta. See siis tähendab, et nt 30aastasel naisel võiks häälekõrgus olla keskmiselt 222 - 30\*0.5 = 207 Hz ja 60aastasel naisel 222 - 60\*0.5 = 192 Hz
+- Soo ja vanuse interaktsioon tähendab seda, et meeste puhul toimib vanuse efekt pisut teisiti. Lisaks vanuse üldefektile tuleb meeste puhul liita soo ja vanuse efekt, mis põhimõtteliselt antud juhul muudab vanuse efekti vastupidiseks: -0.5 + 0.7 = 0.2 Hz aastas tõuseb meeste hääl ning näiteks 30aastase mehe hääle kõrgus võiks olla 222 - 110 -30\*0.5 +30\*0.7 = 112 Hz, aga 60aastasel mehel 222 - 110 -60\*0.5 +60\*0.7 = 124 Hz.
+- Vestluspartneri soo efekt on -5 Hz, mis mõjub siis, kui ta on mees, sest naine on baastase. Miks naine on baastase? Sest see on andmestikus tähistatud "F", mis on tähestikus "M"-ist eespool. Kuidas see vestluspartneri efekt mõjub kõneleja soo ja vanusega seoses? Kuna mudelis on see ainult peamõjuna ja ilma interaktsioonideta, siis mõjub see sõltumata kõneleja soost ja vanusest alati ühte moodi: meestega rääkides kasutatakse 5 Hz madalamat häält.
+
+Ilma `lmerTest` paketi kasutamata ei esitata fikseeritud efektide tabelis p-väärtusi. Sel juhul peaks hindama faktori olulisust statistiku *t* väärtuse alusel: rusikareegel on see, et kui selle absoluutväärtus on suurem kui kaks |t| > 2, siis on faktor oluline.
+
+```{r, echo=T}
+# värv = kõneleja sugu, punkti kuju = vestluspartneri sugu; baastase N (must ja ring)
+plot(f0_mean ~ SP1_age, col = SP1_gender, pch = as.numeric(SP2_gender), data = dat, xlim = c(20,70))
+
+sm4coefs <- summary(sm4)$coefficients[,"Estimate"]
+
+for(i in 0:1) {
+  # naiste reg.jooned (must), kui räägivad naistega (pidev), ja kui räägivad meestega (katkend)
+  lines(x = 20:70, y = c(sm4coefs["(Intercept)"] + 
+                             20:70 * sm4coefs["SP1_age"] + 
+                             i * sm4coefs["SP2_genderM"]), 
+        lty = i+1)
+  # meeste reg.jooned (punane): kui räägivad naistega (pidev), meestega (katkend)
+  lines(x = 20:70, y = c(sm4coefs["(Intercept)"] + 
+                             20:70 * sm4coefs["SP1_age"] + 
+                             sm4coefs["SP1_genderM"] + 
+                             20:70 * sm4coefs["SP1_genderM:SP1_age"] + 
+                             i * sm4coefs["SP2_genderM"]), 
+        lty = i+1, col=2)
+}
+```
+Sama ggplotiga:  
+
+```{r}
+library(tidyverse)
+ggplot(data = dat, aes(x = SP1_age, y = f0_mean, color = SP1_gender, shape = SP2_gender)) +
+    geom_point(size = 2) +
+    scale_shape_manual(values = c(1,2)) +
+    scale_color_manual(values = c("black", "red")) +
+    # naiskõnelejad, kes räägivad naistega
+    geom_abline(intercept = sm4coefs["(Intercept)"],
+                slope = sm4coefs["SP1_age"],
+                color = "black", linetype = "solid") +
+    # naiskõnelejad, kes räägivad meestega
+    geom_abline(intercept = sm4coefs["(Intercept)"] + sm4coefs["SP2_genderM"],
+                slope = sm4coefs["SP1_age"],
+                color = "black", linetype = "dashed") +
+    # meeskõnelejad, kes räägivad naistega
+    geom_abline(intercept = sm4coefs["(Intercept)"] + sm4coefs["SP1_genderM"],
+                slope = sm4coefs["SP1_age"] + sm4coefs["SP1_genderM:SP1_age"],
+                color = "red", linetype = "solid") +
+    # meeskõnelejad, kes räägivad meestega
+    geom_abline(intercept = sm4coefs["(Intercept)"] + sm4coefs["SP1_genderM"] + sm4coefs["SP2_genderM"],
+                slope = sm4coefs["SP1_age"] + sm4coefs["SP1_genderM:SP1_age"],
+                color = "red", linetype = "dashed")
+```
+
+
+
+Kuna siin mudelis on seletavate tunnustena kõneleja enda omadused, mis ühe kõneleja puhul korduda ei saa, siis siia juhuslikku kallet lisada ei saa.
+
+
+## Näide 2: vokaali kestus ja välde
+
+
+Kasutame teist andmestikku, mis on kogutud samast *eesti keele spontaanse kõne foneetilisest korpusest*, kasutatud artiklis Lippus, P., Asu, E. L., Teras, P., & Tuisk, T. (2013). Quantity-related variation of duration, pitch and vowel quality in spontaneous Estonian. Journal of Phonetics, 41(1), 17–28. https://doi.org/10.1016/j.wocn.2012.09.005
+
+Selles töös uuriti eesti keele välte akustilisi tunnuseid. Andmestikus on info 1714 kahesilbilise sõna kohta, mõõdetud on häälikute kestust, põhitooni liikumist, vokaalikvaliteeti jms. Samuti on märgitud sõnade välde, fookusrõhk jms.
+
+Andmestik on saadaval DataDOI repositooriumis: http://dx.doi.org/10.15155/repo-16
+Loeme sisse otse veebilingilt.
+```{r}
+dat2 <- read.delim("http://datadoi.ut.ee/bitstream/handle/33/51/Lippus_etal_JPhon2013_dataset.txt?sequence=4&isAllowed=y")
+```
+
+Tegemist on korpusuuringuga, mis tüüpiliselt rikub tavalise lineaarse mudeli mõõtmiste sõltumatuse nõuet: meil on ühelt kõnelejalt korjatud kokku kõik uurimiskriteeriumitele vastavad sõnad ja ühelt kõnelejalt on rohkem kui üks rida andmestikus; samuti võivad andmestikus esineda korduvad sõnad.
+
+```{r}
+# ühelt kõnelejalt on vähemalt 23 ja kuni 203 sõna
+quantile(table(dat2$SP))
+# ainult 179 sõna esineb ühe korra, mõned sõnad esinevad 50-100 korda
+table(table(dat2$Word))
+```
+
+Eesti keeles on 3 väldet (nt sada : saada : saada) ja välde kõige rohkem mõjutab rõhulise vokaali kestust. Kui uurida vokaali kestust, siis fikseeritud faktorina võiks kestuse varieerumist seletada:
+
+1) välde, 
+2) lauserõhk (fookus)
+3) sõnaliik.
+
+Vokaalide kestust võib mõjutada ka kõnetempo, mis võib olla kõnelejati erinev. Samuti võib mõjutada vokaali häälikuline kontekst ehk sõna, milles ta esineb. Nii nagu kõnelejatest on meil juhuslik valim, on meil ka keeles esinevatest sõnadest juhuslik valim, mistõttu me ei saa nende fikseeritud efekti arvestada.
+
+Kodeerime mõned numbritena sisestatud faktorid ümber faktoriteks:
+```{r}
+dat2$Quantity <- factor(dat2$Quantity)
+dat2$Focus <- factor(dat2$Focus); levels(dat2$Focus) <- c("no","yes")
+```
+
+## Kas rõhulise silbi vokaali kestus sõltub vältest?
+
+Jätame välja kinnise esisilbiga (nn *metsa*-tüüpi) sõnad, sest neis on esimene vokaal fonoloogiliselt lühike, sest väldet kannab silbilõpukonsonant.
+
+```{r}
+boxplot(V1 ~ Quantity, data = dat2, subset = Struct == "cvcv", 
+        ylab = "V1 kestus (ms)", xlab = "Välde")
+```
+
+## Juhuslik kõneleja vabaliige
+
+Kui teeme 0-mudeli, siis lmer'i eeldus on, et mudelis on vähemalt üks juhuslik efekt. Kui ühtegi fikseeritud efekti ei ole, siis saab olla selleks ainult juhuslik vabaliige.
+
+Juhuslikku vabaliiget tähistab `(1|juhuslik_faktor)`
+
+Lisame esimeseks vabaliikmeks kõneleja, seda võiks tõlgendada kui individuaalset kõnetempo efekti.
+
+```{r}
+m0 <- lmer(V1 ~ (1|SP), data = dat2, subset = Struct == "cvcv", REML = F)
+```
+
+Ja siis lisame ka ühe fikseeritud faktori, selleks võiks olla välde:
+```{r}
+m1 <- lmer(V1 ~ Quantity + (1|SP), data = dat2, subset = Struct == "cvcv", REML = F)
+anova(m0, m1)
+```
+```{r}
+summary(m1)
+```
+Välte efekt oli oluline. Esimeses vältes oli vokaali pikkus 58 millisekundit, teises 118 ms ja kolmandas vältes 139 ms.
+
+Vaatame nüüd kõnelejatepõhiseid vabaliikmeid:
+```{r}
+ranef(m1)
+```
+
+
+SP1 kõnetempo on keskmiselt 19 ms kiirem (Q1 58-19=39, Q2 118-19=99, Q3 139-19=120), SP10 on jällegi 23 ms aeglasem, jne. Individuaalne vabaliige tähendab seda, et see efekt liitub kõigele üldiselt.
+
+```{r}
+sjPlot::plot_model(m1, type = "re", sort.est = T, grid = F)
+```
+
+
+
+Siin joonisel on kast-vurrud diagrammina vokaalikestuse jaotused kolmes vältes ja punase joonega on lisatud mudeli hinnang välte efektile:
+```{r}
+plot(V1 ~ Quantity, data = dat2, subset = Struct=="cvcv")
+coefs <- summary(m1)$coefficients[,"Estimate"]
+lines(y = coefs["(Intercept)"] + c(0, coefs[c("Quantity2", "Quantity3")]), 
+      x = 1:3, lwd = 3, col = "red")
+```
+```{r}
+ggplot() +
+    geom_boxplot(data = dat2 %>% filter(Struct=="cvcv"), aes(x = Quantity, y = V1)) +
+    geom_line(aes(x = 1:3,
+                  y = c(coefs["(Intercept)"],
+                        coefs["(Intercept)"] + coefs["Quantity2"],
+                        coefs["(Intercept)"] + coefs["Quantity3"]),
+                  group = 1),
+              color = "red", size = 1)
+```
+
+
+
+Siin joonisel on eri värviga iga kõneleja individuaalne joon, mida on mudeli juhusliku vabaliikme põhjal korrigeeritud:
+
+```{r}
+plot(V1 ~ Quantity, data = dat2, subset = Struct == "cvcv")
+coefs <- summary(m1)$coefficients[,"Estimate"]
+for(i in 1:nrow(ranef(m1)$SP)) lines(y = ranef(m1)$SP[i,] + coefs["(Intercept)"] + c(0,coefs[c("Quantity2", "Quantity3")]), x = 1:3, col = i)
+```
+
+```{r}
+ranef(m1)$SP %>%
+    mutate(koneleja = rownames(.),
+           Q1 = coefs["(Intercept)"] + `(Intercept)`,
+           Q2 = Q1 + coefs["Quantity2"],
+           Q3 = Q1 + coefs["Quantity3"]) %>%
+    pivot_longer(., cols = starts_with("Q"), names_prefix = "Q",
+                 names_to = "välde", values_to = "kõnetempo") -> df
+
+ggplot() +
+    geom_boxplot(data = dat2 %>% filter(Struct == "cvcv"), 
+                 aes(x = Quantity, y = V1)) +
+    geom_line(data = df,
+              aes(x = välde, y = kõnetempo, color = koneleja, group = koneleja),
+              show.legend = F)
+```
+
+
+
+
+## Juhuslik kalle
+
+Lisaks individuaalsele üldisele kõnetempole on välte mõju ka kõnelejati veidi erinev. See tähendab, et aeglasema kõnetempoga võib-olla aeglustatakse pikemaid häälikuid rohkem, lühemaid vähem, või vastupidi.
+
+Juhuslikku kallet (*random slope*) tähistab `(1+fikseeritud_faktor|juhuslik_faktor)`. Juhuslik kalle on seotud mingi fikseeritud faktoriga, see see, mille võrra fikseeritud efekti mõju korrigeeritakse. 
+
+```{r}
+m2 <- lmer(V1 ~ Quantity + (1+Quantity|SP), data = dat2, subset = Struct=="cvcv", REML = F)
+anova(m1, m2)
+```
+
+Juhuslik kalle on oluline. Vaatame mudeli väljundit
+
+```{r}
+summary(m2)
+```
+
+Ja vaatame juhuslikke efekte:
+```{r}
+ranef(m2)
+```
+
+```{r}
+sjPlot::plot_model(m2, type = "re")
+```
+
+
+
+Juhuslike kalletega joonis:
+```{r}
+plot(V1 ~ Quantity, data = dat2, subset = Struct == "cvcv")
+coefs <- summary(m2)$coefficients[,"Estimate"]
+for(i in 1:nrow(ranef(m2)$SP)) lines(y = coefs["(Intercept)"] + 
+                                         c(ranef(m2)$SP[i,"(Intercept)"], 
+                                           ranef(m2)$SP[i,"Quantity2"] + coefs["Quantity2"], 
+                                           ranef(m2)$SP[i,"Quantity3"] + coefs["Quantity3"]), 
+                                     x = 1:3, 
+                                     col = i)
+```
+```{r}
+ranef(m2)$SP %>%
+    mutate(koneleja = rownames(.),
+           Q1 = coefs["(Intercept)"] + `(Intercept)`,
+           Q2 = coefs["(Intercept)"] + coefs["Quantity2"] + Quantity2,
+           Q3 = coefs["(Intercept)"] + coefs["Quantity3"] + Quantity3) %>%
+    select(koneleja, Q1, Q2, Q3) %>%
+    pivot_longer(., cols = starts_with("Q"), names_to = "välde", values_to = "kõnetempo", names_prefix = "Q") -> df2
+
+ggplot() +
+    geom_boxplot(data = dat2 %>% filter(Struct == "cvcv"), aes(x = Quantity, y = V1)) +
+    geom_line(data = df2, aes(x = välde, y = kõnetempo, color = koneleja, group = koneleja), 
+              show.legend = F)
+
+```
+
+
+
+
+## Mitu juhuslikku faktorit
+
+Lisaks keelejuhi efektile võib korduval sõnal olla efekt. 
+```{r}
+m3 <- lmer(V1 ~ Quantity + (1|SP) + (1|Word), data = dat2, subset = Struct == "cvcv", REML=F)
+```
+Võrdleme seda mudeliga, kus oli ainult üks juhuslik vabaliige (1|SP)
+```{r}
+anova(m1, m3)
+```
+
+Sõna juhuslik efekt on oluline. Mida see tähendab? Siin mudelis on siis nüüd 2 juhuslikku vabaliiget, st et vabaliiget kohandatakse iga korduva sõna JA iga korduva kõneleja suhtes. Sisuliselt see tähendab, et nii nagu igal kõnelejal võib olla individuaalne kõnetempol võib mõni sõna (näteks sageduse või mingi häälikukombinatsiooni koartikulatsiooni tõttu) olla regulaarselt lühem või pikem kui teised.
+
+```{r}
+summary(m3)
+```
+
+Käsuga `ranef()` saab juhuslike faktorite efekte vaadata:
+```{r, eval=F}
+ranef(m3)
+```
+
+```{r}
+sjPlot::plot_model(m3, type = "re", sort.est = T, grid = F)
+```
+
+
+
+Muidugi ühes mudelis võib olla ka mitu juhuslikku faktorit, millest mõnel on ka juhuslikud kalded ja teisel ei ole, aga peame ka arvestama, et iga juhusliku efekti lisamine võtab fikseeritud efektidelt seletusjõudu vähemaks.
+
+## ANOVA segamudeliga
+
+Segamudelist saab ka ANOVA väljundi, et kirjeldada faktori üldefekti olulisust.
+```{r}
+anova(m3)
+```
+
+Siit võib siis väita, et vältel on vokaali kestusele oluline efekt F(2, 365.49) = 372.97, p < 0.001.
+
+## Post-hoc test
+
+Ja samuti peaks tegema post-hoc testi segamudeli puhul, kui on faktor, millel on rohkem kui kaks taset ja tahame võrrelda ka mittebaastasemetevahelisi erinevusi. Tukey HSD testi tegemiseks saab kasutada näiteks `multcomp` paketti.
+
+```{r}
+#install.packages("multcomp")
+library(multcomp)
+summary(glht(m3, linfct = mcp(Quantity = "Tukey")), test = adjusted("holm"))
+```
+Post-hoc testi tulemusel võib öelda, et vokaali kestus on oluliselt erinev kõigis kolmes vältes p<0.001.
+
+## Kordamisküsimused
+
+Kordamisküsimuste testi saad teha ka Moodle'is, seal näed peale vastamist ka õigeid vastuseid ja selgitusi.
+
+#### 1. Juhuslik faktor on juhuslik selle poolest, et
+
+a) selle mõju uuritavale tunnusele ei ole oluline
+b) meil on selle mõjust suva
+c) meil on valimis juhuslik valik populatsiooni esindajatest
+d) selle mõju ei ole võimalik kirjeldada
+
+<!-- Õige: c. Juhusliku faktori mõju on (võib olla) uuritavale tunnusele oluline, aga meie valimis on juhuslik valik populatsioonis esindatud isenditest. Laiemalt võttes, fikseeritud faktoril saab olla lõplik hulk tasemeid, aga juhuslikult faktoril mitte.  -->
+
+
+#### 2. Varasemates praktikumides kasutatud andmesti `ldt.csv` on töödeldud nii, et seal on sõltumatud mõõtmised, sest iga sõna kohta on arvutatud katseisikute keskmine reaktsiooniaeg. Eelmises praktikumis leidsime, et reaktsiooniaega mõjutab sõna pikkus ja sagedus, aga nende vahel ei ole olulist interaktsiooni. Kui meil oleks kasutada katseandmestik sellisel kujul, et iga rida tabelis on ühe katsisiku reaktsiooniaeg vastavale sõnale, siis peaks segamudelis testima ka
+
+a) peaks valima, kas katseisiku mõju või sõna mõju
+b) sõna mõju juhusliku pikkuse ja sageduse kaldena, katseisikut vabaliikmena
+c) nii sõna kui katseisiku mõju juhusliku faktorina
+d) sõna juhuliku vabaliikmena ja sõna juhuliku kaldena
+
+<!-- õige: c. Peaks testima nii juhuslikku katseisiku kui sõna mõju. Seda, kas vabaliime või kaldena, peaks testima. Juhuslik vabaliige tähendab, et on katseisiku või sõna üldefekt: üks katseisik on aeglasem, teine kiirem, üht sõna tuntakse kiiremini, teist aegalsemini. Kalle on nagu interaktsioon fikseeritud faktoriga:  näiteks katseisiku juhuslik kalle sõna pikkusele tähendaks, et eri pikkusega sõnu tunneks erinevad katseisikud ära erineva kiirusega. Juhuslikku sõna kallet sagedusele ja pikkusele ei ole võimalik lisada, sest sagedus ja pikkus on sõna omadused ja sama sõna ei saa andmestikus esineda erineva pikkuse või sageudsega, tal on alati samad tunnused.   -->
+
+#### 3. Oletame, et reaktsiooniaega mõjutab sõna pikkus ja sagedus, mille vahel ei ole interaktsiooni. Mudel arvestab sõna mõjuga reaktsioooniajale ning katseisikute reaktsoonikiirus on erinev sõltuvalt sõna sagedusest. Milline selle mudeli valem võiks olla?
+
+a) RT ~ pikkus * sagedus + (1|katsesiik) + (1|sõna)
+b) RT ~ pikkus + sagedus + (1|katsesiik) + (1|sõna)
+c) RT ~ pikkus + sagedus + (1+sagedus|katsesiik) + (1+pikkus|sõna)
+d) RT ~ pikkus + sagedus + (1+sagedus|katsesiik) + (1|sõna)
+
+<!-- Õige: d. Fikseeritud faktorid on pikkus ja sagedus, nende vahel ei ole interaktsiooni. Katseisikul on juhuslik kalle sagedusele ja sõnal on ainult juhuslik vabaliige. -->
+
+
+#### 4. Kuidas hinnata lineaarse segamudeli fikseeritud faktori olulisust?
+
+a) tuleb võrrelda ANOVA testiga mudelit, kus faktor on sees, ja mudelit, kust see on välja jäetud
+b) kui faktori p > 0.05, siis on oluline
+c) kui faktori |t| > 2, siis on oluline
+d) kui faktori Estimate > 0.2, siis on oluline
+
+<!-- Õige: a ja c. Iga faktori olulisust saab hinnata selle kaudu, et kui selle lisamine muudab ANOVA testiga testimisel mudeli jääke oluliselt, siis on see oluline faktor. Lisaks annab mudeli väljund statistiku t väärtuse, kui selle absoluutväärtus on suurem kui 2, siis võiks faktor olla oluline. Lisaks on võimalik installida pakett lmerTest, mis lisab p-väärtuse. P-väärtus peaks siiski olema võimalikult väike ehk väiksem kui 0.05, mitte suurem. Faktori mõju suurust näitab mudeli hinnang ehk Estimate ehk beeta, aga selle suuruse hindamisel peaks lähtuma sellest, mis skaalal on mõõtmised. Ka väga väike efekt võib olla statistiliselt oluline. --> 
+
+#### 5. Kui meil on vaja võrrelda rohkem kui 2 tasemega faktorite kõiki tasemeid
+
+a) peame tegema post-hoc testi
+b) teeme lihtsalt testi mitu korda, vahetame baastaset
+c) post-hoc testi tegemine on keeruline ja seda tuleks vältida
+d) segamudeliga ei peagi post-hoc testi tegema
+
+<!-- Õige a. Segamudeliga peab post-hoc testi tegema sama moodi nagu tavalise lineaarse mudeliga, kui on vaja testida võrdlusi mittebaastasemete vahel. Võib teha Bonferroni korrektsiooni vahetatud baastasemetega kordustestile, aga võib ka kasutada Tukey testi. -->
+
+## Järgmisel korral
+
+- Logistiline regressioon e uuritav tunnus on nominaalne (kahe tasemega).
