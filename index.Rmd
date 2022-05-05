@@ -1,0 +1,16 @@
+---
+title: Kvantitatiivse andmeanalüüsi alused humanitaarteadlastele ja rakendustarkvara
+  R (FLFL.00.009)
+knit: (function(input_file, encoding) {
+    out_dir <- 'html';
+    rmarkdown::render(input_file,
+      encoding=encoding,
+      output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
+date: kevad 2022 
+output: 
+  html_document:
+    theme: flatly
+    highlight: tango
+    self_contained: true
+---
+

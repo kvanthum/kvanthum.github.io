@@ -1,5 +1,10 @@
 ---
 title: "2. praktikum"
+knit: (function(input_file, encoding) {
+    out_dir <- 'html';
+    rmarkdown::render(input_file,
+      encoding=encoding,
+      output_file=file.path(dirname(input_file), out_dir, '2-andmetyybid_objektityybid.html'))})
 date: 23.02.2022 
 output: 
   html_document:
@@ -61,7 +66,7 @@ Eri skaalal tunnused võimaldavad erineval hulgal tehteid.
 - Suhteskaala tunnused võimaldavad kõige rohkem tehteid. Lisaks kõikidele eelnimetatutele saab neid tunnuseid võrrelda ka sellel alusel, __kui mitu korda__ on mingi väärtus teisest väärtusest suurem või väiksem (nt 80-aastane on 4 korda vanem kui 20-aastane, aga 80 kraadi ei ole 4 korda rohkem kui 20 kraadi).  
 
 <center>
-![pilt](scales.JPG){width=50%}  
+![pilt](imgs/scales.JPG){width=50%}  
 <span style="font-size:12px">Levshina 2015: 18</span>
 </center>
 
@@ -76,8 +81,8 @@ Küsitluses, millele vastasid, olid järgmised küsimused. Millised neist on kva
 
 
 ```{r echo = FALSE}
-load("kysimustik_2022.RData")
-dat <- read.delim("kysimustik2021_taiend.txt", fileEncoding = "UTF-8")
+load("data/kysimustik_2022.RData")
+dat <- read.delim("data/kysimustik2021_taiend.txt", fileEncoding = "UTF-8")
 kyssad <- dat[1,]
 ```
 
@@ -105,9 +110,9 @@ library(egg)
 library(gridGraphics)
 library(webp)
 library(png)
-glaucus <- read_webp("glaucus.png")
-kaelkirjak <- readPNG("giraffe.png")
-koer <- read_webp("dog.webp")
+glaucus <- read_webp("imgs/glaucus.png")
+kaelkirjak <- readPNG("imgs/giraffe.png")
+koer <- read_webp("imgs/dog.webp")
 
 teema <- theme(panel.background = element_rect(fill = "grey80"),
                panel.grid = element_line(color = "grey70"),
@@ -334,7 +339,7 @@ nchar(tekst2) # leia objekti tekst2 väärtuse tähemärkide arv
 substr(tekst2, 4, 7) # võta välja objekti tekst2 väärtuse 4-7 tähemärk
 ```
 
-<p style="text-align: right;">![](q15.PNG){width=40%}</p>
+<p style="text-align: right;">![](imgs/q15.PNG){width=40%}</p>
 <p style="text-align: right;">Küsimus R-i testist</p>
 
 __Tõeväärtus__ (*logical*) on binaarne muutuja, millel on kaks võimalikku väärtust: __TRUE__ ja __FALSE__, need sisestatakse suurtäheliselt ilma jutumärkideta, töötab ka ainult esitähega T/F. Milleks seda vaja on? Näiteks kui me kasutame võrratusi, siis vastuseks on tõeväärtus. Võrratusi läheb meil vaja hiljem, kui meil on näteks suuremast andmestikust vaja leida kindlatele tunnustele vastav alamosa.
@@ -389,7 +394,7 @@ class(vek1)
 length(vek1)
 ```
 
-<p style="text-align: right;">![](q1.PNG){width=40%} ![](q2.PNG){width=40%}</p>
+<p style="text-align: right;">![](imgs/q1.PNG){width=40%} ![](imgs/q2.PNG){width=40%}</p>
 <p style="text-align: right;">Küsimused R-i testist</p>
 
 
@@ -416,7 +421,7 @@ vek5[3] # vektori kolmas element
 vek5[2:4] # vektori teine, kolmas ja neljas element
 vek5[c(5,1)] # vektori viies ja esimene element
 ```
-<p style="text-align: right;">![](q3.PNG){width=40%}</p>
+<p style="text-align: right;">![](imgs/q3.PNG){width=40%}</p>
 <p style="text-align: right;">Küsimus R-i testist</p>
 
 
@@ -447,7 +452,7 @@ levels(haridus)
 levels(arvud)
 ```
 
-<p style="text-align: right;">![](q11.PNG){width=60%}</p>
+<p style="text-align: right;">![](imgs/q11.PNG){width=60%}</p>
 <p style="text-align: right;">Küsimus R-i testist</p>
 
 Faktoreid saab ümber järjestada näiteks `factor()`-funktsioonis argumendi `levels` abil.
@@ -475,13 +480,13 @@ Siin kursusel kasutame kõige rohkem ilmselt tabeleid, mille klass on *data.fram
 
 R-is saab andmeid ka vektoritest `data.frame()` käsuga tabeliks kokku panna, aga üldjuhul saame *data.frame*'i kujulise objekti nii, et loeme tabelina struktureeritud andmeid failist. Käsuga `read.table()` saab importida R-i tabeleid, mis on näiteks csv- või txt-formaadis, ent erinevate käskudega (eri pakettidest) saab sisse lugeda ka teistest formaatides tabeleid (nt xlsx).
 
-<p style="text-align: right;">![](q5.PNG){width=40%}</p>
+<p style="text-align: right;">![](imgs/q5.PNG){width=40%}</p>
 <p style="text-align: right;">Küsimus R-i testist</p>
 
 Kui andmestik on R-is korrastatud ja RData formaadis salvestatud, siis neid andmestikke saab avada käsuga `load()`. Näiteks sellisel kujul on Moodle'is failis *kysimustik_2022.RData* korrastatud vastused küsimustikule, mida eelmises praktikumis täitsite. Lisaks on seal ka varasemate aastate vastused.
 
 ```{r, echo=T}
-load("kysimustik_2022.RData")
+load("data/kysimustik_2022.RData")
 ```
 
 Selle käsurea rakendamisest justkui ei juhtugi midagi, aga töölauale tekkis objekt nimega **kysimustik**. Nüüd oleks vaja saada natuke aimu, mida see tabel endast kujutab. Selleks proovime käske:
@@ -505,8 +510,8 @@ str(kysimustik) # näita tabeli struktuuri
 
 Mis tüüpi andmed on tabelis? Mis skaalal?
 
-<p style="text-align: right;">![](q8.PNG){width=40%} ![](q9.PNG){width=40%}</p>
-<p style="text-align: right;">![](q4.PNG){width=40%}</p>
+<p style="text-align: right;">![](imgs/q8.PNG){width=40%} ![](imgs/q9.PNG){width=40%}</p>
+<p style="text-align: right;">![](imgs/q4.PNG){width=40%}</p>
 <p style="text-align: right;">Küsimused R-i testist</p>
 
 Tabelist saab selle osi pärida samamoodi *indeksite* abil nagu vektorist, aga nüüd peab arvestama, et nurksulgudes tuleb märkida nii ridade kui ka veergude indeksid. 
