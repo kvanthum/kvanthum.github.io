@@ -4,7 +4,7 @@ Tartu Ülikooli kursuse "Kvantitatiivse andmeanalüüsi alused humanitaarteadlas
 
 Materjalid on koostanud Pärtel Lippus ja Maarja-Liisa Pilvik.
 
-![](imgs/HITSA_logo.png){width=20%}
+![](imgs/HITSA_logo.png)
 
 Shield: [![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
 
