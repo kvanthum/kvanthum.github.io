@@ -505,6 +505,7 @@ Kui mudelis on olulisi interaktsioone, võiks kasutada III tüüpi ANOVAt. Loe l
 
 ```{r}
 tab_model(m5.glm, 
+          transform = NULL, # näita logaritmitud šansisuhteid
           show.reflvl = T, # näita tunnuste baastasemeid
           show.ci = F, # ära näita usaldusvahemikke
           show.se = T, # näita koefitsiendi standardviga
@@ -512,7 +513,7 @@ tab_model(m5.glm,
           use.viewer = F) # ära näita tabelit Vieweris, vaid eraldi brauseris
 ```
 
-Kui mudelis on mingite tunnuste vahel oluline interaktsioon, ei saa mudeli peamõjusid enam üksinda tõlgendada. Nii tuleks pikkuse mõju tõlgendada mudelis `m5.glm` ainult koos murde mõjuga. Kesk-murderühmas pikkusel niisiis mõju ei ole, aga Lõuna-murderühmas kasvab *peale*-konstruktsiooni kasutamise tõenäosus iga sõnapikkuse logaritmitud ühiku (ehk iga arvu 2 astme) kohta umbes 1.85 korda ja Saare-murderühmas tervelt 1.91 korda. 
+Kui mudelis on mingite tunnuste vahel oluline interaktsioon, ei saa mudeli peamõjusid enam üksinda tõlgendada. Nii tuleks pikkuse mõju tõlgendada mudelis `m5.glm` ainult koos murde mõjuga. Kesk-murderühmas pikkusel niisiis mõju ei ole, Lõuna-murderühmas aga kasvab *peale*-konstruktsiooni kasutamise tõenäosus oluliselt iga sõnapikkuse logaritmitud ühiku (ehk iga arvu 2 astme) kohta umbes `exp(-0.14+0.61)=1.599994` korda, Saarte-murderühmas  `exp(-0.14+0.65)=1.665291` korda.  
 
 ```{r}
 plot_model(m5.glm, type = "int")
