@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '1-sissejuhatus.html'))})
-date: 21.02.2022 
+date: 20.02.2023 
 output: 
   html_document:
     theme: flatly
@@ -17,32 +17,40 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{css style settings, echo = FALSE}
+blockquote {
+    padding: 10px 20px;
+    margin: 0 0 20px;
+    font-size: 14px;
+    border-left: 5px solid #eee;
+}
+```
 
 # Sissejuhatus {.tabset .tabset-pills}
 
 ## Kursuse korraldusest
 
--   **E** 10.15-11.45, **K** 10.15-11.45  
+-   **E** 14.15-15.45, **K** 10.15-11.45.  
 -   Kokku 20 kohtumist.  
 -   Toimumisnädalad 26-30, 32-35, 37.  
--   See tähendab, et praktikume **EI** toimu 28. ja 30. märtsil ning 2. ja 4. mail.  
--   Kui vähegi võimalik püüame kohtuda kohapeal. Jätame võimaluse osaleda ka Zoomi kaudu, ent praktikume ei salvestata.  
+-   See tähendab, et praktikume **EI** toimu 27. ja 29. märtsil ning 1. ja 3. mail.  
+-   Kui vähegi võimalik, püüame kohtuda kohapeal. Jätame võimaluse osaleda ka Zoomi kaudu, ent praktikume ei salvestata.  
 -   Kohalkäimine (sh virtuaalne) ei ole kohustuslik, küll aga tungivalt soovituslik. 
--   Kõik õppematerjalid [Moodle](https://moodle.ut.ee/course/view.php?id=3774)'is\  
+-   Kõik õppematerjalid on [Moodle](https://moodle.ut.ee/course/view.php?id=3774)'is.    
 -   Loeng + praktiline osa.  
 -   Kursus on arvestuslik (arvestatud/mittearvestatud).  
 -   Arvestuse saamiseks vajalik esitada **kõik** kursuse jooksul antud kodutööd ja lõpuprojekt.  
 -   3 kodutööd:  
-    -   Andmetüübid - tidyverse, tähtaeg **20.03.2022**.
-    -   Valim ja populatsioon - Mittearvuliste tunnuste vahelised seosed, tähtaeg **03.04.2022**.
-    -   Lineaarse regressiooni mudelid - Logistilise regressiooni segamudelid, tähtaeg **01.05.2022**.
--   Lõpuprojekt: iseseisev töö, milles kasutatakse mõnd kursusel käsitletud meetodit mõnel kursusel mitte käsitletud andmestikul. Peab sisaldama nii koodi, analüüsi kui ka järeldusi. Kokku u 5 lk. Kursuse viimasel nädalal saab enda projektist, sellega kaasnenud probleemidest jms-st lühidalt (u 5 minutit) ka teistele rääkida. Võib edasi arendada teiste ainete raames tehtud projekte, kui on selgelt välja toodud, mis analüüse olete selle aine põhjal lisanud ning kuidas need aitavad uuritavat nähtust kirjeldada ja seletada. Esitamise tähtaeg **07.05.2022**.  
+    -   Andmetüübid - tidyverse, tähtaeg **19.03.2023**.
+    -   Valim ja populatsioon - Mittearvuliste tunnuste vahelised seosed, tähtaeg **02.04.2023**.
+    -   Lineaarse regressiooni mudelid - Logistilise regressiooni segamudelid, tähtaeg **30.04.2023**.
+-   Lõpuprojekt: iseseisev töö, milles kasutatakse mõnd kursusel käsitletud meetodit mõnel kursusel mitte kasutatud andmestikul. Peab sisaldama nii koodi, analüüsi kui ka järeldusi. Kokku u 5 lk. Kursuse viimasel nädalal saab enda projektist, sellega kaasnenud probleemidest jms-st lühidalt (u 5 minutit) ka teistele rääkida. Võib edasi arendada teiste ainete raames tehtud projekte, kui on selgelt välja toodud, mis analüüse olete selle aine põhjal lisanud ning kuidas need aitavad uuritavat nähtust kirjeldada ja seletada. Esitamise tähtaeg **05.05.2023**.  
 
 
 Selleks, et mõne nädala pärast kursuse materjalid pilla-palla kõiksugu salajastes kohtades laiali ei oleks ning et andmestike sisselugemine, jooniste salvestamine jms oleks võimalikult hõlbus, võiks kasutada selget kaustade ja failide struktuuri. Näiteks midagi sellist:  
 
 ```
-kvanthum2022  
+kvanthum2023  
     /materjalid  
         /praktikum1.html  
         /praktikum1.Rmd  
@@ -73,17 +81,16 @@ kvanthum2022
 
 ## Kvantitatiivne andmeanalüüs humanitaarteadustes
 
-### Mida see kvantitatiivne andmeanalüüs tähendab?  
-- Kogused, hulgad -> arvud (mõõtmis- ja loendusandmed)
+- Mõõtmis- ja loendusandmed: arvud
 - Empiirilisus   
 - Suurtes andmehulkades orienteerumine  
 - Nähtuste kirjeldamine, koosesinemise mustrid ja põhjuslikud seosed  
     - <http://www.tylervigen.com/spurious-correlations>  
 - Sagedused, tõenäosused, varieerumise modelleerimine  
-- Kvantitatiivsete meetodite abil saab jõuda läbipaistvate ja korratavate tulemusteni. See võimaldab teadlaste vahel hõlpsamat dialoogi.  
+
 
 <br>
-**Kvantitatiivsete meetodite kasutamine ei vastandu teooriale ega asenda kvalitatiivseid!** 
+**Kvantitatiivsete meetodite kasutamine ei asenda kvalitatiivset analüüsi ega vastandu teooriale!** 
 <br>
 <br>
 <br>
@@ -98,15 +105,18 @@ Kvantitatiivsed meetodid humanitaarteadustes?
 <br>
 _________________________________________
 
-> *A common predjudice, to be sure, divides the social world into phenomena that are suitable for quantification (population distributions, social mobility, etc.) and those that are irreducibly qualitative: conversation, narratives, biography, ethnography, and history often serve as examples. __Formalisms clearly can and do apply, however, to these phenomena as well__.* (Tilly 2004)
+> *A common prejudice, to be sure, divides the social world into phenomena that are suitable for quantification (population distributions, social mobility, etc.) and those that are irreducibly qualitative: conversation, narratives, biography, ethnography, and history often serve as examples. __Formalisms clearly can and do apply, however, to these phenomena as well__.* ([Tilly 2004](https://dokumen.pub/explaining-social-processes-9781594515002-2007044656-9781594515019.html): 38)
 
-> *Although history is not an exact science, counting, comparing, classifying, and modeling are nevertheless useful methods for __measuring our degree of doubt or certainty, making our hypotheses explicit, and evaluating the influence of a phenomenon__.* (Lemercier, Zalc 2019)
+> *Although history is not an exact science, counting, comparing, classifying, and modeling are nevertheless useful methods for __measuring our degree of doubt or certainty, making our hypotheses explicit, and evaluating the influence of a phenomenon__.* ([Lemercier, Zalc 2019](https://www.jstor.org/stable/j.ctvbqs963))
 
 
-## Lugemismaterjal
+
+
+## Lugemismaterjali
+
 Selle kursuse aluseks on põhiliselt õpikud 
 
-- Natalia Levshina (2015) "How to do Linguistics with R",
+- Natalia Levshina (2015) "How to do Linguistics with R",  
 - Richard McElreath (2015) "Statistical Rethinking",  
 - Bodo Winter (2020) "Statistics for linguists: An introduction using R".  
 
@@ -114,42 +124,49 @@ Selle kursuse aluseks on põhiliselt õpikud
 
 <br>
 
-Õpikuid ja ülevaateid humanitaar- ja sotsiaalteaduste meetodite kohta aga ilmub üha enam. Springeri kirjastusel näiteks on terve sari [***Quantitative Methods in the Humanities and Social Sciences***](https://www.springer.com/series/11748?detailsPage=titles), mille alt on hetkeseisuga ilmunud juba tervelt 17 raamatut.  
+Õpikuid ja ülevaateid humanitaar- ja sotsiaalteaduste meetodite kohta aga ilmub üha enam. Springeri kirjastusel näiteks on terve sari [***Quantitative Methods in the Humanities and Social Sciences***](https://www.springer.com/series/11748?detailsPage=titles), mille alt on hetkeseisuga ilmunud juba tervelt 18 raamatut.  
 
 <center>![](imgs/springerseries.jpg){width=30%}</center>
 
-Ajaloolasi võib huvitada ka näiteks Claire Lemercier & Claire Zalc (2019) [***Quantitative Methods in the Humanities: An Introduction***](https://www.upress.virginia.edu/title/5168), millega on seotud ka pidevalt täienev [kodulehekülg](https://quanthum.hypotheses.org/).  
+Ajaloolasi võib huvitada ka näiteks Claire Lemercier & Claire Zalc (2019) [***Quantitative Methods in the Humanities: An Introduction***](https://www.upress.virginia.edu/title/5168) ja Charles H. Feinstein & Mark Thomas (2002) [***Making History Count: A Primer in Quantitative Methods for Historians***](https://www.cambridge.org/core/books/making-history-count/8A9D227F8ADF3BD048382D911A2C4A33).  
 
-<center>![](imgs/quanthuman.jpg){width=30%}</center>
+<center>![](imgs/quanthuman.jpg){width=30%}
+![](imgs/feinstein_thomas.jpg){width=30%}</center>  
 
 
+<!-- Tegeleme rakendusliku statistikaga, kirjeldava ja järeldavaga. Ei tegele stilomeetria, dimensioonide vähendamise tehnikatega -->
 
 ## Miks R?
+
+<center>![](imgs/excel_r.jpg){width=70%}</center>
+<!-- kuupäevad, filtritega piiratud tegevused, paremad graafikud, suured andmestikud ja nende muutmine -->
+
+<br>
+<br>
+
 - Vabavaraline  
 - Palju erinevaid pakette ja abimaterjale  
 - Võrdlemisi lihtne süntaks   
-- Võimaldab kasutada väga paljusid andmeformaate
-- Spetsialiseerunud pigem andmeanalüüsile
+- Võimaldab kasutada väga paljusid andmeformaate  
+- Spetsialiseerunud pigem andmeanalüüsile  
 - Koodid taaskasutatavad ja jagatavad  
-- Andmeid saab koguda, puhastada, analüüsida ja visualiseerida ühes keskkonnas (RStudio abil ka ühes programmiaknas)  
-- Palju lisavõimalusi (slaidid, dokumendid, interaktiivsed rakendused) 
+- Muudab analüüsi läbipaistvaks ja korratavaks      
+- Andmeid saab koguda, puhastada, analüüsida ja visualiseerida ühes keskkonnas (RStudio abil ka ühes programmiaknas)   
+- Palju lisavõimalusi (slaidid, dokumendid, interaktiivsed rakendused, veebilehed)   
 
 R-iga seotud uudistega, pakettide ning funktsioonidega kursis olemiseks tasub silma peal hoida leheküljel [R-Bloggers](https://www.r-bloggers.com/).
 
-RStudio lehel on vabalt kättesaadavad erinevad andmeanalüüsi, visualiseerimise, masinõppe jm-ga seotud [õpikud](https://rstudio.com/resources/books/).
-Samuti leiab sealt nn [spikrid](https://rstudio.com/resources/cheatsheets/), kuhu on koondatud populaarsemate pakettide põhifunktsioonid.  
 
+## RStudio
 
-## RStudio ja selle kohandamine
+RStudio on R-i integreeritud arenduskeskkond (IDE), mis võimaldab mugavamalt R-iga töötada. R-i võib kasutada ka ilma RStudiota, aga RStudiot ei saa kasutada ilma R-ita.  
+RStudiost on praeguseks olemas nii lokaalne, töölauaversioon, millega meie töötame, kui ka pilvepõhine, brauseris kasutatav versioon RStudio Cloud, mis sobib hästi lühemateks kursusteks ja kollaboratiivseks tööks.   
 
-RStudio on R-i integreeritud arenduskeskkond (IDE), mis võimaldab mugavamalt R-iga töötada. R-i võib kasutada ka ilma RStudiota, aga RStudiot ei saa kasutada ilma R-ita.
 <!-- paketid, graafika, töölaua ülevaade jne-->
 <!-- kohandatav kasutajaliides, sisse-ehitatud lisapaketid, koodi lõpetamine -->
 <!-- praeguseks võimaldab juba kasutada ka teisi programmeerimiskeeli, nt Python -->
 
-RStudiost on praeguseks olemas nii lokaalne, töölauaversioon, millega meie töötame, kui ka pilvepõhine, brauseris kasutatav versioon RStudio Cloud, mis sobib hästi lühemateks kursusteks ja kollaboratiivseks tööks. 
-
-Kasutame sel kursusel R-i ja RStudio viimaseid versioone (vastavalt R 4.1.2 ja RStudio 2022.02.0). 
+Kasutame sel kursusel [R-i](https://www.r-project.org/) ja [RStudio](https://posit.co/download/rstudio-desktop/) viimaseid versioone (vastavalt R 4.2.2 ja RStudio 2022.12.0). 
 
 
 ### Nippe ja trikke
@@ -159,7 +176,7 @@ Kasutame sel kursusel R-i ja RStudio viimaseid versioone (vastavalt R 4.1.2 ja R
 - Teksti murdmine: `Tools -> Global Options -> Code -> Editing -> Soft-wrap R source files`  
 - Kodeeringu määramine: `Tools -> Global Options -> Code -> Saving -> Default text encoding: UTF-8`  
 - Töökataloogi otsimine: `getwd()`  
-- Töökataloogi määramine: `setwd()`  
+- Töökataloogi määramine: `setwd()` või `Session -> Set Working Directory -> Choose Directory`    
 - Vaikimisi töökataloogi määramine: `Tools -> Global Options -> General -> Default working directory`
 - Töölaua puhtana hoidmine: `Tools -> Global Options -> General -> Workspace` (eemalda linnuke)
 - Pakettide installimine: `install.packages("paketinimi")`  
@@ -200,7 +217,7 @@ Pakettide ja nende funktsioonide kohta leiab enamasti abi R-i enda abifailidest 
   
 või  
   
-`?paste`  
+`?paste` 
 `?ggplot2::ggplot`  
 
 Kui sa ei tea täpselt, mis funktsiooni otsida, siis võid kasutada kaht küsimärki, et otsida enda installitud pakettidest mingit järjendit.   
@@ -215,13 +232,13 @@ Samuti võib otsida pakette tutvustavaid näiteid koos seletava tekstiga.
 `browseVignettes(package = "ggplot2")`
 
 
-Kõiksugu praktikas ettetulevate probleemide korral aitab kõige paremini guugeldamine, mis viib sageli lehele [Stackoverflow](https://stackoverflow.com/questions/tagged/r).  
+Kõiksugu praktikas ettetulevate probleemide korral aitab kõige paremini mõistagi guugeldamine, mis viib sageli lehele [Stackoverflow](https://stackoverflow.com/questions/tagged/r).  
 
 
-## Ülesanne
+## Ülesanne 1
 
-- Määra enda kodukataloogiks kursuse kaust (nt `kvanthum2022`).  
-- Tee uus skript, kuhu sisestad alloleva koodijupi. Loodud funktsioon võtab kasutajalt sisendi ning teeb kõikide sisestatud sõnade esitähed suureks.  
+- Määrame enda kodukataloogiks kursuse kausta (nt `kvanthum2023`).  
+- Teeme uue skripti, kuhu sisestame alloleva koodijupi. Loodud funktsioon võtab kasutajalt sisendi ning teeb kõikide sisestatud sõnade esitähed suureks.  
 
 ```{r, eval = FALSE}
 suured <- function(){
@@ -233,10 +250,65 @@ paste(toupper(substring(sonad, 1, 1)),
 }
 ```
 
-- Korrasta skriptis koodi taanded ning salvesta skript enda kodukausta skriptide kausta (nt `kvanthum2022/skriptid`) nimega *praks1_skript.R*. Pane skriptifail kinni.    
-- Trüki konsooli `source("skriptid/praks1_skript.R")` ning seejärel `suured()`. Vaata, kas funktsioon annab sisestatud sõnade esisuurtähelised vasted.  
+- Korrastame skriptis koodi taanded ning salvestame skripti enda kodukausta skriptide kausta (nt `kvanthum2023/skriptid`) nimega *praks1_skript.R*. Paneme skriptifaili kinni.    
+- Trükime RStudio konsooli `source("skriptid/praks1_skript.R")` ning seejärel `suured()`. Vaatame, kas funktsioon annab sisestatud sõnade esisuurtähelised vasted.  
 
-Uuri ka abimaterjalidest, mida teevad funktsioonis kasutatud käsud `readline`, `unlist`, `strsplit`, `toupper`, `substring` ja `tolower`.   
+Uurime ka abimaterjalidest, mida teevad funktsioonis kasutatud käsud `readline`, `unlist`, `strsplit`, `toupper`, `substring` ja `tolower`.   
+
+
+## Ülesanne 2
+
+Teeme joonise R-i pakettide arvust läbi aastate.
+
+```{r, eval = F}
+# Installime ja laadime vajalikud paketid
+paketid1 <- c("rvest", "tidyverse")
+sapply(paketid1, function(pakett) if(!pakett %in% installed.packages()) install.packages(pakett, dependencies = TRUE))
+library(rvest)
+library(tidyverse)
+
+# Laadime alla andmestiku
+url <- "https://cran.r-project.org/web/packages/available_packages_by_date.html"
+paketileht <- read_html(url)
+paketitabel <- html_table(paketileht)[[1]]
+
+# Teeme joonise
+paketitabel %>%
+  mutate(aasta = format.Date(Date, "%Y")) %>% # teeme kuupäevast aasta
+  group_by(aasta) %>% # grupeerime andmed aasta kaupa
+  tally() %>% # loeme kokku igal aastal lisandunud paketid
+  mutate(n = cumsum(n)) %>% # liidame igale aastale eelmiste aastate arvud
+  ggplot(aes(x = aasta, y = n)) + # teeme ggploti joonise
+  geom_col() + # tulpdiagrammina
+  geom_text(aes(label = n), vjust = -0.2) # lisame ka arvud tekstina
+```
+
+
+## Ülesanne 3
+
+Võtame ühe Exceli faili (Ott Velsberg 2022, <https://avaandmed.eesti.ee/datasets/arvamuskusitlus-tehisintellekti-laiema-kasutuse-kohta-(12.202104.2022)>), impordime selle RStudiosse ning loome kiire ülevaate andmestiku tunnustest ja nende jaotumisest.
+
+```{r, eval = F}
+# Installime ja laadime vajalikud paketid
+paketid2 <- c("readxl", "gtsummary", "esquisse")
+sapply(paketid2, function(pakett) if(!pakett %in% installed.packages()) install.packages(pakett, dependencies = TRUE))
+library(readxl)
+library(gtsummary)
+library(esquisse)
+
+# Loeme sisse Exceli andmestiku
+andmestik <- readxl::read_excel("data/Andmestik.xlsx")
+
+# Vaatame tunnuste ülevaadet
+tbl_summary(andmestik)
+
+# Vaatame tunnuste ülevaadet vastavalt soole
+tbl_summary(andmestik, by = Sugu)
+
+# Teeme mõne joonise
+esquisser()
+```
+
 
 
 ## Küsimustik
