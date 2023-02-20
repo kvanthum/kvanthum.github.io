@@ -217,7 +217,7 @@ Pakettide ja nende funktsioonide kohta leiab enamasti abi R-i enda abifailidest 
   
 või  
   
-`?paste` 
+`?paste`   
 `?ggplot2::ggplot`  
 
 Kui sa ei tea täpselt, mis funktsiooni otsida, siis võid kasutada kaht küsimärki, et otsida enda installitud pakettidest mingit järjendit.   
@@ -263,7 +263,7 @@ Teeme joonise R-i pakettide arvust läbi aastate.
 ```{r, eval = F}
 # Installime ja laadime vajalikud paketid
 paketid1 <- c("rvest", "tidyverse")
-sapply(paketid1, function(pakett) if(!pakett %in% installed.packages()) install.packages(pakett, dependencies = TRUE))
+sapply(paketid1, function(pakett) if(!pakett %in% installed.packages()) install.packages(pakett))
 library(rvest)
 library(tidyverse)
 
@@ -291,7 +291,7 @@ Võtame ühe Exceli faili (Ott Velsberg 2022, <https://avaandmed.eesti.ee/datase
 ```{r, eval = F}
 # Installime ja laadime vajalikud paketid
 paketid2 <- c("readxl", "gtsummary", "esquisse")
-sapply(paketid2, function(pakett) if(!pakett %in% installed.packages()) install.packages(pakett, dependencies = TRUE))
+sapply(paketid2, function(pakett) if(!pakett %in% installed.packages()) install.packages(pakett))
 library(readxl)
 library(gtsummary)
 library(esquisse)

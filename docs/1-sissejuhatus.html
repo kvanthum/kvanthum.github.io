@@ -750,7 +750,8 @@ abifailidest ja dokumentatsioonist.</p>
 <code>help(ggplot, package = &quot;ggplot2&quot;)</code><br />
 <code>help(package = &quot;ggplot2&quot;)</code></p>
 <p>või</p>
-<p><code>?paste</code> <code>?ggplot2::ggplot</code></p>
+<p><code>?paste</code><br />
+<code>?ggplot2::ggplot</code></p>
 <p>Kui sa ei tea täpselt, mis funktsiooni otsida, siis võid kasutada
 kaht küsimärki, et otsida enda installitud pakettidest mingit
 järjendit.<br />
@@ -801,7 +802,7 @@ esisuurtähelised vasted.</li>
 <p>Teeme joonise R-i pakettide arvust läbi aastate.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Installime ja laadime vajalikud paketid</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>paketid1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;rvest&quot;</span>, <span class="st">&quot;tidyverse&quot;</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(paketid1, <span class="cf">function</span>(pakett) <span class="cf">if</span>(<span class="sc">!</span>pakett <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) <span class="fu">install.packages</span>(pakett, <span class="at">dependencies =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(paketid1, <span class="cf">function</span>(pakett) <span class="cf">if</span>(<span class="sc">!</span>pakett <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) <span class="fu">install.packages</span>(pakett))</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rvest)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
@@ -827,7 +828,7 @@ impordime selle RStudiosse ning loome kiire ülevaate andmestiku
 tunnustest ja nende jaotumisest.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Installime ja laadime vajalikud paketid</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>paketid2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;readxl&quot;</span>, <span class="st">&quot;gtsummary&quot;</span>, <span class="st">&quot;esquisse&quot;</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(paketid2, <span class="cf">function</span>(pakett) <span class="cf">if</span>(<span class="sc">!</span>pakett <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) <span class="fu">install.packages</span>(pakett, <span class="at">dependencies =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(paketid2, <span class="cf">function</span>(pakett) <span class="cf">if</span>(<span class="sc">!</span>pakett <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) <span class="fu">install.packages</span>(pakett))</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(esquisse)</span>
