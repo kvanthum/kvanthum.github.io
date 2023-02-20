@@ -286,7 +286,7 @@ paketitabel %>%
 
 ## Ülesanne 3
 
-Võtame ühe Exceli faili (Ott Velsberg 2022, <https://avaandmed.eesti.ee/datasets/arvamuskusitlus-tehisintellekti-laiema-kasutuse-kohta-(12.202104.2022)>), impordime selle RStudiosse ning loome kiire ülevaate andmestiku tunnustest ja nende jaotumisest.
+Võtame ühe Exceli faili (Ott Velsberg 2022, <https://avaandmed.eesti.ee/datasets/arvamuskusitlus-tehisintellekti-laiema-kasutuse-kohta-(12.202104.2022)>), salvestame selle kursuse andmestike kausta (nt `kvanthum2023/andmestikud`), impordime selle RStudiosse ning loome kiire ülevaate andmestiku tunnustest ja nende jaotumisest.
 
 ```{r, eval = F}
 # Installime ja laadime vajalikud paketid
@@ -297,7 +297,7 @@ library(gtsummary)
 library(esquisse)
 
 # Loeme sisse Exceli andmestiku
-andmestik <- readxl::read_excel("data/Andmestik.xlsx")
+andmestik <- readxl::read_excel("andmestikud/Andmestik.xlsx")
 
 # Vaatame tunnuste ülevaadet
 tbl_summary(andmestik)
