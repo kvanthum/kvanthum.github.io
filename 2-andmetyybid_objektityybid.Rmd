@@ -36,7 +36,7 @@ Sellel kursusel tegeleme põhiliselt küsitlus- ja andmebaaside andmetega, mida 
 Näiteks võime iseloomustada inimesi nende pikkuse, kaalu, silmavärvi, hariduse jpm tunnuste põhjal. Sõnu jällegi võib iseloomustada nende graafilise pikkuse, silpide arvu, välte, tähendusklassi, sõnaliigi, sageduse jms tunnuste põhjal.  
 
 **Tunnused**/muutujad aitavad niisiis andmeid kirjeldada ja jagunevad **uuritavateks/sõltuvateks** tunnusteks (see, mida uurime ja mille kohta tahame midagi väita) ja **seletavateks/sõltumatuteks** tunnusteks (need, mille kaudu uuritavat tunnust iseloomustame). Inglise keeles viidatakse neile sageli vastavalt kui *dependent variable* või *response* ja *independent variable* või *predictor*.  
-Näiteks võime uuritava tunnusena käsitleda inimese kaalu ning seletavate tunnustena inimese pikkust, füüsilist aktiivsust (nt minutites nädalas), unetundide arvu jms. Sõnade puhul võib meil olla näiteks hüpotees, et lühemad sõnad on sagedasemad, mispuhul saame uuritavaks tunnuseks võtta sõnasageduse ja seletavaks tunnuseks sõna pikkuse.    
+Näiteks võime uuritava tunnusena käsitleda inimese kaalu ning seletavate tunnustena inimese pikkust, füüsilist aktiivsust (nt minutites nädalas), unetundide arvu jms. Sõnade puhul võib meil olla näiteks hüpotees, et sagedasemad sõnad on lühemad, mispuhul saame uuritavaks tunnuseks võtta sõna pikkuse ja seletavaks tunnuseks sõna sageduse. Kas võiks ka vastupidi?     
 
 Mis on järgmistes näidetes uuritav ja mis seletav tunnus?   
 
@@ -335,10 +335,13 @@ tundmatu <- NA
 is.na(tundmatu)
 ```
 
-Objektide tüüpi saab küsida käsuga **`class()`**.  
+Objektide tüüpi saab küsida käsuga **`mode`** või **`class()`**.  
 ```{r}
+mode(arv1)
 class(arv1)
+mode(pärisnimi)
 class(pärisnimi)
+mode(tundmatu)
 class(tundmatu)
 ```
 
@@ -415,7 +418,7 @@ arvuvektor3 <- 1:5
 Proovi nüüd nende vektorite peal käsku `length()`, mis ütleb, mitu väärtust vektoris on.     
 
 
-Ühes vektoris on **kõik elemendid sama tüüpi** (nt ainult arvud, ainult tekst, ainult loogilised väärtused). Vektori tüüpi saab jällegi küsida käsuga `class()`.
+Ühes vektoris on **kõik elemendid sama tüüpi** (nt ainult arvud, ainult tekst, ainult loogilised väärtused). Vektori tüüpi saab jällegi küsida käsuga `mode()` või `class()`.
 
 ```{r, echo=T}
 class(arvuvektor)
@@ -510,12 +513,21 @@ levels(haridus)
 levels(arvud)
 ```
 
+Kui vektorite puhul annavad käsud `mode()` ja `class()` sama väljundi, siis keerukamate andmestruktuuride puhul näeme nende kasutuses juba erinevusi. Näiteks faktorite puhul ütleb `class()` seda, milline on andmestruktuur, `mode()` aga seda, mis tüüpi andmetest see struktuur koosneb.  
+
+```{r}
+class(haridus)
+mode(haridus)
+```
+
+
 Eraldi faktori liik on järjestatud faktor (*ordered factor*), mille puhul on eksplitsiitne ka see, et iga järgmine faktori tase on eelmisest suurem/kõrgem/rohkem/tähtsam.
 
 ```{r}
 haridus <- factor(haridus, ordered = TRUE)
 haridus
 class(haridus)
+mode(haridus)
 ```
 
 
@@ -549,7 +561,7 @@ Kui andmestik on R-is korrastatud ja RData formaadis salvestatud, siis neid andm
 load("data/kysimustik_2023.RData")
 ```
 
-Selle käsurea rakendamisest justkui ei juhtugi midagi, aga töölauale tekkis objekt nimega **kysimustik**, mille klassiks on `data.frame`.   
+Selle käsurea rakendamisest justkui ei juhtugi midagi, aga töölauale tekkis objekt nimega **kysimustik**, mille klassiks on `data.frame`.     
 
 ```{r}
 class(kysimustik)
