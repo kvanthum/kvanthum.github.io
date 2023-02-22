@@ -304,8 +304,8 @@ pärisnimi <- "Tartu"
 üldnimi <- 'ülikool' # ühekordsed jutumärgid töötavad samaväärselt
 arv <- "103"
 paste(pärisnimi, üldnimi, arv, sep= " ") # kleebi kolme objekti väärtused kokku (paste = kleebi)
-nchar(üldnimi) # leia objekti tekst2 väärtuse tähemärkide arv (n = number, char = characters)
-substr(üldnimi, 4, 7) # võta välja objekti tekst2 väärtuse 4.-7. tähemärk (substr = substring)
+nchar(üldnimi) # leia objekti üldnimi väärtuse tähemärkide arv (n = number, char = characters)
+substr(üldnimi, 4, 7) # võta välja objekti üldnimi väärtuse 4.-7. tähemärk (substr = substring)
 pärisnimi + üldnimi # mis juhtub matemaatilisi tehteid proovides?
 ```
 
