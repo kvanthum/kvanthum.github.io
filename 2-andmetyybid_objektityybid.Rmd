@@ -312,7 +312,7 @@ pärisnimi + üldnimi # mis juhtub matemaatilisi tehteid proovides?
 <p style="text-align: right;">![](imgs/q15.PNG){width=40%}</p>
 <p style="text-align: right;">Küsimus R-i testist</p>
 
-__Tõeväärtus__ (*logical*) on binaarne muutuja, millel on kaks võimalikku väärtust: __TRUE__ ja __FALSE__, need sisestatakse suurtäheliselt ilma jutumärkideta, töötab ka ainult esitähega T/F. Milleks seda vaja on? Näiteks kui me kasutame võrratusi, siis vastuseks on tõeväärtus. Võrratusi läheb meil vaja hiljem, kui meil on näteks suuremast andmestikust vaja leida kindlatele tunnustele vastav alamosa. Tõeväärtustega saab ka matemaatilisi tehteid teha.  
+__Tõeväärtus__ (*logical*) on binaarne muutuja, millel on kaks võimalikku väärtust: __TRUE__ ja __FALSE__, need sisestatakse suurtäheliselt ilma jutumärkideta, töötab ka ainult esitähega T/F. Milleks seda vaja on? Näiteks kui me kasutame võrratusi, siis vastuseks on tõeväärtus. Võrratusi läheb meil vaja hiljem, kui meil on näiteks suuremast andmestikust vaja leida kindlatele tunnustele vastav alamosa. Tõeväärtustega saab ka matemaatilisi tehteid teha.  
 
 ```{r}
 üks <- 1
@@ -335,7 +335,7 @@ tundmatu <- NA
 is.na(tundmatu)
 ```
 
-Objektide tüüpi saab küsida käsuga **`mode`** või **`class()`**.  
+Objektide tüüpi saab küsida käsuga **`mode()`** või **`class()`**.  
 ```{r}
 mode(arv1)
 class(arv1)
