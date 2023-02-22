@@ -43,8 +43,6 @@ Kasutame andmestikku `kysimustik_2023.RData`.
 load("data/kysimustik_2023.RData")
 ```
 
-
-
 ## Aritmeetiline keskmine
 
 Aritmeetilise keskmise leidmiseks on R-is käsk mean(). Üldiselt on selle käsu sisendiks arvuline vektor (või maatriks).
