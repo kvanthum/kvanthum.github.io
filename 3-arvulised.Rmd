@@ -43,7 +43,7 @@ Kasutame andmestikku `kysimustik_2023.RData`.
 load("data/kysimustik_2023.RData")
 ```
 
-
+!!!mingi teine tekst
 
 ## Aritmeetiline keskmine
 
