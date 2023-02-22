@@ -92,7 +92,7 @@ mean(kysimustik$kaua_opid[kysimustik$oppekava == "eesti ja soome-ugri keeleteadu
 
 Seda saab ka kombineerides `mean()` käsku `apply()` käsuga. Keskmine ülikoolis õpitud aeg erialati:
 
-```{r, eval=F}
+```{r, eval=T}
 tapply(kysimustik$kaua_opid, kysimustik$oppekava, mean)
 ```
 
