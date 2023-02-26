@@ -45,7 +45,7 @@ load("data/kysimustik_2023.RData")
 
 ## Aritmeetiline keskmine
 
-Aritmeetilise keskmise leidmiseks on R-is käsk mean(). Üldiselt on selle käsu sisendiks arvuline vektor (või maatriks).
+Aritmeetilise keskmise leidmiseks on R-is käsk `mean()`. Üldiselt on selle käsu sisendiks arvuline vektor (või maatriks).
 
 Plussid:
 
@@ -59,6 +59,7 @@ Miinused:
 - erinditest (erandlikult suurtest/väikestest vaatlustest) kergesti mõjutatud;
 
 Juhul, kui andmed on tabelis ja tahame ühe arvuliste väärtuste tulba keskmist, siis peame selle tabelist vektorina välja tõmbama. Selleks on R-i süntaksis kolm varianti (mis annavad sama tulemuse):
+
 ```{r, echo=T, eval=F}
 # tulba indeks nurksulgudes
 kysimustik[,1]
@@ -137,7 +138,7 @@ median(kysimustik$kaua_opid)
 
 Ja seda saab sama moodi kombineerida `tapply()` käsuga:
 
-```{r, eval=FALSE}
+```{r, eval=T}
 tapply(kysimustik$kaua_opid, kysimustik$oppekava, median)
 ```
 
@@ -154,6 +155,7 @@ quantile(kysimustik$synniaasta)
 25%, 50% ja 75% kvantiile nimetatakse **kvartiilideks** selle järgi, et need jagavad andmestiku neljaks võrdseks osaks. Kvartiile kokku on 3. Mediaan on 50% kvantiil ehk 2. kvartiil.
 
 Andmestikku võib jagada aga ka vähemateks või enamateks osadeks.
+
 ```{r, eval = FALSE}
 # Jaga andmestik kaheks võrdseks osaks
 quantile(kysimustik$synniaasta, 
@@ -176,7 +178,7 @@ quantile(kysimustik$synniaasta,
 
 ```
 
-1\. ja 3. kvartiili (ehk 25% ja 75% kvantiili) vahe saab leida funktsiooniga **`IQR()`**.
+Esimese ja kolmanda kvartiili (ehk 25% ja 75% kvantiili) vahe saab leida funktsiooniga **`IQR()`**.
 ```{r, eval = FALSE}
 IQR(kysimustik$synniaasta)
 
@@ -190,13 +192,24 @@ quantile(kysimustik$synniaasta)[[4]]-
 
 Haare on arvulise tunnuse maksimaalse ja minimaalse väärtuse vahe (*max()* - *min()*). See on mõjutatav erinditest ehk üldiste andmete suhtes mingis mõttes erandlikest vaatlustest. R-is väljastab haarde funktsioon **`range()`** vaid suurima ja vähima väärtuse, mitte nende vahe.
 
-```{r, eval = FALSE}
+```{r}
 range(kysimustik$synniaasta)
+```
+
+Nende väärtuste vahe saab kätte funktsiooniga **`diff()`**
+
+```{r}
+diff(range(kysimustik$synniaasta))
+```
+
+Sama siis õppimisajaga:
+
+```{r, eval = FALSE}
 range(kysimustik$kaua_opid)
 
 # Leiame vahe
-range(kysimustik$synniaasta)[2]-
-  range(kysimustik$synniaasta)[1]
+range(kysimustik$kaua_opid)[2]-
+  range(kysimustik$kaua_opid)[1]
 
 # Sama saab leida tegelikult
 # funktsioonide min() ja max() abil
@@ -206,56 +219,53 @@ range(kysimustik$synniaasta)[2]-
 ## Standardhälve ja dispersioon
 
 Standardhälve iseloomustab vaatluste mingi arvulise tunnuse hajuvust selle tunnuse keskmise väärtuse ümber. Väike standardhälve näitab, et tunnuse väärtused on keskmisele üldiselt üsna sarnased, suur standardhälve näitab, et väärtuste erinevus keskmisest on suur (nt haare on hästi suur). Standardhälbe funktsioon R-is on **`sd()`** (*standard deviation*).
-```{r, eval = FALSE}
+
+```{r}
 sd(kysimustik$synniaasta)
+```
 
-# Kuidas selleni jõutakse?
+Kuidas seda arvutatakse:
 
-# Loeme kokku, kui palju vaatlusi on
-(vaatlusi <- length(kysimustik$synniaasta))
-
+```{r, eval = FALSE}
 # Vaatame kõiki sünniaasta väärtusi
 kysimustik$synniaasta
 
-# Leiame sünniaastate keskmise
+# 1. Loeme kokku, kui palju vaatlusi on
+(vaatlusi <- length(kysimustik$synniaasta))
+
+# 2. Leiame sünniaastate keskmise
 (keskmine <- mean(kysimustik$synniaasta))
 
-# Lahutame igast väärtusest keskmise
-# (leiame iga üksiku vaatluse erinevuse
-# keskmisest ehk hälbe)
+# 3. Lahutame igast väärtusest keskmise
+# (leiame iga üksiku vaatluse erinevuse keskmisest ehk hälbe)
 (erinevused <- kysimustik$synniaasta - keskmine)
 
-# Võtame need erinevused ruutu
+# 4. Võtame need erinevused ruutu
 (erinevuste_ruut <- erinevused^2)
 
-# Leiame nende erinevuste ruutude summa
+# 5. Leiame nende erinevuste ruutude summa
 (ruutude_summa <- sum(erinevuste_ruut))
 
-# Korrutame erinevuste ruutude summa
-# läbi jagatisega, kus 1 on jagatud 
-# vaatluste arvust ühe võrra väiksema
-# arvuga.
-# See ongi tegelikult dispersioon ehk 
-# tunnuse hajuvus.
+# 6. Korrutame erinevuste ruutude summa läbi jagatisega, kus 1 on jagatud  vaatluste arvust ühe võrra väiksema arvuga. See ongi tegelikult dispersioon ehk tunnuse hajuvus.
 (dispersioon <- ruutude_summa/(vaatlusi-1))
 # See on sama, mis
 var(kysimustik$synniaasta) # dispersiooni funktsioon
 
-# Standardhälve on ruutjuur dispersioonist
+# 7. Standardhälve on ruutjuur dispersioonist
 sqrt(dispersioon)
 ```
 
 See, kas jagatises, millega ruutude summat korrutatakse, on nimetajas vaatluste arv või tuleb vaatluste arvust lahutada 1 (nagu meie näites), sõltub sellest, kas meil on tegu kõikse valimiga (st meie valim ammendab kõik võimalikud vaatlused) või mitte (meie valimis on juhuslik hulk kõikidest võimalikest). Kui meil oleks kõikide sellel kursusel osalenute vastused, siis võiksime öelda, et meil on kõikne valim (saame selle abil kirjeldada ära iga viimsegi kursusel osaleja), ent kuna meil kõikide vastuseid ei ole, siis peame eeldama, et meil on juhuslik väiksem valim üldisest populatsioonist.
 
 
-![](imgs/disp.png)  
+![](imgs/disp.png)
 Dispersioon ehk hajuvus on hälvete ruutude aritmeetiline keskmine ehk teisisõnu keskmine vaatluste erinevus keskmisest väärtusest. Mida suurem on dispersioon, seda suurem on hajuvus. Sagedamini raporteeritakse uurimustes standardhälvet, kuna ruutjuure võtmine võimaldab vaadelda hajuvust originaalühikutes (antud juhul nt aastates).
-
 
 
 ## Karpdiagramm
 
 Karpdiagramm ehk kastdiagramm (*boxplot*) esitab arvulise tunnuse kvartiiljaotuse (vt [Kvantiilid]).
+
 ```{r}
 boxplot(kysimustik$synniaasta)
 ```
@@ -291,10 +301,10 @@ sort(kysimustik$synniaasta[kysimustik$synniaasta < yl_vurr],
 sort(kysimustik$synniaasta[kysimustik$synniaasta > al_vurr], 
      decreasing = FALSE)[1]
 
-
 ```
 
 Väärtused, mis vurrude vahele ei mahu, sest nad on teiste andmetega võrreldes erandlikult suured/väikesed, on **erindid** (*outliers*). Saame ka erindid kätte funktsioonist **`boxplot`**.
+
 ```{r, eval = FALSE}
 # Salvestame kastdiagrammi eraldi objekti
 b <- boxplot(kysimustik$synniaasta)
@@ -311,7 +321,9 @@ boxplot(synniaasta ~ lemmikloom,
         data = kysimustik,
         col = c("lightblue", 
                 "yellow", 
-                "grey"))
+                "grey",
+                "red"), 
+                las=1, ylab = "Sünniaasta")
 ```
 
 ## Histogramm
@@ -322,7 +334,7 @@ Histogramm ehk astmikdiagramm sobib arvuliste andmete visualiseerimiseks ning es
 hist(kysimustik$synniaasta)
 ```
 
-Jooniselt näeme, et kõige enam (20) on neid tudengeid, kes on sündinud 90ndate esimesel poolel, ainult üks tudeng on sündinud vahemikus 1965-1970 ja kaks vahemikus 1970-1975. R arvestab piiripealsed väärtused enamasti sellele eelnenud klassi (nt aastal 1990 sündinud on klassis 1985-1990, mitte 1990-1995).
+Jooniselt näeme, et kõige enam on neid tudengeid, kes on sündinud 1990ndate esimesel poolel. Üksikud tudengid on sündinud vahemikus 1965-1970 ja 1970-1975, kõige nooremad 2000-2005. R arvestab piiripealsed väärtused enamasti sellele eelnenud klassi (nt aastal 1990 sündinud on klassis 1985-1990, mitte 1990-1995).
 
 ```{r}
 # Teeme 4 numbrivektorit
@@ -357,7 +369,8 @@ hist(kysimustik$synniaasta,
 
 ## Hajuvusdiagramm
 
-Hajuvusdiagramm ehk X-Y diagramm (*scatterplot*) sobib paremini kahe arvulise tunnuse vaheliste seoste kujutamiseks. Kui **`plot()`** funktsioonis anda argumendiks ainult üks vektor, joonistatakse väärtused y-teljele ning x-teljele vektori indeksid ehk järjekorranumbrid. 
+Hajuvusdiagramm ehk X-Y diagramm (*scatterplot*) sobib paremini kahe arvulise tunnuse vaheliste seoste kujutamiseks. Kui **`plot()`** funktsioonis anda argumendiks ainult üks vektor, joonistatakse väärtused y-teljele ning x-teljele vektori indeksid ehk järjekorranumbrid.
+
 ```{r}
 plot(kysimustik$kaua_opid)
 ```
