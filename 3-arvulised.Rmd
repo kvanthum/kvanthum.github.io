@@ -255,10 +255,11 @@ var(kysimustik$synniaasta) # dispersiooni funktsioon
 sqrt(dispersioon)
 ```
 
-See, kas jagatises, millega ruutude summat korrutatakse, on nimetajas vaatluste arv või tuleb vaatluste arvust lahutada 1 (nagu meie näites), sõltub sellest, kas meil on tegu kõikse valimiga (st meie valim ammendab kõik võimalikud vaatlused) või mitte (meie valimis on juhuslik hulk kõikidest võimalikest). Kui meil oleks kõikide sellel kursusel osalenute vastused, siis võiksime öelda, et meil on kõikne valim (saame selle abil kirjeldada ära iga viimsegi kursusel osaleja), ent kuna meil kõikide vastuseid ei ole, siis peame eeldama, et meil on juhuslik väiksem valim üldisest populatsioonist.
+See, kas jagatises, millega ruutude summat korrutatakse, on nimetajas vaatluste arv või tuleb vaatluste arvust lahutada 1 (nagu meie näites), sõltub sellest, kas meil on tegu kõikse valimiga (st meie valim ammendab kõik võimalikud vaatlused) või mitte (meie valimis on juhuslik hulk kõikidest võimalikest). Kui meil oleks kõikide sellel kursusel osalenute vastused, siis võiksime öelda, et meil on kõikne valim (saame selle abil kirjeldada ära iga viimsegi kursusel osaleja), ent kuna meil kõikide vastuseid ei ole, siis peame eeldama, et meil on juhuslik väiksem valim üldisest populatsioonist.  
 
 
 ![](imgs/disp.png)
+
 Dispersioon ehk hajuvus on hälvete ruutude aritmeetiline keskmine ehk teisisõnu keskmine vaatluste erinevus keskmisest väärtusest. Mida suurem on dispersioon, seda suurem on hajuvus. Sagedamini raporteeritakse uurimustes standardhälvet, kuna ruutjuure võtmine võimaldab vaadelda hajuvust originaalühikutes (antud juhul nt aastates).
 
 
@@ -316,14 +317,13 @@ Erindid võivad tekkida mõõtmis- või andmekogumisvigade tõttu, ent võivad o
 
 
 Kast-vurrud diagramm sobib hästi rühmade võrdlemiseks. Näiteks vaatame vastajate sünniaastat vastavalt sellele, millise looma nad valisid.
+
 ```{r}
-boxplot(synniaasta ~ lemmikloom, 
-        data = kysimustik,
-        col = c("lightblue", 
-                "yellow", 
-                "grey",
-                "red"), 
-                las=1, ylab = "Sünniaasta")
+boxplot(synniaasta ~ lemmikloom, # arvuline y ~ mittearvuline x
+        data = kysimustik, # andmestiku nimi
+        col = c("lightblue", "yellow", "grey", "red"), # mittearvulise x-i klasside värvid
+        las = 1, # y-telje sildid horisontaalselt 
+        ylab = "Sünniaasta") # y-telje pealkiri
 ```
 
 ## Histogramm
@@ -355,14 +355,15 @@ hist(vec4, main = "9:20 (12 elementi)")
 
 
 Funktsioonis saab erinevate argumentidega täpsustada mh ka seda, mitmes sagedusklassis andmed peaksid olema esitatud (R võtab seda siiski kui soovitust ning pakub selle põhjal enda lahenduse), klasside värvi jne.
+
 ```{r}
-hist(kysimustik$synniaasta, 
-     breaks = 4,
-     col = c("blue", "purple", "red", "pink"),
-     border = "grey50",
-     xlab = "Sünniaasta", 
-     ylab = "Sagedus", 
-     main = "Sünniaasta histogramm")
+hist(kysimustik$synniaasta, # x-telje arvuline tunnus
+     breaks = 4, # sagedusklasside arv - 1
+     col = c("blue", "purple", "red", "pink", "green"), # tulpade täitevärvid
+     border = "grey50", # tulpade piirjoonte värv
+     xlab = "Sünniaasta", # x-telje pealkiri
+     ylab = "Sagedus", # y-telje pealkiri
+     main = "Sünniaasta histogramm") # joonise pealkiri
 ```
 
 
@@ -377,13 +378,13 @@ plot(kysimustik$kaua_opid)
 
 Rohkem kasutatakse hajuvusdiagramme **kahe arvulise tunnuse** seose kuvamiseks. Näiteks kas õppimisaeg ja sünniaeg on omavahel seotud?
 ```{r}
-plot(kaua_opid ~ synniaasta, # y ~ x
-     data = kysimustik,
-     col = "grey45",
-     pch = 15,
-     main = "Õpitud aastate seos sünniaastaga",
-     xlab = "Sünniaasta",
-     ylab = "Õpitud aastate arv")
+plot(kaua_opid ~ synniaasta, # arvuline y ~ arvuline x
+     data = kysimustik, # andmestiku nimi
+     col = "grey45", # punktide värv
+     pch = 15, # punktide suurus
+     main = "Õpitud aastate seos sünniaastaga", # joonise pealkiri
+     xlab = "Sünniaasta", # x-telje pealkiri
+     ylab = "Õpitud aastate arv") # y-telje pealkiri
 ```
 ```{r, collapse = TRUE}
 # Tähistame nüüd veel eri värvidega
@@ -394,22 +395,22 @@ plot(kaua_opid ~ synniaasta, # y ~ x
 plot(kaua_opid ~ synniaasta,
      data = kysimustik,
      pch = 15,
-     col = c("grey45", "orange")[kogemused_kvant],
+     col = c("grey45", "orange")[kogemused_kvant], # punktide värv vastavalt andmestiku tunnusele
      main = "Õpitud aastate seos sünniaastaga",
      xlab = "Sünniaasta",
      ylab = "Õpitud aastate arv")
 
 # Lisame ka legendi
-legend("topright", 
-       c("Ei", "Jah"), 
-       fill = c("grey45", "orange"),
-       title = "Kogemusi kvantmeetoditega",
-       horiz = TRUE, 
-       cex = 1)
+legend("topright",  # asend ülemises paremas nurgas
+       c("Ei", "Jah"), # klasside nimetused
+       fill = c("grey45", "orange"), # klasside värvid joonisel
+       title = "Kogemusi kvantmeetoditega", # legendi pealkiri
+       horiz = TRUE, # klassid kõrvuti (mitte üksteise all)
+       cex = 1) # suurus
 ```
 
 ## Harjutusi
 
 1. Arvuta õppeaja keskmine, mediaan ja standardhälve.
-2. Arvuta samad asjad loomaeelistuse ja tee-kohvi eelistuse kaupa. kasuta tapply käsku
+2. Arvuta samad asjad loomaeelistuse ja tee-kohvi eelistuse kaupa. Kasuta `tapply()` käsku.  
 3. Joonista karpdiagramm õppeaja jaotusest tee-kohvi eelistuse kaupa. Värvi kastid kahe eri värviga.

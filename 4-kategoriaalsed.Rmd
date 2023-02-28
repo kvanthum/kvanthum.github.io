@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '4-kategoriaalsed.html'))})
-date: 02.03.2022
+date: 01.03.2023
 output: 
   html_document:
     theme: flatly
@@ -21,9 +21,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Eelmisel korral
 
-Eelmine kord tegelesime arvuliste andmete kirjeldamise ja visualiseerimisega ning kasutasime andmestikku failis `kysimustik_2022.RData`. 
+Eelmine kord tegelesime arvuliste andmete kirjeldamise ja visualiseerimisega ning kasutasime andmestikku failis `kysimustik_2023.RData`. 
 ```{r}
-load("data/kysimustik_2022.RData")
+load("data/kysimustik_2023.RData")
 ```
 
 
@@ -32,7 +32,7 @@ Arvuliste tunnuste (nt vanus, aasta, sõnasagedused jne) **kirjeldamiseks** kasu
 - aritmeetilist **keskmist** `mean(kysimustik$kaua_opid)` koos standardhälbega `sd(kysimustik$kaua_opid)`;   
   - Mis on hulga vaatluste mingi keskmine näitaja ja kui erinevad üksikud vaatlused sellest keskmisest on?   
 - **mediaani** `median(kysimustik$kaua_opid)`.  
-  - Mis on hulga vaatluste mingi tüüpiline näitaja?  
+  - Mis on hulga vaatluste tüüpiline näitaja?  
 
 Arvuliste tunnuste **visualiseerimiseks** kasutatakse põhiliselt   
 
@@ -92,10 +92,10 @@ plot(kaua_opid ~ synniaasta, data = kysimustik, main = "plot(kaua_opid ~ synniaa
   * pirukas
   * tulpdiagramm
 
-Kasutame edasi andmestikku `kysimustik_2022.RData`.  
+Kasutame edasi andmestikku `kysimustik_2023.RData`.  
 
 ```{r, eval = F}
-load("data/kysimustik_2022.RData")
+load("data/kysimustik_2023.RData")
 ```
 
 ## Kuidas kirjeldada kategoriaalseid andmeid?
@@ -106,8 +106,8 @@ load("data/kysimustik_2022.RData")
 </center>
 
 
-Meeldetuletuseks: kvalitatiivsed/kategoriaalsed tunnused on (sisuliselt) mittearvulised tunnused, mis jagunevad nominaalskaala ja ordinaal- ehk järjestusskaala tunnusteks. **Sisuliselt mittearvulised** tähendab siinjuures seda, et ehkki ka järjestusskaalat võib esitada arvuliste väärtuste abil (nt hinnanguskaala 1st 5ni), ei ole need enamasti käsitletavad päris arvuliste tunnustena. Näiteks ei arvutata sageli hinnanguskaalade keskmist, sest kuidas peaks täpselt tõlgendama keskmist 3.6, kui 3 tähistab skaalal "Nii ja naa" ja 4 "Pigem nõustun"? 
-Samas on hinnangute arvuline käsitlemine võimalik näiteks juhul, kui vastajal lastakse vabalt määrata mingi sobiv väärtus skaalal, millel ainult algus- ja lõpp-punkti väärtused on määratletud. Samas peab ka sel juhul tulemuste tõlgendamisel alati arvestama sellega, kui laialt skaala on määratud (nt hakkab mängima rolli see, kas skaala on 1st 5ni või 1st 20ni).
+Meeldetuletuseks: kvalitatiivsed/kategoriaalsed tunnused on (sisuliselt) mittearvulised tunnused, mis jagunevad nominaalskaala ja ordinaal- ehk järjestusskaala tunnusteks. **Sisuliselt mittearvulised** tähendab siinjuures seda, et ehkki ka järjestusskaalat võib esitada arvuliste väärtuste abil (nt hinnanguskaala 1st 5ni), ei ole need enamasti käsitletavad päris arvuliste tunnustena. Näiteks ei arvutata sageli hinnanguskaalade keskmist, sest kuidas peaks täpselt tõlgendama keskmist 3.6, kui 3 tähistab skaalal "Nii ja naa" ja 4 "Pigem nõustun"?   
+Samas on hinnangute arvuline käsitlemine võimalik näiteks juhul, kui vastajal lastakse vabalt määrata mingi sobiv väärtus skaalal, millel ainult algus- ja lõpp-punkti väärtused on määratletud. Küll aga peab ka sel juhul tulemuste tõlgendamisel alati arvestama sellega, kui laialt skaala on määratud (nt hakkab mängima rolli see, kas skaala on 1st 5ni või 1st 20ni).
 
 Kategoriaalseid andmeid saab kirjeldada eelkõige **sagedustabelite** ja **moodi** abil, järjestusskaala tunnuste puhul saab teatavate mööndustega kasutada ka **mediaani**.    
 
@@ -117,10 +117,7 @@ summary(kysimustik) # ülevaade/kokkuvõte andmestiku tunnustest
 
 # Nimetame lemmiklooma tasemed 
 # lühema esituse huvides ümber
-levels(kysimustik$lemmikloom) <- c("Glcs",
-                                 "Klkrjk",
-                                 "Kr",
-                                 "EiM")
+levels(kysimustik$lemmikloom) <- c("Glcs", "Klkrjk", "Kr", "EiM")
 ```
 
 ## Sagedustabelid
@@ -135,15 +132,16 @@ t.jook # trüki tabel konsooli
 ```
 
 ```{r, results='hide'}
-class(t.jook)
-str(t.jook) # sisuliselt nagu vektor, millel on rea- ja/või tulbanimed
+class(t.jook) # mis tüüpi andmestruktuur?
+mode(t.jook) # mis tüüpi andmed?
+str(t.jook) # sisuliselt nagu arvuvektor, millel on rea- ja/või tulbanimed
 ```
 
 
 Kui kasutame funktsioonis kaht argumenti, saame kahemõõtmelise sagedustabeli ehk **risttabeli** ehk jaotustabeli. See esitab kahe tunnuse ühisjaotuse.
 ```{r}
-(t.jook.loom <- table(kysimustik$lemmikjook, 
-                     kysimustik$lemmikloom)) # suuna tabel objekti t.jook.loom JA trüki tabel konsooli
+# suuna tabel objekti t.jook.loom JA trüki tabel konsooli
+(t.jook.loom <- table(kysimustik$lemmikjook, kysimustik$lemmikloom)) 
 ```
 
 ```{r, results='hide'}
@@ -165,24 +163,57 @@ ftable(kysimustik$lemmikjook,
        kysimustik$kogemused_kvant)
 ```
 
-Ka sagedustabeleid saab indekseerida, nagu vektoreid ja andmetabeleid (`data.frame`). Mida näitavad meile järgmised kaks käsku? 
+`table()` on R-i baaspaketi (`base`) funktsioon, `ftable()` on paketi `stats` funktsioon. Vt ka teisi sama paketi funktsioone, nt `aggregate()`, mis töötab sarnaselt käsule `tapply()`:  
+
+```{r, eval = F}
+# Leia sünniaasta mediaan vastavalt lemmikjoogile
+tapply(kysimustik$synniaasta, kysimustik$lemmikjook, median)
+aggregate(kysimustik$synniaasta, list(kysimustik$lemmikjook), median)
+
+# ... ja lemmikloomale
+tapply(kysimustik$synniaasta, list(kysimustik$lemmikjook, kysimustik$lemmikloom), median)
+aggregate(kysimustik$synniaasta, list(kysimustik$lemmikjook, kysimustik$lemmikloom), median)
+```
+
+
+Ka sagedustabeleid saab indekseerida, nagu vektoreid ja andmetabeleid (`data.frame`): kantsulgudes enne koma tulevad ridade indeksid ja pärast koma tulpade indeksid. Mida näitavad meile järgmised kaks käsku?  
 ```{r, eval = F}
 t.jook.loom[1,]
 t.jook.loom[,c("Kr", "Glcs")]
 ```
 
 
-
-### **`prop.table()`**
-
-Sagedustabeli põhjal võime leida ka **suhtelised sagedused** ehk osakaalud ehk proportsioonid, mida saab teisendada protsentideks. Suhtelisi sagedusi on vaja näiteks selleks, et võrrelda eri suuruses valimeid.
+Tabeli tulbanimede muutmiseks saame asendada käsus `colnames()` saadud vektori sama pika vektoriga, milles on uued tulbanimed.  
 
 ```{r}
-# Leia tee või kohvi valinute proportsioonid kõikidest vastustest
+colnames(t.jook.loom)
+colnames(t.jook.loom) <- c("Glaucus", "Kirjak", "Koer", "Ei meeldi")
+t.jook.loom
+```
+
+Tabeli reanimede muutmiseks saame asendada käsus `rownames()` saadud vektori.
+
+```{r}
+rownames(t.jook.loom)
+rownames(t.jook.loom) <- c("kohv", "tee")
+t.jook.loom
+```
+
+
+
+
+### **`prop.table()`** ja **`proportions()`**
+
+Sagedustabeli põhjal võime leida ka **suhtelised sagedused** ehk osakaalud ehk proportsioonid, mida saab 100-ga läbi korrutades teisendada protsentideks. Suhtelisi sagedusi on vaja näiteks selleks, et võrrelda eri suuruses valimeid.  
+
+```{r}
+# Leia tee või kohvi valinute osakaalud kõikidest vastustest
 t.jook/sum(t.jook)
 ```
+
+Sama tulemuse saame, kasutades tabeli objektil funktsiooni `prop.table()` või `proportions()`. Mõlemal juhul tuleb sisendiks anda **sagedustabel** (mitte lihtsalt tunnuste nimed).  
+
 ```{r, results='hide'}
-# Sama tulemuse saame, kasutades tabeli objektil funktsiooni prop.table()
 prop.table(t.jook)
 # ehk
 prop.table(table(kysimustik$lemmikjook))
@@ -200,7 +231,7 @@ t.jook.prop*100
 round(t.jook.prop*100, 2) # ümardame tulemused 2 komakohani
 ```
 
-Vaatame ka risttabeli suhtelisi sagedusi ja kasutame argumenti `margin`, et kuvada neid ridade (`margin = 1`) või tulpade (`margin = 2`) lõikes.
+Vaatame ka 2 kategoriaalse tunnuse risttabeli suhtelisi sagedusi ja kasutame argumenti `margin`, et kuvada neid ridade (`margin = 1`) või tulpade (`margin = 2`) lõikes.  
 ```{r, eval = FALSE}
 prop.table(t.jook.loom) # kõikide lahtrite summa = 1
 
@@ -226,7 +257,8 @@ Nii absoluutsete kui ka suhteliste sagedustega tabelitele saab lisada marginaals
 addmargins(t.jook.loom)
 addmargins(prop.table(t.jook.loom))
 
-addmargins(prop.table(t.jook.loom, 1), 2) # argumenti "margin=" ei pea tingimata välja kirjutama 
+# argumenti "margin =" ei pea tingimata välja kirjutama
+addmargins(prop.table(t.jook.loom, 1), 2)  
 addmargins(prop.table(t.jook.loom, 2), 1)
 ```
 
@@ -236,7 +268,7 @@ Sagedustabeleid saab kirjutada faili, nagu ka andmetabeleid ehk *data frame*'e. 
 
 ```{r, eval = F}
 write.table(x = t.jook.loom, # tabelobjekt
-            file = "joogid_loomad.csv", # faili nimi koos laiendiga
+            file = "joogid_loomad.tsv", # salvestatava faili nimi koos laiendiga
             quote = FALSE, # tekstitunnused ilma ümbritsevate jutumärkideta
             sep = "\t") # tulpi eraldab tabulaator
 ```
@@ -250,7 +282,7 @@ Kindlam on salvestamisel teisendada sagedus- v risttabelid enne siiski niisiis `
 data.frame(t.jook.loom) # nn pikk andmetabel
 
 write.table(x = data.frame(t.jook.loom), # andmetabeli objekt
-            file = "joogid_loomad.csv", # faili nimi koos laiendiga
+            file = "joogid_loomad.tsv", # faili nimi koos laiendiga
             quote = FALSE, # tekstitunnused ilma ümbritsevate jutumärkideta
             sep = "\t", # tulpi eraldab tabulaator
             row.names = FALSE) # reanimesid (1, 2, 3 jne) ei lisata
@@ -261,11 +293,17 @@ write.table(x = data.frame(t.jook.loom), # andmetabeli objekt
 # data.frame() muudab maatriksi andmetabeliks
 (t.jook.loom.df <- data.frame(unclass(t.jook.loom)))
 
+class(t.jook.loom)
+class(t.jook.loom.df)
+
 # lisame andmetabelisse tulba "jook" jooginimedega, mis praegu on lihtsalt tabelobjekti reanimed
 t.jook.loom.df$jook <- rownames(t.jook.loom)
 
+# järjestame tulbad ümber (5. tulp esimeseks ja siis tulbad 1-4)
+t.jook.loom.df <- t.jook.loom.df[c(5,1:4)]
+
 write.table(x = t.jook.loom.df, # andmetabeli objekt
-            file = "joogid_loomad.csv", # faili nimi koos laiendiga
+            file = "joogid_loomad.tsv", # faili nimi koos laiendiga
             quote = F, # tekstitunnused ilma ümbritsevate jutumärkideta
             sep = "\t", # tulpi eraldab tabulaator
             row.names = F) # reanimesid ("Kohv", "Tee") ei lisata
@@ -310,11 +348,11 @@ grid.table(df)
 
 ## Mood
 
-Nii arvuliste kui ka kategoriaalsete tunnuste puhul võib leida moodi ehk kõige populaarsema väärtuse.
+Nii arvuliste kui ka kategoriaalsete tunnuste puhul võib leida moodi ehk **kõige populaarsema väärtuse/klassi**.
 
-Kõige populaarsema väärtuse **sageduse** saab leida funktsiooniga **`max()`**, kõige ebapopulaarsema väärtuse sageduse funktsiooniga **`min()`**.  
+Kõige populaarsema väärtuse **sageduse** saab leida funktsiooniga **`max()`**, kõige ebapopulaarsema väärtuse sageduse funktsiooniga **`min()`**.     
 
-```{r, results = 'hold'}
+```{r}
 (t.loom <- table(kysimustik$lemmikloom))
 max(t.loom)
 min(t.loom)
@@ -323,20 +361,20 @@ min(t.loom)
 Kõige populaarsema **väärtuse** enda ehk **moodi** indeksi saame leida funktsiooniga **`which.max()`** ning kõige ebapopulaarsema väärtuse indeksi funktsiooniga **`which.min()`**.  
 
 
-```{r, results = 'hold'}
+```{r}
 which.max(t.loom) # moodi indeks: tabeli 3. element on kõige sagedasem
 which.min(t.loom) # tabeli 4. element on kõige harvem
-
 names(t.loom[which.max(t.loom)]) # mood
 names(t.loom[which.min(t.loom)]) # lihtsalt kõige harvem esinev väärtus
 ```
+
 `which.max()` annab meile niisiis tabeli kõige sagedasema elemendi *indeksi* ehk järjekorranumbri. Selle abil saame kõige sagedasema elemendi enda tabelist nurksulgude abil välja võtta ning lõpuks küsida `names()` funktsiooni abil ainult moodi ehk elementi ennast (st tabeli tulbanime) ilma sageduseta.  
 
 
 
 ## Mediaan järjestustunnuste kirjeldamiseks
 
-Järjestustunnuste kirjeldamiseks saab kasutada kõiki neid samu meetodeid, mida ka nominaaltunnuste puhul.
+Järjestustunnuste kirjeldamiseks saab kasutada kõiki neid samu meetodeid, mida ka nominaaltunnuste puhul.  
 
 ```{r, results='hide'}
 summary(kysimustik)
@@ -381,7 +419,7 @@ Kuna tegemist on (järjestatud) faktoriga, ei suuda R ise selle mediaani kohe le
 median(as.numeric(kysimustik$kursuse_labimine))
 ```
 
-Mäletatavasti oli mediaan paaritu arvu vaatluste korral variatsioonirea keskmine. Kui meil on aga paarisarv vaatlusi, on mediaan kahe keskmise vaatluse aritmeetiline keskmine. Kui meil oleks nüüd paarisarv vaatlusi, mille mediaan jääks täpselt 3 ja 4 vahele, siis kuidas tõlgendada mediaani 3.5, kui 3 tähistab vastust "Võin läbi saada, aga võin ka põruda" ja 4 tähistab vastust "Tõenäoliselt saan läbi"?
+Mäletatavasti oli mediaan paaritu arvu vaatluste korral variatsioonirea keskmine. Kui meil on aga paarisarv vaatlusi, on mediaan kahe keskmise vaatluse aritmeetiline keskmine (siin `(4+4)/2 = 4`). Kui meil oleks nüüd paarisarv vaatlusi, mille mediaan jääks täpselt 3 ja 4 vahele, siis kuidas tõlgendada mediaani 3.5, kui 3 tähistab vastust "Võin läbi saada, aga võin ka põruda" ja 4 tähistab vastust "Tõenäoliselt saan läbi"?
 
 Aga aritmeetiline keskmine ise?
 
@@ -416,7 +454,7 @@ Käsitleme siin kaht hajuvusnäitajat:
 ![](imgs/variation_ratio.JPG){width=75%}
 </center>
 
-Variatsioonisuhte leidmiseks lahutatakse 1st moodi sageduse ja kõikide vaatluste hulga jagatis. Variatsioonisuhe näitab, **kui suure osa andmetest jätab kõige sagedasem väärtus kirjeldamata**.
+Variatsioonisuhte leidmiseks lahutatakse 1st moodi sageduse ja kõikide vaatluste hulga jagatis. Variatsioonisuhe näitab, **kui suure osa andmetest jätab kõige sagedasem väärtus kirjeldamata**. Põhimõtteliselt lahutatakse 1st moodi suhteline sagedus.  
 
 ```{r, results='hide'}
 fm <- max(t.loom) # kõige populaarsema vastuse sagedus
@@ -429,9 +467,14 @@ fm/N # populaarseima vastuse osakaal kõikidest vastustest
 
 Mida lähemal *v* on nullile, seda homogeensem on andmestik (kõige sagedasem väärtus kirjeldab üksi suurema osa andmetest ära). Mida lähemal *v* on ühele, seda heterogeensem ja hajuvam on andmestik (palju erinevaid kategooriaid).
 
-Siin näitab variatsioonisuhte väärtus, et kõige populaarsem kategooria (*koer*) kirjeldab ära umbes poole kõikidest andmetest, aga ka muid loomi on piisavalt palju vastatud selleks, et need oleksid olulised.  
+Siin näitab variatsioonisuhte väärtus, et kõige populaarsem kategooria (*koer*) kirjeldab ära umbes poole kõikidest andmetest, aga ka muid loomi on piisavalt palju vastatud selleks, et need oleksid andmete kirjeldamisel olulised.  
 
-Variatsioonisuhe ei peegelda aga seda, kui palju neid teisi vastusevariante on, nt kas need 52% vastustest lähevad jagamisele kahe, kolme, nelja, kümne või kasvõi saja vastusevariandi vahel.  
+Variatsioonisuhe ei peegelda aga seda, kui palju neid teisi vastusevariante on, nt kas need 49% vastustest lähevad jagamisele kahe, kolme, nelja, kümne või kasvõi saja vastusevariandi vahel. 
+
+Praegusel juhul saabki maksimaalne variatsioonisuhe olla 0.75, sest kui jagada 80 vaatlust võrdselt 4 kategooriasse (= maksimaalne andmete hajuvus), on meil 4 moodi (igaühe sagedus 20) ja `1-20/80 = 0.75`. Kohe, kui mõnda kategooriasse mõne teise arvelt vaatlusi juurde lisada (nt 20, 20, 21, 19), muutub see moodiks ja variatsioonisuhe väheneb: `1-21/80 = 0.7375`.    
+Kui meil oleks ainult 2 kategooriat (nt koera vastuseid 40 ja kaelkirjaku vastuseid 40), siis saaks maksimaalne variatsioonisuhe olla `1-40/80 = 0.5`. Kui meil oleks 10 kategooriat ja igas kategoorias võrdselt vastuseid (8), saaks maksimaalne variatsioonisuhe olla aga tervelt `1-8/80 = 0.9`. 
+
+Variatsioonisuhte tõlgendamisel ja võrdlemisel tuleb seega arvesse võtta ka seda, mitmesse klassi vaatlused üldse on jagatud.  
 
 
 ## Hälve moodist
@@ -461,15 +504,18 @@ Mida suurem on *DM*, seda rohkem on andmetes varieerumist ja seda ühtlasema sag
 Hälve moodist "karistab" vähese valikuvõimaluse eest, st kui meil oleks ainult 2 klassi, siis oleks kõige populaarsemast väärtusest ehk moodist hälbimine suurem kui siis, kui meil oleks 3 klassi. -->
 
 
+
 ## Kategoriaalsete tunnuste visualiseerimine
 <center>
 ![](imgs/charts.jpg){width=75%}
 </center>
 
+<br>
+
 Kategoriaalsete andmete visualiseerimiseks kasutatakse enamasti sektordiagramme (nn *pirukaid*) ja tulpdiagramme. Tegeleme selles aines põhiliselt tulpdiagrammidega, sest  
 
 - sektordiagramme on keeruline tõlgendada, väiksemad erinevused ei tule selgelt esile;  
-- sektordiagramme on kerge väärkasutada ("valetada");  
+- sektordiagramme on kerge väärkasutada;  
 - kui lisada protsentide sildid loetavuse parandamiseks, kaotab sektordiagramm ise kogu oma mõtte;  
 - sektordiagrammid on kasulikud ainult siis, kui võrrelda maksimaalselt 3 gruppi, mille sageduserinevused on suured.  
 
@@ -563,14 +609,32 @@ barplot(t,
         las = 1)
 ```
 
-Jooniste salvestamine käib samamoodi nagu eelnevalt tabelobjektide joonisena salvestamisega.  
+Jooniste salvestamine käib samamoodi nagu eelnevalt tabelobjektide joonisena salvestamisega: kas `Plots -> Export -> Save as Image` või  
+
+```{r, eval = F}
+png(filename = "joonis1.png", width = 15, height = 12, units = "cm", res = 300)
+barplot(t, 
+        horiz = TRUE, 
+        col = c("grey35", "orange"), 
+        ylab = "Kursuse läbimise tõenäosus",
+        xlab = "Vastanute proportsioonid",
+        main = "Hinnang kursuse läbimise tõenäosusele\nvastavalt kogemusele kvantitatiivsete meetoditega",
+        legend = TRUE, 
+        args.legend = list(x = "bottomright", 
+                           ncol = 2, 
+                           title = "Kogemused kvantmeetoditega"),
+        las = 1)
+dev.off()
+```
+
 
 ## Harjutused
 
 1. Võrdle lemmiklooma hälvet moodist lemmikjoogi hälbega moodist. Mida järeldad?   
-2. Tee sagedustabel küsimustikule vastanute programmeerimisoskuse kohta. Tulemuste mugavamaks kuvamiseks nimeta tunnuse tasemed lühemalt ümber (nt "Oskan hästi", "Oskan vähe", "Ei oska" ja "Oskan natuke"). 
+2. Tee sagedustabel küsimustikule vastanute programmeerimisoskuse kohta ja salvesta see eraldi objekti (nt nimega `t.prog`). Tulemuste mugavamaks kuvamiseks nimeta tunnuse tasemed lühemalt ümber (nt "Oskan hästi", "Oskan vähe", "Ei oska" ja "Oskan natuke"). 
 3. Salvesta loodud tabel txt-failina nii, et tulpasid eraldavad tühikud. Kas vajad jutumärke (`quote = TRUE`)? Kas vajad ridade numbreid (`row.names = TRUE`)?     
-4. Tee küsimustiku lemmiklooma tunnusest allolev joonis. Kui hätta jääd, uuri käsuga `?barplot` abifailist, mida mingid funktsiooni argumendid teevad. R-i n-ö sisse-ehitatud värvipaleti värvinimesid näed käsuga `colors()` ja värvinimesid koos värvidega nt käsuga `showCols1()`.     
+4. Tee küsimustiku lemmiklooma tunnusest allolev joonis. Kui hätta jääd, uuri käsuga `?barplot` abifailist, mida mingid funktsiooni argumendid teevad. R-i n-ö sisse-ehitatud värvipaleti värvinimesid näed käsuga `colors()` ja värve koos värvinimedega käsuga `scales::show_col(colors(), cex_label = 0.5)` (`cex_label` argumendi väärtust muutes saad värvinimede silte suuremaks ja väiksemaks teha).    
+
 ```{r, echo = FALSE}
 barplot(table(kysimustik$lemmikloom), 
         names.arg = c("Glaucus", "Kirjak", "Koer", "Ei meeldi"), 
