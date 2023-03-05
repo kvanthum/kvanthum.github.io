@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '5-ggplot2.html'))})
-date: 07.03.2022
+date: 06.03.2023
 output: 
   html_document:
     theme: flatly
@@ -37,7 +37,9 @@ Pakett **`ggplot2`**:
 library(ggplot2)
 
 # Laadi andmestik
-load("data/kysimustik_2022.RData")
+# tabel on csv-formaadis, tabelil on päiserida tulpade nimedega (header), 
+# tulpasid eraldab tabulaator ("\t") ja faili kodeering on UTF-8
+valimised <- read.delim("data/kandidaadid_2023.csv", header = T, sep = "\t", encoding = "UTF-8")
 ```
 
 Ggploti spikri leiad [siit](https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf), levinumad funktsioonid [siit](https://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html).  
@@ -48,228 +50,254 @@ Kõige esimeseks kihiks loob funktsioon `ggplot()` tühja kihi, kus saab täpsus
 
 ```{r}
 # Joonistatakse ainult tühi palett.
-ggplot(data = kysimustik)
+ggplot(data = valimised)
 ```
 
 
-**Andmestiku tunnuste** visualiseerimiseks kasutatakse argumenti `mapping` ja selle väärtusena funktsiooni `aes` (*aesthetics*). `aes`'i argumentidega (sulgude sees) on omakorda võimalik öelda näiteks, et visualiseeri graafiku **x-teljel** üht tunnust (`x = ...`), **y-teljel** teist (`y = ...`), **värvi** abil kolmandat (`color = ...`), **täitevärvi** abil neljandat (`fill = ...`), **kujundi** abil viiendat (`shape = ...`), **suuruse** abil kuuendat (`size = ...`) jne. Üht ja sama tunnust võib visualiseerida ka mitme `aes`'i argumendiga.
+**Andmestiku tunnuste** visualiseerimiseks kasutatakse argumenti `mapping` ja selle väärtusena funktsiooni `aes` (*aesthetics*). `aes`'i argumentidega (sulgude sees) on omakorda võimalik öelda näiteks, et visualiseeri graafiku **x-teljel** üht tunnust (`x = ...`), **y-teljel** teist (`y = ...`), **värvi** abil kolmandat (`color = ...`), **täitevärvi** abil neljandat (`fill = ...`), **kujundi** abil viiendat (`shape = ...`), **suuruse** abil kuuendat (`size = ...`), **läbipaistvuse** abil seitsmendat (`alpha = ...`), **joone tüübi** abil kaheksandat (`linetype = ...`) jne. Üht ja sama tunnust võib visualiseerida ka mitme `aes`'i argumendiga (nt võime kandidaatide sugu väljendada ühel ja samal joonisel nii eraldi tulpadena x-teljel kui ka erineva tulba täitevärviga).
 
-Kui tahame küsimustikust x-teljel visualiseerida lemmiklooma kategooriaid, siis täpsustame selle argumendiga `mapping = aes(x = lemmikloom)`. Kui andmestik on täpsustatud, siis `aes`-funktsiooni sees pole vaja tulbale enam dollarimärgiga viidata, piisab lihtsalt tulba nimest.   
+Kui tahame küsimustikust x-teljel visualiseerida soo kategooriaid, siis täpsustame selle argumendiga `mapping = aes(x = sugu)`. Kui andmestik on täpsustatud, siis `aes`-funktsiooni sees pole vaja tulbale enam dollarimärgiga viidata, piisab lihtsalt tulba nimest.   
 
 ```{r}
-ggplot(data = kysimustik,
-       mapping = aes(x = lemmikloom))
+ggplot(data = valimised,
+       mapping = aes(x = sugu))
 ```
 
-Kuna me ei ole veel öelnud, mismoodi me lemmiklooma tahame graafikul kuvada (nt kas tulpdiagrammina või pirukana), siis joonistatakse endiselt tühi palett, mille x-teljele on nüüd märgitud lemmiklooma kategooriad.  
+Kuna me ei ole veel öelnud, mismoodi me sugu tahame graafikul kuvada (nt kas tulpdiagrammina või pirukana, ehkki päris piruka funktsiooni ggplotis ei olegi), siis joonistatakse endiselt tühi palett, mille x-teljele on nüüd märgitud soo kategooriad.  
 
 Nii `data`'t kui ka `mapping`'ut on võimalik täpsustada ka hilisemates kihtides, kusjuures argumentide nimed (`data =` ja `mapping =`) võib ka ära jätta, kui nende järjekord on õige.
 
 ### Harjuta
 
-<span style="color: black;">Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.</span>
+<span style="color: black;">Laadi RStudiosse eelmistes praktikumides kasutatud küsimustik. Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.</span>
 
 
 ## 2. kiht: *geom*
 
 Teine kiht täpsustab, **millist graafikutüüpi** mingi tunnuse või tunnuste kuvamiseks kasutada. Seda kihti nimetatakse `geom_function`'iks. Levinumad **geom**'id on
 
-- `geom_point()` (hajuvusdiagrammid),  
+- `geom_point()` (hajuvusdiagrammid), 
+- `geom_count()` (hajuvusdiagrammid, kus kattuvad punktid on suuremad),  
 - `geom_histogram()` (histogrammid),  
 - `geom_boxplot()` (karpdiagrammid),  
-- `geom_bar()` (tulpdiagrammid),  
+- `geom_bar()` (tulpdiagrammid, kui sagedused tuleb arvutada), 
+- `geom_col()` (tulpdiagrammid, kui sagedused on juba arvutatud), 
 - `geom_label()` (sildid),  
-- `geom_text()` (tekst)  
+- `geom_text()` (tekst),  
+- `geom_line()` (joondiagrammid),  
+- `geom_smooth()` (trendijooned),  
 - jne.  
 
 ```{r, fig.show = 'hold'}
 # Jätame ära argumentide nimed "data" ja "mapping"
-
-ggplot(kysimustik,
-       aes(x = lemmikloom)) +
+ggplot(valimised,
+       aes(x = sugu)) +
   geom_bar()
 
 # Käsku võib lugeda nii:
-# kasuta andmestikust 'kysimustik'
+# kasuta andmestikust 'valimised'
 # graafiku x-teljel kuvamiseks
-# tunnust 'lemmikloom',
-# nii et graafiku tüübiks on tulpdiagramm.
-
-# geom_bar() on funktsioon, mis loeb
-# kategoriaalse tunnuse tasemed vaikimisi kokku
-# ja paneb y-teljele tasemete sagedused.
-
-# Kui andmestikus oleks juba eraldi tulp sagedustega,
-# peaksime aes()-funktsioonis täpsustama selle tulba
-# y-argumendi väärtusena (y = sagedused) 
-# ning kasutama geom_bar() funktsiooni sees
-# argumenti stat = "identity"
-# või kasutama geom_bar() asemel funktsiooni geom_col().
-
-# ggplot(data.frame(table(kysimustik$lemmikloom)),
-#        aes(x = Var1, y = Freq)) +
-#   geom_bar(stat = "identity")
-
-# ggplot(data.frame(table(kysimustik$lemmikloom)),
-#        aes(x = Var1, y = Freq)) +
-#   geom_col()
+# tunnust 'sugu' nii,
+# et graafiku tüübiks on tulpdiagramm.
 ```
 
-Nagu öeldud, võib `data`'t ja tunnuste `mapping`'ut täpsustada ka geom-kihtides. Näiteks ülal oleva graafiku saame ka sellise koodiga:  
+**`geom_bar()`** on funktsioon, mis loeb kategoriaalse tunnuse tasemed vaikimisi kokku ja paneb y-teljele tasemete sagedused, ilma et peaksime sageduste leidmiseks esmalt nt `table()`-funktsiooni kasutama ja seda `data.frame`'iks teisendama.  
+
+Kui andmestikus oleks juba eraldi tulp sagedustega, peaksime `aes()`-funktsioonis täpsustama selle tulba y-argumendi väärtusena (`y = sageduste_tulp`) ning kasutama `geom_bar()` funktsiooni sees argumenti `stat = "identity"` või kasutama `geom_bar()` asemel funktsiooni **`geom_col()`**.
+
+```{r, eval = F}
+ggplot(data.frame(table(valimised$sugu)),
+       aes(x = Var1, y = Freq)) + # y-teljel sagedused
+  geom_bar(stat = "identity")
+
+# või
+ggplot(data.frame(table(valimised$sugu)),
+       aes(x = Var1, y = Freq)) +
+  geom_col()
+
+```
+
+Sellisest sagedustega andmestikust saab teha ka piruka ehk sektordiagrammi.  
+
+```{r, eval = F}
+ggplot(data.frame(table(valimised$sugu)),
+       aes(x = "", y = Freq, fill = Var1)) +
+  geom_col() + 
+  coord_polar(theta = "y")
+```
+
+
+Nagu öeldud, võib `data`'t ja tunnuste `mapping`'ut täpsustada ka `geom`-kihtides. Näiteks ülal oleva graafiku saame ka sellise koodiga:  
 
 ```{r}
 ggplot() +
-  geom_bar(data = kysimustik, 
-           aes(x = lemmikloom))
+  geom_bar(data = valimised,
+           aes(x = sugu))
 ```
 
-Selline vormistus on kasulik eriti siis, kui tahame kujutada samal graafikul erinevate andmestike või sama andmestiku erinevate alamhulkade tunnuseid. Näiteks võime samal graafikul kujutada lisaks eraldi joonega ainult käimasoleva, 2022. aasta vastuste sagedusi. Kuna `geom_line` on nn kollektiivne *geom* ehk selle joonistamiseks kasutatakse mitme vaatluse andmeid (joont ei saa joonistada ainult 1 vaatluse põhjal), siis selleks, et joon oleks ühendatud üle kõikide kategooriate, kasutame `aes`-funktsiooni sees argumenti `group`. Kui tahta näidata ainult üht vaatluste gruppi ehk mingit üht alamosa tervest andmestikust, võib `group`'i väärtus olla mis tahes konstant, nt 1, 500, "a", "konstant" vmt.
+Selline vormistus on kasulik eriti siis, kui tahame kujutada samal graafikul erinevate andmestike või sama andmestiku erinevate alamhulkade tunnuseid (iga kujutusviisi jaoks tuleb teha eraldi `geom`-kiht). Näiteks võime samal graafikul kujutada lisaks eraldi joonega ainult mingi valimisnimekirja, nt sotsiaaldemokraatide mees- ja naiskandidaatide arvu. Kuna **`geom_line`** on nn kollektiivne *geom* ehk selle joonistamiseks kasutatakse mitme vaatluse andmeid (joont ei saa joonistada ainult 1 vaatluse põhjal), siis selleks, et joon oleks ühendatud üle kõikide kategooriate, kasutame `aes`-funktsiooni sees argumenti `group`. Kui tahta näidata ainult üht vaatluste gruppi ehk mingit üht alamosa tervest andmestikust, nagu siin näites, võib `group`'i väärtus olla mis tahes konstant, nt 1, 500, "a", "konstant" vmt.
 
 ```{r, fig.show='hold'}
-ggplot() +
-  geom_bar(data = kysimustik,
-           aes(x = lemmikloom)) +
-  geom_line(data = kysimustik[kysimustik$aasta == "2022",],
-            aes(x = lemmikloom,
-                group = 1),
-            stat = "count",
-            color = "gold1")
-
 # stat = "count" tuleb lisada, et
 # ggplot teaks, kust tulevad joone jaoks y-teljele sagedused
 # ("count" ehk "loe kokku").
+
+ggplot() +
+  geom_bar(data = valimised,
+           aes(x = sugu)) +
+  geom_line(data = valimised[valimised$nimekiri == "Sotsiaaldemokraatlik Erakond",],
+            aes(x = sugu, group = 1),
+            stat = "count",
+            color = "tomato1")
+
 ```
 
 
-Kui aga tahta grupeerida vaatlusi mingi andmestiku tunnuse järgi ning näidata seega kõiki selle tunnuse alusel tekkivaid andmestiku alamosi korraga, tuleb `group` väärtuseks panna seesama andmestiku tunnus ise. Sel juhul ei tule iga tunnuse taseme kohta tekitada uut kihti omaette alamandmestikuga (nt `kysimustik[kysimustik$aasta == "2018",]`, `kysimustik[kysimustik$aasta == "2019",]` jne) Kuvame näiteks kõikide aastate vastuseid tulpade peal eri värvi joontena.
+Kui aga tahta grupeerida vaatlusi mingi andmestiku tunnuse järgi (nt valimisnimekiri) ning näidata seega **kõiki** selle tunnuse alusel tekkivaid andmestiku alamosi korraga, tuleb `group` väärtuseks panna seesama andmestiku tunnus ise. Sel juhul ei tule iga tunnuse taseme kohta tekitada uut `geom`-kihti omaette alamandmestikuga (nt `valimised[valimised$nimekiri == "Sotsiaaldemokraatlik Erakond",]`, `valimised[valimised$nimekiri == "Eesti Reformierakond",]` jne). Kuvame näiteks kõikide erakondade mees- ja naiskandidaatide arvu üldiste tulpade peal eri värvi joontena.
 
 ```{r}
 ggplot() +
-  geom_bar(data = kysimustik,
-           aes(x = lemmikloom)) +
-  geom_line(data = kysimustik,
-            aes(x = lemmikloom,
-                group = aasta, # grupeeriv tunnus
-                color = aasta), # värvime ka jooned grupeeriva tunnuse järgi
+  geom_bar(data = valimised,
+           aes(x = sugu)) +
+  geom_line(data = valimised,
+            aes(x = sugu, 
+                group = nimekiri, # grupeeriv tunnus
+                color = nimekiri), # värvime ka jooned grupeeriva tunnuse järgi (värv nüüd aes()-funktsiooni sees!)
             stat = "count")
 ```
+
+```{r, eval = F}
+# Need data ja aes osad, mis kahel geom-kihil kattuvad
+# (data = valimised ja aes(x = sugu)),
+# võib liigutada ka lihtsalt ggplot()-funktsiooni sisse
+ggplot(valimised, aes(x = sugu)) +
+  geom_bar() +
+  geom_line(aes(group = nimekiri, 
+                color = nimekiri), 
+            stat = "count")
+```
+
 
 Võrdle:  
 
 ```{r}
-ggplot() +
-  geom_bar(data = kysimustik,
-           aes(x = lemmikloom)) +
-  geom_line(data = kysimustik,
-            aes(x = lemmikloom,
-                group = 1), # grupeeriv konstant
+ggplot(valimised, aes(x = sugu)) +
+  geom_bar() +
+  geom_line(aes(group = 1), # grupeeriv konstant
+            color = "red", # joone värv ei sõltu mingist andmestiku tunnusest
             stat = "count")
 ```
 
 ### Harjuta
 
-<span style="color: lightgrey;">Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.</span>  
+<span style="color: lightgrey;">Laadi RStudiosse eelmistes praktikumides kasutatud küsimustik. Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.</span>  
 <span style="color: black;">Kuva sünniaasta ja õpitud aastate arvu suhet hajuvusdiagrammil.</span>
 
 ## 3. kiht: *scale*
 
-Kolmas kiht lubab modifitseerida seda, **kuidas** mingil kujul graafikul esitamiseks valitud tunnus graafikul täpselt välja näeb. Seda kihti nimetatakse ka `scale_function`'iks.  
+Kolmas kiht lubab modifitseerida seda, **kuidas** mingil kujul graafikul esitamiseks valitud tunnus graafikul täpselt välja näeb. Seda kihti nimetatakse `scale_function`'iks.  
 
-`scale`'iga saab modifitseerida seda elementi, mille kaudu tunnust graafikul kujutatud on, nt `scale_x_...`, `scale_y_...`, `scale_color_...`, `scale_fill_...`, `scale_size_...`, `scale_shape_...` jne.  
+`scale`'iga saab modifitseerida konkreetselt seda elementi, mille kaudu tunnust graafikul kujutatud on, nt `scale_x_...`, `scale_y_...`, `scale_color_...`, `scale_fill_...`, `scale_size_...`, `scale_shape_...`, `scale_alpha_...`, `scale_linetype_...` jne.  
 
 `scale`-funktsiooni nime viimane element (üleval märgitud praegu punktiiriga) kirjeldab tunnuse modifitseerimise tüüpi, värviskaalat vms. See, mis argumendid mingil konkreetsel `scale`-funktsioonil on, sõltub funktsioonist endast. Trüki konsooli nt `scale_` ja vajuta tabulaatorit, et näha erinevaid variante. 
 
-Kasutame siin `scale`-funktsiooni, et nimetada graafikul ümber lemmiklooma tasemed.  
+Kasutame siin `scale`-funktsiooni, et nimetada soo tasemeid graafiku **x-teljel** pikemalt (vastavalt sõnadega *mehi* ja *naisi*) ja kasutada valimisnimekirja joontena kuvamiseks ggploti vaikimisi pakutud **värvide** asemel enda määratud värve. Värvivektoris võib värve määrata kas värvinimede kaudu (nt `c("red", "blue")`, vt ka `colors()`), hex-värvikoodide kaudu (nt `c("#FF0000", "#0000FF")`) või määrates eraldi punase, rohelise ja sinise tooni suhte funktsioonis `rgb()` (nt `rgb(red = 0, blue = 255, green = 0, maxColorValue = 255)`).    
 
 ```{r, fig.show='hold'}
-ggplot(kysimustik,
-       aes(x = lemmikloom)) +
+ggplot(valimised, aes(x = sugu)) +
   geom_bar() +
-  geom_line(aes(group = aasta,
-                color = aasta),
-            stat = "count") +
-  scale_x_discrete(labels = c("Glaucus",
-                              "Kirjak",
-                              "Kutsa",
-                              "Ei meeldi"))
+  geom_line(aes(group = nimekiri, color = nimekiri), stat = "count") +
+  scale_x_discrete(labels = c("mehi", "naisi")) +
+  scale_color_manual(values = c("#007154", "#0073B7", "#F7DB00", "#858C92", "#2E2990", "#91C33C", "#F75E00", "#0594DA", "#DA0600", "#000000"))
 
-
-# 'labels'-argument nimetab joonisel lemmiklooma tasemed ümber (aga mitte andmestikus!)
+# 'labels'-argument nimetab joonisel soo tasemed ümber (aga mitte andmestikus!)
+# 'scale_color_manual' laseb määrata tunnuse tasemetele käsitsi uued värvid
 ```
 
-Muudame `scale`-funktsiooniga eri aastate vastuste joonte värvi.
+`color` täpsustab ggplotis joonte (nt joongraafiku või tulpade jm-de kujundite piirjoonte) värvi. Täitevärvi jaoks on ggplotis `aes`-funktsiooni argument nimega `fill`. Kujutame nüüd tulpdiagrammi x-teljel hoopis nimekirja ja sugu tulpade täitevärvina (`fill`). Tahtes määrata vaikimisi täitevärvide asemel muid värve, tuleb sellisel juhul täpsustada seda kihil, mis algab tekstiga `scale_fill_...`. Võime määrata värvid taas kord käsitsi, kui kasutame funktsiooni `scale_fill_manual(values = c("värv1", "värv2"))` või kasutada juba mõnd olemasolevat värvipaletti, nt [ColorBreweri](https://r-graph-gallery.com/38-rcolorbrewers-palettes.html) omade hulgast.  
 
-```{r, fig.show = 'hold'}
-ggplot(kysimustik,
-       aes(x = lemmikloom)) +
+```{r}
+ggplot(valimised, aes(x = nimekiri, fill = sugu)) +
   geom_bar() +
-  geom_line(aes(group = aasta,
-                color = aasta),
-            stat = "count") +
-  scale_x_discrete(labels = c("Glaucus",
-                              "Kirjak",
-                              "Kutsa",
-                              "Ei meeldi")) +
-  scale_color_manual(values = c("gold1", "skyblue", "tomato1", "seagreen2", "plum2"))
+  scale_fill_brewer(type = "qual", # kvalitatiivne tunnus
+                    palette = 2, # 2. värvipalett
+                    direction = -1) # keera palett vastupidi
+```
 
-# 'scale_color_manual' laseb määrata
-# tunnuse tasemetele käsitsi uued värvid
+
+Vaikimisi sätitakse soo kategooriad üksteise otsa (`position = "stack"`). Võime aga `geom_bar()` funktsiooni sees täpsustada, et   
+
+1. eri kategooriate tulbad võiksid olla hoopis **üksteise kõrval** (`geom_bar(position = "dodge")`) või et  
+2. vaatleme absoluutsageduste asemel hoopis **proportsioone**, st seda, kui suured on ühe või teise nimekirja mees- ja naiskandidaatide osakaalud (`geom_bar(position = "fill")`).  
+
+
+```{r}
+ggplot(valimised, aes(x = nimekiri, fill = sugu)) +
+  geom_bar(position = "dodge") + # meeste ja naiste tulbad kõrvuti
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) 
+
+ggplot(valimised, aes(x = nimekiri, fill = sugu)) +
+  geom_bar(position = "fill") + # meeste ja naiste osakaalud
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) 
+```
+
+Kuna x-telje sildid kipuvad praegu üksteise peale jooksma, on üks variant keerata kogu joonis 90 kraadi paremale nii, et nimekirjade sildid jääksid x-telje asemel y-teljele.
+
+```{r}
+ggplot(valimised, aes(y = nimekiri, fill = sugu)) +
+  geom_bar(position = "dodge") +
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) 
+```
+```{r eval = F}
+# või
+ggplot(valimised, aes(x = nimekiri, fill = sugu)) +
+  geom_bar(position = "dodge") +
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) +
+  coord_flip() # võib lisada ka funktsiooni, mis vahetab x- ja y-telje ära
 ```
 
 
 
-Kujutame nüüd eri aastate vastuseid joonte asemel hoopis  täitevärviga (`fill`). Seda saame määrata kas `ggplot()`- või `geom()`-kihil `aes()`-funktsioonis argumendiga `fill`. `scale`-funktsioonis saame seejärel näiteks määrata, millist värvipaletti tahaksime tulpade täitevärvi jaoks kasutada.  
+Üks asi, mida kindlasti tulpdiagrammidega sageli vaja läheb, on **tulpade ümberjärjestamine**. Üks võrdlemisi kohmakas, aga lihtne ja läbipaistev viis seda teha on anda kategooriate järjekord tekstivektorina ette selle telje `scale`-kihil, kus järjestatavate kategooriate nimed on (meie näites `scale_y_...`). Näiteks kui tahame kuvada tulpasid selle põhjal, kui palju üldse nimekirjades kandidaate kokku on, saame leida selle esmalt `table()`-funktsiooniga, sorteerida sagedustabeli ja küsida sorteeritud tabeli kategooriate nimesid. 
 
-```{r, fig.show='hold'}
-ggplot(kysimustik,
-       aes(x = lemmikloom,
-           fill = aasta)) +
+```{r}
+t.nimekiri <- table(valimised$nimekiri)
+kandidaate_kokku <- names(sort(t.nimekiri))
+
+ggplot(valimised, aes(y = nimekiri, fill = sugu)) +
   geom_bar(position = "dodge") +
-  scale_x_discrete(labels = c("Glaucus",
-                              "Kirjak",
-                              "Kutsa",
-                              "Ei meeldi")) +
-  scale_fill_brewer(type = "qual",
-                    palette = 2)
-
-# Argument 'fill' ütleb,
-# et kasuta andmestikust tunnust
-# 'aasta' ning väljenda seda
-# tulpdiagrammil tulpade erineva
-# täitevärvi kaudu.
-
-# Argument 'position = "dodge"' ütleb,
-# et aseta aastad
-# üksteise kõrvale eraldi tulpadesse.
-
-# 'scale_fill_brewer' laseb värvida
-# täitevärvi kaudu väljendatud tunnuse väärtused
-# breweri värvipaketist kvalitatiivseid tunnuseid 
-# eristava värviga, kasutades paletti nr 2.
-# Uuri funktsiooni kohta nt 
-# ?scale_fill_brewer
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) +
+  scale_y_discrete(limits = kandidaate_kokku)
 ```
 
-Vaatame, kuidas lemmiklooma vastused jagunevad tee- ja kohvijoojate järgi.  
+Kui tahame sorteerida selle järgi, kui palju (absoluutarvuna) nimekirjas on naisi, peame tegema sama asja soo ja nimekirja risttabeli naiste reaga.  
 
-```{r, fig.show='hold'}
-ggplot(kysimustik,
-       aes(x = lemmikloom,
-           fill = lemmikjook)) +
+```{r}
+t.sugu.nimekiri <- table(valimised$sugu, valimised$nimekiri)
+naiskandidaate <- names(sort(t.sugu.nimekiri["N",]))
+
+ggplot(valimised, aes(y = nimekiri, fill = sugu)) +
   geom_bar(position = "dodge") +
-  scale_x_discrete(labels = c("Glaucus",
-                              "Kirjak",
-                              "Kutsa",
-                              "Ei meeldi")) +
-  scale_fill_brewer(type = "qual",
-                    palette = 2)
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) +
+  scale_y_discrete(limits = naiskandidaate)
+```
 
+Veelgi ausam oleks sorteerida selle põhjal, kui suur on nimekirjas naiskandidaatide **osakaal**.  
+
+```{r}
+t.sugu.nimekiri.props <- prop.table(t.sugu.nimekiri, margin = 2)
+naiskandidaatide_osakaal <- names(sort(t.sugu.nimekiri.props["N",]))
+
+ggplot(valimised, aes(y = nimekiri, fill = sugu)) +
+  geom_bar(position = "dodge") +
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) +
+  scale_y_discrete(limits = naiskandidaatide_osakaal)
 ```
 
 
 ### Harjuta
 
-<span style="color: lightgrey;">Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.  
+<span style="color: lightgrey;">Laadi RStudiosse eelmistes praktikumides kasutatud küsimustik. Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.  
 Kuva sünniaasta ja õpitud aastate arvu suhet hajuvusdiagrammil.</span>  
 <span style="color: black;">Tähista erineva värviga need vastajad, kellel on kvantitatiivsete meetoditega kogemust, ja need, kellel ei ole. Kasuta kategooriate jaoks värve "grey45" ja "orange".</span>
 
@@ -279,48 +307,37 @@ Kuva sünniaasta ja õpitud aastate arvu suhet hajuvusdiagrammil.</span>
 Neljandal kihil võime täpsustada telgede ja graafikute pealkirjad, alapealkirjad jmt funktsiooniga `labs()`.
 
 ```{r}
-ggplot(kysimustik,
-       aes(x = lemmikloom,
-           fill = lemmikjook)) +
+ggplot(valimised, aes(y = nimekiri, fill = sugu)) +
   geom_bar(position = "dodge") +
-  scale_x_discrete(labels = c("Glaucus",
-                              "Kirjak",
-                              "Kutsa",
-                              "Ei meeldi")) +
-  scale_fill_brewer(type = "qual",
-                    palette = 2) +
-  labs(x = "Lemmikloom",
-       y = "Sagedus",
-       fill = "Lemmikjook",
-       title = "Lemmiklooma valik vastavalt lemmikjoogile",
-       subtitle = "aastatel 2018-2022",
-       caption = "Andmed: kursuse FLFL.00.009 osalejate vastused küsimustikule")
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) +
+  scale_y_discrete(limits = naiskandidaatide_osakaal) +
+  labs(x = "Kandidaatide arv",
+       y = "",
+       fill = "Sugu",
+       title = "Mees- ja naiskandidaatide arv",
+       subtitle = "Riigikogu valimistel 2023",
+       caption = "Andmed: https://rk2023.valimised.ee/et/candidates")
 ```
+
 
 `ggplot`'i graafikuid saab ka salvestada eraldi objektidesse, et neid taaskasutada. Salvestame meie praeguse joonise objekti nimega *p*. 
 
 ```{r}
-p <- ggplot(kysimustik,
-       aes(x = lemmikloom,
-           fill = lemmikjook)) +
+p <- ggplot(valimised, aes(y = nimekiri, fill = sugu)) +
   geom_bar(position = "dodge") +
-  scale_x_discrete(labels = c("Glaucus",
-                              "Kirjak",
-                              "Kutsa",
-                              "Ei meeldi")) +
-  scale_fill_brewer(type = "qual",
-                    palette = 2) +
-  labs(x = "Lemmikloom",
-       y = "Sagedus",
-       fill = "Lemmikjook",
-       title = "Lemmiklooma valik vastavalt lemmikjoogile",
-       subtitle = "aastatel 2018-2022",
-       caption = "Andmed: kursuse FLFL.00.009 osalejate vastused küsimustikule")
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) +
+  scale_y_discrete(limits = naiskandidaatide_osakaal) +
+  labs(x = "Kandidaatide arv",
+       y = "",
+       fill = "Sugu",
+       title = "Mees- ja naiskandidaatide arv",
+       subtitle = "Riigikogu valimistel 2023",
+       caption = "Andmed: https://rk2023.valimised.ee/et/candidates")
 ```
 
 ### Harjuta
 
-<span style="color: lightgrey;">Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.  
+<span style="color: lightgrey;">Laadi RStudiosse eelmistes praktikumides kasutatud küsimustik. Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.  
 Kuva sünniaasta ja õpitud aastate arvu suhet hajuvusdiagrammil.  
 Tähista erineva värviga need vastajad, kellel on kvantitatiivsete meetoditega kogemust, ja need, kellel ei ole. Kasuta kategooriate jaoks värve "grey45" ja "orange".</span>    
 <span style="color: black;">Lisa graafikule pealkiri "Õpitud aastate seos sünniaastaga", alapealkiri "ja kokkupuutega kvantitatiivsete meetoditega" ning legendi pealkiri "Kogemused kvantitatiivsete meetoditega".</span>  
@@ -329,24 +346,15 @@ Tähista erineva värviga need vastajad, kellel on kvantitatiivsete meetoditega 
 ## 5. kiht: *theme*
 
 Viiendal kihil võime täpsustada otseselt andmetega mitteseotud elementide väljanägemist graafikul funktsiooniga `theme()`. 
-Selliste elementide hulka kuuluvad näiteks üldine teksti suurus, värv, font, paksus, paiknemine, graafiku tausta värv, graafiku piirjoonte olemasolu, paksus, värv, taustaruudustiku kuvamine jne.
+Selliste elementide hulka kuuluvad näiteks üldine teksti suurus, värv, font, paksus, paiknemine, graafiku tausta värv, graafiku piirjoonte olemasolu, paksus, värv, taustaruudustiku kuvamine, legendi asukoht jne.
 On terve hulk n-ö sisse-ehitatud teemasid, nt `theme_bw()`, `theme_grey()`, `theme_light()`, `theme_dark()`, `theme_minimal()`, `theme_classic()` jne.  
 
-```{r, echo = FALSE, fig.width = 12, fig.height = 8, fig.align = "70%"}
+```{r, warning = F, message = F, echo = FALSE, fig.width = 12, fig.height = 8, fig.align = "70%"}
 library(gridExtra)
-p0 <- ggplot(kysimustik,
-       aes(x = lemmikloom,
-           fill = lemmikjook)) +
-  geom_bar(position = "dodge") +
-  scale_x_discrete(labels = c("Glaucus",
-                              "Kirjak",
-                              "Kutsa",
-                              "Ei meeldi")) +
-  scale_fill_brewer(type = "qual",
-                    palette = 2) +
-  labs(x = "Lemmikloom",
-       y = "Sagedus",
-       fill = "Lemmikjook")
+p0 <- ggplot(valimised, aes(y = nimekiri, fill = sugu)) +
+  geom_bar(position = "dodge", show.legend = F) +
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) +
+  scale_y_discrete(limits = naiskandidaatide_osakaal, labels = abbreviate(naiskandidaatide_osakaal, method = "left.kept"))
 p1 <- p0 + theme_bw() + ggtitle("theme_bw()")
 p2 <- p0 + theme_grey() + ggtitle("theme_grey()")
 p3 <- p0 + theme_light() + ggtitle("theme_light()")
@@ -378,7 +386,7 @@ Näiteks võib teha sellise teemakihi:
 theme(axis.text = element_text(size = 12, # telgede teksti suuruseks 12
                                color = "grey50"), # ja värviks hallikas
       legend.background = element_rect(fill = "transparent"), # legendi taust läbipaistvaks
-      legend.position = c(0.1, 0.8), # legend joonise sisse (suhteline asend x- ja y-teljel)
+      legend.position = c(0.9, 0.9), # legend joonise sisse (suhteline asend x- ja y-teljel)
       panel.background = element_rect(fill = "grey90"), # joonise üldala taustaks hallikas 
       panel.grid = element_blank(), # kustuta taustaruudustik
       plot.subtitle = element_text(hjust = 0.5), # joonda joonise alapealkiri keskele
@@ -390,74 +398,154 @@ theme(axis.text = element_text(size = 12, # telgede teksti suuruseks 12
 Kasutame nüüd objekti *p* salvestatud graafikut ning lisame sellele loodud teema.  
 
 ```{r}
-p + theme(axis.text = element_text(size = 12, 
-                                   color = "grey50"), 
+p + theme(axis.text = element_text(size = 12, color = "grey50"), 
           legend.background = element_rect(fill = "transparent"), 
-          legend.position = c(0.1, 0.8), 
+          legend.position = c(0.9, 0.9), 
           panel.background = element_rect(fill = "grey90"), 
           panel.grid = element_blank(), 
           plot.subtitle = element_text(hjust = 0.5), 
-          plot.title = element_text(hjust = 0.5, 
-                                    face = "bold"))
+          plot.title = element_text(hjust = 0.5, face = "bold"))
 ```
+
+Kui tahame legendi järjekorda muuta, et see vastaks joonise tulpade värvide järjekorrale, võime teha seda funktsioonis `guides()`.  
+
+```{r}
+p + theme(axis.text = element_text(size = 12, color = "grey50"), 
+          legend.background = element_rect(fill = "transparent"), 
+          legend.position = c(0.9, 0.9), 
+          panel.background = element_rect(fill = "grey90"), 
+          panel.grid = element_blank(), 
+          plot.subtitle = element_text(hjust = 0.5), 
+          plot.title = element_text(hjust = 0.5, face = "bold")) +
+  guides(fill = guide_legend(reverse = T))
+```
+
+
 
 ### Harjuta
 
-<span style="color: lightgrey;">Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.  
+<span style="color: lightgrey;">Laadi RStudiosse eelmistes praktikumides kasutatud küsimustik. Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.  
 Kuva sünniaasta ja õpitud aastate arvu suhet hajuvusdiagrammil.  
 Tähista erineva värviga need vastajad, kellel on kvantitatiivsete meetoditega kogemust, ja need, kellel ei ole. Kasuta kategooriate jaoks värve "grey45" ja "orange".  
 Lisa graafikule pealkiri "Õpitud aastate seos sünniaastaga", alapealkiri "ja kokkupuutega kvantitatiivsete meetoditega", sobivad x- ja y-telje pealkirjad ning legendi pealkiri "Kogemused kvantitatiivsete meetoditega".</span>  
-<span style="color: black;">Lisa graafikule teema, mis värviks graafiku tausta värviga "aliceblue" ning joondaks pealkirja keskele.</span>
+<span style="color: black;">Lisa graafikule teema, mis värviks graafiku tausta värviga "aliceblue" ning joondaks pealkirja ja alapealkirja keskele.</span>
 
 ## 6. kiht: paneelid (*facets*)
 
 `ggplot`'i üks suuri eeliseid on paneelide funktsioon, mille abil on võimalik jagada andmestik ühe või mitme tunnuse järgi osadeks ning kuvada kõikide alamandmestike graafikuid korraga ühel joonisel.
 
-Jagame näiteks tehtud graafiku aastate põhjal paneelideks. Kasutame selleks funktsiooni `facet_wrap()`. Tunnus, mille alusel paneelid tehakse, lisatakse argumendina funktsiooni sisse.    
+Jagame näiteks tehtud graafiku kandidaatide hariduse põhjal paneelideks. Kasutame selleks funktsiooni `facet_wrap()`. Tunnus, mille alusel paneelid tehakse, lisatakse argumendina funktsiooni sisse.    
 
 ```{r}
-ggplot(kysimustik,
-       aes(x = lemmikloom,
-           fill = lemmikjook)) +
+ggplot(valimised, aes(y = nimekiri, fill = sugu)) +
   geom_bar(position = "dodge") +
-  scale_x_discrete(labels = c("Glaucus",
-                              "Kirjak",
-                              "Kutsa",
-                              "Ei meeldi")) +
-  scale_fill_brewer(type = "qual",
-                    palette = 2) +
-  labs(x = "Lemmikloom",
-       y = "Sagedus",
-       fill = "Lemmikjook",
-       title = "Lemmiklooma valik vastavalt lemmikjoogile",
-       subtitle = "aastatel 2018-2022",
-       caption = "Andmed: kursuse FLFL.00.009 osalejate vastused küsimustikule") +
-  theme(axis.text = element_text(size = 12, 
-                                   color = "grey50"),
-          legend.background = element_rect(fill = "transparent"),
-          legend.position = c(0.7, 0.1),
-          legend.direction = "horizontal",
-          panel.background = element_rect(fill = "grey90"), 
-          panel.grid = element_blank(),
-          plot.subtitle = element_text(hjust = 0.5),
-          plot.title = element_text(hjust = 0.5,
-                                    face = "bold")) +
-  facet_wrap("aasta", nrow = 3) # Jagame andmestiku aastate järgi paneelideks (3 reale). NB! Tunnus jutumärkides!
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) +
+  scale_y_discrete(limits = naiskandidaatide_osakaal) +
+  labs(x = "Kandidaatide arv",
+       y = "",
+       fill = "Sugu",
+       title = "Mees- ja naiskandidaatide arv",
+       subtitle = "Riigikogu valimistel 2023",
+       caption = "Andmed: https://rk2023.valimised.ee/et/candidates") +
+  theme(axis.text = element_text(size = 10, color = "grey50"), 
+        legend.background = element_rect(fill = "transparent"), 
+        legend.position = c(0.9, 0.9), 
+        panel.background = element_rect(fill = "grey90"), 
+        panel.grid = element_blank(), 
+        plot.subtitle = element_text(hjust = 0.5), 
+        plot.title = element_text(hjust = 0.5, face = "bold")) +
+  guides(fill = guide_legend(reverse = T)) +
+  facet_wrap("haridus") # Jagame andmestiku hariduse järgi paneelideks. NB! Tunnus jutumärkides!
+```
+
+Või vaatame joonisel hoopis osakaalusid:  
+
+```{r}
+ggplot(valimised, aes(y = nimekiri, fill = sugu)) +
+  geom_bar(position = "fill") + # osakaalude tulpdiagramm
+  scale_fill_brewer(type = "qual", palette = 2, direction = -1) +
+  scale_y_discrete(limits = naiskandidaatide_osakaal) +
+  scale_x_continuous(labels = scales::percent) +
+  labs(x = "Osakaal",
+       y = "",
+       fill = "Sugu",
+       title = "Mees- ja naiskandidaatide osakaal",
+       subtitle = "Riigikogu valimistel 2023",
+       caption = "Andmed: https://rk2023.valimised.ee/et/candidates") +
+  theme(axis.text = element_text(size = 10, color = "grey50"), 
+        axis.text.x = element_text(size = 7), # x-telje tekst protsentideks ja väiksemas kirjas
+        legend.background = element_rect(fill = "transparent"), 
+        legend.position = "top", # legend joonise kohale
+        panel.background = element_rect(fill = "grey90"), 
+        panel.grid = element_blank(), 
+        plot.subtitle = element_text(hjust = 0.5), 
+        plot.title = element_text(hjust = 0.5, face = "bold")) +
+  guides(fill = guide_legend(reverse = T)) +
+  facet_wrap("haridus", 
+             labeller = label_wrap_gen()) # murra pikad paneelide pealkirjad eraldi ridadele
 ```
 
 
 Joonist paneelideks jagav tunnus peab olema funktsioonis kas jutumärkides või kujul `~tunnus` (ilma jutumärkideta). Võib jagada ka mitme tunnuse järgi. Sel juhul on funktsiooni sees kas `c("esimenetunnus", "teinetunnus")` või `esimenetunnus~teinetunnus`. Alternatiiv funktsioonile `facet_wrap()` on `facet_grid()`, mis kuvab paneele pisut teistmoodi.
 
+
+
 ### Harjuta
 
-<span style="color: lightgrey;">Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.  
+<span style="color: lightgrey;">Laadi RStudiosse eelmistes praktikumides kasutatud küsimustik. Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.  
 Kuva sünniaasta ja õpitud aastate arvu suhet hajuvusdiagrammil.  
 Tähista erineva värviga need vastajad, kellel on kvantitatiivsete meetoditega kogemust, ja need, kellel ei ole. Kasuta kategooriate jaoks värve "grey45" ja "orange".  
 Lisa graafikule pealkiri "Õpitud aastate seos sünniaastaga", alapealkiri "ja kokkupuutega kvantitatiivsete meetoditega", sobivad x- ja y-telje pealkirjad ning legendi pealkiri "Kogemused kvantitatiivsete meetoditega".   
-Lisa graafikule teema, mis värviks graafiku tausta värviga "aliceblue" ning joondaks pealkirja keskele.</span>  
-<span style="color: black;">Näita erinevatel paneelidel tee- ja kohvijoojate vastuseid.</span>
+Lisa graafikule teema, mis värviks graafiku tausta värviga "aliceblue" ning joondaks pealkirja ja alapealkirja keskele.</span>  
+<span style="color: black;">Näita erinevatel paneelidel tee- ja kohvijoojate vastuseid. Jaga kuvatavaid andmeid veel väiksemateks gruppideks vastavalt lemmikloomale. Võrdle `facet_wrap()` ja `facet_grid()` väljundeid. </span>
 
 ## Eelmiste kordade graafikud
+
+Kuna kohandatavaid graafiku elemente on ggplotis väga palju, on sellega võimalik matkida sisuliselt mis tahes graafikute stiile, sh baaspaketi graafikat.  
+
+### Karpdiagramm
+```{r, echo = F}
+load("data/kysimustik_2023.RData")
+```
+
+
+```{r}
+# Sünniaasta karpdiagramm
+ggplot(kysimustik, 
+       aes(y = synniaasta)) +
+  stat_boxplot(geom = "errorbar", # vurrud tuleb joonistada eraldi funktsiooniga
+               width = 0.5) + # vurru laius 50% oma tavalaiusest
+  geom_boxplot(outlier.shape = 1, # muuda erindi sümbolit
+               outlier.size = 2,  # tee erindi sümbol suuremaks
+               fill = "lightgrey") + # määra karbi täitevärv
+  scale_y_continuous(breaks = seq(1970, 2000, 10)) + # y-skaala 1970-st 2000-ni 10-aastaste intervallidena
+  labs(y = "") + # y-teljelt tekst ära
+  theme_classic() +
+  theme(axis.text.y = element_text(angle = 90, # y-telje tekst 90-kraadise nurga alla
+                                   hjust = 0.5), # y-telje tekst joondada sakkidega
+        axis.text.x = element_blank(), # ära näita x-telje teksti
+        axis.ticks.x = element_blank(), # ära näita x-telje sakke
+        panel.background = element_rect(color = "black")) + # joonise alale must kast ümber
+  xlim(-1, 1) # lisa karbist vasakule ja paremale natuke tühja ruumi
+```
+
+```{r}
+# Lemmiklooma ja sünniaasta karpdiagramm
+ggplot(kysimustik, 
+       aes(x = lemmikloom, y = synniaasta)) +
+  stat_boxplot(geom = "errorbar", # vurrud
+               width = 0.5) + # vurrud 50% oma tavalaiusest
+  geom_boxplot(fill = c("lightblue", # kastide värvid
+                        "yellow", # NB! ei ole seotud andmestiku tunnusega
+                        "grey", "red"),
+               outlier.shape = 1, # erindi kuju
+               outlier.size = 2) + # erindi suurus
+  scale_y_continuous(breaks = seq(1970, 2000, 5)) + # y-skaala 1970-st 2000-ni 5-aastaste intervallidena
+  labs(y = "Sünniaasta") + # muuda y-telje pealkirja
+  theme_classic() +
+  theme(panel.background = element_rect(color = "black"))
+```
+
 
 ### Histogramm
 ```{r, message = FALSE}
@@ -475,8 +563,7 @@ ggplot(kysimustik,
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5), # graafiku pealkiri keskele
         axis.text.y = element_text(angle = 90, # y-telje väärtused 90-kraadise nurga alla
-                                   hjust = 0.5), # y-telje väärtused joondada sakkidega
-        panel.background = element_rect(color = "black")) # joonise alale serv ümber 
+                                   hjust = 0.5)) # y-telje väärtused joondada sakkidega
 ```
 
 ```{r, message = FALSE}
@@ -486,56 +573,17 @@ ggplot(kysimustik,
   geom_histogram(binwidth = 10, # sagedusklassi ulatus 10 ühikut
                  boundary = 0, # joonda klassid skaalaga
                  color = "grey50", # klasside ääred hallid
-                 fill = c("blue", "purple", "red", "pink", "blue")) + # klasside sisu nelja erineva värviga
-  scale_x_continuous(breaks = seq(1960, 2000, 10)) + # x-skaala 1960-st 2000-ni 10-aastaste intervallidena
+                 fill = c("blue", "purple", "red", "pink", "green")) + # klasside sisu viie erineva värviga
+  scale_x_continuous(breaks = seq(1960, 2010, 10)) + # x-skaala 1960-st 2010-ni 10-aastaste intervallidena
   labs(title = "Sünniaasta histogramm", 
        x = "Sünniaasta", 
        y = "Sagedus") +
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5), # pealkiri keskele
-        panel.background = element_rect(color = "black")) # joonisele piirjoon
+        axis.text.y = element_text(angle = 90, hjust = 0.5)) # y-telje teksti pöörata ja joondada sakkidega
 ```
 
 
-### Karpdiagramm
-```{r}
-# Sünniaasta karpdiagramm
-ggplot(kysimustik, 
-       aes(y = synniaasta)) +
-  stat_boxplot(geom = "errorbar", # vurrud tuleb joonistada eraldi funktsiooniga
-               width = 0.5) + # vurru laius 50% oma tavalaiusest
-  geom_boxplot(outlier.shape = 1, # muuda erindi sümbolit
-               outlier.size = 2,  # tee erindi sümbol suuremaks
-               fill = "lightgrey") +
-  scale_y_continuous(breaks = seq(1970, 2000, 5)) + # y-skaala 1970-st 2000-ni 5-aastaste intervallidena
-  labs(y = "") +
-  theme_classic() +
-  theme(axis.text.y = element_text(angle = 90, # y-telje tekst 90-kraadise nurga alla
-                                   hjust = 0.5), # y-telje tekst joondada sakkidega
-        axis.text.x = element_blank(), # ära näita x-telje teksti
-        axis.ticks.x = element_blank(), # ära näita x-telje sakke
-        panel.background = element_rect(color = "black")) +
-  xlim(-1, 1) # lisa karbist vasakule ja paremale natuke tühja ruumi
-```
-
-```{r}
-# Lemmiklooma ja sünniaasta karpdiagramm
-ggplot(kysimustik, 
-       aes(x = lemmikloom, y = synniaasta)) +
-  stat_boxplot(geom = "errorbar", # vurrud
-               width = 0.5) + # vurrud 50% oma tavalaiusest
-  geom_boxplot(fill = c("lightblue", # kastide värvid
-                        "yellow", # NB! ei ole seotud andmestiku tunnusega
-                        "grey", "red"),
-               outlier.shape = 1, # erindi kuju
-               outlier.size = 2) + # erindi suurus
-  scale_x_discrete(drop = FALSE) + # ära viska välja lemmiklooma klassi, mida keegi ei vastanud
-  scale_y_continuous(breaks = seq(1970, 2000, 5)) + # y-skaala 1970-st 2000-ni 5-aastaste intervallidena
-  theme_classic() +
-  theme(axis.text.y = element_text(angle = 90, # y-telje tekst 90-kraadise nurga alla
-                                   hjust = 0.5), # y-telje tekst joondada sakkidega
-        panel.background = element_rect(color = "black"))
-```
 
 ### Hajuvusdiagramm
 
@@ -543,7 +591,7 @@ ggplot(kysimustik,
 # Ülikoolis õpitud aastate hajuvusdiagramm
 ggplot(kysimustik, 
        aes(y = kaua_opid, 
-           x = seq_along(kaua_opid))) + # vektor, mis koosneb arvudest 1...48
+           x = seq_along(kaua_opid))) + # vektor, mis koosneb arvudest 1...80
   geom_point(shape = 1, # punktide kuju
              size = 1.5) + # punktide suurus
   labs(x = "Index") + # x-telje pealkiri
@@ -579,7 +627,7 @@ ggplot(kysimustik,
            color = kogemused_kvant)) + # punktid värvitud andmestiku tunnuse järgi
   geom_point(shape = 15, 
              size = 1.5) +
-  scale_x_continuous(breaks = seq(1970, 1995, 5)) +
+  scale_x_continuous(breaks = seq(1970, 2000, 5)) +
   scale_color_manual(name = "Kogemusi kvantmeetoditega", # värvilegendi pealkiri
                      values = c("grey50", "orange")) + # kategooriate värvid
   labs(x = "Sünniaasta", 
@@ -591,9 +639,9 @@ ggplot(kysimustik,
                                    hjust = 0.5),
         plot.title = element_text(hjust = 0.5),
         legend.direction = "horizontal", # legend horisontaalne
-        legend.position = c(0.4, 1), # legend algab x-telje 40% peal ning lõppeb y-telje 100% peal
+        legend.position = c(0.5, 1), # legend algab x-telje 50% peal ning lõppeb y-telje 100% peal
         legend.justification = c(0,1), # legendi asetus 
-        legend.background = element_rect(color = "black"))
+        legend.background = element_rect(color = "black")) # legendile must piirjoon ümber
 ```
 
 ### Tulpdiagramm
@@ -604,6 +652,7 @@ ggplot(kysimustik,
   geom_bar(fill = "grey70", 
            color = "black") +
   labs(y = "", x = "") +
+  scale_y_continuous(breaks = seq(0, 50, 10)) +
   theme_classic() + 
   theme(axis.line.x = element_blank(), # kustuta x-telje joon
         axis.text.y = element_text(angle = 90, # y-telje tekst 90-kraadise kaldega
@@ -619,21 +668,20 @@ ggplot(kysimustik,
   geom_bar(position = "dodge", # kategooriad kõrvuti tulpadena
            color = "black") + # tulpade piirjoon must
   scale_x_discrete(drop = FALSE) + # jäta alles vastusteta kategooriad
-  scale_y_continuous(breaks = seq(0, 14, 2)) + # y-teljel väärtused 0st 14ni kahese sammuga
+  scale_y_continuous(breaks = seq(0, 20, 5)) + # y-teljel väärtused 0st 20ni viiese sammuga
   scale_fill_manual(values = c("grey35", "orange"), # määra käsitsi kogemused_kvant kategooriate värvid
                     name = "Kogemusi kvantmeetoditega") + # nimeta legend ümber
   labs(x = "Kursuse läbimise tõenäosus", 
        y = "Vastanute arv") +
   theme_classic() +
-  theme(axis.text.y = element_text(angle = 90, 
-                                   hjust = 0.5),
-        axis.line.y = element_blank(), # kustuta ära y-telje joon
+  theme(axis.line.y = element_blank(), # kustuta ära y-telje joon
         axis.ticks.y = element_blank(), # kustuta ära y-telje sakid
-        legend.position = c(0.4, 0), # legendi suhteline asend x- ja y-telje suhtes
+        legend.position = c(0.5, 0), # legendi suhteline asend x- ja y-telje suhtes
         legend.justification = c(0,0), # legendi asetus
         legend.direction = "horizontal", # legend horisontaalne
         legend.background = element_rect(color = "black")) + # legendile must piirjoon ümber
-  coord_flip() # vaheta x- ja y-telg ära
+  coord_flip() + # vaheta x- ja y-telg ära
+  guides(fill = guide_legend(reverse = T)) # pööra legendi kategooriate järjekorda
 ```
 
 ```{r}
@@ -641,7 +689,7 @@ ggplot(kysimustik,
 ggplot(kysimustik, 
        aes(x = kursuse_labimine, 
            fill = kogemused_kvant)) +
-  geom_bar(position = "fill", # absoluutsageduste asemel osakaalud (skaala 0-1)
+  geom_bar(position = position_fill(reverse = TRUE), # absoluutsageduste asemel osakaalud (skaala 0-1), nii et hall "Ei" osa oleks vasakul (vrd lihtsalt position = "fill")
            color = "black") +
   scale_x_discrete(drop = FALSE) + # näita ka vastusteta kategooriaid
   scale_y_continuous(breaks = seq(0, 1, 0.2)) + # y-skaala 0st 1ni intervalliga 0.2
@@ -650,37 +698,9 @@ ggplot(kysimustik,
   labs(x = "Kursuse läbimise tõenäosus", 
        y = "Vastanute proportsioonid") +
   theme_classic() +
-  theme(axis.text.y = element_text(angle = 90, 
-                                   hjust = 0.5), 
-        axis.line.y = element_blank(), # kustuta y-telje joon
+  theme(axis.line.y = element_blank(), # kustuta y-telje joon
         axis.ticks.y = element_blank(), # kustuta y-telje sakid
-        legend.position = c(0.4, 0), 
-        legend.justification = c(0,0), 
-        legend.direction = "horizontal", 
-        legend.background = element_rect(color = "black")) +
-  coord_flip()
-```
-
-```{r}
-# Horisontaalne tulpdiagramm osakaaludega
-# ja kategooriate vastupidise järjekorraga
-ggplot(kysimustik, 
-       aes(x = kursuse_labimine, 
-           fill = kogemused_kvant)) +
-  geom_bar(position = position_fill(reverse = TRUE), # osakaaludega tulbad ning nendes kategooriad vastupidises järjekorras
-           color = "black") +
-  scale_x_discrete(drop = FALSE) +
-  scale_y_continuous(breaks = seq(0, 1, 0.2)) +
-  scale_fill_manual(values = c("grey35", "orange"), 
-                    name = "Kogemusi kvantmeetoditega") +
-  labs(x = "Kursuse läbimise tõenäosus", 
-       y = "Vastanute proportsioonid") +
-  theme_classic() +
-  theme(axis.text.y = element_text(angle = 90, 
-                                   hjust = 0.5), 
-        axis.line.y = element_blank(), 
-        axis.ticks.y = element_blank(), 
-        legend.position = c(0.4, 0), 
+        legend.position = c(0.5, 0), 
         legend.justification = c(0,0), 
         legend.direction = "horizontal", 
         legend.background = element_rect(color = "black")) +
@@ -739,6 +759,7 @@ sample(colors(), 10) # suvalised 10 värvi
 colors()[!grepl("grey", colors())] # värvid ilma hallideta
 sample(colors()[!grepl("grey", colors())], 10) # suvalised 10 värvi ilma hallideta
 ```
+
 Aga millised need värvid välja näevad? Võid vaadata näiteks sellelt lehelt [siit](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwisk_XF_ZHvAhWKyaQKHW4IDagQFjASegQIAhAD&url=http%3A%2F%2Fwww.stat.columbia.edu%2F~tzheng%2Ffiles%2FRcolor.pdf%3Futm_source%3Dtwitterfeed%26utm_medium%3Dtwitter&usg=AOvVaw26EiKHu_B9O7W3Nd7avZTI) või laadides hulga funktsioone käsuga `demo(colors())`.
 
 ```{r, eval = F}
@@ -757,6 +778,7 @@ col2rgb("green")
 col2rgb("seagreen1")
 col2rgb("forestgreen")
 ```
+
 Samuti saab kasutada hex-värvikoode, mis koosnevad trellidest ja kuuest kuueteistkümnendsüsteemis sümbolist. 
 Hex-värvikoodid põhinevad kümnendarvudega väljendatud RGB-mudeli väärtuste teisendamisel kuueteistkümnendsüsteemi.  
 
@@ -769,6 +791,7 @@ rgb(0,255,0,maxColorValue = 255) # green
 rgb(84,255,159,maxColorValue = 255) # seagreen1
 rgb(34,139,34,maxColorValue = 255) # forestgreen
 ```
+
 Hex-värve saab kombineerida värvipaletiks lugematul hulgal veebilehtedel, nt [siin](https://coolors.co/). 
 Oma värvipaletti saab seejärel R-is mingil joonisel kasutada.
 
@@ -899,10 +922,9 @@ ggplot(data = kysimustik,
        aes(x = programmeerimisoskus, y = synniaasta)) +
   geom_boxplot(fill = "grey90", # karpide värv
                outlier.shape = 4) + # erindite kuju
-  geom_point(aes(size = kaua_opid, # suurus andmetest
+  geom_jitter(aes(size = kaua_opid, # suurus andmetest
                  color = programmeerimisoskus), # värv andmetest
              alpha = 0.3, # läbipaistvus
-             position = "jitter", # punktide hajus paigutus
              show.legend = FALSE) + # ära näita legendi
   scale_x_discrete(limits = levels(kysimustik$programmeerimisoskus)[c(3,2,4,1)], # järjesta tasemed joonisel ümber
                    labels = c("Ei oska", "Oskan vähe", 
@@ -926,10 +948,9 @@ ggplot(data = kysimustik,
        aes(x = programmeerimisoskus, y = synniaasta)) +
   geom_boxplot(fill = "grey90", 
                outlier.shape = 4) +
-  geom_point(aes(size = kaua_opid, 
+  geom_jitter(aes(size = kaua_opid, 
                  color = kaua_opid), # värv andmetest
              alpha = 0.7, 
-             position = "jitter",
              show.legend = FALSE) + 
   scale_x_discrete(limits = levels(kysimustik$programmeerimisoskus)[c(3,2,4,1)], 
                    labels = c("Ei oska", "Oskan vähe", 
