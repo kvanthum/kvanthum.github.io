@@ -47,3 +47,33 @@ df2["kontakt"] = df["kontakt"].str.replace("\n", "; ")
 
 
 df2.to_csv("C:/Users/a71385/Desktop/kvanthum.github.io/data/kandidaadid_2023_raw.csv", sep = "\t", index = False, encoding = "utf-8", )
+
+
+# Kraabi tulemused
+driver_tulemused = webdriver.Chrome(ChromeDriverManager().install())
+url_tulemused = "https://rk2023.valimised.ee/et/detailed-voting-result/index.html"
+driver_tulemused.get(url_tulemused)
+time.sleep(10)
+content_tulemused = driver_tulemused.find_elements(By.CLASS_NAME, "district-link")
+ringkonnad_tulemused = [r.find_element(By.TAG_NAME, "a").get_attribute("href") for r in content_tulemused]
+
+df_tulemused = pd.DataFrame(columns = ["nimi", "hääli_kokku", "e-hääli", "hääli_välisriigist", "hääli_väljaspool_ringkonda"])
+
+for t in ringkonnad_tulemused:
+    #t = ringkonnad_tulemused[0]
+    driver_tulemused.get(t)
+    time.sleep(3)
+    tabelid = driver_tulemused.find_elements(By.CLASS_NAME, "table")[2:]
+    nimekirjatabelid = sum([tbl.find_element(By.TAG_NAME, "tbody").find_elements(By.TAG_NAME, "tr") for tbl in tabelid], [])
+    for n in nimekirjatabelid:
+        #n = nimekirjatabelid[0]
+        if n.get_attribute("class") == "":
+            n1 = n.find_elements(By.TAG_NAME, "td")
+            kandinimi_tulemus = n1[1].text
+            kandi_haali_kokku = n1[2].text
+            kandi_e_haali = n1[len(n1)-1].text
+            kandi_valisriigist = n1[len(n1)-3].text
+            kandi_valjaspool = n1[len(n1)-2].text
+            df_tulemused = df_tulemused.append({"nimi" : kandinimi_tulemus, "hääli_kokku" : kandi_haali_kokku, "e-hääli" : kandi_e_haali, "hääli_välisriigist" : kandi_valisriigist, "hääli_väljaspool_ringkonda" : kandi_valjaspool}, ignore_index = True)
+
+df_tulemused.to_csv("C:/Users/a71385/Desktop/kvanthum.github.io/data/kandidaadid_2023_raw_votes.csv", sep = "\t", index = False, encoding = "UTF-8")
