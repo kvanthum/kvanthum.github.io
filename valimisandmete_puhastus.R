@@ -2,7 +2,7 @@ library(rvest)
 library(tidyverse)
 
 # Loe andmed sisse
-dat <- read.delim("C:/Users/a71385/Desktop/kvanthum.github.io/data/kandidaadid_2023.csv", encoding = "UTF-8")
+dat <- read.delim("C:/Users/a71385/Desktop/kvanthum.github.io/data/kandidaadid_2023_raw.csv", encoding = "UTF-8")
 head(dat)
 
 # Lisa sugu, vanus ja tähtkuju
@@ -59,6 +59,8 @@ dat %>%
 
 on_mees <- ifelse(c(T, T, T, T, T, F, F, F, T, F, F, T, T, T, F, F, F, F, T, T, T, F, F, F, F, F, T, F, T, T, F, T, T, T, T, T, T, T, F, T, F, F, F, T, F, T, F, F, F, F, F, F, F, T, F, T, T, T, T, T, T, T, F, T, T, T, T, T, F, F, F, T, T, T, T, F, T, F), "M", "N")
 
+data.frame(soota_nimed, on_mees) %>% arrange(on_mees)
+
 dat2[is.na(dat2$sugu),]$sugu <- on_mees
 
 # arvuta vanus
@@ -77,26 +79,21 @@ dat2 %>%
 
 names(dat2)
 dat2 %>%
-    select(ringkond, nimekiri, nimi, sünniaeg, vanus, sugu, tähtkuju, haridus, erakond, kontakt) %>%
-    write.table(file = "C:/Users/a71385/Desktop/kvanthum.github.io/data/kandidaadid_2023.csv", quote = F, sep = "\t", row.names = F, fileEncoding = "UTF-8")
+    select(ringkond, nimekiri, nimi, sünniaeg, vanus, sugu, tähtkuju, haridus, erakond, amet, kontakt) -> dat2
 
 
-
-library(tidyverse)
-nimekirjad <- read.delim("data/kandidaadid_2023.csv", header = T, sep = "\t", encoding = "UTF-8")
-nimekirjad
 tulemused <- read.delim("data/kandidaadid_2023_raw_votes.csv", header = T, sep = "\t", encoding = "UTF-8")
 tulemused
 # Kas kõik nimed mõlemas tabelis?
-nimekirjad$nimi[!nimekirjad$nimi %in% tulemused$nimi]
+dat2$nimi[!dat2$nimi %in% tulemused$nimi]
 
-left_join(nimekirjad, tulemused, by = "nimi")
-nimekirjad[520,]
+left_join(dat2, tulemused, by = "nimi")
+dat2[520,]
 tulemused[tulemused$nimi == "TARMO TAMM",] # e200 - 876
-left_join(nimekirjad, tulemused, by = "nimi", multiple = "all") -> valimised_tulemused
+left_join(dat2, tulemused, by = "nimi", multiple = "all") -> valimised_tulemused
 valimised_tulemused %>% filter(nimi == "TARMO TAMM")
-valimised_tulemused <- valimised_tulemused[!(valimised_tulemused$nimi == "TARMO TAMM" & valimised_tulemused$nimekiri == "Erakond Eesti 200" & valimised_tulemused$hääli_kokku == 1259),]
-valimised_tulemused <- valimised_tulemused[!(valimised_tulemused$nimi == "TARMO TAMM" & valimised_tulemused$nimekiri != "Erakond Eesti 200" & valimised_tulemused$hääli_kokku != 1259),]
+valimised_tulemused <- valimised_tulemused[!(valimised_tulemused$nimi == "TARMO TAMM" & valimised_tulemused$nimekiri == "Erakond Eesti 200" & valimised_tulemused$hääli_kokku == 1258),]
+valimised_tulemused <- valimised_tulemused[!(valimised_tulemused$nimi == "TARMO TAMM" & valimised_tulemused$nimekiri != "Erakond Eesti 200" & valimised_tulemused$hääli_kokku != 1258),]
 
 valimised_tulemused[valimised_tulemused$nimi == "KERT KINGO",]$sugu <- "N"
 

@@ -46,3 +46,6 @@ vignettes/*.pdf
 
 # Files
 *_files/
+
+# Homework
+/kodutood/
