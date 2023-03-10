@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '7-valim_hypoteesid.html'))})
-date: 14.03.2022
+date: 13.03.2023
 output: 
   html_document:
     theme: flatly
@@ -30,10 +30,10 @@ knitr::opts_chunk$set(echo = TRUE)
 - Hüpoteeside testimine: parameetrilised testid  
 
 
-Kasutame jätkuvalt andmestikku `kysimustik_2022.RData`.
+Kasutame jätkuvalt andmestikku `kysimustik_2023.RData`.
 
 ```{r}
-load("data/kysimustik_2022.RData")
+load("data/kysimustik_2023.RData")
 ```
 
 
@@ -208,10 +208,11 @@ Sama näeme ka karpdiagrammilt.
 boxplot(kaua_opid ~ lemmikjook, data = kysimustik)
 ```
 ```{r}
-# ggplotiga
+# ggplotiga; nagu näha, siis see, kuidas vurre arvutatakse, on baasgraafikas ja ggplotis pisut erinev, nii et on pisut erinev arv erindeid.
 library(ggplot2)
 ggplot(data = kysimustik) +
-  geom_boxplot(aes(x = lemmikjook, y = kaua_opid))
+  geom_boxplot(aes(x = lemmikjook, y = kaua_opid)) +
+  labs(y = "Ülikoolis õppimise aeg (aastates)", x = "Lemmikjook")
 ```
 
 
@@ -243,7 +244,7 @@ Kui seame oma hüpoteesid valesti, siis ühepoolse testiga võime teha valesid j
 ```{r}
 t.test(kaua_opid ~ kogemused_kvant, data = kysimustik, alternative = "greater", var.equal=T)
 ```
-Sellise ühepoolse testi tulemus, et kogemusteTA rühma õppimiseg **ei ole pikem** kui kogemusteGA rühmal ei tähenda automaatselt, et rühmad ei ole erinevad ja et nad kuuluvad samasse populatsiooni, sest kogemusteTA rühma õppimisaeg võib ka olla lühem kui kogemusteGA rühmal. Seega, kui meil ei ole kindlat põhjust kasutada ühepoolset testi, siis peaks alati valima pigem kahepoolse.
+Sellise ühepoolse testi tulemus, et **ILMA kogemusteta** rühma õppimiseg **ei ole pikem** kui **kogemustega** rühmal ei tähenda automaatselt, et rühmad ei ole erinevad ja et nad kuuluvad samasse populatsiooni, sest kogemusteTA rühma õppimisaeg võib ka olla lühem kui kogemusteGA rühmal. Seega, kui meil ei ole kindlat põhjust kasutada ühepoolset testi, siis peaks alati valima pigem kahepoolse.
 
 ## Jaotused, normaaljaotus
 
@@ -323,6 +324,7 @@ Aga mida suurem valim, seda rohkem läheneb normaaljaotusele. Genereerime mitu e
 ```{r, fig.align = 'center', fig.height = 6, fig.width = 12}
 par(mfrow=c(2,5))
 for(i in 1:10) hist(rnorm(2^i ,1.5, 0.1), xlim=c(1.2, 1.8), main=paste(2^i, "punkti"))
+par(mfrow=c(1,1))
 ```
 
 
@@ -384,7 +386,8 @@ Oletame, et tahame vaadata, kas ülikoolis õpitud aastate arv erineb nende hulg
 
 ### Histogramm
 
-Histogrammi vaadates näeb (enam-vähem), kas jaotus on sümmeetriline. See ei ole mingi lollikindel test, aga annab esmase ülevaate.
+Kas jaotus on sümmeetriline?
+
 ```{r, eval=F}
 hist(kysimustik$kaua_opid)
 ```
@@ -405,14 +408,15 @@ ggplot(data = kysimustik,
 Vasakul, y-teljel näeme tegelikke kvantiile: ehkki mõõtmiste skaala on `r min(kysimustik$kaua_opid)` -- `r max(kysimustik$kaua_opid)` aastat, jääb suurem osa andmepunkte `r paste(quantile(kysimustik$kaua_opid, probs = c(0.25,0.75)), collapse =" ja ")` vahele. Sellise jagunemise puhul eeldaks normaaljaotus (qq-joonel), et 95% andmetest jääks keskmisest +-2 standarhälbe kaugusele (x-teljel) ehk et andmepunktide skaala ulatus oleks antud juhul ülemisest otsast palju väiksem ning ulatuks alumises otsas palju kaugemale (miinuspoolele).
 
 ```{r}
+# Tegelike andmete keskmine
+(kesk <- mean(kysimustik$kaua_opid))
+# Tegelike andmete standardhälve
+(shalve <- sd(kysimustik$kaua_opid))
+```
+
+```{r}
 # Tegelikud kvantiilid
 quantile(kysimustik$kaua_opid)
-```
-```{r}
-# Tegelike andmete keskmine
-mean(kysimustik$kaua_opid)
-# Tegelike andmete standardhälve
-sd(kysimustik$kaua_opid)
 ```
 
 
