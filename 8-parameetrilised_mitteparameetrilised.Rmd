@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '8-parameetrilised_mitteparameetrilised.html'))})
-date: 16.03.2022
+date: 15.03.2023
 output: 
   html_document:
     theme: flatly
@@ -31,12 +31,16 @@ knitr::opts_chunk$set(echo = TRUE)
   * Wilcoxoni astaksummatest (= Manni-Whitney U-test) (kaks rühma)
 - Efekti suuruse hindamine
 
-Kasutame andmestikke `kysimustik_2022.RData` ja `kandidaadid.RData`
+Kasutame andmestikke `kysimustik_2023.RData` ja `kandidaadid_2023.csv`
 
 ```{r}
-load("data/kysimustik_2022.RData")
-load("data/kandidaadid.RData")
+load("data/kysimustik_2023.RData")
+kandidaadid <- read.delim("data/kandidaadid_2023.csv")
 ```
+
+*Pane tähele, et andmestik kysimustik on R-i andmefail, mille lugemiseks käsk `load()`.
+Kandidaatide andmestik on tabuleeritud tekstifail. Kuigi failinimel on laiend .csv, mis viitaks juskui komadega eraldatud väljadele, on tegelikult failis väljaeraldajaks tabulatsioonimärk, mistõttu tabeli R-i lugemiseks sobib kõige paremini käsk `read.delim()`. Kui oled Windowsi masinas, siis võivad täpitähed olla valesti loetud, selle vastu aitab, kui lisad käsule veel argumendi encoding = "UTF-8".*
+
 
 ## Parameetrilised testid
 
@@ -94,7 +98,7 @@ Kordusmõõtmistega test:
 
 - Rühma sees on mõõtmised sõltumatud, aga võrreldavate rühmade vahel on kokku kuuluvad mõõtmiste paarid. Näiteks soorituskatse, kus testitakse sooritust kahes erinevas tingimuses, erinevatel ajahetkedel jne.
 - Nt katseisikute rühma kehatemperatuuri on mõõdetud enne ja pärast ravimi manustamist.
-- Nt ühe klassi keeleoskust on testitud enne ja pärast keelekursust
+- Nt ühe klassi keeleoskust on testitud enne ja pärast keelekursust.
 - ...
 
 **Mida teha, kui mõõtmised ei ole sõltumatud?**
@@ -105,7 +109,10 @@ Lihtsam ja klassikalisem variant on arvutada iga indiviidi kohta vaadeldavate ka
 
 Alati tasuks vaadata andmete jaotust. Kindlasti ei ole mõtet teha t-testi, kui jaotus on ühtlane. Jaotuse kontrollimiseks võiks kasutada nii visualiseerimist kui normaaljaotuse testi (`hist`, `qqnorm`+`qqline`, `shapiro.test`). 
 
-Kui ei ole normaaljaotus, võiks proovida normaliseerimist. Paremale kallutatud (ingl *skewed right*) asümmeetrilise jaotuse korral tasuks proovida logaritmimist (`log`). Kui mõõtmiste hulgas on väärtust 0, siis käsk `log1p`, mis lisab kõigile väärtustele +1. (Negatiivseid väärtuseid logaritmida ei saa, nii et kui neid on, siis enne logaritmimist tasuks reskaleerida andmed miinimumväärtuse suhtes.) 
+Kui ei ole normaaljaotus, võiks proovida normaliseerimist. 
+
+- Paremale kallutatud (ingl *skewed right*) asümmeetrilise jaotuse korral tasuks proovida logaritmimist (`log`). Kui mõõtmiste hulgas on väärtust 0, siis käsk `log1p`, mis lisab kõigile väärtustele +1. (Negatiivseid väärtuseid logaritmida ei saa, nii et kui neid on, siis enne logaritmimist tasuks reskaleerida andmed miinimumväärtuse suhtes.) 
+- Vasakule kallutatud (*skewed left*) jaotuse korral võib proovida astendamist, mis on logaritmimise pöördtehe (käsk `exp()`).
 
 Kui andmed ei allu normaliseerimisele, siis kui on >30 mõõtmist, võib ikkagi t-testi teha, kui on vähem, siis peaks mitteparameetrilise testi valima.
 
@@ -117,8 +124,13 @@ Proovime hüpoteetilise näite peal. Näiteks oletame, et me teame, et mingis va
 ```{r}
 # 32 last keskmise pikkusega 1.5 meetrit
 # ja standardhälbega 0.1 meetrit.
+set.seed(43)
 pikkus <- rnorm(32, 1.5, 0.1)
+```
 
+Kuna see on juhuslikult genereeritud arvujada, siis siin on keskmine = `r mean(pikkus)` ja standardhälve = `r sd(pikkus)` ehk enam-vähem midagi soovitud 1.5 ja 0.1 kanti.
+
+```{r}
 # mu tähistab parameetrit, mille osas
 # valimit testime. Antud juhul on see
 # pikkuse aritmeetiline keskmine 1.5 meetrit.
@@ -156,15 +168,16 @@ Kui meil on üks seletav tunnus, millel on kaks taset, ja tahame teha t-testi, e
 head(kysimustik[,c("kaua_opid", "kogemused_kvant")])
 ```
 
-Kuna meil ei ole otseselt alust oletada, et eelnevate kogemustega üliõpilased on kauem ülikoolis käinud või vastupidi, siis teeme kahepoolse testi. Kuna tegu ei ole kordusmõõtmistega, kasutame testi sõltumatute valimitega varianti, mille puhul    
-**H0**: Kogemustega ja kogemusteta üliõpilaste keskmine ülikoolis õpitud aastate arv ei erine.  
-**H1**: Kogemustega ja kogemusteta üliõpilaste keskmine ülikoolis õpitud aastate arv on erinev.
+Kuna meil ei ole otseselt alust oletada, et eelnevate kvantmeetodite kogemustega üliõpilased on kauem ülikoolis käinud või vastupidi, siis teeme kahepoolse testi. Kuna tegu ei ole kordusmõõtmistega, kasutame testi sõltumatute valimitega varianti, mille puhul 
+
+ - **H0**: Kogemustega ja kogemusteta üliõpilaste keskmine ülikoolis õpitud aastate arv ei erine.  
+ - **H1**: Kogemustega ja kogemusteta üliõpilaste keskmine ülikoolis õpitud aastate arv on erinev.
 
 ```{r}
 t.test(kysimustik$kaua_opid ~ kysimustik$kogemused_kvant)
 ```
 
-*p*-väärtus on < 0.05, seega peame hülgama nullhüpoteesi ja võtma vastu alternatiivse hüpoteesi, mille kohaselt kvantmeetodite kogemustega ja kogemusteta üliõpilaste ülikoolis õpitud aastate keskmised on erinevad.  
+Üllatus-üllatus, *p*-väärtus on > 0.05, seega peame jääma nullhüpoteesi juurde, mille kohaselt kvantmeetodite kogemustega ja kogemusteta üliõpilaste ülikoolis õpitud aastate keskmised ei ole erinevad.  
 
 T-statistiku väärtus üksinda ei ütle meile eriti midagi, sest see ei ole samades ühikutes kui uuritav tunnus. Nullhüpoteesi kehtivuse korral (kui kahe grupi keskmised on täpselt võrdsed) on t-statistiku väärtus 0. Selle, kui kaugele *t* väärtus võib 0-st kummaski suunas minna, määrab vabadusastmete arv ([*df*](https://blog.minitab.com/blog/statistics-and-quality-data-analysis/what-are-degrees-of-freedom-in-statistics)) ja olulisusnivoo (*⍺*). Kui nt statistiku suurus on `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$statistic` ja *p*-väärtus `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$p.value`, siis tõenäosus, et saame sellise statistiku väärtuse nii suure valimiga, on `r round(t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$p.value*100, 1)`%, eeldusel, et kehtib nullhüpotees ja gruppide vahel pole mingit erinevust. 
 
@@ -201,7 +214,7 @@ var.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant)
 Logaritmitud uuritava tunnusega on gruppide dispersioon sarnane (*p* > 0.05), nii et saab teha võrdsete dispersioonidega t-testi (`var.equal = TRUE`).
 
 ```{r}
-t.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant, 
+t.test((kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant, 
        var.equal = TRUE)
 ```
 
@@ -212,7 +225,7 @@ t.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant,
 ```
 
 Artikli tekstis tuleks lisaks **p-väärtusele** kirja panna ka **statistiku t väärtus** ja **vabadusastmete arv**. Näiteks APA stiilis võiks see välja näha nii:
-"T-test näitas, et rühmad on erinevad: t (`r round(tulemus$parameter, 1)`) = `r round(tulemus$statistic, 1)`; p = `r round(tulemus$p.value, 3)`."
+"T-test näitas, et rühmad ei ole erinevad: t (`r round(tulemus$parameter, 1)`) = `r round(tulemus$statistic, 1)`; p = `r round(tulemus$p.value, 3)`."
 
 Tihtipeale on ka kombeks p-väärtust näidata kategooriates suurem kui 0.05 (mitteoluline), väiksem kui 0.05, 0.01 või 0.001. Üldiselt üle kolme komakoha ei ole kombeks esitada.
 
@@ -230,8 +243,8 @@ Proovime t-testi tegemise läbi veel ühe näite peal.
 Andmestikus `kandidaadid.RData` on viimaste, 2019 märtsis toimunud riigikogu valimiste tulemused.
 
 1. Laeme andmestiku ja vaatame, mis see endast kujutab
-```{r, eval=F}
-load("kandidaadid.RData")
+```{r, eval=T}
+load("data/kandidaadid.RData")
 str(kandidaadid)
 ```
 
