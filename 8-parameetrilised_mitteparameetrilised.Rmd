@@ -31,15 +31,16 @@ knitr::opts_chunk$set(echo = TRUE)
   * Wilcoxoni astaksummatest (= Manni-Whitney U-test) (kaks rühma)
 - Efekti suuruse hindamine
 
-Kasutame andmestikke `kysimustik_2023.RData` ja `kandidaadid_2023.csv`
+Kasutame andmestikke `kysimustik_2023.RData` ning kahtede viimaste riigikogu valimiste andmestikke `kandidaadid2019.RData` ja `kandidaadid_2023.csv`.
 
 ```{r}
 load("data/kysimustik_2023.RData")
-kandidaadid <- read.delim("data/kandidaadid_2023.csv")
+load("data/kandidaadid2019.RData")
+kandidaadid2023 <- read.delim("data/kandidaadid_2023.csv")
 ```
 
 *Pane tähele, et andmestik kysimustik on R-i andmefail, mille lugemiseks käsk `load()`.
-Kandidaatide andmestik on tabuleeritud tekstifail. Kuigi failinimel on laiend .csv, mis viitaks juskui komadega eraldatud väljadele, on tegelikult failis väljaeraldajaks tabulatsioonimärk, mistõttu tabeli R-i lugemiseks sobib kõige paremini käsk `read.delim()`. Kui oled Windowsi masinas, siis võivad täpitähed olla valesti loetud, selle vastu aitab, kui lisad käsule veel argumendi encoding = "UTF-8".*
+Kandidaatide andmestik on tabuleeritud tekstifail. Kuigi failinimel on laiend .csv, mis viitaks juskui komadega eraldatud väljadele, on tegelikult failis väljaeraldajaks tabulatsioonimärk, mistõttu tabeli R-i lugemiseks sobib kõige paremini käsk `read.delim()`. Kui oled Windowsi masinas, siis võivad täpitähed olla valesti loetud, selle vastu aitab, kui lisad käsule veel argumendi `encoding = "UTF-8"`.*
 
 
 ## Parameetrilised testid
@@ -158,6 +159,7 @@ t.test(pikkus, mu = 1.3, alternative = "greater")
 
 ## Kahe valimiga t-test
 
+Vaatame esmalt 2019. riigikogu valimiste põhjal, kas mees- ja naiskandidaadid said võrdselt hääli.
 
 Kui meil on üks seletav tunnus, millel on kaks taset, ja tahame teha t-testi, et võrrelda, kas kahe grupi keskmised erinevad, peame vaatama, kuidas andmed on korrastatud.
 
@@ -165,67 +167,74 @@ Kui meil on üks seletav tunnus, millel on kaks taset, ja tahame teha t-testi, e
 - Ühes tulbas uuritav tunnus, teises tulbas rühmitav tunnus: `t.test(y~x)`
 
 ```{r}
-head(kysimustik[,c("kaua_opid", "kogemused_kvant")])
+head(kandidaadid2019[,c("sugu", "hääli_kokku")])
 ```
 
-Kuna meil ei ole otseselt alust oletada, et eelnevate kvantmeetodite kogemustega üliõpilased on kauem ülikoolis käinud või vastupidi, siis teeme kahepoolse testi. Kuna tegu ei ole kordusmõõtmistega, kasutame testi sõltumatute valimitega varianti, mille puhul 
+Enne t-testi tegemist peaks veenduma, et andmed on ka normaaljaotusega.
 
- - **H0**: Kogemustega ja kogemusteta üliõpilaste keskmine ülikoolis õpitud aastate arv ei erine.  
- - **H1**: Kogemustega ja kogemusteta üliõpilaste keskmine ülikoolis õpitud aastate arv on erinev.
-
-```{r}
-t.test(kysimustik$kaua_opid ~ kysimustik$kogemused_kvant)
+```{r, eval=F}
+qqnorm((kandidaadid2019$hääli_kokku))
+qqline((kandidaadid2019$hääli_kokku))
+shapiro.test((kandidaadid2019$hääli_kokku))
 ```
 
-Üllatus-üllatus, *p*-väärtus on > 0.05, seega peame jääma nullhüpoteesi juurde, mille kohaselt kvantmeetodite kogemustega ja kogemusteta üliõpilaste ülikoolis õpitud aastate keskmised ei ole erinevad.  
 
-T-statistiku väärtus üksinda ei ütle meile eriti midagi, sest see ei ole samades ühikutes kui uuritav tunnus. Nullhüpoteesi kehtivuse korral (kui kahe grupi keskmised on täpselt võrdsed) on t-statistiku väärtus 0. Selle, kui kaugele *t* väärtus võib 0-st kummaski suunas minna, määrab vabadusastmete arv ([*df*](https://blog.minitab.com/blog/statistics-and-quality-data-analysis/what-are-degrees-of-freedom-in-statistics)) ja olulisusnivoo (*⍺*). Kui nt statistiku suurus on `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$statistic` ja *p*-väärtus `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$p.value`, siis tõenäosus, et saame sellise statistiku väärtuse nii suure valimiga, on `r round(t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$p.value*100, 1)`%, eeldusel, et kehtib nullhüpotees ja gruppide vahel pole mingit erinevust. 
+Kuigi meil võib olla seda küsimust esitades mõngane eelaimus, et meeskandidaadid võisid saada rohkem hääli kui naiskandidaadid, siis me otseselt ei saa välistada võimalust, et meeskandidaadid võisid naistest vähem hääli saada. Seepärast teeme kahepoolse testi. Kuna tegu ei ole kordusmõõtmistega, kasutame testi sõltumatute valimitega varianti, mille puhul 
 
-Kahepoolne test ei testi otseselt, kas ühe või teise grupi keskmine on teisest oluliselt suurem/väiksem, ent seda, mille alusel test erinevuse leiab, näeb väljundi lõpust, kus on antud kahe grupi keskmised: kogemusteta üliõpilaste **logaritmitud** ülikoolis õpitud aastate keskmine on 1.06 ja kogemustega üliõpilaste **logaritmitud** ülikoolis õpitud aastate keskmine 1.88. Kontrollime:
+ - **H0**: Mees- ja naiskandidaatide häälesaak keskmiselt ei erine.  
+ - **H1**: Mees- ja naiskandidaadid said keskmiselt erineva hulga hääli.
 
 ```{r}
-mean(kysimustik[kysimustik$kogemused_kvant == "Ei", "kaua_opid"])
-mean(kysimustik[kysimustik$kogemused_kvant == "Jah", "kaua_opid"])
+t.test(log(kandidaadid2019$hääli_kokku) ~ kandidaadid2019$sugu)
 ```
 
-*95 percent confidence interval* väljundis näitab, et 95-s juhuslikus valimis 100-st jääks nende kahe grupi keskmiste vahe ehk `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$estimate[1]-t.test(log(kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$estimate[2]` näidatud vahemikku `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$conf.int[1]` ja `r t.test((kysimustik$kaua_opid)~kysimustik$kogemused_kvant)$conf.int[2]` vahele. Kui kahe grupi keskmised üksteisest oluliselt ei erineks, siis jääks usaldusvahemikku ka väärtus 0 (nulli saab ju siis, kui lahutada ühest keskmisest teine keskmine, mis on sama suur kui esimene).
+Kuna *p*-väärtus on < 0.05, siis võime hüljata nullhüpoteesi ja võtta vastu H1, mille kohaselt naised ja mehed said valimistel erineva hulga hääli.  
 
-Vaikimisi teeb R sellise t-testi, milles ta eeldab, et kahe grupi hajuvus ei ole võrdne ehk dispersioonid ei ole võrdsed (*Welch Two Sample t-test*), mis on tihtipeale tõsi.
+T-statistiku väärtus üksinda ei ütle meile eriti midagi, sest see ei ole samades ühikutes kui uuritav tunnus. Nullhüpoteesi kehtivuse korral (kui kahe grupi keskmised on täpselt võrdsed) on t-statistiku väärtus 0. Selle, kui kaugele *t* väärtus võib 0-st kummaski suunas minna, määrab vabadusastmete arv ([*df*](https://blog.minitab.com/blog/statistics-and-quality-data-analysis/what-are-degrees-of-freedom-in-statistics)) ja olulisusnivoo (*⍺*). Kui nt statistiku suurus on `r t.test(log(hääli_kokku)~sugu, data=kandidaadid2019)$statistic` ja *p*-väärtus `r t.test(log(hääli_kokku)~sugu, data=kandidaadid2019)$p.value`, siis tõenäosus, et saame sellise statistiku väärtuse nii suure valimiga, on `r round(t.test(log(hääli_kokku)~sugu, data=kandidaadid2019)$p.value*100, 1)`%, eeldusel, et kehtib nullhüpotees ja gruppide vahel pole mingit erinevust. 
+
+Kahepoolne test ei testi otseselt, kas ühe või teise grupi keskmine on teisest oluliselt suurem/väiksem, ent seda, mille alusel test erinevuse leiab, näeb väljundi lõpust, kus on antud kahe grupi keskmised: **logaritmitud** häälesaagi keskmised meestel ja naistel. Kontrollime:
 
 ```{r}
-var(kysimustik[kysimustik$kogemused_kvant == "Ei","kaua_opid"])
-var(kysimustik[kysimustik$kogemused_kvant == "Jah","kaua_opid"])
+mean(log(kandidaadid2019$hääli_kokku[kandidaadid2019$sugu=="mees"]))
+mean(log(kandidaadid2019$hääli_kokku[kandidaadid2019$sugu=="naine"]))
 ```
 
-Dispersioonide erinevust saab kontrollida F-testiga (R-is `var.test()`), kus F-statistik on kahe grupi dispersioonide jagatis. 
+*95 percent confidence interval* väljundis näitab, et 95-s juhuslikus valimis 100-st jääks nende kahe grupi keskmiste vahe ehk `r t.test(log(hääli_kokku)~sugu, data=kandidaadid2019)$estimate[1]-t.test(log(hääli_kokku)~sugu, data=kandidaadid2019)$estimate[2]` näidatud vahemikku `r t.test(log(hääli_kokku)~sugu, data=kandidaadid2019)$conf.int[1]` ja `r t.test(log(hääli_kokku)~sugu, data=kandidaadid2019)$conf.int[2]` vahele. Kui kahe grupi keskmised üksteisest oluliselt ei erineks, siis jääks usaldusvahemikku ka väärtus 0 (nulli saab ju siis, kui lahutada ühest keskmisest teine keskmine, mis on sama suur kui esimene).
+
+Vaikimisi teeb R sellise t-testi, mis eeldab, et kahe grupi hajuvus ei ole võrdne ehk dispersioonid ei ole võrdsed (*Welch Two Sample t-test*), mis on tihtipeale tõsi. Dispersioon mäletatavasti on standardhälbe ruut, see näitab seda, kui suur on keskmiselt rühmasisene varieerumine.
+
 ```{r}
-var.test(kysimustik$kaua_opid ~ kysimustik$kogemused_kvant)
+var(log(kandidaadid2019[kandidaadid2019$sugu == "mees","hääli_kokku"]))
+var(log(kandidaadid2019[kandidaadid2019$sugu == "naine","hääli_kokku"]))
 ```
 
-Kui F-statistiku väärtus on 1, siis on dispersioonid võrdsed. Mida rohkem F-statistik 1-st erineb, seda erinevamad on kahe grupi dispersioonid. Juhul, kui esimese grupi dispersioon on väiksem kui teise grupi oma, siis jääb väärtus 0 ja 1 vahele (mida lähemale 0-le, seda erinevamad dispersioonid teineteisest on). Kui esimese grupi dispersioon on suurem kui teise grupi oma, siis jääb väärtus 1 ja lõpmatuse vahele. Teisisõnu: F = 0.5 ja F = 1.5 ei näita ühesuurust erinevust gruppide dispersioonides.  
-Kui *p* > 0.05, siis jääb kehtima nullhüpotees, et kahe dispersiooni suhe/jagatis on 1. Kui *p* < 0.05, siis peab vastu võtma alternatiivse hüpoteesi, mille kohaselt dispersioonid ei ole võrdsed (ja peaks tegema Welchi t-testi).  
-
-Dispersiooni peaks kontrollima sama andmestikuga, millega t-testi teeme, st KUI oleksime jaotuse normaliseerimiseks andmed logaritminud, siis peaks ka dispersiooni testi sisendis logaritmima: 
+Dispersioonide erinevust saab kontrollida F-testiga (R-is `var.test()`), kus F-statistik on kahe grupi dispersioonide jagatis.
 
 ```{r}
-var.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant)
+var.test(log(kandidaadid2019$hääli_kokku) ~ kandidaadid2019$sugu)
 ```
 
-Logaritmitud uuritava tunnusega on gruppide dispersioon sarnane (*p* > 0.05), nii et saab teha võrdsete dispersioonidega t-testi (`var.equal = TRUE`).
+Kui F-statistiku väärtus on 1, siis on dispersioonid võrdsed. Mida rohkem F-statistik ühest erineb, seda erinevamad on kahe grupi dispersioonid. Juhul, kui esimese grupi dispersioon on väiksem kui teise grupi oma, siis jääb väärtus 0 ja 1 vahele (mida lähemale 0-le, seda erinevamad dispersioonid teineteisest on). Kui esimese grupi dispersioon on suurem kui teise grupi oma, siis jääb väärtus 1 ja lõpmatuse vahele. Teisisõnu: F = 0.5 ja F = 1.5 ei näita ühesuurust erinevust gruppide dispersioonides.
+
+Kui *p* > 0.05, siis jääb kehtima nullhüpotees, et kahe dispersiooni suhe/jagatis on 1. __Kui *p* < 0.05, siis peab vastu võtma alternatiivse hüpoteesi, mille kohaselt dispersioonid ei ole võrdsed (ja peaks tegema Welchi t-testi).__
+
+Dispersiooni peaks kontrollima sama andmestikuga, millega t-testi teeme, st kui jaotuse normaliseerimiseks on andmed logaritminud, siis peaks ka dispersiooni testi sisendis logaritmima, muidu ei ole logaritmimist siin ka vaja.
+
+Kuna F-test näitaks, et gruppide dispersioon on sarnane (*p* > 0.05), siis saab teha võrdsete dispersioonidega t-testi (`var.equal = TRUE`).
 
 ```{r}
-t.test((kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant, 
+t.test(log(kandidaadid2019$hääli_kokku) ~ kandidaadid2019$sugu, 
        var.equal = TRUE)
 ```
 
 ## Kuidas t-testi tulemust raporteerida
 
 ```{r}
-(tulemus <- t.test(kysimustik$kaua_opid ~ kysimustik$kogemused_kvant))
+tulemus <- t.test(log(kandidaadid2019$hääli_kokku) ~ kandidaadid2019$sugu,  var.equal = TRUE)
 ```
 
 Artikli tekstis tuleks lisaks **p-väärtusele** kirja panna ka **statistiku t väärtus** ja **vabadusastmete arv**. Näiteks APA stiilis võiks see välja näha nii:
-"T-test näitas, et rühmad ei ole erinevad: t (`r round(tulemus$parameter, 1)`) = `r round(tulemus$statistic, 1)`; p = `r round(tulemus$p.value, 3)`."
+"T-test näitas, et rühmad on erinevad: t (`r round(tulemus$parameter, 1)`) = `r round(tulemus$statistic, 1)`; p = `r round(tulemus$p.value, 3)`."
 
 Tihtipeale on ka kombeks p-väärtust näidata kategooriates suurem kui 0.05 (mitteoluline), väiksem kui 0.05, 0.01 või 0.001. Üldiselt üle kolme komakoha ei ole kombeks esitada.
 
@@ -238,17 +247,18 @@ report(tulemus) # käsu sisendiks on siis t-test
 
 ## Harjutus 1  
 
-Proovime t-testi tegemise läbi veel ühe näite peal.
+Proovime t-testi tegemise läbi veel ühe näite peal. Vaatame, kas ka 2023. aasta valimiste tulemustes oli meeste ja naiste häälesaak erinev.
 
-Andmestikus `kandidaadid.RData` on viimaste, 2019 märtsis toimunud riigikogu valimiste tulemused.
+Andmestikus `kandidaadid_2023.csv` on 2023 märtsis toimunud riigikogu valimiste tulemused.
 
 1. Laeme andmestiku ja vaatame, mis see endast kujutab
-```{r, eval=T}
-load("data/kandidaadid.RData")
+```{r, eval=F}
+kandidaadid <- read.delim("data/kandidaadid_2023.csv")
 str(kandidaadid)
 ```
 
 2. Vaatame deskriptiivseid statistikuid: kui palju oli kandidaatide hulgas mehi ja naisi ja kui palju nad keskmiselt hääli said? Tulbas *sugu* on kandidaadi sugu ning tulbas *haali_kokku* on igale kandidaadile antud kogu häälte arv.
+
 ```{r}
 # Käsuga table() saad vaadata sugude sagedust
 # Käsuga tapply(arvuline_tunnus, rühmitav_tunnus, FUN) saad vaadata keskmist häältesaaki sooti
@@ -256,28 +266,32 @@ str(kandidaadid)
 
 3. Kas lisaks sellele, et mehi oli kandidaatide hulgas rohkem, anti neile ka rohkem hääli? Kas me võime selle kontrollimiseks kasutada t-testi? Kas t-testi eeldused on täidetud?
 
-```{r, eval=F, echo=T}
-hist(kandidaadid$haali_kokku)
-qqnorm(kandidaadid$haali_kokku)
-qqline(kandidaadid$haali_kokku)
-shapiro.test(kandidaadid$haali_kokku)
+```{r, eval=F, echo=F}
+hist(kandidaadid$hääli_kokku)
+qqnorm(log(kandidaadid$hääli_kokku))
+qqline(log(kandidaadid$hääli_kokku))
+shapiro.test(log(kandidaadid$hääli_kokku))
 ```
 
 5. Sõnasta hüpoteesid. Kas ühe- või kahepoolne hüpotees?
 
 6. Kas dispersioonid on võrdsed?
 ```{r, eval=F}
-var.test(kandidaadid$haali_kokku ~ kandidaadid$sugu)
+var.test(log(kandidaadid$hääli_kokku) ~ kandidaadid$sugu)
 ```
 
 7. Tee t-test. Kas Student või Welch? Kas ühe- või kahepoolne?
 ```{r, eval=F, echo=F}
-t.test(log(haali_kokku)~sugu, 
+t.test(log(hääli_kokku)~sugu, 
        data=kandidaadid, 
        var.equal = TRUE)
 ```
 
 8. Mis järelduse teeme?
+
+```{r, eval=F, echo=F}
+boxplot(log(hääli_kokku)~sugu, data=kandidaadid)
+```
 
 
 
@@ -296,18 +310,23 @@ Kui usaldusvahemik sisaldab väärtust 0 ja testi nullhüpotees on, et mingi par
 
 <!-- Olulisusnivoo määras ära tõenäosuse, millega on lubatud 1. liiki viga ehk 0-hüpoteesi ümberlükkamine, kui tegelikult kehtib 0-hüpotees. Usaldusnivoo määrab seega ära tõenäosuse, millega ei lükata ümber õiget nullhüpoteesi.-->
 
-Vaatame uuesti testide väljundeid ning seekord pöörame tähelepanu usaldusvahemikule.  
-```{r}
-var.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant)
-```
+Vaatame uuesti testide väljundeid ning seekord pöörame tähelepanu usaldusvahemikule.
 
-F-testi alternatiivne hüpotees on, et kahe grupi dispersioonide erinevus ei ole võrdne **1**-ga, ja nullhüpotees seega, et kahe grupi dispersioonide erinevus on võrdne **1**-ga. Seega peab nullhüpoteesi juurde jääma juhul, kui usaldusvahemik sisaldab väärtust 1. Antud juhul vastab see tõele: 95 valimis 100-st on F-statistik ehk kahe grupi dispersioonide jagatis 0.45 ja 2.62 vahel, hõlmates ka varianti F = 1, mispuhul dispersioonid on võrdsed. Seda, et usaldusvahemikku jääb väärtus, mille suhtes testi tehakse, näitab ka see, et testi *p*-väärtus on suur.
+Dispersiooni testi usaldusvahemik:
 
 ```{r}
-t.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant)
+(dispersioon <- var.test(log(kandidaadid2019$hääli_kokku) ~ kandidaadid2019$sugu))
 ```
 
-T-testi alternatiivne hüpotees on, et kahe grupi keskmiste erinevus ei ole võrdne **0**-ga, ja nullhüpotees seega, et kahe grupi keskmiste erinevus on võrdne **0**-ga. Seega peab nullhüpoteesi juurde jääma juhul, kui usaldusvahemik sisaldab väärtust 0. Siin see paika ei pea: usaldusvahemik jääb -1.03 ja -0.095 vahele ega jäta võimalust, et 95-l juhul 100-st võiks keskmiste erinevus olla ka 0 (erinevust ei oleks). Seega on ka *p*-väärtus väike ning nullhüpoteesi seose juhuslikkusest peab hülgama.
+F-testi alternatiivne hüpotees on, et kahe grupi dispersioonide erinevus ei ole võrdne **1**-ga, ja nullhüpotees seega, et kahe grupi dispersioonide erinevus on võrdne **1**-ga. Seega peab nullhüpoteesi juurde jääma juhul, kui usaldusvahemik sisaldab väärtust 1. Antud juhul vastab see tõele: 95 valimis 100-st on F-statistik ehk kahe grupi dispersioonide jagatis `r round(dispersioon$conf.int[1], 2)` ja `r round(dispersioon$conf.int[2], 2)` vahel, hõlmates ka varianti F = 1, mispuhul dispersioonid on võrdsed. Seda, et usaldusvahemikku jääb väärtus, mille suhtes testi tehakse, näitab ka see, et testi *p*-väärtus on suur.
+
+T-testi usaldusvahemik:
+
+```{r}
+(ttest <- t.test(log(kandidaadid2019$hääli_kokku) ~ kandidaadid2019$sugu, var.equal = TRUE))
+```
+
+T-testi alternatiivne hüpotees on, et kahe grupi keskmiste erinevus ei ole võrdne **0**-ga, ja nullhüpotees seega, et kahe grupi keskmiste erinevus on võrdne **0**-ga. Seega peab nullhüpoteesi juurde jääma juhul, kui usaldusvahemik sisaldab väärtust 0. Siin see paika ei pea: usaldusvahemik jääb `r round(ttest$conf.int[1], 2)` ja `r round(ttest$conf.int[2], 2)` vahele ega jäta võimalust, et 95-l juhul 100-st võiks keskmiste erinevus olla ka 0 (erinevust ei oleks). Seega on ka *p*-väärtus väike ning nullhüpoteesi seose juhuslikkusest peab hülgama.
 
 ## Mõju suurus
 
@@ -330,7 +349,7 @@ Mõju suurust (*efect size*) saab hinnata näiteks Coheni *d* abil. Selle leidmi
 ```{r, warning=FALSE}
 #install.packages("effsize")
 library(effsize)
-cohen.d(log(haali_kokku) ~ sugu, data=kandidaadid)
+cohen.d(log(hääli_kokku) ~ sugu, data=kandidaadid2019)
 ```
 
 Kui *d* väärtus on positiivne, siis on esimese grupi keskmine suurem kui teise grupi oma. Kui negatiivne, on esimese grupi keskmine väiksem kui teise oma.
@@ -343,7 +362,7 @@ Siin on *d* positiivne, seega on meeste (logaritmitud) häälesaak keskmiselt pi
 0.5 < *|d|* <= 0.8: keskmine mõju  
 0.8 < *|d|*: suur mõju  
 
-NB! Pakett `effsize` arvutab Coheni *d*-statistikut võrdsete dispersioonidega. Kui tahame statistikut olukorras, kus dispersioonid ei ole võrdsed (teeme Welchi t-testi), peame kasutama mõne teise paketi funktsioone. Coheni *d* arvutamiseks sobib näiteks ka paketi `report` funktsioon `report_effectsize()`. Näiteks kui logaritmitud häältesaagi dispersioon ei oleks meeste ja naiste seas ühtaoline, peaksime tegema t-testi ilma argumendita `var.equal = TRUE` ning mõju suuruse leidma funktsiooniga `report_effectsize(t.test(log(haali_kokku) ~ sugu, data = kandidaadid, var.equal = F))`.  
+NB! Pakett `effsize` arvutab Coheni *d*-statistikut võrdsete dispersioonidega. Kui tahame statistikut olukorras, kus dispersioonid ei ole võrdsed (teeme Welchi t-testi), peame kasutama mõne teise paketi funktsioone. Coheni *d* arvutamiseks sobib näiteks ka paketi `report` funktsioon `report_effectsize()`. Näiteks kui logaritmitud häältesaagi dispersioon ei oleks meeste ja naiste seas ühtaoline, peaksime tegema t-testi ilma argumendita `var.equal = TRUE` ning mõju suuruse leidma funktsiooniga `report_effectsize(t.test(log(hääli_kokku) ~ sugu, data = kandidaadid2019, var.equal = F))`.  
 
 ## Mitteparameetrilised testid
 
@@ -421,55 +440,58 @@ Selles mitteparameetriliste testide peres on kaks sarnast testi, mõlemad R-is k
 </table> 
 
 
-Vaatleme nüüd uuesti mitteparameetrilise testiga ülikoolis õpitud aastate erinevust kahes grupis. Kuna mitteparameetriline test ei eelda normaaljaotust, pole siin õpitud aastate arvu vaja logaritmida.  
+Vaatleme nüüd uuesti mitteparameetrilise testiga meeste ja naiste häälesaaki 2019. valimistel. Kuna mitteparameetriline test ei eelda normaaljaotust, pole siin häälte arvu vaja logaritmida.  
 
 ```{r}
-wilcox.test(kysimustik$kaua_opid ~ kysimustik$kogemused_kvant, 
+wilcox.test(kandidaadid2019$hääli_kokku ~ kandidaadid2019$sugu, 
             exact = FALSE, conf.int = TRUE)
 ```
 
 Näeme, et alternatiivhüpotees on, et *true location shift is not equal to 0*. Põhimõtteliselt tähendab see seda, et ühe grupi jaotus oleks teisest x-teljel paremal või vasakul. Ehkki sagedasti tõlgendatakse seda kui kahe valimi mediaanide erinevust, on see rangelt võttes pigem mediaan kahe valimi erinevusest (võivad ka kattuda). 
-Kuna *p*-väärtus on < 0.05, siis saame selle sisuka hüpoteesi vastu võtta ja tõdeda veel kord, et kvantmeetodite kogemustega ja kogemusteta üliõpilaste ülikoolis õpitud aastate arv erineb.
+Kuna *p*-väärtus on < 0.05, siis saame selle sisuka hüpoteesi vastu võtta ja tõdeda veel kord, et 2019. aasta valmistel erines mees- ja naiskandidaatide häälesaak oluliselt.
 
 Statistiku väärtus leitakse järgmiselt.  
 Kõigepealt järjestatakse kõik uuritava tunnuse väärtused väiksemast suuremani.
 
 ```{r}
 # võtame andmestikust välja ainult kahe tulba andmed.
-kysimus1 <- kysimustik[,c("kogemused_kvant", "kaua_opid")]
+kysimus1 <- kandidaadid2019[,c("sugu", "hääli_kokku")]
 
 # järjestame andmed uuritava tunnuse ehk õpitud aastate järgi
-kysimus1 <- kysimus1[order(kysimus1$kaua_opid),]
+kysimus1 <- kysimus1[order(kysimus1$hääli_kokku),]
 ```
 
-Seejärel määratakse uuritava tunnuse väärtustele astakud ehk sisuliselt järjekorranumbrid: kõige väiksem väärtus saab astakuks e järjekorranumbriks 1, sellest järgmine 2 jne. Kui mitu väärtust on ühesugused, saavad need kõik ühesugused astakud. Näiteks siin on kohe alguses 5 üliõpilast, kes on õppinud ülikoolis ainult 1 aasta. Seega ei saa nad järjekorranumbreid 1, 2, 3, 4 ja 5 ega 1, 1, 1, 1, 1 vmt vaid kõik ühtmoodi (1+2+3+4+5)/5 = 3.
+Seejärel määratakse uuritava tunnuse väärtustele astakud ehk sisuliselt järjekorranumbrid: kõige väiksem väärtus saab astakuks e järjekorranumbriks 1, sellest järgmine 2 jne. Kui mitu väärtust on ühesugused, saavad need kõik ühesugused astakud. 
+
+Näiteks siin on kohe alguses kaks kandidaati, kes on saanud 3 häält ja nende järjekorranumbrid 3 ja 4 lähevad jagamisele (3+4)/2 = 3.5. Järgmised kolm knadidaati on saanud 4 häält ja kuna nad on järjekorras kohtadel 5 -- 7, siis nende numbriks saab (5+6+7)/3 = 6, järgmised 5 kandidaati on viie häälega kohtadel 8 -- 13 ja nende numbriks saab (8+9+10+11+12)/5 = 10.
+
 ```{r}
 # lisame andmetesse uue tulba, kus on
 # uuritava tunnuse astakud
-kysimus1$astak <- rank(kysimus1$kaua_opid)
-head(kysimus1, 10)
+kysimus1$astak <- rank(kysimus1$hääli_kokku)
+head(kysimus1, 15)
 tail(kysimus1, 10)
 ```
 
 Edasi leitakse nende ridade astakute summa, kus **seletava** tunnuse lahtris on selle tunnuse (vaikimisi tähestiku) järjekorras esimesena tulev väärtus.
 
 ```{r}
-levels(kysimus1$kogemused_kvant)
-(ei_summa <- sum(kysimus1[kysimus1$kogemused_kvant == "Ei", "astak"]))
+levels(kandidaadid2019$sugu)
+(mees_summa <- sum(kysimus1[kysimus1$sugu == "mees", "astak"]))
 ```
 
-Kui "Ei" vastanute ülikoolis õpitud aastate arv on väike, on need ka järjekorras eespool, nende astakud madalamad ja astakute summa seega väiksem.
+Kui meeskandidaatide häälesaak on suurem, on need ka järjekorras tagapool, nende astakud kõrgemad ja astakute summa seega suurem
 
-Järgmiseks leiame kõikide nende vastanute arvu, kellel ei ole kvantitatiivsete meetoditega kogemusi, korrutame selle arvu läbi sellest arvust ühe võrra suurema arvuga ning jagame tulemuse kahega. Lõpuks lahutame saadud arvu astakute summast.
+Järgmiseks leiame kõikide meeskandidaatide arvu, korrutame selle läbi sellest arvust ühe võrra suurema arvuga ning jagame tulemuse kahega. Lõpuks lahutame saadud arvu astakute summast.
 
 ```{r}
-(n_ei <- table(kysimus1$kogemused_kvant)["Ei"])
-(W_U <- ei_summa - (n_ei*(n_ei + 1)/2))
+(n_mees <- table(kysimus1$sugu)["mees"])
+(W_U <- mees_summa - (n_mees*(n_mees + 1)/2))
 ```
 
-Mida lähemal on W-statistik 0-le, seda selgem erinevus kahe grupi vahel on. W teoreetilised väärtused ulatuvad 0-st (täielik erinevus gruppide vahel, kõik ühe grupi väärtused järjestatud tabeli ühes otsast ja teise grupi väärtused teises otsas) kuni kummagi kategooria vaatluste arvu korrutiseni (kaht gruppi ei joonistu välja, kategooriate vaatlused paiknevad järjestatud tabelis omavahel kõik läbisegi). Siin oleks W maksimaalne väärtus niisiis 17*31 ehk
+Mida lähemal on W-statistik 0-le, seda selgem erinevus kahe grupi vahel on. W teoreetilised väärtused ulatuvad 0-st (täielik erinevus gruppide vahel, kõik ühe grupi väärtused järjestatud tabeli ühes otsast ja teise grupi väärtused teises otsas) kuni kummagi kategooria vaatluste arvu korrutiseni (kaht gruppi ei joonistu välja, kategooriate vaatlused paiknevad järjestatud tabelis omavahel kõik läbisegi). Siin oleks W maksimaalne väärtus niisiis mees- ja naiskandidaatide arvu korrutis, 734*365 ehk
 ```{r}
-table(kysimustik$kogemused_kvant)[1] * table(kysimustik$kogemused_kvant)[2]
+table(kandidaadid2019$sugu)[1] * table(kandidaadid2019$sugu)[2]
 ```
 
 
@@ -479,16 +501,14 @@ table(kysimustik$kogemused_kvant)[1] * table(kysimustik$kogemused_kvant)[2]
 Mitteparameetrilise testi mõju suuruse hindamiseks saab kasutada Cliffi delta statistikut paketist `effsize`.
 
 ```{r}
-cliff.delta(kysimustik$kaua_opid ~ kysimustik$kogemused_kvant)
+library(effsize)
+cliff.delta(kandidaadid2019$hääli_kokku ~ kandidaadid2019$sugu)
 ```
 
-Negatiivne delta näitab, et teises grupis (antud juhul "Jah" vastanute hulgas) on uuritaval tunnusel suuremad väärtused kui esimeses grupis. Teisisõnu: kvantmeetodite kogemusega üliõpilased on kauem ülikoolis õppinud. Cliffi delta absoluutväärtus näitab põhimõtteliselt kahe tõenäosuse vahet P(y > x) - P(y < x): **tõenäosus**, et juhuslikult 2. grupist valitud vaatlus on suurem kui juhuslikult 1. grupist valitud vaatlus, **miinus tõenäosus**, et juhuslikult 2. grupist valitud vaatlus on väiksem kui juhuslikult 1. grupist valitud vaatlus.
+Positiivne delta näitab, et esimeses grupis (antud juhul meeskandidaatide hulgas) on uuritaval tunnusel suuremad väärtused kui teises grupis. Kui oleks vastupidi, oleks delta negatiivne. Teisisõnu: meeskandidaadid said 2019. valimistel rohkem hääli. Cliffi delta absoluutväärtus näitab põhimõtteliselt kahe tõenäosuse vahet P(y > x) - P(y < x): **tõenäosus**, et juhuslikult 2. grupist valitud vaatlus on suurem kui juhuslikult 1. grupist valitud vaatlus, **miinus tõenäosus**, et juhuslikult 2. grupist valitud vaatlus on väiksem kui juhuslikult 1. grupist valitud vaatlus.
 
-```{r}
-head(kysimustik[,c("kaua_opid", "kogemused_kvant")])
-```
 
-Peaksime võrdlema kõiki võimalikke paare. Nt esimese "Jah" vastanu õpitud aastaid (10 aastat) kõikide "Ei" vastanutega (2, 4 jne aastat õppinutega), seejärel teise "Jah" vastanu õpitud aastaid (6 aastat) kõikide "Ei" vastanutega jne. Sisuliselt on kõiki võimalikke kombinatsioone 31("Jah" vastanuid)*17("Ei" vastanuid) ehk 527. Tabelis oleks seega nt 31 rida ja 17 tulpa, 1. reas 10-2, 10-4 jne, 2. reas 6-2, 6-4 jne.
+<!-- Peaksime võrdlema kõiki võimalikke paare. Nt esimese "Jah" vastanu õpitud aastaid (10 aastat) kõikide "Ei" vastanutega (2, 4 jne aastat õppinutega), seejärel teise "Jah" vastanu õpitud aastaid (6 aastat) kõikide "Ei" vastanutega jne. Sisuliselt on kõiki võimalikke kombinatsioone 31("Jah" vastanuid)*17("Ei" vastanuid) ehk 527. Tabelis oleks seega nt 31 rida ja 17 tulpa, 1. reas 10-2, 10-4 jne, 2. reas 6-2, 6-4 jne.
 
 ```{r}
 # Teeme kõikidest võimalikest "Jah" ja "Ei" kombinatsioonidest tabeli
@@ -505,6 +525,7 @@ p_y_suurem <- length(out[out > 0])/sum(length(out))
 p_x_suurem <- length(out[out < 0])/sum(length(out))
 (delta <- p_y_suurem - p_x_suurem)
 ```
+ -->
 
 Kuna tegemist on tõenäosuste erinevusega, saab Cliffi delta **absoluutväärtus** olla 0 ja 1 vahel. Mida lähemal 0-le, seda väiksem mõju (tõenäosus, et ühest grupist juhuslikult valitud väärtus on suurem kui teisest grupist juhuslikult valitud väärtus on sama suur kui tõenäosus, et see on väiksem), mida lähemal 1-le, seda suurem mõju.
 
@@ -518,38 +539,18 @@ R-is on Cliffi delta skaala määratud nii:
 
 ## Harjutus 2
 
-Esimeses harjutuses vaatasime t-testiga, kas riigikogu valimistel oli meeste ja naiste häältesaak erinev. 
+Kontrolli kursuse osalejate hulgas tehtud küsimustikust, kas ülikoolis õpitud aeg võiks olla erinev üliõpilastel, kelle on või ei ole varasemat kogemust kvantitatiivsete meetoditega. Alustame eelmises praktikumis jutuks olnud hüpoteeside seadmisest:
 
-1. Kontrollime jaotust:
-```{r, eval=FALSE}
-hist(kandidaadid$haali_kokku)
-# Logaritmitud väärtustega histogramm:
-hist(log(kandidaadid$haali_kokku))
-shapiro.test(log(kandidaadid$haali_kokku))
-```
-Ja meenutuseks kordame parameetrilist t-testi logaritmitud väärtustega:
-```{r, eval=F}
-t.test(log(haali_kokku) ~ sugu, kandidaadid)
-```
+- H0 ...
+- H1 ...
 
-Leiame mõju suuruse logaritmitud andmetel:
-```{r, eval=F}
-cohen.d(log(haali_kokku) ~ sugu, kandidaadid)
-```
+1. Kontrollime jaotust. Kas andmed on normaaljaotusega või kas neid annab normaliseerida? Mis testi peaks kasutama?
 
-2. Kuna andmed siiski ei olnud ju normaaljaotusega, teeme wilcoxoni testi. Kuna mitteparameetriliselt testil ei ole nõudmisi jaotusele, siis logaritmida pole tarvis, teeme testi tavaliste väärtuste peal.
-```{r, eval=F}
-wilcox.test(haali_kokku ~ sugu, kandidaadid)
-```
-Kuna test põhineb astakutel, saab see hakkama nii normaaljaotust üldjoontes siiski jälgivate andmetega kui ka tugevalt paremale või vasakule kaldu olevate andmetega.
+2. Tee vastavalt kas t.test või wilcox.test
 
 
-3. Leiame mõju suuruse logaritmimata andmetel.
-```{r, eval=FALSE}
-cliff.delta(haali_kokku ~ sugu, kandidaadid)
-```
 
-4. Võrdleme t-testi ja wilcoxoni testi tulemusi ja efekti suurust. 
+3. Leiame mõju suuruse, vastavalt siis kas Coheni D (parameetriline, kui eelmises sammus t-test) või Cliffi Delta (mitteparameetriline, kui eelmises sammus wilcox).
 
 
 ## Järgmisel korral
