@@ -40,11 +40,11 @@ load("data/kysimustik_2023.RData")
 
 ## Valim ja populatsioon
 
-**Populatsiooni** ehk **üldkogumi** moodustavad uurimisobjekti kõik esindajad. Enamasti on populatsioon nii suur ja raskesti kättesaadav, et ei ole võimalik uurida kogu populatsiooni.
+**Populatsiooni** ehk **üldkogumi** moodustavad uurimisobjekti kõik esindajad. Enamasti on populatsioon nii suur ja raskesti kättesaadav, et ei ole võimalik uurida kogu populatsiooni. Näiteks kui uurime inimkäitumist, siis populatsioon on kogu inimkond, kui uurime eesti keelt, siis kõik eesti keele kõnelejad või kõik eesti keeles kirjutatud tekstid.
 
 **Valim** on mingite kriteeriumite alusel tehtud valik uurimisobjektidest, mis uuringus vaatluse alla võetakse ja mille omadusi kogu populatsioonile laiendatakse.
 
-**Kõikne uuring**: mõõdetakse kõik objektid üldkogumis (nt rahvaloendus).
+**Kõikne uuring**: mõõdetakse kogu populatsiooni ehk kõik objektid üldkogumis (nt rahvaloendus, aga ka nt kõik ühe kirjaniku teosed).
 
 - **Üldkogum** ehk **populatsioon**: objektide hulk, kelle/mille kohta soovitakse järeldusi teha.
 - Plussid:
@@ -93,7 +93,7 @@ Valimi suuruse määrab ülesanne, mida tahetakse lahendada.
 - Kõige halvem variant;
 - kõige kergemini saadav;
 - mõnikord ainuke võimalik variant.
-
+- Näiteks õppejõud kutsub oma tajukatsesse tema kursusel käivad üliõpilased.
 
 ## Hüpoteeside testimine
 
@@ -131,7 +131,7 @@ Need hüpoteesid on üksteist välistavad, st alati peab üks neist kehtima ja k
 
 Nullhüpotees väidab tavaliselt üldkogumi vastavust teatud standardile. See on väide üldkogumi parameetri kohta ja kehtib nii kaua, kuni seda pole ümber lükatud. Parameeter tähendab siinjuures mingit populatsiooni iseloomustavad näitajat (nt Eesti meeste keskmine pikkus), mille väärtust me sageli ei tea.
 
-**Nullhüpoteesi ei saa tõestada!**
+**Nullhüpoteesi ei saa tõestada!** (vähemalt ilma kogu populatsiooni mõõtmata)
 
 Sisukas hüpotees on väide üldkogumi parameetri kohta, mis on tõene siis, kui nullhüpotees osutub valeks.
 
