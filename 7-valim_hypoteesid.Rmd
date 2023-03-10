@@ -187,6 +187,7 @@ Kui aga teooriast on teada, milline see erinevus peaks olema, siis saab kontroll
 
 ### Näiteid: t-test (keskmiste võrdlemine)
 
+T-testist tuleb põhjalikumalt juttu järgmises praktikumis. See on test, millega võrrelda kahe rühma arvulise tunnuse keskmisi väärtusi, test näitab, kui tõenäone on, et vaadeldavad rühmad on samast populatsioonist juhuslikult võetud valimit. 
 
 Meil on küsimustikule vastanute seas nii kohvi- kui teejoojaid. Testime, kas nad kuuluvad samasse üliõpilaste populatsiooni näiteks õppimisaja poolest. Hüpoteesid on järgnevad:
 
@@ -415,8 +416,10 @@ Vasakul, y-teljel näeme tegelikke kvantiile: ehkki mõõtmiste skaala on `r min
 ```
 
 ```{r}
-# Tegelikud kvantiilid
-quantile(kysimustik$kaua_opid)
+# Tegelikud väärtused, mis hõlmavad 99%, 95% ja 66% andmetest
+quantile(kysimustik$kaua_opid, probs = c(0.005, 0.025, 0.17, 0.5, 0.83, 0.975, 0.995))
+# Kolm, kaks ja üks standardhälvet keskmisest
+c(kesk-3:1*shalve, kesk, kesk+1:3*shalve)
 ```
 
 
