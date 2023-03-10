@@ -389,7 +389,7 @@ Oletame, et tahame vaadata, kas ülikoolis õpitud aastate arv erineb nende hulg
 
 Kas jaotus on sümmeetriline?
 
-```{r, eval=F}
+```{r, eval=T}
 hist(kysimustik$kaua_opid)
 ```
 
@@ -398,7 +398,7 @@ Normaaljaotuse puhul peaks kõige kõrgem tulp jääma joonise keskele ning tulp
 ### Kvantiilide võrdlemine
 
 Üks võimalus on võrrelda andmete kvantiiljaotust. Kas teoreetiline ja tegelik jaotus lähevad kokku?
-```{r, eval=F}
+```{r, eval=T}
 library(ggplot2)
 ggplot(data = kysimustik, 
        aes(sample = kaua_opid)) +
@@ -408,6 +408,11 @@ ggplot(data = kysimustik,
 
 Vasakul, y-teljel näeme tegelikke kvantiile: ehkki mõõtmiste skaala on `r min(kysimustik$kaua_opid)` -- `r max(kysimustik$kaua_opid)` aastat, jääb suurem osa andmepunkte `r paste(quantile(kysimustik$kaua_opid, probs = c(0.25,0.75)), collapse =" ja ")` vahele. Sellise jagunemise puhul eeldaks normaaljaotus (qq-joonel), et 95% andmetest jääks keskmisest +-2 standarhälbe kaugusele (x-teljel) ehk et andmepunktide skaala ulatus oleks antud juhul ülemisest otsast palju väiksem ning ulatuks alumises otsas palju kaugemale (miinuspoolele).
 
+
+### Milline võiks jaotus välja näha, kui andmed oleksid normaaljaotusega?
+
+Saame genereerida teoreetilised väärtused keskmise ja standardhälbe põhjal.
+
 ```{r}
 # Tegelike andmete keskmine
 (kesk <- mean(kysimustik$kaua_opid))
@@ -416,28 +421,21 @@ Vasakul, y-teljel näeme tegelikke kvantiile: ehkki mõõtmiste skaala on `r min
 ```
 
 ```{r}
-# Tegelikud väärtused, mis hõlmavad 99%, 95% ja 66% andmetest
-quantile(kysimustik$kaua_opid, probs = c(0.005, 0.025, 0.17, 0.5, 0.83, 0.975, 0.995))
+# Tegelikud väärtused, mis hõlmavad 99%, 95% ja 68% andmetest
+quantile(kysimustik$kaua_opid, probs = c(0.005, 0.025, 0.16, 0.5, 0.84, 0.975, 0.995))
 # Kolm, kaks ja üks standardhälvet keskmisest
-c(kesk-3:1*shalve, kesk, kesk+1:3*shalve)
+round(c(kesk-3:1*shalve, kesk, kesk+1:3*shalve),3)
 ```
 
+Siin kõrvuti tegelik jaotus (must joon) ja teoreetiline normaaljaotus õppimisaja mõõtmistearvu, keskmise ja standardhälbe korral (punane joon):
 
-Milline võiks kvantiiljaotus välja näha, kui andmed oleksid normaaljaotusega? Genereerime meie andmestiku keskmise ja standardhälbega hulga juhuslikke arve:
-```{r}
+```{r, echo=F}
+plot(density(kysimustik$kaua_opid),
+     main = "Tegelik vs. teoreetiline normaaljaotus", xlim=c(kesk-3*shalve, max(kysimustik$kaua_opid)))
 set.seed(1)
-pseudo_kaua_opid <- rnorm(n = length(kysimustik$kaua_opid), 
+lines(density(rnorm(n = length(kysimustik$kaua_opid), 
              mean = mean(kysimustik$kaua_opid), 
-             sd = sd(kysimustik$kaua_opid))
-
-```
-(Käsk `set.seed` annab juhuslike arvude genereerimisele kindla "seemne", siis saame käsku korrates sama tulemuse.)
-
-
-Selline näeks siis välja kvantiiljaotuse graafik, kui sama keskmise ja standardhälbega sama suur andmestik oleks normaaljaotusega.
-```{r}
-qqnorm(pseudo_kaua_opid)
-qqline(pseudo_kaua_opid)
+             sd = sd(kysimustik$kaua_opid))), col="red")
 ```
 
 
@@ -490,14 +488,24 @@ Kas logaritmimine aitas meil saavutada uuritava tunnuse normaaljaotuse?
  - kui *p* > 0.05, siis jääme nullhüpoteesi juurde, mille kohaselt andmed on normaaljaotusega.
  - Kui *p* < 0.05, lükkame nullhüpoteesi ümber ja järeldame, et andmed **ei ole normaaljaotusega**.
 
+
+Tegelik vs. teoreetiline normaaljaotus logaritmitud andmetega:
+
+```{r, echo=F}
+set.seed(1)
+plot(density(rnorm(n = length(kysimustik$kaua_opid), 
+             mean = mean(log(kysimustik$kaua_opid)), 
+             sd = sd(log(kysimustik$kaua_opid)))), col="red", main = "Tegelik vs. teoreetiline normaaljaotus")
+lines(density(log(kysimustik$kaua_opid)))
+```
+
+
+
 Aga peale selle, et üritada andmeid normaliseerida, tasuks kontrollida, palju andmeid oligi.  Parameetriliste testide puhul peaks normaaljaotuse nõudesse rangemalt suhtuma juhul, kui mõõtmisi on vähem kui 30. Kui mõõtmisi on alla 30 ja andmed ei ole normaaljaotusega ka normaliseerides, siis peaks valima mitteparameetrilise testi. Kui andmeid on rohkem, siis võib ka mitte normaaljaotusega andmestikuga parameetrilist testi teha.
 
 ```{r}
 length(kysimustik$kaua_opid)
 ```
-
-
-
 
 ## Lõpetuseks
 

@@ -287,17 +287,23 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "\e259";
+.tabset-dropdown > .nav-tabs > li.active:before {
+content: "";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "\e258";
-font-family: 'Glyphicons Halflings';
+content: "";
 border: none;
+}
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "";
+font-family: 'Glyphicons Halflings';
+display: inline-block;
+padding: 10px;
+border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -361,9 +367,10 @@ visualiseerimine</a></li>
 <li><a href="5-ggplot2.html">Pakett <code>ggplot2</code> andmete
 visualiseerimiseks</a></li>
 <li><a href="6-tidyverse.html">Pakett <code>tidyverse</code> andmete
-töötlemiseks</a>
-<!--7. [Valim ja populatsioon. Hüpoteesid ja tõenäosus](7-valim_hypoteesid.html)  
-8. [Parameetrilised ja mitteparameetrilised testid](8-parameetrilised_mitteparameetrilised.html) 
+töötlemiseks</a></li>
+<li><a href="7-valim_hypoteesid.html">Valim ja populatsioon. Hüpoteesid
+ja tõenäosus</a><br />
+<!--8. [Parameetrilised ja mitteparameetrilised testid](8-parameetrilised_mitteparameetrilised.html) 
 9. [Arvuliste tunnuste vahelised seosed](9-arvuliste_seosed.html) 
 10. [Mittearvuliste tunnuste vahelised seosed](10-mittearvuliste_seosed.html)  
 11. [Lineaarse regressiooni mudelid (1)](11-lineaarsed1.html) 
