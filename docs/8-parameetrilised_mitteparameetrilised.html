@@ -386,17 +386,23 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "\e259";
+.tabset-dropdown > .nav-tabs > li.active:before {
+content: "";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "\e258";
-font-family: 'Glyphicons Halflings';
+content: "";
 border: none;
+}
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "";
+font-family: 'Glyphicons Halflings';
+display: inline-block;
+padding: 10px;
+border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -460,22 +466,22 @@ testid</h1>
 </ul></li>
 <li>Efekti suuruse hindamine</li>
 </ul>
-<p>Kasutame andmestikke <code>kysimustik_2023.RData</code> ning kahtede
-viimaste riigikogu valimiste andmestikke
-<code>kandidaadid2019.RData</code> ja
-<code>kandidaadid_2023.csv</code>.</p>
+<p>Kasutame juba tuttavaid andmestikke
+<code>kysimustik_2023.RData</code> ja <code>kandidaadid_2023.csv</code>
+ning 2019. aasta riigikogu valimiste andmestikku
+<code>kandidaadid2019.RData</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/kysimustik_2023.RData&quot;</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/kandidaadid2019.RData&quot;</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>kandidaadid2023 <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">&quot;data/kandidaadid_2023.csv&quot;</span>)</span></code></pre></div>
 <p><em>Pane tähele, et andmestik kysimustik on R-i andmefail, mille
 lugemiseks käsk <code>load()</code>. Kandidaatide andmestik on
 tabuleeritud tekstifail. Kuigi failinimel on laiend .csv, mis viitaks
-juskui komadega eraldatud väljadele, on tegelikult failis
-väljaeraldajaks tabulatsioonimärk, mistõttu tabeli R-i lugemiseks sobib
-kõige paremini käsk <code>read.delim()</code>. Kui oled Windowsi
-masinas, siis võivad täpitähed olla valesti loetud, selle vastu aitab,
-kui lisad käsule veel argumendi
-<code>encoding = &quot;UTF-8&quot;</code>.</em></p>
+juskui komadega eraldatud väljadele ja selle lugemiseks sobiks käsk
+<code>read.csv()</code>, on tegelikult failis väljaeraldajaks
+tabulatsioonimärk, mistõttu tabeli R-i lugemiseks sobib kõige paremini
+käsk <code>read.delim()</code>. Kui oled Windowsi masinas, siis võivad
+täpitähed olla valesti loetud, selle vastu aitab, kui lisad käsule veel
+argumendi <code>encoding = &quot;UTF-8&quot;</code>.</em></p>
 </div>
 <div id="parameetrilised-testid" class="section level2">
 <h2>Parameetrilised testid</h2>
