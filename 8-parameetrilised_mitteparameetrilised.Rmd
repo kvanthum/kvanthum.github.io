@@ -31,7 +31,7 @@ knitr::opts_chunk$set(echo = TRUE)
   * Wilcoxoni astaksummatest (= Manni-Whitney U-test) (kaks rühma)
 - Efekti suuruse hindamine
 
-Kasutame andmestikke `kysimustik_2023.RData` ning kahtede viimaste riigikogu valimiste andmestikke `kandidaadid2019.RData` ja `kandidaadid_2023.csv`.
+Kasutame juba tuttavaid andmestikke `kysimustik_2023.RData` ja `kandidaadid_2023.csv` ning 2019. aasta riigikogu valimiste andmestikku `kandidaadid2019.RData`.
 
 ```{r}
 load("data/kysimustik_2023.RData")
@@ -40,7 +40,7 @@ kandidaadid2023 <- read.delim("data/kandidaadid_2023.csv")
 ```
 
 *Pane tähele, et andmestik kysimustik on R-i andmefail, mille lugemiseks käsk `load()`.
-Kandidaatide andmestik on tabuleeritud tekstifail. Kuigi failinimel on laiend .csv, mis viitaks juskui komadega eraldatud väljadele, on tegelikult failis väljaeraldajaks tabulatsioonimärk, mistõttu tabeli R-i lugemiseks sobib kõige paremini käsk `read.delim()`. Kui oled Windowsi masinas, siis võivad täpitähed olla valesti loetud, selle vastu aitab, kui lisad käsule veel argumendi `encoding = "UTF-8"`.*
+Kandidaatide andmestik on tabuleeritud tekstifail. Kuigi failinimel on laiend .csv, mis viitaks juskui komadega eraldatud väljadele ja selle lugemiseks sobiks käsk `read.csv()`, on tegelikult failis väljaeraldajaks tabulatsioonimärk, mistõttu tabeli R-i lugemiseks sobib kõige paremini käsk `read.delim()`. Kui oled Windowsi masinas, siis võivad täpitähed olla valesti loetud, selle vastu aitab, kui lisad käsule veel argumendi `encoding = "UTF-8"`.*
 
 
 ## Parameetrilised testid
