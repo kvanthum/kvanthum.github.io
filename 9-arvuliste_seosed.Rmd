@@ -45,6 +45,11 @@ Nüüd liigume edasi kahe tunnuse vaheliste seoste juurde ning vaatleme korrelat
 
 Andmestikud, mida see kord kasutame: `ldt.csv` ja `DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt`.
 
+```{r}
+ldt <- read.csv("data/ldt.csv")
+dr <- read.delim("data/DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt", encoding = "UTF-8")
+```
+
 ## Sõltuvuse tüübid
 
 Sõltuvust saab iseloomustada selle järgi, kas see on
@@ -158,6 +163,8 @@ par(mfrow = c(1,2))
 plot(b ~ a, xlim = c(0,20), ylim = c(0,20), main = "r = 0"); abline(lm(b ~ a))
 plot(b2 ~ a2, xlim = c(0,20), ylim = c(0,20), main = "r = 0.87"); abline(lm(b2 ~ a2))
 ```
+
+## Korrelatsioon sõnapikkuse ja reaktsiooniaja vahel
 
 Loeme sisse andmestiku `ldt.csv` paketist [`Rling`](https://benjamins.com/sites/z.195/content/package.html), mis on lisamaterjal Natalia Levshina õpikule "How to do linguistics with R" (2015). Andmestik sisaldab 100 juhuslikult valitud sõna [the English Lexicon Projecti](https://elexicon.wustl.edu/) andmebaasist (Balota jt 2007). ELP sisaldab katselisi ja kirjeldavaid andmeid (nt sõna pikkus, sagedus, ortograafiliste naabrite arv, konkreetsus/abstraktsus, sõnaliik, sõna keskmine äratundmisaeg, sõna keskmine nimetamisaeg jpm) enam kui 40 000 inglise keele sõna kohta, samuti andmeid väljamõeldud sõnade kohta. Vaata lähemalt [siit](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwi8-_7x3rHvAhUFIcUKHQibCLMQFjAAegQIARAF&url=https%3A%2F%2Flink.springer.com%2Fcontent%2Fpdf%2F10.3758%2FBF03193014.pdf&usg=AOvVaw1xeOcBRb5Jst1v2X49-I8a).
 
@@ -390,6 +397,8 @@ Spearmani ja Kendalli korrelatsioonikordaja olulisuse testimisel on kaks eeldust
 2. Mõlemad tunnused on järjestustunnused (kui ei ole, siis R muudab need automaatselt järjestustunnusteks).
 
 Ilmselgelt peab tegemist olema ka monotoonse seosega, vastasel juhul ei ole korrelatsioonikordajal mingit sisu.
+
+## Korrelatsioon doktoritööde bibliograafia näitel
 
 Vaatleme näiteks, kas eesti ja üldkeeleteaduse instituudis aastatel 1994-2021 kaitstud doktoritööd on läinud aastatega mahukamaks?
 ```{r}

@@ -287,23 +287,17 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before {
-content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "\e259";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "";
-border: none;
-}
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "";
+content: "\e258";
 font-family: 'Glyphicons Halflings';
-display: inline-block;
-padding: 10px;
-border-right: 1px solid #ddd;
+border: none;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -372,9 +366,10 @@ töötlemiseks</a></li>
 ja tõenäosus</a><br />
 </li>
 <li><a href="8-parameetrilised_mitteparameetrilised.html">Parameetrilised ja
-mitteparameetrilised testid</a>
-<!--9. [Arvuliste tunnuste vahelised seosed](9-arvuliste_seosed.html) 
-10. [Mittearvuliste tunnuste vahelised seosed](10-mittearvuliste_seosed.html)  
+mitteparameetrilised testid</a></li>
+<li><a href="9-arvuliste_seosed.html">Arvuliste tunnuste vahelised
+seosed</a>
+<!--10. [Mittearvuliste tunnuste vahelised seosed](10-mittearvuliste_seosed.html)  
 11. [Lineaarse regressiooni mudelid (1)](11-lineaarsed1.html) 
 12. [Lineaarse regressiooni mudelid (2)](12-lineaarsed2.html) 
 13. [Lineaarse regressiooni segamudelid](13-lineaarsed_sega.html) 
