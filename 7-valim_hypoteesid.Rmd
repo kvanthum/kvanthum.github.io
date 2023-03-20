@@ -181,7 +181,7 @@ Kui nüüd kahe grupi keskmisi võrdleva testi *p*-väärtus oleks 0,03, siis t�
 
 Kui aga teooriast on teada, milline see erinevus peaks olema, siis saab kontrollida **ühepoolset hüpoteesi**.
 
-- H0: keskmine > a VÕI keskmine1 > keskmine2
+- H0: keskmine >= a VÕI keskmine1 >= keskmine2
 - H1: keskmine < a VÕI keskmine1 < keskmine2
 
 
@@ -219,8 +219,8 @@ ggplot(data = kysimustik) +
 
 Teine näide: kas üliõpilased, kellel on varasemaid kogemusi kvantitatiivsete meetoditega, on keskmiselt kauem ülikoolis õppinud kui need, kellel kogemusi ei ole?
 
-H0: kogemuseGA õppimisaeg = kogemuseTA õppimisaeg<br>
-H1: kogemuseGA õppimisaeg > kogemuseTA õppimisaeg
+H0: kogemuseTA õppimisaeg = kogemuseGA õppimisaeg<br>
+H1: kogemuseTA õppimisaeg < kogemuseGA õppimisaeg
 
 
 ```{r,results = 'hold'}
@@ -245,7 +245,7 @@ Kui seame oma hüpoteesid valesti, siis ühepoolse testiga võime teha valesid j
 ```{r}
 t.test(kaua_opid ~ kogemused_kvant, data = kysimustik, alternative = "greater", var.equal=T)
 ```
-Sellise ühepoolse testi tulemus, et **ILMA kogemusteta** rühma õppimiseg **ei ole pikem** kui **kogemustega** rühmal ei tähenda automaatselt, et rühmad ei ole erinevad ja et nad kuuluvad samasse populatsiooni, sest kogemusteTA rühma õppimisaeg võib ka olla lühem kui kogemusteGA rühmal. Seega, kui meil ei ole kindlat põhjust kasutada ühepoolset testi, siis peaks alati valima pigem kahepoolse.
+Sellise ühepoolse testi tulemus, et **ILMA kogemusteta** rühma õppimiseg **ei ole pikem** kui **kogemustega** rühmal, ei tähenda automaatselt, et rühmad ei ole erinevad ja et nad kuuluvad samasse populatsiooni, sest kogemusteTA rühma õppimisaeg võib ka olla lühem kui kogemusteGA rühmal. Seega, kui meil ei ole kindlat põhjust kasutada ühepoolset testi, siis peaks alati valima pigem kahepoolse.
 
 ## Jaotused, normaaljaotus
 
@@ -262,7 +262,7 @@ plot(function(x)-dnorm(x), -3,3, main="U-jaotus")
 ```
 Joonise kood Keith Johnson 2008, Quantitative methods in linguistics, lk 14-15.
 
- - **ühtlase jaoutse** puhul on kõiki väärtuseid võrdne hulk;
+ - **ühtlase jaotuse** puhul on kõiki väärtuseid võrdne hulk;
  - **normaaljaotuse** kõige sagedasem väärtus on keskmine ja väärtused jagunevad selle ümber ühtlaselt mõlemale poole;
 - **asümmeetrilise jaotuse** tipp ehk sagedaseim väärtus ei ole keskmine ja tipust allapoole ja ülespoole jäävad servad ei ole sümmeetrilised;
 - **J-jaotuse** puhul on kõige sagedasem väärtus ühes skaala otsas ja väärtuste sagedus langeb skaala teise otsa poole liikudes;
@@ -291,7 +291,7 @@ text(x=0, 0.28, "1 sd\n68% andmetest", col="black")
 arrows(y0=0.24, y1=0.24, x0=-1, x1=1,code = 3)
 ```
 
-**...sest see on kirjeldatav kahe arvuga**
+**...järelikult on see kirjeldatav kahe arvuga**
 
 Kui me teame teame **keskmist** ja **standardhälvet**, siis me võime tuletada kõigi teiste punktide väärtused.
 <br><br>
@@ -350,7 +350,7 @@ hist(pikkus)
 ```{r}
 # ggplotiga
 ggplot(data = as.data.frame(pikkus)) +
-  geom_histogram(aes(x = pikkus), bins = 6)
+  geom_histogram(aes(x = pikkus), bins = 9)
 ```
 
 
@@ -441,7 +441,7 @@ lines(density(rnorm(n = length(kysimustik$kaua_opid),
 
 ### Shapiro-Wilki test
 
-Shapiro-Wilk'i test hindab *tõenäosust, et valim on pärit normaaljaotusega populatsioonist*. Testi nullhüpotees on, et valim **on** pärit normaaljaotusega populatsioonist. Tulemuse tõlgendamisel on tavaliselt *α* = 0.05 ehk et *p* > 0.05, võib otsustada, et on normaaljaotus (me ei saa nullhüpoteesi ümber lükata), kui *p* < 0.05, siis ei ole (on alust vastu võtta alternatiivne hüpotees: valim ei ole pärit normaaljaotusega populatsioonist). 
+Shapiro-Wilki test hindab *tõenäosust, et valim on pärit normaaljaotusega populatsioonist*. Testi nullhüpotees on, et valim **on** pärit normaaljaotusega populatsioonist. Tulemuse tõlgendamisel on tavaliselt *α* = 0.05 ehk kui *p* > 0.05, võib otsustada, et on normaaljaotus (me ei saa nullhüpoteesi ümber lükata), kui *p* < 0.05, siis ei ole (on alust vastu võtta alternatiivne hüpotees: valim ei ole pärit normaaljaotusega populatsioonist). 
 
 ```{r, eval=F}
 shapiro.test(kysimustik$kaua_opid)

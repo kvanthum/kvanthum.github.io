@@ -91,7 +91,7 @@ T-test sobib siis, kui:
 **Mõõtmised ei ole rühma sees sõltumatud, kui...**
 
 - soorituskatses iga katseisik vastab mitmele küsimusele;
-- korpuses, kus on mitu erinevat teksti ja igas tekstis on mitu lauset, mingit iga lause puhul mõõdetud tunnust;
+- korpuses, kus on mitu erinevat teksti ja igas tekstis on mitu lauset, uuritakse mingit iga lause puhul mõõdetud tunnust;
 - üliõpilaste eksamitulemused erinevatel kursustel, kui (osaliselt) samad üliõpilased osalevad mitmel kursusel...
 - ...
 

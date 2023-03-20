@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '10-mittearvuliste_seosed.html'))})
-date: 23.03.2022
+date: 22.03.2023
 output: 
   html_document:
     theme: flatly
@@ -64,6 +64,7 @@ tab
 
 
 Visualiseerime tabelit.
+
 ```{r}
 par(mfrow = c(1, 2)) # näita jooniseid ühes reas kahes tulbas (= kõrvuti)
 barplot(tab, 
@@ -74,18 +75,32 @@ barplot(tab,
 
 barplot(prop.table(tab, margin = 2), 
         col = c("gold1", "grey50"))
+par(mfrow = c(1, 1)) # vii sätted uuesti algsele kujule
+```
+
+```{r}
+# ggplotiga
+library(tidyverse)
+tab %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "Vorm") %>%
+  pivot_longer(cols = c("Pärisnimi", "Üldnimi"), names_to = "Liik", values_to = "Sagedus") %>%
+  ggplot() +
+  geom_col(aes(x = Liik, y = Sagedus, fill = Vorm), position = "fill") +
+  scale_fill_manual(values = c("gold1", "grey50"))
 ```
 
 
-
+Hii-ruut-testi tegemisel võrreldakse tegelikke ja teoreetilisi sagedusi.  
 **Vaadeldud/tegelikud** (*observed*) sagedused on tegelikud sagedused igas tabeli lahtris (nt 43, 77 jne).   
-**Oodatud/teoreetilised** (*expected*) sagedused leitakse valemiga `reasumma*veerusumma/kogusumma`. Teoreetilised sagedused eeldavad, et andmed on ühtlaselt jaotunud ja kehtib nullhüpotees, et tunnuse väärtused on juhuslikud ja kaks tunnust ei ole üksteisest sõltuvad. Mida suurem on tegelike sageduste erinevus oodatud sagedustest, seda suurem on ka hii-ruut-statistiku väärtus.
+**Oodatud/teoreetilised** (*expected*) sagedused leitakse valemiga `reasumma*veerusumma/kogusumma`. Teoreetilised sagedused eeldavad, et andmed on ühtlaselt jaotunud ja kehtib nullhüpotees, et tunnuse väärtused on juhuslikud ja kaks tunnust ei ole üksteisest sõltuvad. Mida suurem on tegelike sageduste erinevus teoreetilistest sagedustest, seda suurem on ka hii-ruut-statistiku väärtus.
 
 ```{r}
 addmargins(tab)
 ```
 ```{r}
-# Näiteks pika sisseütlevaga pärisnimede (Tartusse) oodatud sagedus oleks
+# Näiteks lühikese sisseütlevaga pärisnimede (kuhu? - Tartu) teoreetiline sagedus oleks
+# (reasumma*veerusumma/kogusumma)
 addmargins(tab)[1,3]*addmargins(tab)[3,1]/sum(tab)
 ```
 
@@ -119,21 +134,21 @@ sum(((t$observed - t$expected)^2)/t$expected)
 ```
 
 Mida suurem erinevus tegelike ja oodatud sageduste vahel on, seda suurem on statistiku väärtus, ehkki konkreetne väärtus sõltub oluliselt marginaalsagedustest.  
-Kuna *p*-väärtus on siin väga väike, võime hüljata nullhüpoteesi ja võtta vastu sisuka hüpoteesi, mille kohaselt kaks tunnust on omavahel sõltuvuses.
+Kuna *p*-väärtus on siin väga väike, võime hüljata nullhüpoteesi ja võtta vastu sisuka hüpoteesi, mille kohaselt kaks tunnust on omavahel sõltuvuses, kuna on väga väike tõenäosus, et saaksime juhuslikult säärased andmed ja sellise (nullist erineva) hii-ruut-statistiku, kui nullhüpotees kehtiks ja kahe tunnuse vahel mingit seost ei oleks.
 
-Kasutasime praegu testi tegemisel argumenti `correct = FALSE`. Vaikimisi tehakse R-is 2x2 tabelite puhul test Yates'i pidevuse parandusega, mis püüab parandada sellest tekkivat viga, et diskreetset jaotust püütakse lähendada pideva jaotusega. Pidevusparanduse käigus lahutatakse iga lahtri sageduse ja selle oodatud sageduse vahe absoluutväärtusest veel 0,5. Nii väheneb hii-ruut-statistiku väärtus ja suureneb *p*-väärtus. Tegemist on niisiis pisut konservatiivsema taktikaga.
+Kasutasime praegu testi tegemisel argumenti `correct = FALSE`. Vaikimisi tehakse R-is 2x2 tabelite puhul test nn Yates'i pidevusparandusega (*Yates' continuity correction*). Pidevusparanduse käigus lahutatakse iga lahtri sageduse ja selle oodatud sageduse vahe absoluutväärtusest veel 0,5. Nii väheneb hii-ruut-statistiku väärtus ja suureneb *p*-väärtus. Tegemist on niisiis pisut konservatiivsema taktikaga, mida võiks rakendada juhul, kui 2x2 tabelis on mõni teoreetiline sagedus < 5.
 
 ```{r}
 chisq.test(tab)
 ```
-Pidevusparanduse käigus muutuvad ainult statistik ja *p*-väärtus, oodatud sagedusi ja jääke pidevusparanduse kasutamine kuidagi ei mõjuta. Pidevusparandust soovitatakse kasutada ainult juhul, kui 2x2 tabelis on mõni oodatud sagedus < 5. 
+Pidevusparanduse käigus muutuvad ainult statistik ja *p*-väärtus, oodatud sagedusi ja jääke pidevusparanduse kasutamine kuidagi ei mõjuta.
 
 Pane tähele, et kahe tunnuse sõltuvust testival hii-ruut-testil on vabadusastmete arv enam mitte üks vähem kui vaatluste arv, vaid (ridade arv - 1) * (tulpade arv - 1). 
 
 Testi *p*-väärtus näitab niisiis, kui tõenäoline on selle vabadusastmete arvu ja määratud olulisusnivoo korral (nt df = 1, alfa = 0.05), et saaksime sellise statistiku ka siis, kui kahe tunnuse vahel poleks tegelikult mingit seost. Hii-ruut-jaotuse kriitilisi väärtusi, millest alates saame lugeda seose oluliseks, saab vaadata vastavatest tabelitest, nt [siit](https://people.richland.edu/james/lecture/m170/tbl-chi.html).
 
 
-Tuleb aga silmas pidada, et mida suurem on vabadusastmete arv ehk mida rohkem kategooriaid kahel tunnusel kokku on, seda tõenäolisemalt hii-ruut-test sealt mõne olulise seose tuvastab. Seepärast ei soovitata teha hii-ruut-testi väga suurtel tabelitel, kus on mitu rida ja/või mitu tulpa.  
+Tuleb aga silmas pidada, et mida suurem on vabadusastmete arv ehk mida rohkem kategooriaid kahel tunnusel kokku on, seda tõenäolisemalt hii-ruut-test sealt mõne olulise seose tuvastab. Seepärast ei soovitata teha hii-ruut-testi väga suurtel tabelitel, kus on palju ridu ja tulpasid.  
 
 
 
@@ -142,7 +157,7 @@ Tuleb aga silmas pidada, et mida suurem on vabadusastmete arv ehk mida rohkem ka
 Hii-ruut-test ise ütleb lihtsalt, et kahe kategoriaalse tunnuse vahel on statistiliselt oluline seos, aga ei ütle midagi selle kohta, milline see seos on. Seepärast oleks kasulik vaadata Pearsoni jääkide abil, millised erinevused tegelike ja oodatud sageduste vahel on suuremad. Pearsoni jääke arvutatakse valemiga $\frac{(o-e)}{\sqrt{e}}$.
 
 ```{r}
-# Näiteks illatiivis pärisnimede jääk on
+# Näiteks lühikese sisseütlevaga pärisnimede jääk on
 (t$observed[1]-t$expected[1])/sqrt(t$expected[1])
 ```
 ```{r}
