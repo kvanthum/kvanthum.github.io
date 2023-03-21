@@ -38,7 +38,15 @@ Tegelikult on hii-ruut-testid terve testide pere, mille arvutamiseks kasutatakse
 <p>Franke, Todd Michael, Timothy Ho & Christina A. Christie 2012. <a href="https://www.researchgate.net/publication/258124458_The_Chi-Square_Test_Often_Used_and_More_Often_Misinterpreted">The Chi-Square Test: Often Used and More Often Misinterpreted.</a><em> American Journal of Evaluation</em> 33(3), 448-458.</p>
 </center>
 
-Praktikas ei tehta sageli eksplitsiitset vahet, kas kasutatakse testi *independence* või *homogeneity* varianti. Selle praktikumi näites tõlgendame testi nii, et ühe valimi põhjal uuritakse kahe tunnuse omavahelise seose olemasolu: kas ühe tunnuse väärtuste teadmine aitab ennustada teise tunnuse väärtust (*chi-square test of independence*)?    
+**Kooskõlamäära testis** (*goodness of fit*) vaatleme mingi kategoriaalse tunnuse jaotumist ühes valimis ning testime, kas see valim võiks tulla populatsioonist, mille sama tunnuse jaotumise kohta on meil juba teadmine olemas. See testi liik on niisiis analoogne nt ühe valimiga t-testile, kus võrdleme valimi mingit arvulist näitajat (nt laste pikkused) populatsiooni omaga, otsustamaks, kui tõenäoline on, et valim on samast populatsioonist. Arvulise näitaja asemel on siin aga mingi kategoriaalse tunnuse väärtuste sagedused.    
+
+**Sõltumatuse testis** (*independence*) uurime kahe tunnuse vahelist seost samas valimis, **homogeensuse testis** (*homogeneity*) aga uurime, kas ühe tunnuse kategooriate proportsioonid on kahes sõltumatus valimis erinevad. See eristus võib aga kohati olla keeruline, kuna alati pole selge, mis hetkest peaks rääkima eraldi populatsioonidest/gruppidest. Testi tegemine käib mõlemal juhul samamoodi, ent erinevused tulenevad valimi moodustamisest ja testi tõlgendamisest.
+
+<center>
+![](imgs/hiiruudud.png){width=40%}
+</center>
+
+Selles praktikumis keskendume sõltumatuse testile, kus uurime kahe tunnuse omavahelise seose olemasolu: **kas ühe tunnuse väärtuste teadmine aitab ennustada teise tunnuse väärtust** (*chi-square test of independence*)?    
 
 Vaatleme näitena andmeid Ann Siimani artiklist ["Ainsuse sisseütleva vormi valiku seos morfosüntaktiliste ja semantiliste tunnustega - materjali ning meetodi sobivus korpusanalüüsiks"](http://www.kirj.ee/public/ESA/2015/esa_61_2015_207_232.pdf) (2015), kus ta kasutas hii-ruut-testi, et selgitada välja, millest sõltub sisseütleva käände kasutuses see, kas kasutatakse lühikest sisseütleva käände vormi ehk **aditiivi** (*majja*) või pikka sisseütleva käände vormi ehk **illatiivi** (*majasse*).
 
@@ -63,58 +71,86 @@ tab
 (Kui meil oleks vormikasutuse kohta põhjalikum andmestik, saaks risttabelit saaks mõistagi teha ka andmestiku tunnustest, nt `table(andmed$tunnus1, andmed$tunnus2)`.)
 
 
-Visualiseerime tabelit.
+Visualiseerime sagedusi.  
 
-```{r}
+```{r, results='hold'}
 par(mfrow = c(1, 2)) # näita jooniseid ühes reas kahes tulbas (= kõrvuti)
-barplot(tab, 
+# esimene joonis:
+barplot(tab, # sisendiks tavaline risttabel
         col = c("gold1", "grey50"), 
-        legend.text = rownames(tab), 
-        beside = TRUE, 
-        args.legend = list(x = "topleft"))
+        legend.text = rownames(tab), # legendi väärtused võta tabeli reanimedest
+        beside = TRUE, # tulbad kõrvuti
+        args.legend = list(x = "topleft")) # legend ülemisse vasakusse nurka
 
-barplot(prop.table(tab, margin = 2), 
+# teine joonis:
+barplot(prop.table(tab, margin = 2), # sisendiks suhteliste sagedustega risttabel
         col = c("gold1", "grey50"))
 par(mfrow = c(1, 1)) # vii sätted uuesti algsele kujule
 ```
 
-```{r}
+```{r, message=F, results = 'hold', warning=F}
 # ggplotiga
 library(tidyverse)
-tab %>%
-  as.data.frame() %>%
-  rownames_to_column(var = "Vorm") %>%
-  pivot_longer(cols = c("Pärisnimi", "Üldnimi"), names_to = "Liik", values_to = "Sagedus") %>%
-  ggplot() +
-  geom_col(aes(x = Liik, y = Sagedus, fill = Vorm), position = "fill") +
-  scale_fill_manual(values = c("gold1", "grey50"))
+
+# teeme esmalt table-objektist data.frame-objekti
+tab_pikk <- tab %>% # võtame table-tüüpi objekti
+  as.data.frame() %>% # teisendame selle data.frame-tüüpi objektiks
+  rownames_to_column(var = "Vorm") %>% # paneme pakutud reanimed tulpa "Vorm"
+  pivot_longer(cols = c("Pärisnimi", "Üldnimi"), # teeme laiast tabelist pika, nii et võtame pärisnime ja üldnime tulbad
+               names_to = "Liik", # need tulbanimed ("Pärisnimi", "Üldnimi") paneme pika tabeli tulpa "Liik" 
+               values_to = "Sagedus") # tulpades olevad sagedused pika tabeli tulpa "Sagedus"
+
+# esimene joonis:
+ggplot(tab_pikk) +
+  geom_col(aes(x = Liik, y = Sagedus, fill = Vorm), position = "dodge") +
+  scale_fill_manual(values = c("gold1", "grey50")) +
+  theme(legend.position = "top") -> p1
+
+# teine joonis:
+ggplot(tab_pikk) +
+  geom_col(aes(x = Liik, y = Sagedus, fill = Vorm), position = "fill", show.legend = F) +
+  scale_fill_manual(values = c("gold1", "grey50")) +
+  labs(y = "Suhteline sagedus") -> p2
+
+# kuva jooniseid kõrvuti
+# install.packages("gridExtra")
+library(gridExtra)
+grid.arrange(p1, p2, nrow = 1)
 ```
 
 
-Hii-ruut-testi tegemisel võrreldakse tegelikke ja teoreetilisi sagedusi.  
-**Vaadeldud/tegelikud** (*observed*) sagedused on tegelikud sagedused igas tabeli lahtris (nt 43, 77 jne).   
-**Oodatud/teoreetilised** (*expected*) sagedused leitakse valemiga `reasumma*veerusumma/kogusumma`. Teoreetilised sagedused eeldavad, et andmed on ühtlaselt jaotunud ja kehtib nullhüpotees, et tunnuse väärtused on juhuslikud ja kaks tunnust ei ole üksteisest sõltuvad. Mida suurem on tegelike sageduste erinevus teoreetilistest sagedustest, seda suurem on ka hii-ruut-statistiku väärtus.
+Hii-ruut-test põhineb tegelike ja teoreetiliste sageduste võrdlemisel.  
+**Tegelikud/vaadeldud** (*observed*) sagedused on tegelikud sagedused igas tabeli lahtris (nt 43, 77 jne).   
+**Teoreetilised/oodatud** (*expected*) sagedused leitakse valemiga `reasumma*veerusumma/kogusumma`. Teoreetilised sagedused eeldavad, et andmed on ühtlaselt jaotunud ja kehtib nullhüpotees, et tunnuse väärtused on juhuslikud ja kaks tunnust ei ole üksteisest sõltuvad. Sellisel juhul peaks saama tabeli lahtrite väärtused tuletada puhtalt ridade ja veergude kogusagedustest. Mida suurem on tegelike sageduste erinevus teoreetilistest sagedustest, seda suurem on ka hii-ruut-statistiku väärtus.
 
 ```{r}
-addmargins(tab)
+(tab2 <- addmargins(tab)) # lisame tabelile rea- ja veerusummad
 ```
 ```{r}
 # Näiteks lühikese sisseütlevaga pärisnimede (kuhu? - Tartu) teoreetiline sagedus oleks
 # (reasumma*veerusumma/kogusumma)
-addmargins(tab)[1,3]*addmargins(tab)[3,1]/sum(tab)
+tab2["Lühike","Sum"]*tab2["Sum","Pärisnimi"]/tab2["Sum","Sum"]
 ```
+
+Teoreetilisi sagedusi ei pea aga ise käsitsi arvutama, need saab kätte ka hii-ruut-testi väljundist.  
 
 ```{r}
 chisq.test(tab)$expected # teoreetilised sagedused
 ```
 
+<br>
+<br>
 
 **Hii-ruut-testi eeldused**:
 
 - Valim on üldkogumist juhuslikult valitud.
-- Vaatlused on sõltumatud.
-- Iga vaatlus peab sobima risttabelis täpselt ainult ühte lahtrisse (st iga uuritava tunnuse ainult ühte kategooriasse).
+- Vaatlused on sõltumatud.  
+- Iga vaatlus peab sobima risttabelis täpselt ainult ühte lahtrisse (st iga uuritava tunnuse ainult ühte kategooriasse).  
 
+Uuritava andmestiku puhul ei ole tegelikult vaatluste sõltumatuse nõue täidetud, kuna korpuses ei ole igalt kõnelejalt ainult üks mingi sisseütlevas käändes sõna kasutuskord. See tähendab, et kõneleja/kirjutaja, kes on rohkem sisseütlevas käändes sõnu tarvitanud, mõjutab enam ka testi tulemusi. Keelekorpustega, kus pahatihti on ka keeruline tuvastada, kes täpselt kõneleja/kirjutaja on, vaatluste sõltumatuse nõuet niisiis sageli eiratakse.  
+
+<br>
+<br>
 
 Sõnastame hüpoteesid.
 
@@ -127,7 +163,7 @@ Teeme nüüd päriselt hii-ruut-testi.
 chisq.test(tab, correct = FALSE)
 ```
 
-Hii-ruut-statistik leitakse valemiga $x^2 = \sum \frac{(o-e)^2}{e}$ ehk
+Hii-ruut-statistik leitakse valemiga $x^2 = \sum \frac{(o-e)^2}{e}$, kus *o* (*observed*) on tegelik sagedus ja *e* (*expected*) on teoreetiline sagedus.  
 ```{r}
 t <- chisq.test(tab, correct = FALSE)
 sum(((t$observed - t$expected)^2)/t$expected)
@@ -136,7 +172,7 @@ sum(((t$observed - t$expected)^2)/t$expected)
 Mida suurem erinevus tegelike ja oodatud sageduste vahel on, seda suurem on statistiku väärtus, ehkki konkreetne väärtus sõltub oluliselt marginaalsagedustest.  
 Kuna *p*-väärtus on siin väga väike, võime hüljata nullhüpoteesi ja võtta vastu sisuka hüpoteesi, mille kohaselt kaks tunnust on omavahel sõltuvuses, kuna on väga väike tõenäosus, et saaksime juhuslikult säärased andmed ja sellise (nullist erineva) hii-ruut-statistiku, kui nullhüpotees kehtiks ja kahe tunnuse vahel mingit seost ei oleks.
 
-Kasutasime praegu testi tegemisel argumenti `correct = FALSE`. Vaikimisi tehakse R-is 2x2 tabelite puhul test nn Yates'i pidevusparandusega (*Yates' continuity correction*). Pidevusparanduse käigus lahutatakse iga lahtri sageduse ja selle oodatud sageduse vahe absoluutväärtusest veel 0,5. Nii väheneb hii-ruut-statistiku väärtus ja suureneb *p*-väärtus. Tegemist on niisiis pisut konservatiivsema taktikaga, mida võiks rakendada juhul, kui 2x2 tabelis on mõni teoreetiline sagedus < 5.
+Kasutasime praegu testi tegemisel argumenti `correct = FALSE`. Vaikimisi tehakse R-is 2x2 tabelite puhul test nn **Yatesi pidevusparandusega** (*Yates' continuity correction*). Pidevusparanduse käigus lahutatakse iga lahtri sageduse ja selle oodatud sageduse vahe absoluutväärtusest veel 0,5. Nii väheneb hii-ruut-statistiku väärtus ja suureneb *p*-väärtus. Tegemist on niisiis pisut konservatiivsema taktikaga, mida võiks rakendada juhul, kui 2x2 tabelis on mõni teoreetiline sagedus < 5.
 
 ```{r}
 chisq.test(tab)
@@ -151,14 +187,22 @@ Testi *p*-väärtus näitab niisiis, kui tõenäoline on selle vabadusastmete ar
 Tuleb aga silmas pidada, et mida suurem on vabadusastmete arv ehk mida rohkem kategooriaid kahel tunnusel kokku on, seda tõenäolisemalt hii-ruut-test sealt mõne olulise seose tuvastab. Seepärast ei soovitata teha hii-ruut-testi väga suurtel tabelitel, kus on palju ridu ja tulpasid.  
 
 
+## Harjutus 1
 
-#### Jäägid
+Laadi kursusel kasutatud küsimustiku andmestik ning vaata esmalt, kas leiad statistiliselt olulise seose **lemmikjoogi** ja **kvantitatiivsete meetodite kogemuse** vahel.  
+
+<br> 
+Seejärel loe sisse 2023. aasta valimiste andmestik, jäta välja üksikkandidaatide andmed ning kontrolli, kas on statistiliselt oluline seos **soo** ja **valimisnimekirja** vahel.   
+
+
+
+## Hii-ruut-testi jäägid
 
 Hii-ruut-test ise ütleb lihtsalt, et kahe kategoriaalse tunnuse vahel on statistiliselt oluline seos, aga ei ütle midagi selle kohta, milline see seos on. Seepärast oleks kasulik vaadata Pearsoni jääkide abil, millised erinevused tegelike ja oodatud sageduste vahel on suuremad. Pearsoni jääke arvutatakse valemiga $\frac{(o-e)}{\sqrt{e}}$.
 
 ```{r}
 # Näiteks lühikese sisseütlevaga pärisnimede jääk on
-(t$observed[1]-t$expected[1])/sqrt(t$expected[1])
+(t$observed["Lühike", "Pärisnimi"]-t$expected["Lühike", "Pärisnimi"])/sqrt(t$expected["Lühike", "Pärisnimi"])
 ```
 ```{r}
 # Jäägid saab kätte ka testi väljundist
@@ -176,24 +220,21 @@ barplot(t$residuals,
         ylab = "Pearsoni jäägid")
 ```
 
+```{r, warning=F, message=F}
+# ggplotiga
+jaak_pikk <- t$residuals %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "Vorm") %>%
+  pivot_longer(cols = c("Pärisnimi", "Üldnimi"), names_to = "Liik", values_to = "Jääk")
 
-Paketis `vcd` olevad funktsioonid `mosaic()` ja `assoc()` näitavad lisaks jääkidele ka tunnuse tasemete jaotumist (näiteks seda, et pärisnimesid ongi andmetes oluliselt vähem).
+ggplot(jaak_pikk) +
+  geom_col(aes(x = Liik, fill = Vorm, y = Jääk), position = "dodge")
 
-```{r}
-# install.packages("vcd")
-# library(vcd)
-vcd::mosaic(tab, shade = TRUE, varnames = FALSE)
 ```
-```{r}
-# library(vcd)
-vcd::assoc(tab, shade = TRUE, varnames = FALSE)
-```
 
-Jääkide graafikul on helesinisega märgitud positiivne jääk vahemikus 2 kuni 4 (meie graafikul pikas sisseütlevas käändes pärisnimed) ja tumesinisega sellest suurem positiivne jääk (4+, meie graafikul puudub). Helepunasega on märgitud negatiivne jääk vahemikus -2 kuni -4 (meie graafikul lühikese sisseütlevaga pärisnimed) ja tumepunasega sellest suurem negatiivne jääk (väiksem kui -4, meie graafikul puudub).
+Mida suurem on Pearsoni jäägi absoluutväärtus, seda enam on tõenäoliselt konkreetne lahter statistiliselt olulise hii-ruut-statistiku väärtusesse panustanud.
 
-Graafikul on samuti kujutatud kõikide lahtrite, ridade ja veergude osakaalud tabelis. Näiteks on pärisnimesid mõlema käändevormiga oluliselt vähem kui üldnimesid.
-
-Selleks, et näha, millised jäägid esindavad **olulist** erinevust oodatud sagedustest, vaatame **standardiseeritud jääke**. Standardiseeritud jäägid R-i hii-ruut-testi kontekstis (ka Pearsoni jäägid on põhimõtteliselt standardiseeritud) väljendavad erinevust tegeliku ja oodatud sageduse vahel, mis on jagatud mitte ruutjuurega oodatud sagedustest (nagu tavaliste Pearsoni jääkide puhul), vaid ruutjuurega avaldisest, kus korrutatakse oodatud sagedused, 1 - oodatud sageduste osakaal ridade summast ja 1 - oodatud sageduste osakaal tulpade summast. Need on tuntud ka kui *adjusted residuals*.  
+Selleks aga, et näha, millised jäägid esindavad **olulist** erinevust oodatud sagedustest, vaatame **standardiseeritud jääke**. Standardiseeritud jäägid R-i hii-ruut-testi kontekstis (ka Pearsoni jäägid on põhimõtteliselt standardiseeritud) väljendavad erinevust tegeliku ja oodatud sageduse vahel, mis on jagatud mitte ruutjuurega oodatud sagedustest (nagu tavaliste Pearsoni jääkide puhul), vaid ruutjuurega avaldisest, kus korrutatakse oodatud sagedused, 1 - oodatud sageduste osakaal ridade summast ja 1 - oodatud sageduste osakaal tulpade summast. Need on tuntud ka kui *adjusted residuals*.  
 
 Näiteks lühikeses sisseütlevas käändes pärisnime standardiseeritud jääk oleks 
 
@@ -209,7 +250,7 @@ Näiteks lühikeses sisseütlevas käändes pärisnime standardiseeritud jääk 
 t$stdres
 ```
 
-Kui olulisuse nivoo on 0.05, siis on statistiliselt olulised need jäägid, mis on suuremad kui 1.96 või väiksemad kui -1.96 (tihti ümardatakse ka 2 ja -2).
+Kui olulisuse nivoo on 0.05, siis on statistiliselt olulised need jäägid, mis on suuremad kui 1.96 või väiksemad kui -1.96 (tihti ümardatakse ka 2 ja -2). Vastava kriitilise väärtuse võib leida nt funktsiooniga `qnorm(1-olulisuse_nivoo/2)`.  
 
 ```{r}
 barplot(t$stdres, 
@@ -221,8 +262,15 @@ abline(h = -1.96, col = "red", lty = "dashed")
 ```
 
 ```{r}
-library(corrplot)
-corrplot(t$stdres, is.corr = F)
+# ggplotiga
+t$stdres %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "Vorm") %>%
+  pivot_longer(., cols = c("Pärisnimi", "Üldnimi"), names_to = "Liik", values_to = "Std_jääk") %>%
+  ggplot() +
+  geom_col(aes(x = Liik, fill = Vorm, y = Std_jääk), position = "dodge") +
+  geom_hline(aes(yintercept = 1.96), col = "red", linetype = "dashed") +
+  geom_hline(aes(yintercept = -1.96), col = "red", linetype = "dashed")
 ```
 
 
@@ -233,9 +281,9 @@ Kategoriaalsete tunnuste vahelise seose tugevust saab mõõta näiteks Craméri 
 
 ```{r}
 # install.packages("vcd")
-# library(vcd)
+library(vcd)
 
-vcd::assocstats(tab)
+assocstats(tab)
 ```
 
 Sümmeetrilise 2x2 risttabeli puhul on Craméri V (ruutjuur hii-ruut-statistiku ja vaatluste arv * vabadusastmete arv jagatisest) ja φ-kordaja (ruutjuur hii-ruut-statistiku ja vaatluste arvu jagatisest) samad ja varieeruvad vahemikus nullist üheni. 
@@ -264,13 +312,19 @@ Ka hii-ruut-testi jaoks võib arvutada välja testi võimsuse, mis ütleb, kui s
 
 ```{r, message=FALSE, warning=FALSE}
 library(pwr)
-w <- vcd::assocstats(tab)$cramer # mõju suurus
+w <- assocstats(tab)$cramer # mõju suurus
 N <- sum(tab) # vaatluste arv
 df <- t$parameter # vabadusastmete arv
 
 pwr.chisq.test(w = w, N = N, df = df, sig.level = 0.05)
 ```
 
+
+## Harjutus 2
+
+Leia, millised soo ja valimisnimekirja kombinatsioonid panustavad kõige enam hii-ruut-testi tulemusse (standardiseeritud jäägid), kui tugev on seos soo ja valimisnimekirja vahel ning milline on testi võimsus.  
+
+Kontrolli seejärel, kas äkki tuli küsimustiku andmete põhjal seos lemmikjoogi ja kvantitatiivsete meetodite kogemuse vahel ebaoluline seetõttu, et testi võimsus polnud piisav.  
 
 
 ## Fisheri täpne test
@@ -369,6 +423,6 @@ set.seed(1)
 chisq.test(tab2, simulate.p.value = TRUE, B = 3000)
 ```
 
-## Harjuta
+## Järgmisel korral
 
-Kas leiad kursusel kasutatud küsimustiku andmestikust mõne statistiliselt olulise seose kahe kategoriaalse tunnuse vahel?  
+Järgmisel korral läheme kahe tunnuse vaheliste seoste hindamise juurest regressioonimudelite juurde, mis võimaldavad ühe tunnuse muutumist kirjeldada enamate kui ainult ühe teise tunnuse kaudu. 
