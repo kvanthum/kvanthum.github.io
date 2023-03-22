@@ -364,11 +364,11 @@ Kuna *p* > 0.05, siis jääme nullhüpoteesi juurde, mille järgi jääkide vahe
 Autokorrelatsiooni testimisel tuleb hoolikas olla ka nt andmete sorteerimisega!  
 
 ```{r}
-durbinWatsonTest(lm(Mean_RT ~ Length, data = ldt[order(ldt1$Mean_RT),]))
+durbinWatsonTest(lm(Mean_RT ~ Length, data = ldt1[order(ldt1$Mean_RT),]))
 ```
 
 
-Kui oleme kindlad, et andmestik vastab kõikidele eeldustele, siis saame testida kordaja olulisust. Nagu ka t-testi puhul, võib valida, kas teeme ühepoolse või kahepoolse testi. Kui eeldame, et korrelatsioon on positiivne ehk sisukas hüpotees on, et korrelatsioonikordaja > 0, siis teeme ühepoolse hüpoteesi ja lisame *alternative = "greater"*. Kui eeldame, et korrelatsioon on negatiivne (korrelatsioonikordaja < 0), siis lisame *alternative = "less"*.
+Kui oleme kindlad, et andmestik vastab kõikidele eeldustele, siis saame testida kordaja olulisust. Nagu ka t-testi puhul, võib valida, kas teeme ühepoolse või kahepoolse testi. Kui eeldame, et korrelatsioon on positiivne ehk sisukas hüpotees on, et korrelatsioonikordaja > 0, siis teeme ühepoolse hüpoteesi ja lisame *alternative = "greater"*. Kui eeldame, et korrelatsioon on negatiivne (korrelatsioonikordaja < 0), siis lisame *alternative = "less"*. Kui pole otsest põhjust testida ainult kas negatiivset või positiivset korrelatsiooni, võib jätta `alternative` argumendi välja või kasutada *alternative = "two.sided"*.  
 NB! Funktsiooni `cor.test()` argumendid on kujul `x, y`, mitte `y ~ x`.
 
 ```{r, results='hold'}
@@ -420,6 +420,9 @@ Kuna tunnused ei ole kumbki normaaljaotusega, oleks parem kasutada Spearmani võ
 
 ```{r}
 cor.test(dr$aasta, dr$lk, method = "spearman", alternative = "greater")
+# kui pole otsest eeldust, mille kohaselt negatiivne korrelatsioon ei tohiks võimalik olla,
+# võiks tegelikult testida kahepoolset hüpoteesi
+cor.test(dr$aasta, dr$lk, method = "spearman", alternative = "two.sided")
 ```
 
 Nende andmete põhjal ei saa me väita, et korrelatsioon oleks ei tugev ega ka statistiliselt oluline.
@@ -474,6 +477,16 @@ ggplot(data = dr,
            cor.coef.name = "rho",
            alternative = "greater") 
 ```
+
+## Kuidas korrelatsioonitesti tulemust raporteerida
+
+Nagu t-testi puhul, saame ka siin kasutada paketti `report`.  
+
+```{r, warning=F, message=F}
+library(report)
+report(cor.test(dr$aasta, dr$pealp, method = "spearman", alternative = "greater"))
+```
+
 
 
 ## Korrelatsioonikordaja valimine
@@ -574,8 +587,8 @@ Vaatame näiteks korrelatsioonitesti võimsust, kui uurime sõna pikkuse ja reak
 # install.packages("pwr")
 library(pwr)
 
-n = nrow(ldt1)
-r = cor(ldt1$Mean_RT, ldt1$Length)
+n = nrow(ldt1) # valimi suurus / vaatluste arv
+r = cor(ldt1$Mean_RT, ldt1$Length) # mõju suurus (siin korrelatsioonikordaja)
 
 pwr.r.test(n = n, r = r, sig.level = 0.05, alternative = "greater")
 ```
@@ -587,19 +600,19 @@ Testi võimsuse analüüs aitab nõnda näiteks aru saada, kas statistiliselt eb
 Ka t-testile on `pwr` paketis oma funktsioon.
 
 ```{r, results='hold'}
-load("data/kysimustik_2022.RData")
+load("data/kysimustik_2023.RData")
 t.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant, 
        var.equal = TRUE)
 
 moju <- effsize::cohen.d(log(kaua_opid) ~ kogemused_kvant, kysimustik)
 
-n = nrow(kysimustik) # andmestiku ridade/vaatluste arv
-d = moju$estimate # mõju suurus
+n = nrow(kysimustik) # valimi suurus / vaatluste arv
+d = moju$estimate # mõju suurus (siin Coheni D)
 pwr.t.test(n = n, d = d, sig.level = 0.05, alternative = "two.sided")
 ```
 
 
-Siin saame t-testiga statistiliselt ebaolulise tulemuse (olulisuse nivool 0.05) ning kuna testi võimsus on sellise vaatluste arvu ning mõju suurusega päris suur (82%), peame tõdema, et ilmselt õpitud aastate arvu ja kvantitatiivsete meetodite kogemuse vahel tõepoolest ei ole olulist seost ka populatsioonis.
+Siin saame t-testiga statistiliselt ebaolulise tulemuse (olulisuse nivool 0.05) ning kuna testi võimsus on sellise vaatluste arvu ning mõju suurusega päris suur (86%), peame tõdema, et ilmselt õpitud aastate arvu ja kvantitatiivsete meetodite kogemuse vahel tõepoolest ei ole olulist seost ka populatsioonis ja tõenäosus, et teeme seda öeldes teist tüüpi vea (= tegelikult on oluline seos populatsioonis olemas), on 14%.  
 
 
 

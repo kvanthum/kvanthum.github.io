@@ -147,7 +147,7 @@ Testist saame sisuka/alternatiivse hüpoteesi kohta lugeda, et *alternative hypo
 + Ühe sabaga (*one-tailed*) testi teeme siis, kui meil on kindlad teadmised selle kohta, et üks rühm on suurem kui teine ja vastupidist võimalust ei ole. Kogu 5% eksimisvabadust (*⍺* = 0.05) pannakse selle peale, et X on suurem kui Y ning vastupidist võimalust ei kontrollita. Seega kui tegelikult Y on suurem kui X, siis ühe sabaga testiga me sellele kinnitust ei saa.
 + Kahe sabaga (*two-tailed*) testi teeme siis, kui üks rühm võib olla teisest nii suurem kui väiksem ja mõlemat võimalust on vaja kontrollida. Kahe sabaga testi puhul jagatakse vastavalt ka eksimisvõimalus kahe alternatiivse võimaluse vahel ja seega on *p*-väärtus kahe sabaga testil poole suurem.
 + Hüpoteesid peaks sõnastama ja valiku ühe või kahe sabaga testi vahel tegema lähtuvalt eelnevatest teadmistest andmete olemuse kohta, mitte lähtuvalt tulemusest.  
-+ Ühe sabaga testi kasuks peaks otsutama siis, kui see mingil välisel põhjusel on õigustatud, mitte selleks, et saavutada võimalikult suurt *p*-väärtust.
++ Ühe sabaga testi kasuks peaks otsutama siis, kui see mingil välisel põhjusel on õigustatud, mitte selleks, et saavutada võimalikult väikest *p*-väärtust.
 + T-testi argument `alternative = c("two.sided", "less", "greater")`.
 
 Näiteks me teame, et lasteaias neid samu lapsi mõõdeti ja siis nende keskmine pikkus oli 1.3 meetrit ja me taham teada, kas nad on oluliselt kasvanud. Me teame, et lühemaks jääda nad ei saa, seega võime teha ühe sabaga testi ja küsida, kas mõõdetud laste pikkus on oluliselt pikem kui 1.25 (see on siis H1):

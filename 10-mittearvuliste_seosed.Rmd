@@ -22,9 +22,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Tänases praktikumis
 
 - hii-ruut-test  
+- seose tugevuse hindamine  
 - Fisheri täpne test  
 - Monte-Carlo simulatsioon  
-- mittearvuliste tunnuste vahelise seose tugevuse hindamine  
 
 
 ## Hii-ruut-test
@@ -305,6 +305,18 @@ Suuremate (mitteruut)tabelite puhul võivad hakata kordajate väärtused erinema
 
 Tavaliselt kasutatakse 2x2 tabelist suuremate tabelite puhul Craméri V-d, sest see on võrreldav ka eri suurustega tabelite korral.
 
+## Kuidas hii-ruut-testi tulemust raporteerida
+
+Hii-ruut-testi tegemisel on tavaks esitada hii-ruut-statistiku väärtus koos vabadusastmete arvu ja vaatluste arvuga ning *p*-väärtus. Võib lisada ka info mõju suuruse kohta.  
+
+```{r, echo = F}
+chisq.test(tab, correct = F)
+```
+
+Hii-ruut-testi tulemus on statistiliselt oluline: *X^2^*(1, N = 840) = 11.239, *p* < 0.001. Craméri V on 0.12, mille põhjal on tegemist siiski nõrga seosega.  
+
+
+
 
 ## Testi võimsus
 
@@ -312,7 +324,7 @@ Ka hii-ruut-testi jaoks võib arvutada välja testi võimsuse, mis ütleb, kui s
 
 ```{r, message=FALSE, warning=FALSE}
 library(pwr)
-w <- assocstats(tab)$cramer # mõju suurus
+w <- assocstats(tab)$cramer # mõju suurus (siin Craméri V)
 N <- sum(tab) # vaatluste arv
 df <- t$parameter # vabadusastmete arv
 
@@ -322,9 +334,10 @@ pwr.chisq.test(w = w, N = N, df = df, sig.level = 0.05)
 
 ## Harjutus 2
 
-Leia, millised soo ja valimisnimekirja kombinatsioonid panustavad kõige enam hii-ruut-testi tulemusse (standardiseeritud jäägid), kui tugev on seos soo ja valimisnimekirja vahel ning milline on testi võimsus.  
+Leia, millised soo ja valimisnimekirja kombinatsioonid panustavad kõige enam hii-ruut-testi tulemusse (standardiseeritud **jäägid**), kui tugev on **seos** soo ja valimisnimekirja vahel ning milline on testi **võimsus**.  
 
 Kontrolli seejärel, kas äkki tuli küsimustiku andmete põhjal seos lemmikjoogi ja kvantitatiivsete meetodite kogemuse vahel ebaoluline seetõttu, et testi võimsus polnud piisav.  
+
 
 
 ## Fisheri täpne test
@@ -368,7 +381,7 @@ Vali Fisheri test, kui
 
 - vaatluste arv < 20 VÕI
 - vaatluste arv on 20-40 ja vähemalt üks teoreetiline sagedus on < 5 VÕI
-- vaatluse arv on > 40, aga vähemalt üks oodatav sagedus on < 1.
+- vaatluste arv on > 40, aga vähemalt üks oodatav sagedus on < 1.
 
 Muudel juhtudel sobib kasutamiseks üldiselt ka hii-ruut-test.
 
@@ -414,7 +427,7 @@ hiid <- c(
 hiid
 ```
 
-Lõpuks arvutatakse nende kordade osakaal simuleeritud tabelitest, mille puhul leitud hii-ruut-statistik oli sama suur või suurem kui algse (ilma pidevusparanduseta) testi statistik `r chisq.test(tab, correct = F)$statistic`. See osakaal ongi testi *p*-väärtus.
+Lõpuks arvutatakse nende kordade osakaal simuleeritud tabelitest, mille puhul leitud hii-ruut-statistik oli sama suur või suurem kui algse (ilma pidevusparanduseta) testi statistik `r chisq.test(tab2, correct = F)$statistic`. See osakaal ongi testi *p*-väärtus.
 
 
 ```{r}
@@ -425,4 +438,4 @@ chisq.test(tab2, simulate.p.value = TRUE, B = 3000)
 
 ## Järgmisel korral
 
-Järgmisel korral läheme kahe tunnuse vaheliste seoste hindamise juurest regressioonimudelite juurde, mis võimaldavad ühe tunnuse muutumist kirjeldada enamate kui ainult ühe teise tunnuse kaudu. 
+Järgmisel korral läheme kahe tunnuse vaheliste seoste hindamise juurest regressioonimudelite juurde, mis võimaldavad ühe tunnuse muutumist kirjeldada enamate tunnuste kaudu. **NB!** Järgmine praktikum alles ülejärgmisel nädalal (3.04)!

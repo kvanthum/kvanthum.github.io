@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '11-lineaarsed1.html'))})
-date: 4.04.2022
+date: 2.04.2023
 output: 
   html_document:
     theme: flatly
@@ -31,7 +31,7 @@ Kasutame vanu tuttavaid andmestikke:
 
 - `ldt.csv`
 - `DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt`
-- `kandidaadid.RData`
+- `kandidaadid2019.RData`
 
 
 ## Seletav tunnus arvuline
@@ -39,7 +39,7 @@ Kasutame vanu tuttavaid andmestikke:
 - Lineaarne regressioon seletab ühe arvulise tunnuse muutumist sõltuvalt teis(t)e tunnus(t)e muutumisest. 
 - Kahe arvulise tunnuse puhul on see sama mis korrelatsioon, aga kui korrelatsiooni puhul me ei ütle, kumb tunnus teise muutuse põhjustab, siis lineaarses mudelis on **sõltuv tunnus y** ja **seletav tunnus x**. 
 - Sõltuv tunnus **peab** olema arvuline tunnus.
-- Seletav tunnus võib olla  arvuline või ka nominaalne kategoriaalne tunnus (faktor)
+- Seletav tunnus võib olla arvuline või ka nominaalne kategoriaalne tunnus (faktor)
 
 ### Mudeli eeldused
 
@@ -55,7 +55,7 @@ Nagu t-testigi puhul, on lineaarse regressiooni eelduseks, et
 
 ### Näide 1: Kas lühemaid sõnu tuntakse kiiremini ära?
 
-Kasutame eelmisest korrast tuttavat Levshina õpiku andmestikku `ldt`. Eelmisel korral leidsime, et sõnade äratundmise keskmise reaktsiooniaja ja sõna pikkuse vahel oli positiivne korrelatsioon. Proovime sama lineaarse regressioonimudeliga testida.
+Kasutame üleeelmisest korrast tuttavat Levshina õpiku andmestikku `ldt`. Eelmisel korral leidsime, et sõnade äratundmise keskmise reaktsiooniaja ja sõna pikkuse vahel oli positiivne korrelatsioon. Proovime sama lineaarse regressioonimudeliga testida.
 
 ```{r, fig.align = 'center'}
 ldt <- read.csv("data/ldt.csv")
@@ -66,7 +66,7 @@ abline(m, col="red")
 
 ### Kas mudeli eeldused on täidetud?
 
-- Iga sõna esineb andmestikus ühe korra, rühma keskmised reaktsiooniajad.
+- Iga rida andmestikus käib ühe katses esinenud sõna kohta, mida testis esineb ühe korra. Katses osales rohkem kui üks katseisik, kes igale sõnale vastasid, aga andmestikus on iga sõna kohta rühma keskmised reaktsiooniajad.
 - Kas tunnused on normaaljaotusega? Testime!
     + sõna pikkus on
     + reaktsiooniaeg on, kui logaritmida
@@ -80,6 +80,7 @@ Kui korrelatsiooni puhul me testisime seda, kas kahe arvulise tunnuse vahel on s
 - Kas sõna pikkus võib mõjutada seda, kui kiiresti see ära tuntakse?
 
 Lineaarse mudeli saab käsuga `lm()`, mida kasutasime juba regressioonijoone joonistamiseks.
+
 ```{r}
 ldt2 <- ldt[ldt$Mean_RT < 1200,]
 m <- lm(Mean_RT~Length, data=ldt2)
@@ -182,7 +183,7 @@ plot(lk~aasta, data=dokt, main="Eesti keele doktoritööde maht", xlim=c(0, 2020
 abline(mudel)
 ```
 
-Tegelikult ei peaks muidugi vaatama mudelit tegelike andmete muutumispiirkonnast väljaspool. Põhimõtteliselt oleks ka võimalik mitte mudelile vabaliiget jätta või siis teisendada andmeid nii, et 0 oleks näiteks esimene vaadeldav aasta, kust meil on mõõtmisi (st aasta 1994, kui toimusid esimesed doktoritööde kaitsmised). 
+Tegelikult ei peaks muidugi vaatama mudelit tegelike andmete muutumispiirkonnast väljaspool. Mõningatel juhtudel on kasulik teisendada andmeid nii, et 0 oleks näiteks esimene vaadeldav aasta, kust meil on mõõtmisi (st aasta 1994, kui toimusid esimesed doktoritööde kaitsmised), sellisel juhul on vabaliige ja kirjeldavate tunnuste efektid paremini interpreteeritavad. 
 
 
 ## Seletav tunnus nominaalne
@@ -194,16 +195,16 @@ Tegelikult ei peaks muidugi vaatama mudelit tegelike andmete muutumispiirkonnast
 - Erinevus arvulise kirjeldava tunnusega mudelist on see, et kui arvulise tunnuse puhul on üks *kalde kordaja* (*slope*), siis **nominaalsel tunnusel on iga baastasemest erineva taseme kohta eraldi kordaja**. Arvulise tunnuse puhul saab kalde kordaja tunnuse väärtusega läbi korrutades välja arvutada kalde väärtuse igas skaalalpunktis. Nominaalse tunnuse puhul rakendatakse vastava taseme kalde kordajat binaarselt TRUE/FALSE väärtustega.
 
 ## Kahe tasemega faktor
-### Näide 3: Kas kandidaadi sugu mõjutab häältesaaki?
+### Näide 3: Kas kandidaadi sugu mõjutab häältesaaki (2019 riigikogu valmisite andmetes)?
 
 Võtame valimistulemuste andmestiku ja vaatame alustuseks kahe tasemega faktorit: kas sugu mõjutab häältesaaki? Me oleme juba t-testiga teinud kindlaks, et meeskandidaadid said keskmiselt rohkem hääli kui naiskandidaadid, kuigi efekti suurus oli väga väike.
 
 ```{r}
-load("data/kandidaadid.RData")
+load("data/kandidaadid2019.RData")
 ```
 Kas mudeli eeldused on täidetud?
 
-- Mäletatavasti tunnus haali_kokku ei ole normaaljaotusega, aga kui see logaritmida, siis vastab normaaljaotuse tunnustele. Kuna kandidaate oli rohkem kui 30, siis võiks ka normaaljaotuse eeldust ignoreerida, aga kui logaritmimine aitab normaalajotust saavutada, siis võiks seda ikkagi teha.
+- Mäletatavasti tunnus hääli_kokku ei ole normaaljaotusega, aga kui see logaritmida, siis vastab normaaljaotuse tunnustele. Kuna kandidaate oli rohkem kui 30, siis võiks ka normaaljaotuse eeldust ignoreerida, aga kui logaritmimine aitab normaalajotust saavutada, siis võiks seda ikkagi teha.
 - Mõõtmised on sõltumatud: iga kandidaat on individuaalne isik ja esindatud andmestikus ühe reaga.
 
 Sõltuva ja sõltmatu tunnuse määramisel ei ole siin ilmselt vaja pikalt mõelda, sest juba tehniliselt kui me tahame kasutada lineaarset mudelit, siis uuritav tunnus peab olema arvuline. Ja kui oleks võimalus, et kandidaadi sugu võiks mõjutada see, kui palju ta hääli sai, siis peaksime valima hoopis logistilise regressioonimudeli, millest tuleb juttu umbes üle-ülejärgmises praktikumis :)
@@ -214,7 +215,7 @@ Kahetasemelise faktori puhul ei ole mudeli väljundi tõlgenduse seisukohast vä
 
 
 ```{r}
-sugu.lm <- lm(log(haali_kokku)~sugu, data=kandidaadid)
+sugu.lm <- lm(log(hääli_kokku)~sugu, data=kandidaadid2019)
 summary(sugu.lm)
 ```
 
@@ -231,8 +232,8 @@ AGA nüüd on vabaliikmeks ehk mõtteliseks 0-punktiks faktori baastase. St esim
 summary(sugu.lm)
 ```
 
-
 Mudel annab prognoositud väärtused: meeste häälesaak on 5.08749 ühikut ja naiste oma on meeste omast -0.23767 võrra erinev. Ühikud on üldiselt samad mudeli sisendiks olnud ühikud, ehk hääled, AGA siin peab meeles pidama, et kui normaliseerimise eesmärgil sai uuritav tunnus logaritmitud, siis mudeli prognoositud väärtustest algse ühiku kätte saamiseks peame tegema logaritmimise pöördtehte ehk astendama:
+
 ```{r}
 # Meeste häältesaak on vabaliikme väärtus
 exp(sugu.lm$coefficients[1])
@@ -242,12 +243,12 @@ exp(sugu.lm$coefficients[1]+sugu.lm$coefficients[2])
 
 Teeme selguse mõttes sama mudeli ka ilma logaritmimata uuritava tunnusega, see küll eirab mudeli normaaljaotuse eeldust, aga on oluliselt lihtsam tõlgendada:
 ```{r}
-sugu.lm2 <- lm(haali_kokku~sugu, data=kandidaadid)
+sugu.lm2 <- lm(hääli_kokku~sugu, data=kandidaadid2019)
 summary(sugu.lm2)
 ```
 Nüüd võime koefitsientide põhjal öelda, et mehed said keskmiselt `r round(sugu.lm2$coefficients[1])` häält ja naised `r abs(round(sugu.lm2$coefficients[2]))` häält vähem ehk keskmiselt `r round(sugu.lm2$coefficients[1] + sugu.lm2$coefficients[2])` häält. Ja saame mudeli prognoositud väärtusi otse võrrelda aritmeetiliste keskmiste väärtustega:
 ```{r}
-tapply(kandidaadid$haali_kokku, kandidaadid$sugu, mean)
+tapply(kandidaadid2019$hääli_kokku, kandidaadid2019$sugu, mean)
 ```
 
 
@@ -256,12 +257,12 @@ tapply(kandidaadid$haali_kokku, kandidaadid$sugu, mean)
 
 Proovime nüüd  testida seletavat tunnust, millel oleks rohkem kui kaks taset. Näiteks kandidaatide haridus:
 ```{r}
-table(kandidaadid$haridus)
+table(kandidaadid2019$haridus)
 ``` 
 Haridusel on kandidaatide andmestikus 4 taset, aga kuna algharidusega kandidaate on ainult 1, siis ilmselt oleks mõistlik jätta see kandidaat analüüsist välja, sest üks mõõtmispunkt on liiga vähe, et seost kirjeldada.
 
 ```{r}
-haridus.lm <- lm(log(haali_kokku)~haridus, data=kandidaadid, subset = haridus != "Algharidus")
+haridus.lm <- lm(log(hääli_kokku)~haridus, data=kandidaadid2019, subset = haridus != "Algharidus")
 summary(haridus.lm)
 ```
 
@@ -295,7 +296,7 @@ ANOVA võrdleb rühmade hajuvust valimi üldise hajuvusega. R-is on ANOVA seotud
 Anova testi tegemiseks paneme lihtsalt lineaarse mudeli väljundi `summary()` käsu asemel `anova()` käsu sisse:
 
 ```{r}
-sugu.lm <- lm(log(haali_kokku)~sugu, data=kandidaadid)
+sugu.lm <- lm(log(hääli_kokku)~sugu, data=kandidaadid2019)
 anova(sugu.lm)
 ```
 
@@ -309,7 +310,7 @@ anova(sugu.lm)
 Kahe tasemega faktori puhul on tulemus võrdlemisi sarnane t-testiga.
 
 ```{r}
-t.test(log(haali_kokku)~sugu, data=kandidaadid)
+t.test(log(hääli_kokku)~sugu, data=kandidaadid2019)
 ```
 
 ## ANOVA, faktor 3 tasemega
@@ -318,7 +319,7 @@ t.test(log(haali_kokku)~sugu, data=kandidaadid)
 Nüüd näide rohkem kui kahe tasemega faktorist: kandidaatide andmestikus haridus on 4 taset, või kui ainult ühe mõõtmisega põhiharidus välja visata, siis on 3 taset. Ainult üks mõõtmine on endiselt liiga vähe. Aga kolme rühmaga enam t-testi teha ei saa.
 
 ```{r}
-haridus.lm <- lm(log(haali_kokku)~haridus, data=kandidaadid, subset = haridus != "Algharidus")
+haridus.lm <- lm(log(hääli_kokku)~haridus, data=kandidaadid2019, subset = haridus != "Algharidus")
 anova(haridus.lm)
 ```
 
@@ -351,8 +352,8 @@ siis me ei tea, kas kõrghariduse ja põhiharidusega kandidaatide häältesaak o
 Kordame lihtsalt lineaarset mudelit muudetud baasväärtusega. Sellks võib andmestikus muuta ära baasväärtuse käsuga `relevel()` (või lihtsalt käsuga `factor()`), aga kui me ei taha andmestikku muuta, võib ainult `lm()` käsu sees muuta faktori baastaset käsuga `C()`. Lisaks, kuna ühe haridustaseme jätsime välja, tuleks kasutada käsku `droplevels()`, mis eemaldab faktoritasemed, mida ei esine.
 
 ```{r}
-haridus.lm1 <- lm(log(haali_kokku)~C(droplevels(haridus), base=1), data=kandidaadid[ kandidaadid$haridus != "Algharidus",])
-haridus.lm2 <- lm(log(haali_kokku)~C(droplevels(haridus), base=3), data=kandidaadid[ kandidaadid$haridus != "Algharidus",])
+haridus.lm1 <- lm(log(hääli_kokku)~C(droplevels(haridus), base=1), data=kandidaadid2019[ kandidaadid2019$haridus != "Algharidus",])
+haridus.lm2 <- lm(log(hääli_kokku)~C(droplevels(haridus), base=3), data=kandidaadid2019[ kandidaadid2019$haridus != "Algharidus",])
 summary(haridus.lm1)
 summary(haridus.lm2)
 ```
@@ -398,7 +399,7 @@ Need annavad täpselt sama tulemuse. Kuid Tukey testi sisendiks peab kasutama k�
 
 
 ```{r}
-haridus.anova <- aov(log(haali_kokku)~haridus, data=kandidaadid, subset = haridus != "Algharidus")
+haridus.anova <- aov(log(hääli_kokku)~haridus, data=kandidaadid2019, subset = haridus != "Algharidus")
 summary(haridus.anova)
 ```
 

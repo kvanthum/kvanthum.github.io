@@ -386,23 +386,17 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before {
-content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "\e259";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "";
-border: none;
-}
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "";
+content: "\e258";
 font-family: 'Glyphicons Halflings';
-display: inline-block;
-padding: 10px;
-border-right: 1px solid #ddd;
+border: none;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -553,7 +547,7 @@ sooritus/mõõtmine;</li>
 <ul>
 <li>soorituskatses iga katseisik vastab mitmele küsimusele;</li>
 <li>korpuses, kus on mitu erinevat teksti ja igas tekstis on mitu
-lauset, mingit iga lause puhul mõõdetud tunnust;</li>
+lauset, uuritakse mingit iga lause puhul mõõdetud tunnust;</li>
 <li>üliõpilaste eksamitulemused erinevatel kursustel, kui (osaliselt)
 samad üliõpilased osalevad mitmel kursusel…</li>
 <li>…</li>
@@ -668,7 +662,7 @@ tegema lähtuvalt eelnevatest teadmistest andmete olemuse kohta, mitte
 lähtuvalt tulemusest.<br />
 </li>
 <li>Ühe sabaga testi kasuks peaks otsutama siis, kui see mingil välisel
-põhjusel on õigustatud, mitte selleks, et saavutada võimalikult suurt
+põhjusel on õigustatud, mitte selleks, et saavutada võimalikult väikest
 <em>p</em>-väärtust.</li>
 <li>T-testi argument
 <code>alternative = c(&quot;two.sided&quot;, &quot;less&quot;, &quot;greater&quot;)</code>.</li>
@@ -1162,7 +1156,7 @@ normaaljaotust, pole siin häälte arvu vaja logaritmida.</p>
 ##  Wilcoxon rank sum test with continuity correction
 ## 
 ## data:  kandidaadid2019$hääli_kokku by kandidaadid2019$sugu
-## W = 147164, p-value = 0.007688
+## W = 147165, p-value = 0.007688
 ## alternative hypothesis: true location shift is not equal to 0
 ## 95 percent confidence interval:
 ##   5.000035 44.999999
