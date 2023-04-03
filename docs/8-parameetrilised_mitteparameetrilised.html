@@ -522,8 +522,8 @@ pikkust, Tammsaare teoste keskmist sõnade pikkust, komplekssust vmt,
 siis saame kontrollida, kas meie valim pärineb samast
 populatsioonist);</li>
 </ul></li>
-<li>uuritav tunnus on normaaljaotusega või kummaski grupis on vaatluste
-arv &gt; 30;</li>
+<li>uuritav tunnus on (kummaski grupis) normaaljaotusega või kummaski
+grupis on vaatluste arv &gt; 30;</li>
 <li>valim on juhuslik st uuritavad subjektid on valimisse valitud
 juhuslikult;
 <ul>
@@ -708,9 +708,13 @@ tulbas: <code>t.test(x, y)</code></li>
 ## 6  mees          36</code></pre>
 <p>Enne t-testi tegemist peaks veenduma, et andmed on ka
 normaaljaotusega.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>((kandidaadid2019<span class="sc">$</span>hääli_kokku))</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qqline</span>((kandidaadid2019<span class="sc">$</span>hääli_kokku))</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">shapiro.test</span>((kandidaadid2019<span class="sc">$</span>hääli_kokku))</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># kogu tunnus</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>((kandidaadid2019<span class="sc">$</span>hääli_kokku))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">qqline</span>((kandidaadid2019<span class="sc">$</span>hääli_kokku))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">shapiro.test</span>((kandidaadid2019<span class="sc">$</span>hääli_kokku))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># gruppides eraldi</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(kandidaadid2019<span class="sc">$</span>hääli_kokku, kandidaadid2019<span class="sc">$</span>sugu, shapiro.test)</span></code></pre></div>
 <p>Kuigi meil võib olla seda küsimust esitades mõngane eelaimus, et
 meeskandidaadid võisid saada rohkem hääli kui naiskandidaadid, siis me
 otseselt ei saa välistada võimalust, et meeskandidaadid võisid naistest
