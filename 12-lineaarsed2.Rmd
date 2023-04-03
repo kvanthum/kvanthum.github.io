@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '12-lineaarsed2.html'))})
-date: 6.04.2022
+date: 5.04.2023
 output: 
   html_document:
     theme: flatly
@@ -28,7 +28,8 @@ knitr::opts_chunk$set(echo = TRUE)
 Andmestikud endiselt:
 
  - `ldt.csv`
- - `kandidaadid.RData`
+ - `kandidaadid2019.RData`
+ - `kandidaadid2023.csv`
 
 ## Kaks arvulist tunnust
 
@@ -280,10 +281,10 @@ Kuna interaktsioon mudelis `ldt1.mod2` ei olnud oluline, siis selleks et interak
 <br><br>
 ```{r, fig.align = 'center', echo=F, fig.width=15}
 par(mfcol = c(1,2))
-plot(Mean_RT ~ Length, data = ldt1, xlab = "Sõna pikkus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna pikkus")
+plot(Mean_RT ~ Length, type="n", data = ldt1, xlab = "Sõna pikkus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna pikkus")
 for(i in log1p(quantile(ldt1$Freq))) lines(x = 3:14, y = (700 + 15*3:14 + i * -25 + 3:14*i*3), col = which(quantile(log1p(quantile(ldt1$Freq))) == i))
 
-plot(Mean_RT ~ log1p(Freq), data = ldt1, xlab = "Sõna sagedus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna sagedus", axes = F)
+plot(Mean_RT ~ log1p(Freq), type="n", data = ldt1, xlab = "Sõna sagedus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna sagedus", axes = F)
 for(i in quantile(ldt1$Length)) lines(x = 0:12, y = (700 + i * 15 + 0:12 * -25 + i*0:12*3), col = which(quantile(ldt1$Length)==i))
 box(); axis(side=2); axis(side=1, at=0:12, labels = round(exp(0:12)-1))
 ```
@@ -295,10 +296,10 @@ Ja kui interaktsioon oleks negatiivne:
 <br><br>
 ```{r, fig.align = 'center', echo=F, fig.width=15}
 par(mfcol = c(1,2))
-plot(Mean_RT ~ Length, data = ldt1, xlab = "Sõna pikkus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna pikkus")
+plot(Mean_RT ~ Length, data = ldt1, type="n", xlab = "Sõna pikkus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna pikkus")
 for(i in log1p(quantile(ldt1$Freq))) lines(x = 3:14, y = (1000 + 3:14 * 15 + i * -25 + 3:14*i*-3), col = which(quantile(log1p(quantile(ldt1$Freq))) == i))
 
-plot(Mean_RT ~ log1p(Freq), data = ldt1, xlab = "Sõna sagedus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna sagedus", axes = F)
+plot(Mean_RT ~ log1p(Freq), data = ldt1, type="n", xlab = "Sõna sagedus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna sagedus", axes = F)
 for(i in quantile(ldt1$Length)) lines(x = 0:12, y = (1000 + i * 15 + 0:12 * -25 + i*0:12*-3), col = which(quantile(ldt1$Length) == i))
 box(); axis(side=2); axis(side=1, at=0:12, labels = round(exp(0:12)-1))
 ```
@@ -354,11 +355,11 @@ Sageli kasutatakse ka hoopis **inkrementaalset** meetodit, st alustatakse 0-mude
 
 Loeme valimistulemuste andmestiku R-i.
 ```{r}
-load("data/kandidaadid.RData")
+load("data/kandidaadid2019.RData")
 ```
 Vaatasime eelmisel korral eraldi soo ja vanuse efekti häältesaagile ja leidsime, et mõlemal faktoril on väike aga oluline efekt. Nüüd võiksime ühes mudelis testida kõiki võimalikke faktoreid ja välja selgitada, millised kirjeldavad häältesaaki kõige paremini. Andmestikus on sellised faktorid, mille seosed on andmestikku lisatud eeldusel, et neil on ehk hääletustulemusega mingi seos:
 ```{r}
-colnames(kandidaadid)
+colnames(kandidaadid2019)
 ```
 ## Ettevalmistused suuremaks mudeliks
 
@@ -373,7 +374,7 @@ Kui meil on rohkem sõltumatuid tunnuseid, mida mudelis testida, on oluline kont
 - Võib testida tunnuste vahelist korrelatsiooni.
 
 ```{r}
-cov2cor(cov(kandidaadid[,c("e_haaled", "haaled_valisriigist", "kokku_ringkonnas","nr")]))
+cov2cor(cov(kandidaadid2019[,c("e.hääli", "hääli_välisriigist", "kokku_ringkonnas","nr")]))
 ```
 - VIF ehk Variance Inflation Factor (nt car::vif(model1))
 
@@ -381,54 +382,54 @@ cov2cor(cov(kandidaadid[,c("e_haaled", "haaled_valisriigist", "kokku_ringkonnas"
 
 Kandidaatide tabelis on `erakondlik_kuuluvus` ja `nimekiri_voi_uksikkandidaat` väga sarnased, sest enamik kandidaate riigikogu valimistel kandideerib oma erakonna nimekirjas, seega tasuks valida neist üks:
 ```{r, eval=T}
-table(kandidaadid$erakondlik_kuuluvus) # üks ühene rühm
-table(kandidaadid$nimekiri_voi_uksikkandidaat)
+table(kandidaadid2019$erakond) # üks ühene rühm
+table(kandidaadid2019$nimekiri) # valime selle
 ```
 
 
 ```{r, eval=F}
-table(kandidaadid$haridus) # eemalda ühene rühm
-table(kandidaadid$sodiaak)
+table(kandidaadid2019$haridus) # eemalda ühene rühm
+table(kandidaadid2019$tähtkuju)
 ```
 
 Kandidaatide töökohtadest oleks vist liiga keeruline mingit selgete piiridega faktorit kujundada ilma käsitsi sekkumata :(
 ```{r, eval=F}
-head(kandidaadid$tookoht_ja_amet) 
+head(kandidaadid2019$amet) 
 ```
 
 Kandidaatide kontaktanmded ei moodusta ka faktoriseeritavat tunnust, siis võiks ehk ainult vaadata, kas meiliaadress on või ei ole ja vaadata, kas häältesaak võiks seostuda sellega, kas kandidaat kasutab e-posti või mitte.
 ```{r, eval=T}
-head(kandidaadid$kontaktandmed)
-length(grep("@", kandidaadid$kontaktandmed))
+head(kandidaadid2019$kontakt)
+length(grep("@", kandidaadid2019$kontakt))
 ```
 Teeme muutuja *kasutab_meili* binaarse faktorina selle põhjal, kas aadressis esineb "@" sümbol:
 ```{r, eval=T}
-kandidaadid$kasutab_meili <- "ei"; kandidaadid$kasutab_meili[grep("@", kandidaadid$kontaktandmed)] <- "jah"
-kandidaadid$kasutab_meili <- factor(kandidaadid$kasutab_meili, levels = c("jah","ei"))
+kandidaadid2019$kasutab_meili <- "ei"; kandidaadid2019$kasutab_meili[grep("@", kandidaadid2019$kontakt)] <- "jah"
+kandidaadid2019$kasutab_meili <- factor(kandidaadid2019$kasutab_meili, levels = c("jah","ei"))
 ```
 
 Et lisada veel võimalikke kirjeldavaid tunnuseid, tekitame kandidaadi nime põhjal ühe tunnuse, mis võiks kirjeldada nime keerukust: kas nime pikkus (~keerukus) mõjutab häältesaaki :)
 ```{r, eval=F}
-head(kandidaadid$nimi) 
-summary(nchar(kandidaadid$nimi))
+head(kandidaadid2019$nimi) 
+summary(nchar(kandidaadid2019$nimi))
 ```
 ```{r, eval=T}
-kandidaadid$nime_pikkus <- nchar(kandidaadid$nimi)
+kandidaadid2019$nime_pikkus <- nchar(kandidaadid2019$nimi)
 ```
 
 Ja lõpetuseks: sünniaeg on *date*-formaadis, mis võib osutuda tülikaks, selle võiks teisendada vanuseks. Valimised toimusid 2019, nii et arvutame vanuse valimiste ajal.
 ```{r, eval=T}
-is(kandidaadid$sunniaeg)
-head(kandidaadid$sunniaeg)
-kandidaadid$vanus <- 2019 -as.numeric(substr(kandidaadid$sunniaeg, 1,4))
+is(kandidaadid2019$sünniaeg)
+head(kandidaadid2019$sünniaeg)
+kandidaadid2019$vanus <- 2019 -as.numeric(substr(kandidaadid2019$sünniaeg, 1,4))
 ```
-
+## Modelleerimise sammud
 ### Null-mudel ilma ühegi seletava tunnuseta
 
 Kui mudelil ei ole ühtegi seletavat tunnust, uuritava tunnuse varieerumist seletab tema varieerumine ise, siis sellise mudeli valemiks on y ~ 1.
 
 ```{r}
-m0 <- lm(log(haali_kokku) ~ 1, data = kandidaadid, subset = haridus != "Algharidus")
+m0 <- lm(log(hääli_kokku) ~ 1, data = kandidaadid2019, subset = haridus != "Algharidus")
 summary(m0)
 ```
 
@@ -443,7 +444,7 @@ Aga kuna me eelmisel korral juba vaatasime sugu ja haridust, siis alustame neist
 Esimeseks faktoriks lisame *hariduse* ja võrdleme seda ANOVA testi abil nullmudeliga.
 
 ```{r}
-m1 <- lm(log(haali_kokku) ~ haridus, data = kandidaadid, subset = haridus != "Algharidus")
+m1 <- lm(log(hääli_kokku) ~ haridus, data = kandidaadid2019, subset = haridus != "Algharidus")
 anova(m0, m1)
 ```
 Faktor *haridus* muudab mudelit oluliselt, nii et jääb sisse.
@@ -457,7 +458,7 @@ anova(m1)
 
 Lisame teise faktorina soo ning nüüd võrdleme seda mitte nullmudeli vaid eelmise sammuga:
 ```{r, echo=T}
-m2 <- lm(log(haali_kokku) ~ haridus + sugu, data = kandidaadid, subset = haridus != "Algharidus")
+m2 <- lm(log(hääli_kokku) ~ haridus + sugu, data = kandidaadid2019, subset = haridus != "Algharidus")
 anova(m1, m2)
 ```
 Jällegi on mõju oluline, *sugu* peaks ka mudelisse jääma. Vaatame mudeli kokkuvõtet ja ANOVAT ka.
@@ -471,7 +472,7 @@ anova(m2)
 
 Lisame kahe olulise faktori interaktsiooni ja võrdleme seda ainult peamõjusid sisaldava mudeliga:
 ```{r, echo=T}
-m3 <- lm(log(haali_kokku) ~ haridus + sugu + haridus:sugu, data = kandidaadid, subset = haridus != "Algharidus")
+m3 <- lm(log(hääli_kokku) ~ haridus + sugu + haridus:sugu, data = kandidaadid2019, subset = haridus != "Algharidus")
 anova(m2, m3)
 ```
 Ka see on oluline! Vaatame jälle ka mudeli väljundi üle.
@@ -511,7 +512,7 @@ plot_model(m3, type = "int")
 
 Lisame ühe täiendava faktori, näiteks vanuse:
 ```{r}
-m4 <- lm(log(haali_kokku) ~ haridus + sugu + haridus:sugu + vanus, data = kandidaadid, subset = haridus != "Algharidus")
+m4 <- lm(log(hääli_kokku) ~ haridus + sugu + haridus:sugu + vanus, data = kandidaadid2019, subset = haridus != "Algharidus")
 anova(m3, m4)
 ```
 Mudel ei läinud paremaks, nii et see jääb välja, aga vaatame enne mudeli väljundit:
@@ -524,8 +525,7 @@ Selle mudeli p-väärtus on endiselt oluline, st ebaoluline faktor ei tee mudeli
 
 Lisame vanuse asemel näiteks nimekirja, kus kandidaat kandideeris. Kuna sel tulbal on tabelis üsna pikk nimi ja mudeli väljundis esineb see tunnus tulba nimega, siis selle võiks välja vahetada millegi lühema vastu nt "nimek".
 ```{r}
-colnames(kandidaadid)[4] <- "nimek"
-m4 <- lm(log(haali_kokku) ~ haridus + sugu + haridus:sugu + nimek, data = kandidaadid, subset = haridus != "Algharidus")
+m4 <- lm(log(hääli_kokku) ~ haridus + sugu + haridus:sugu + nimekiri, data = kandidaadid2019, subset = haridus != "Algharidus")
 anova(m3, m4)
 ```
 See on jälle väga oluline faktor, jääb sisse!
@@ -543,7 +543,7 @@ Edasi võiks sammhaaval testida kõik võimalikud kombinatsioonid läbi. Mis on 
 
 Alternatiiv oleks alustada maksimaalsest mudelist, mis oleks:
 
-log(haali_kokku)~ nimek \* ringkond \* haridus \* sugu \* vanus \* sodiaak \* kasutab_meili \* nime_pikkus
+log(hääli_kokku)~ nimekiri \* ringkond \* haridus \* sugu \* vanus \* tähtkuju \* kasutab_meili \* nime_pikkus
 
 See sisaldab 8 faktori peamõju, 28 kahe faktori interaktsiooni, 56 kolme faktori interaktsiooni 70 neljast, 56 viiest, 28 kuuest 8 seitsmest ja 1 kaheksa faktori interakstiooni :O
 
@@ -566,8 +566,15 @@ Käsk `step()` kasutab Aikaike informatsioonikriteeriumit (AIC), et ehitada samm
 - Teine argument on `scope`, kuhu praegusel juhul paneme maksimaalse mudeli, st kõikide faktorite ja nendevaheliste interaktsioonidega.
 - Kolmas argument on `direction`, mis määrab faktorite lisamise suuna. Variandid on "both", "backward", "forward", siit praegu valime viimase, mis tähendab, et alustatakse kõige väiksemast mudelist ja lisatakse sellele faktoreid seni, kuni mudel ei lähe enam paremaks. "Backward" tähendaks, et alustatakse maksimaalsest ja faktoreid võetakse vähemaks seni, kuni mudel ei lähe enam paremaks, ja nii võib tulemus tulla veidi erinev.
 
+Teeme kiire katse leida olulised faktorid, mis mõjutasid 2023. aasta valimiste tulemusi.
+
+```{r}
+kandidaadid2023 <- read.delim("data/kandidaadid_2023.csv")
+```
+
+
 ```{r, eval=T}
-m_step <- step(lm(log(haali_kokku) ~ 1, data = kandidaadid, subset = haridus != "Algharidus"), scope = log(haali_kokku) ~ nimek * ringkond * haridus * sugu * vanus * sodiaak * kasutab_meili * nime_pikkus, direction = "forward")
+m_step <- step(lm(log(hääli_kokku) ~ 1, data = kandidaadid2023), scope = log(hääli_kokku) ~ nimekiri * ringkond * haridus * sugu * vanus * tähtkuju, direction = "forward")
 ```
 
 Vaatame tulemust:
@@ -595,7 +602,7 @@ Anova(m3, type="III")
 
 Vaatame Tukey HSD tulemust mudeliga, kus on kahe faktori peamõjud ja nende vaheline interaktsioon:
 ```{r, echo=T}
-TukeyHSD(aov(log(haali_kokku) ~ haridus + sugu + haridus:sugu, data = kandidaadid, subset = haridus != "Algharidus"))
+TukeyHSD(aov(log(hääli_kokku) ~ haridus + sugu + haridus:sugu, data = kandidaadid2019, subset = haridus != "Algharidus"))
 ```
 
 Tukey HSD test annab kõikide faktori tasemete vaheliste paaride võrdlused. Keerulisema ja rohketasemelise faktori korral võib see väljund olla üsna pikk ja kirju. Tavaliselt post-hoc testi tulemusi ei raporteerita tabelina vaid tehakse sellest teksti sees üldistusi või korjatakse sealt välja võrdlused, mis on sisuliselt huvitavad.
