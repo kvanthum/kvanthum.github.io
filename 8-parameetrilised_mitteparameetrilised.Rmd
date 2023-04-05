@@ -74,7 +74,7 @@ T-test sobib siis, kui:
 - uuritav tunnus on arvuline;
 - seletav tunnus kategoriaalne ning sellel on kaks taset (jagab uuritava tunnuse väärtused sisuliselt kahte rühma);
     + aritmeetilise keskmise võrdlemine kahes grupis (kas kaks gruppi on samast populatsioonist) või võrdlemine mingi konstandiga (kui teame mingit populatsiooni parameetrit, nt kõikide Tabasalu meeste keskmist pikkust, Tammsaare teoste keskmist sõnade pikkust, komplekssust vmt, siis saame kontrollida, kas meie valim pärineb samast populatsioonist);
-- uuritav tunnus on normaaljaotusega või kummaski grupis on vaatluste arv > 30;
+- uuritav tunnus on (kummaski grupis) normaaljaotusega või kummaski grupis on vaatluste arv > 30;
 - valim on juhuslik st uuritavad subjektid on valimisse valitud juhuslikult;
     + sealjuures võib tegu olla sõltumatute mõõtmistega või sõltuvate kordusmõõtmistega.
 
@@ -173,9 +173,13 @@ head(kandidaadid2019[,c("sugu", "hääli_kokku")])
 Enne t-testi tegemist peaks veenduma, et andmed on ka normaaljaotusega.
 
 ```{r, eval=F}
+# kogu tunnus
 qqnorm((kandidaadid2019$hääli_kokku))
 qqline((kandidaadid2019$hääli_kokku))
 shapiro.test((kandidaadid2019$hääli_kokku))
+
+# gruppides eraldi
+tapply(kandidaadid2019$hääli_kokku, kandidaadid2019$sugu, shapiro.test)
 ```
 
 
@@ -271,6 +275,9 @@ hist(kandidaadid$hääli_kokku)
 qqnorm(log(kandidaadid$hääli_kokku))
 qqline(log(kandidaadid$hääli_kokku))
 shapiro.test(log(kandidaadid$hääli_kokku))
+
+tapply(log(kandidaadid$hääli_kokku), kandidaadid$sugu, shapiro.test)
+table(kandidaadid$sugu) # > 30 vaatluse
 ```
 
 5. Sõnasta hüpoteesid. Kas ühe- või kahepoolne hüpotees?
