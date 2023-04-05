@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '13-lineaarsed_sega.html'))})
-date: 11.04.2022
+date: 10.04.2022
 output: 
   html_document:
     theme: flatly
@@ -263,6 +263,21 @@ Jätame välja kinnise esisilbiga (nn *metsa*-tüüpi) sõnad, sest neis on esim
 boxplot(V1 ~ Quantity, data = dat2, subset = Struct == "cvcv", 
         ylab = "V1 kestus (ms)", xlab = "Välde")
 ```
+
+### Kui me tahaks tavalist anovat või lineaarset mudelit ilma juhuslike efektideta
+
+Kui me tahaks rakendada selle andmestiku peal varasematest praktikumidest tuttavaid meetodeid ehk ilma juhuslike efektideta anovat või lineaarset mudelit, siis selle kuidagi saama kooskõlla eeldusega, et tegemist on sõltumatute mõõtmistega. Üks võimalus selleks on keskmistada nii, et näiteks iga kõneleja kohta oleks iga välte kohta üks mõõtmine. (Umbes nii on ka Lippus jt 2013 artiklis analüüs läbi viidud.)
+
+```{r, message=F}
+library(tidyverse)
+dat2 %>% 
+    filter(Struct == "cvcv") %>% 
+    group_by(SP, Quantity) %>% 
+    summarise(V1 = mean(V1)) %>% 
+    lm(V1 ~ Quantity, data = .) %>% 
+    summary()
+```
+
 
 ## Juhuslik kõneleja vabaliige
 
