@@ -190,7 +190,7 @@ for(i in 0:1) {
 ```
 Sama ggplotiga:  
 
-```{r}
+```{r, message=FALSE}
 library(tidyverse)
 ggplot(data = dat, aes(x = SP1_age, y = f0_mean, color = SP1_gender, shape = SP2_gender)) +
     geom_point(size = 2) +
@@ -281,6 +281,14 @@ dat2 %>%
 
 ## Juhuslik kõneleja vabaliige
 
+Laeme lineaarsete segamudelite paketi `lme4` ja lisapaketi `lmerTest`, mis lisab lineaarsele segamudelile p-väärtused.
+
+```{r, warning=FALSE, message=FALSE}
+# install.packages("lme4", "lmerTest")
+library(lme4)
+library(lmerTest)
+```
+
 Kui teeme 0-mudeli, siis lmer'i eeldus on, et mudelis on vähemalt üks juhuslik efekt. Kui ühtegi fikseeritud efekti ei ole, siis saab olla selleks ainult juhuslik vabaliige.
 
 Juhuslikku vabaliiget tähistab `(1|juhuslik_faktor)`
@@ -309,7 +317,7 @@ ranef(m1)
 
 SP1 kõnetempo on keskmiselt 19 ms kiirem (Q1 58-19=39, Q2 118-19=99, Q3 139-19=120), SP10 on jällegi 23 ms aeglasem, jne. Individuaalne vabaliige tähendab seda, et see efekt liitub kõigele üldiselt.
 
-```{r}
+```{r, warning=F}
 sjPlot::plot_model(m1, type = "re", sort.est = T, grid = F)
 ```
 
@@ -464,7 +472,7 @@ Siit võib siis väita, et vältel on vokaali kestusele oluline efekt F(2, 365.4
 
 Ja samuti peaks tegema post-hoc testi segamudeli puhul, kui on faktor, millel on rohkem kui kaks taset ja tahame võrrelda ka mittebaastasemetevahelisi erinevusi. Tukey HSD testi tegemiseks saab kasutada näiteks `multcomp` paketti.
 
-```{r}
+```{r, message=F}
 #install.packages("multcomp")
 library(multcomp)
 summary(glht(m3, linfct = mcp(Quantity = "Tukey")), test = adjusted("holm"))
