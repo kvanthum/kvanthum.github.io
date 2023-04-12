@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '13-lineaarsed_sega.html'))})
-date: 10.04.2022
+date: 10.04.2023
 output: 
   html_document:
     theme: flatly
@@ -74,7 +74,15 @@ str(dat)
 
 Kas lineaarse mudeli eeldused on täidetud?
 
-- Ei uuritav tunnus ega kirjeldavad arvulised tunnused ei ole normaaljaotusega, siin ei aita ka logaritmimine, aga andmestikus on üle 30 mõõtmispunkti, nii et väga selle pärast ka muretsema ei pea.
+- Ei uuritav tunnus ega kirjeldavad arvulised tunnused ei ole normaaljaotusega, siin ei aita ka logaritmimine, aga andmestikus on üle 30 mõõtmispunkti, nii et väga selle pärast ka muretsema ei pea. Õigupoolest ei ole lineaarsel regressioonil eeldust, et uuritav tunnus peaks olema normaaljaotusega (vrd nt Pearsoni korrelatsioonikordaja eeldustega), küll aga peavad mudeli jäägid olema normaaljaotusega. Tihtipeale võib aga juhtuda, et kui arvulised tunnused on väga ühele või teisele poole kaldu, ei ole ka mudeli jääkide jaotus normaalne. Mudeli jääkide jaotust saab aga kontrollida pärast mudeli tegemist.  
+- Uuritava tunnuse ja arvulise seletava tunnuse vahel peaks olema lineaarne seos.  
+
+```{r, message = FALSE, warning=FALSE}
+library(tidyverse)
+# Päris lineaarne pole, aga enam-vähem siiski
+ggplot(data = dat, aes(x = SP1_age, y = f0_mean)) + geom_point() + geom_smooth() + facet_wrap("SP1_gender")
+```
+
 - Iga vestluse iga osaleja kohta on andmestikus üks mõõtmispunkt, mis justkui tähendaks, et mõõtmised on sõltumatud. Üldiselt on igas vestluses osalejad erinevad, aga on üksikuid koruvaid osalejaid. Kuna neid ei ole väga palju, siis me võiksime kasutada tavalist lineaarset mudelit ja kui tahame väga hoolega järgida sõltumatute mõõtmiste nõuet, siis võiksime valida korduvate osalejate salvestustest ühe ja ülejäänud kordused andmestikust eemaldada. Vaatame üle, palju on korduvaid osalejaid:
 
 ```{r}
@@ -120,6 +128,13 @@ summary(lm4)
 ggeffects::ggpredict(lm4)
 sjPlot::plot_model(lm4, type = "pred")
 sjPlot::plot_model(lm4, type = "int")
+```
+
+Kontrollime jääkide normaalsust.  
+
+```{r}
+hist(lm4$residuals)
+shapiro.test(lm4$residuals) # eeldus on täidetud
 ```
 
 
@@ -188,6 +203,8 @@ for(i in 0:1) {
         lty = i+1, col=2)
 }
 ```
+
+
 Sama ggplotiga:  
 
 ```{r, message=FALSE}
@@ -318,6 +335,7 @@ ranef(m1)
 SP1 kõnetempo on keskmiselt 19 ms kiirem (Q1 58-19=39, Q2 118-19=99, Q3 139-19=120), SP10 on jällegi 23 ms aeglasem, jne. Individuaalne vabaliige tähendab seda, et see efekt liitub kõigele üldiselt.
 
 ```{r, warning=F}
+
 sjPlot::plot_model(m1, type = "re", sort.est = T, grid = F)
 ```
 

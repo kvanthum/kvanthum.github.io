@@ -287,23 +287,17 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before {
-content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "\e259";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "";
-border: none;
-}
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "";
+content: "\e258";
 font-family: 'Glyphicons Halflings';
-display: inline-block;
-padding: 10px;
-border-right: 1px solid #ddd;
+border: none;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -383,9 +377,10 @@ vahelised seosed</a><br />
 <li><a href="12-lineaarsed2.html">Lineaarse regressiooni mudelid
 (2)</a></li>
 <li><a href="13-lineaarsed_sega.html">Lineaarse regressiooni
-segamudelid</a>
-<!--14. [Logistilise regressiooni mudelid (1)](14-logistilised1.html)  
-15. [Logistilise regressiooni mudelid (2)](15-logistilised2.html) 
+segamudelid</a></li>
+<li><a href="14-logistilised1.html">Logistilise regressiooni mudelid
+(1)</a><br />
+<!--15. [Logistilise regressiooni mudelid (2)](15-logistilised2.html) 
 16. [Logistilise regressiooni mudelid (3) ja logistilise regressiooni segamudelid](16-logistilised3_sega.html)  
 17. [Tingimuslikud otsustuspuud](17-otsustuspuud.html) 
 18. [Juhumetsad](18-juhumetsad.html) --></li>

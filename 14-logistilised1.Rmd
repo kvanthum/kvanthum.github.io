@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '14-logistilised1.html'))})
-date: 13.04.2022
+date: 12.04.2023
 output: 
   html_document:
     theme: flatly
@@ -19,6 +19,91 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Logistilise regressiooni mudelid {.tabset .tabset-pills}
 
+## Lühidalt kordamiseks
+
+<center>
+![](imgs/data_model.jpg){width=50%}
+</center>
+
+```{r}
+load("data/kysimustik_2023.RData")
+# Jätame välja ühe vaatluse
+kysimustik2 <- droplevels(kysimustik[kysimustik$lemmikloom != "Mulle ei meeldi loomad",])
+
+mod <- lm(kaua_opid ~ synniaasta + kogemused_kvant + lemmikloom, data = kysimustik2)
+summary(mod)
+```
+
+
+- Lineaarne regressioon aitab seletada **arvulise uuritava tunnuse** varieerumist ühe või enama seletava tunnuse põhjal.      
+- **Seletavad tunnused** võivad olla nii  
+    + **arvulised**: kui palju suureneb/väheneb uuritava tunnuse väärtus, kui arvuline tunnus suureneb ühe ühiku võrra?
+    + **kategoriaalsed**: kui palju suureneb/väheneb uuritava tunnuse väärtus, kui muuta tunnuse klassi/taset?  
+- Lineaarse mudeli väljundi **vabaliige** (*intercept*) näitab arvulise uuritava tunnuse ennustatud väärtust kontekstis, kus arvulise seletava tunnuse väärtus on (vaikimisi) 0 ja kategoriaalse seletava tunnuse väärtus on (vaikimisi) tähestikulises järjekorras kõige esimene tase.  
+    + Näiteks tunnuse `kogemused_kvant` baastase on `Ei` ja tunnuse `lemmikloom` baastase on `Glaucus atlanticus`.  
+- Lineaarse mudeli väljundi **koefitsiendid** (*coefficient*) ehk regressioonikordajad näitavad muutust arvulise uuritava tunnuse väärtuses, kui muuta seletava tunnuse väärtust (kas 1 ühiku võrra või 1 taseme võrra).    
+    + Näiteks sellisele osalejale, kellel **ei ole kogemusi kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus**, ennustab mudel iga aasta kohta tema sünniaastas õpitud aastate arvu kahanemist `r abs(mod$coefficients[["synniaasta"]])` aasta võrra. Kui sellise osaleja sünniaasta oleks nt 1987, ennustaks mudel tema ülikoolis õpitud aastate arvuks `844.02405 + 1987 * (-0.42024)` ehk `r 844.02405 + 1987 * (-0.42024)` aastat.  
+    + Sama sünniaastaga osalejale, kellel **on kogemusi kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus**, ennustab mudel õpitud aastate arvuks aga `844.02405 + 1987 * (-0.42024) + 1.33101` ehk `r 844.02405 + 1987 * (-0.42024) + 1.33101` aastat.  
+    + Sama sünniaastaga osalejale, kellel **on kogemusi kvantitatiivsete meetoditega ja kelle lemmikloom on koer**, ennustab mudel õpitud aastate arvuks `844.02405 + 1987 * (-0.42024) + 1.33101 - 2.50429` ehk `r 844.02405 + 1987 * (-0.42024) + 1.33101 - 2.50429`.  
+    + Kategoriaalse seletava tunnuse puhul, millel on > 2 taset ja seega > 1 koefitsienti, hindavad kõik koefitsiendid muutust **võrreldes baastasemega** ega ütle midagi koefitsientide omavahelise suhte kohta.  
+        - Näiteks hindavad kõik tunnuse `lemmikloom` koefitsiendid muutust võrreldes glaucus atlanticusega.  
+    + Erinevuse suunda baastasemest näitab koefitsiendi märk: kui koefitsient on positiivne, siis uuritava tunnuse ennustatud väärtus kasvab, kui koefitsient on negatiivne, siis kahaneb.  
+    + Erinevuse statistilist olulisust näitavad koefitsientide *p*-väärtused. Kui koefitsiendi *p*-väärtus on > 0.05, ei ole statistiliselt olulist erinevust **võrreldes baaskontekstiga** (mis ei tähenda tingimata, et erinevus ei oleks oluline mingite teiste väärtuste vahel).    
+        - Näiteks on ennustatud õpitud aastate arv oluliselt erinev osalejal, kelle hüpoteetiline sünniaasta on 0, ja osalejal, kelle hüpoteetiline sünniaasta on 1. Samuti on ennustatud õpitud aastate arv oluliselt erinev osalejal, kelle lemmikloom on glaucus atlanticus, ja osalejal, kelle lemmikloom on koer (aga me ei tea, kas ka näiteks kaelkirjaku ja koera vahel).  
+    + Tasemete omavahelist erinevust saab hinnata *post-hoc* testide või jooniste abil.  
+    
+```{r, warning=F, message=F}
+# https://strengejacke.github.io/ggeffects/articles/introduction_plotmethod.html
+# install.packages("ggeffects")
+library(ggeffects)
+plot(ggpredict(mod))
+```
+    
+- **Mudeli üldist headust** näitab R-ruut (mudelite võrdlemisel kohandatud R-ruut), **mudeli statistilist olulisust** mudeli *p*-väärtus.  
+- Samal andmestikul tehtud mudeleid saab **võrrelda** funktsiooniga `anova()`, mis teeb I tüüpi ANOVA.    
+- Mudelisse kaasatud tunnuste üldist statistilist olulisust saab hinnata II või III tüüpi ANOVAga (nt `car::Anova()`), vastavalt sellele, kas mudelis on olulisi interaktsioone (III) või mitte (II). Kui kasutada ainult ühe mudeli tunnuste olulisuse hindamiseks I tüüpi ANOVAt, sõltub tulemus tasakaalustamata andmestikus sellest, mis järjekorras tunnuseid mudelisse on lisatud.   
+
+```{r, eval = F}
+anova(mod)
+car::Anova(mod, type = 2)
+
+# Muudame seletavate tunnuste järjekorda
+mod2 <- lm(kaua_opid ~ kogemused_kvant + lemmikloom + synniaasta, data = kysimustik2)
+anova(mod2) # kogemused_kvant on ka järsku oluline, sest sünniaastat hinnatakse kõige viimasena
+car::Anova(mod2, type = 2)
+```
+
+- Ka regressioonimudelite tulemusi saab lasta automaatselt raporteerida.  
+
+```{r, warning=F, message=F}
+library(report)
+report_text(mod)
+```
+
+- Kui seletavate tunnuste vahel on oluline **interaktsioon**, tähendab see seda, et ühe seletava tunnuse mõju sõltub sellest, mis on mingi teise tunnuse väärtus.  
+
+```{r}
+mod3 <- lm(kaua_opid ~ synniaasta*lemmikloom, data = kysimustik2)
+plot(ggpredict(mod3, terms = c("synniaasta", "lemmikloom")))
+# Sünniaasta efekt on igal pool negatiivne (= mida suurem sünniaasta, seda vähem ülikoolis õpitud aastaid),
+# aga glaucus atlanticuse valinute puhul on sünniaasta efekt palju suurem (= noorte ja vanade vahel suuremad erinevused õpitud aastates).
+# Lemmiklooma efekt (= glaucus atlanticuse valinud on keskmiselt kauem õppinud) püsib ainult u kuni sünniaastani 1993.   
+```
+
+- Kui lineaarses regressioonimudelis on ka **arvulisi seletavaid tunnuseid** (st tegemist ei ole lihtsalt ANOVAga), võiks kontrollida:  
+    + kas andmetes on mingeid erindeid,  
+    + kas mudeli jääkide (`mudeli_nimi$residuals`) hajuvus on ühtlane,  
+    + kas mudeli jäägid on normaaljaotusega,  
+    + kas uuritava tunnuse ja arvuliste seletavate tunnuste vahel on ikka lineaarne seos (äkki seletaks mõni mittelineaarne mudel uuritava tunnuse varieerumist paremini?),  
+    + kas seletavate tunnuste vahel esineb multikollineaarsust (mitu seletavat tunnust seletab sama asja, seda võiks kontrollida ka kategoriaalsete tunnuste puhul). 
+    + Paljude nende asjade jaoks võib kasutada nt funktsiooni `plot(mudeli_nimi)`:  
+        - 1. Residuals vs. Fitted: x-teljel mudeli ennustatud väärtused, y-teljel mudeli jäägid (erinevused tegelike ja ennustatud väärtuste vahel). Punane horisontaalne joon peaks olema enam-vähem sirge ja jäägid koonduma juhuslikult selle sirge ümber. Kui joon ei ole sirge, võib olla probleeme lineaarse suhtega, kui jäägid ei haju terve x-telje ulatuses ühtlaselt, siis võib olla probleeme jääkide homoskedastilisusega. 
+        - 2. Normal Q-Q: kontrollib jääkide normaaljaotust.  
+        - 3. Scale-Location: x-teljel mudeli ennustatud väärtused, y-teljel ruutjuur standardiseeritud jääkidest. Kontrollib samuti jääkide homoskedastilisust. Kui jäägid ei haju ühtlaselt sirge joone ümber, võib olla homoskedastilisusega probleeme.  
+        - 4. Residuals vs. Leverage Plot: y-teljel standardiseeritud jäägid, x-teljel nn *Leverage*, mis näitab, kui palju mingi konkreetne andmepunkt/vaatlus koefitsientide hinnanguid mõjutab. Kui vaatlusel on suur jääk ja suur *Leverage*'i hinnang, võiks kaaluda selle mudelist väljajätmist.    
+      + Mida komplekssem on mudel, seda keerulisemaks eelduste kontroll läheb (mistõttu seda sageli ei tehta).  
+- Loe ka nt Ako Sauga (2020). [Statistika õpik majanduseriala üliõpilastele](https://digikogu.taltech.ee/et/Item/bdcc647f-fa18-47c1-b499-99024f8bcc93). 
+
 ## Tänases praktikumis
 
 - Tõenäosus, šanss, šansisuhe    
@@ -27,15 +112,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Logistiline regressioon seletab ühe tunnuse muutumist sõltuvalt teis(t)e tunnus(t)e muutumisest, kui **sõltuvaks muutujaks/uuritavaks tunnuseks on kategoriaalne tunnus**.  
 
-Logistilise regressiooni mudel näeb välja sarnane lineaarse regressioonimudeli omaga. Funktsiooni `lm()` asemel kasutame funktsiooni `glm()`, kuna logistiline regressioon on üks mudel nn **üldistatud lineaarsete mudelite** (_**g**eneralized **l**inear **m**odels_) perest. Üldistatud lineaarseid mudeleid seob omavahel eeskätt see, et need ei eelda, et mudeli jäägid oleksid normaaljaotusega, ning nad võimaldavad luua erinevate funktsioonide abil justkui lineaarse seose tunnuste vahel, mille vahel tegelikult lineaarset seost ei ole (sellest natuke hiljem).  
+Logistilise regressiooni mudel näeb välja sarnane lineaarse regressioonimudeli omaga. Funktsiooni `lm()` asemel kasutame funktsiooni `glm()`, kuna logistiline regressioon on üks mudel nn **üldistatud lineaarsete mudelite** (_**g**eneralized **l**inear **m**odels_) perest. Üldistatud lineaarseid mudeleid seob omavahel eeskätt see, et need ei eelda, et mudeli jäägid oleksid normaaljaotusega või homoskedastilised, ning nad võimaldavad luua erinevate funktsioonide abil justkui lineaarse seose tunnuste vahel, mille vahel tegelikult lineaarset seost ei ole (sellest natuke hiljem).  
 
 Logistilise regressiooni mudelit saab teha näiteks nii:  
 
 ```{r}
-load("data/kysimustik_2022.RData")
-
 # Kas vastus lemmikjoogi kohta sõltub lemmikloomast ja sünniaastast?
-m.jook <- glm(lemmikjook ~ lemmikloom + synniaasta, data = kysimustik, family = "binomial") 
+m.jook <- glm(lemmikjook ~ lemmikloom + synniaasta, data = kysimustik2, family = "binomial") 
 # family = "binomial" ütleb, et teeme nn binomiaalset (binaarse uuritava tunnusega) logistilist regressiooni
 summary(m.jook)
 ```
@@ -68,20 +151,20 @@ Mis on tõenäosus, et veeretame täringul paarisarvu silmi?
 
 
 
-Vaatame kursusel osalejate küsimustiku andmestikust tunnust `kogemused_kvant` ja oletame siinjuures, et saame kasutada empiirilisi andmeid seni kursusel osalenute kohta selleks, et ennustada tulevaste kursusel osalejate oskusi ja eelistusi.
+Vaatame kursusel osalejate küsimustiku andmestikust tunnust `kogemused_kvant` ja oletame siinjuures, et saame kasutada empiirilisi andmeid seni kursusel osalenute kohta selleks, et ennustada tulevaste kursusel osalejate oskusi ja eelistusi.   
 
 ```{r}
 (tab <- table(kysimustik$kogemused_kvant))
 ```
 
-Kogemuse omamise **tõenäosuse (*p*)** leidmiseks jagame kogemust omajate (= soodsate võimaluste) arvu kõikide vastajate arvuga ehk 44/(21+44).
+Kogemuse omamise **tõenäosuse (*p*)** leidmiseks jagame kogemust omajate (= soodsate võimaluste) arvu kõikide vastajate (= võimaluste) arvuga ehk `r tab["Jah"]` / (`r tab["Ei"]` + `r tab["Jah"]`). 
 
 ```{r}
 (p_Jah <- tab[["Jah"]]/sum(tab))
 ```
 
-Kogemuse omamise tõenäosus andmestikus on ~0.68.  
-Kogemuse mitteomamise tõenäosus on 1 - kogemuse omamise tõenäosus ehk 1-0.6769231=0.3230769.  
+Kogemuse omamise tõenäosus on `r p_Jah`.  
+Kogemuse mitteomamise tõenäosus on 1 - kogemuse omamise tõenäosus ehk 1-`r p_Jah`=`r 1-p_Jah`.  
 
 
 ```{r}
@@ -90,9 +173,9 @@ Kogemuse mitteomamise tõenäosus on 1 - kogemuse omamise tõenäosus ehk 1-0.67
 (p_Ei <- tab[["Ei"]]/sum(tab))
 ```
 
-Kogemuse mitteomamise tõenäosus andmestikus on seega ~0.32.
+Kogemuse mitteomamise tõenäosus on seega `r p_Ei`.
 
-Sündmuse toimumise (kogemuse omamise) ja sündmuse mittetoimumise (kogemuse mitteomamise) tõenäosused annavad liites kokku 1.
+Sündmuse toimumise (kogemuse omamise) ja sündmuse mittetoimumise (kogemuse mitteomamise) tõenäosused annavad liites kokku 1. Praegusel juhul näeme, et tõenäosuse võiks seega justkui kõrvutada suhtelise sagedusega. Statistilist tõenäosust võibki hinnata mingi sündmuse suhtelise sageduse kaudu, kui mingit teoreetilist tõenäosushinnangut ei osata anda ning kui *katsete/vaatluste arv on küllalt suur*.  
 
 Kui võrdleksime tee- ja kohvijoomise tõenäosust, võiksime määrata, et sündmuse toimumine on teejoomine ja sündmuse mittetoimumine seega kohvijoomine. Teoreetiliselt ei ole oluline, et tegemist on just kohvijoomisega, vaid sisuliselt vaatleme tee joomise ja tee mittejoomise tõenäosusi.    
 
@@ -105,33 +188,22 @@ Kui võrdleksime tee- ja kohvijoomise tõenäosust, võiksime määrata, et sün
 
 ## Šanss
 
-**Šanss** (*odds*) *P = p/(1-p)* on sündmuse toimumise tõenäosuse ja sündmuse mittetoimumise tõenäosuse suhe ning näitab **mitu korda rohkem** sündmus toimub kui ei toimu.
+**Šanss** (*odds*) *P = p/(1-p)* on sündmuse toimumise tõenäosuse ja sündmuse mittetoimumise tõenäosuse suhe ning näitab **mitu korda rohkem** sündmus toimub kui ei toimu. Tähistame siin šanssi suure *P*-tähega.  
 
-Kui kvantmeetodite kogemuse omamise tõenäosus on 0.68 ja mitteomamise tõenäosus on 0.32, siis **kogemuse omamise šanss** on 0.68/0.32 = ~ 2.125. 
+Kui kvantmeetodite kogemuse omamise tõenäosus on `r p_Jah` ja mitteomamise tõenäosus on `r p_Ei`, siis **kogemuse omamise šanss** on `r p_Jah`/`r p_Ei` = `r p_Jah/p_Ei`. 
 
-Kogemust omatakse eeldatavasti niisiis **2.125 korda rohkem** kui ei omata.  
+Kogemust omatakse eeldatavasti niisiis **`r p_Jah/p_Ei` korda rohkem** kui ei omata.  
 
-Kui teejoomise tõenäosus on 0.46 ja tee mittejoomise tõenäosus (= kohvijoomise tõenäosus) on 0.54, siis on **teejoomise šanss** 0.46/0.54 = 0.85.
+Kui teejoomise tõenäosus on `r p_Tee` ja tee mittejoomise tõenäosus (= kohvijoomise tõenäosus) on `r p_Kohv`, siis on **teejoomise šanss** `r p_Tee` / `r p_Kohv` = `r p_Tee/p_Kohv`.  
 
 ```{r}
 (P_Tee <- p_Tee/p_Kohv)
 ```
 
-Teed juuakse **0.85 "korda rohkem"** kui ei jooda.  
+Teed juuakse **`r P_Tee` "korda rohkem"** kui ei jooda.  
 Teisisõnu: teed juuakse vähem kui kohvi. 
 
-Kui šanss oleks 1, siis on sündmuse toimumise ja mittetoimumise tõenäosused võrdsed (nt teed ja kohvi juuakse ühepalju).  
-
-
-Sama tulemuseni jõuame tegelikult siis, kui jagame tõenäosuste asemel absoluutarvud: kogemust omavate arv / kogemust mitteomavate arv või teejoojate arv / mitteteejoojate arv. Ehk kui tõenäosuse leidmiseks jagame soodsate võimaluste arvu kõikide võimaluste arvuga, siis šansi leidmiseks jagame soodsate võimaluste arvu ebasoodsate võimaluste arvuga.
-
-```{r}
-# Kogemuse omamise šanss
-44/21
-# Teejoomise šanss
-30/35
-```
-
+Kui šanss oleks 1, siis oleks sündmuse toimumise ja mittetoimumise tõenäosused võrdsed (nt teed ja kohvi juuakse ühepalju). 
 
 Šansid jäävad 0 ja lõpmatuse vahele.
 
@@ -139,12 +211,22 @@ Sama tulemuseni jõuame tegelikult siis, kui jagame tõenäosuste asemel absoluu
 - Kui **P < 1**, siis sündmuse toimumise tõenäosus < sündmuse mittetoimumise tõenäosus.
 - Kui **P = 1**, siis on sündmuse toimumise ja mittetoimumise tõenäosused võrdsed (0.5).
 
+Sama tulemuseni jõuame tegelikult siis, kui jagame tõenäosuste asemel absoluutarvud: kogemust omavate arv / kogemust mitteomavate arv või teejoojate arv / mitteteejoojate arv. Ehk kui tõenäosuse leidmiseks jagame soodsate võimaluste arvu kõikide võimaluste arvuga, siis šansi leidmiseks jagame soodsate võimaluste arvu ebasoodsate võimaluste arvuga.
 
-**Kontrollküsimus**: mida tähendab, kui sündmuse toimumise šanss on 0.5 (näiteks "šanss, et kroonaviirusesse nakatub naisterahvas on 0.5", kui võrreldakse meeste ja naiste nakatumist)?
+```{r}
+# Kogemuse omamise šanss
+54/26
+# Teejoomise šanss
+32/48
+```
 
 
-Šansse (***P***) saab lihtsalt teisendada tõenäosusteks (***p***) ja vastupidi. 
-Kui *P = p/(1-p)*, siis *p = P/(1+P)*.
+
+**Kontrollküsimus**: mida tähendab, kui sündmuse toimumise šanss on 0.5 (näiteks "šanss, et kroonaviirusesse nakatub naisterahvas, on 0.5", kui võrreldakse meeste ja naiste nakatumist)?  
+
+
+Šansse (***P***) saab lihtsalt teisendada tõenäosusteks (***p***) ja vastupidi.  
+Kui __*P = p/(1-p)*__, siis __*p = P/(1+P)*__.
 
 <table style="width:100%; border:1px solid">
     <tr style="background-color: #dddddd; border:1px solid">
@@ -207,55 +289,63 @@ Kui *P = p/(1-p)*, siis *p = P/(1+P)*.
 <br>
 <br>
 
-**Logit** ehk *šansi logaritm* on - nagu nimigi ütleb - logaritmitud šanss. Selle kaudu hinnatakse logistilises regressioonis uuritava tunnuse ennustatud väärtust mingi seletavate tunnuste kombinatsiooni korral. Kui tõenäosus võib varieeruda nullist üheni [0,1] ja šanss nullist lõpmatuseni [0,∞], siis šansi logaritm miinus lõpmatusest pluss lõpmatuseni [-∞,∞]. See on oluline omadus logistilise regressiooni mudelis!
+**Logit** ehk *šansi logaritm* on - nagu nimigi ütleb - logaritmitud šanss. Selle kaudu hinnatakse logistilises regressioonis uuritava tunnuse ennustatud väärtust mingi seletavate tunnuste kombinatsiooni korral. Kui tõenäosus võib varieeruda nullist üheni [0,1] ja šanss nullist lõpmatuseni [0,∞], siis šansi logaritm võib varieeruda **miinus lõpmatusest pluss lõpmatuseni [-∞,∞]**. See on oluline omadus logistilise regressiooni mudelis!
 
 
 ### Võtame veel ühe näite.
 
 Oletame, et meil on kaks üliõpilast. Ühel on prillid ja teisel ei ole.
 
-Ilma prillideta üliõpilane A hilineb iga 10 loengu kohta 7 loengusse. See tähendab, et ainult 3 loengusse 10st jõuab üliõpilane õigel ajal.
+Ilma prillideta üliõpilane **A(hti)** hilineb iga 10 loengu kohta 7 loengusse. See tähendab, et ainult 3 loengusse 10st jõuab üliõpilane õigel ajal.
 
 1. Mis on tema loengusse hilinemise tõenäosus?
-```{r}
-(p_A_hilineb <- 7/10)
+```{r, echo = F}
+p_A_hilineb <- 7/10
+p_A_eihiline <- 1-p_A_hilineb
+P_A_hilineb <- p_A_hilineb/p_A_eihiline
+```
+
+```{r, eval = F}
+(p_A_hilineb <- ...)
 ```
 
 2. Mis on tema loengusse mittehilinemise tõenäosus?
-```{r}
-(p_A_eihiline <- 1-p_A_hilineb)
+```{r, eval = F}
+(p_A_eihiline <- ...)
 ```
 
 3. Mis on tema loengusse hilinemise šanss?
-```{r}
-7/3
-# VÕI
-p_A_hilineb/p_A_eihiline
+```{r, eval = F}
+(P_A_hilineb <- ...) # NB! Suur P!
 ```
 
-Prillideta üliõpilane A hilineb loengusse **2,3 korda** rohkem kui jõuab õigeks ajaks.
+Prillideta üliõpilane A hilineb loengusse **... korda** rohkem kui jõuab õigeks ajaks.
 
 
-Seevastu prillidega üliõpilane B hilineb iga 10 loengu kohta ainult 1 loengusse. See tähendab, et 9 loengusse 10st jõuab üliõpilane õigel ajal.
+Seevastu prillidega üliõpilane **B(runo)** hilineb iga 10 loengu kohta ainult 1 loengusse. See tähendab, et 9 loengusse 10st jõuab üliõpilane õigel ajal.
 
 1. Mis on tema loengusse hilinemise tõenäosus?
-```{r}
-(p_B_hilineb <- 1/10)
+```{r, echo = F}
+p_B_hilineb <- 1/10
+p_B_eihiline <- 1-p_B_hilineb
+P_B_hilineb <- p_B_hilineb/p_B_eihiline
+```
+
+```{r, eval = F}
+(p_B_hilineb <- ...)
 ```
 
 2. Mis on tema loengusse mittehilinemise tõenäosus?
-```{r}
-(p_B_eihiline <- 1-p_B_hilineb)
+```{r, eval = F}
+(p_B_eihiline <- ...)
 ```
 
 3. Mis on tema loengusse hilinemise šanss?
-```{r}
-1/9
-# VÕI
-p_B_hilineb/p_B_eihiline
+```{r, eval = F}
+(P_B_hilineb <- ...) # NB! Suur P!
 ```
 
-Prillidega üliõpilane B hilineb loengusse **~0,1 korda rohkem** kui jõuab õigeks ajaks? Mida see tähendab?
+Prillidega üliõpilane B hilineb loengusse **... korda rohkem** kui jõuab õigeks ajaks? Mida see tähendab?
 
 Kui korrutada mis tahes arvu läbi ühest väiksema arvuga, siis saame esialgsest arvust igal juhul väiksema väärtuse.
 
@@ -267,16 +357,16 @@ Kui korrutada mis tahes arvu läbi ühest väiksema arvuga, siis saame esialgses
 5*0.1
 ```
 
-Seega kui öelda, et üliõpilane jõuab õigeks ajaks 9 loengusse ja hilineb sellest **0.1111111 korda rohkem**, siis tähendab see tegelikult seda, et ta hilineb vähem kui ei hiline.
+Seega kui öelda, et üliõpilane jõuab õigeks ajaks 9 loengusse ja hilineb sellest **... korda rohkem**, siis tähendab see tegelikult seda, et ta hilineb vähem kui ei hiline.
 
-```{r}
-9*0.1111111
+```{r, eval = F}
+9*...
 ```
 
 Kui see arv ümardada, saame uuesti üliõpilase B loengusse hilinemise kordade arvu.
 
-Kui šanss on väiksem kui 1, siis sündmuse toimumise tõenäosus on väiksem kui sündmuse mittetoimumise tõenäosus. 
-Teisisõnu: kuna prillidega üliõpilase loengusse hilinemise šanss on 0.1, võime järeldada, et üliõpilase loengusse hilinemise tõenäosus on väiksem kui tõenäosus jõuda loengusse õigel ajal. 
+Kui šanss *P* on väiksem kui 1, siis sündmuse toimumise tõenäosus on väiksem kui sündmuse mittetoimumise tõenäosus. 
+Teisisõnu: kuna prillidega üliõpilase loengusse hilinemise šanss on ..., võime järeldada, et üliõpilase loengusse hilinemise tõenäosus on oluliselt väiksem kui tõenäosus jõuda loengusse õigel ajal. 
 
 ## Šansisuhe
 
@@ -286,7 +376,7 @@ Teisisõnu: kuna prillidega üliõpilase loengusse hilinemise šanss on 0.1, võ
 - Kui šansisuhe on **< 1**, siis on 1. rühmas sündmuse toimumise šansid väiksemad kui 2. rühmas.
 - Kui šansisuhe on **= 1**, siis on mõlemas rühmas šansid võrdsed.
 
-Kui tahame nüüd teada, **kui mitu korda** kõrgem on prillideta üliõpilase loengusse hilinemise šanss prillidega üliõpilase omast, peamegi leidma šansisuhte.
+Kui tahame nüüd näiteks teada, **kui mitu korda** kõrgem on prillideta üliõpilase loengusse hilinemise šanss prillidega üliõpilase omast, peamegi leidma šansisuhte.
 
 Šansisuhe ei ole midagi muud kui kahe šansi jagatis.
 
@@ -300,35 +390,37 @@ P_A <- p_A_hilineb/p_A_eihiline
 P_B <- p_B_hilineb/p_B_eihiline
 
 
-# Kahe üliõpilase loengusse hlinemise
+# Kahe üliõpilase loengusse hilinemise
 # šansside suhe
 P_A/P_B
 
 ```
 
-Prillideta üliõpilase šanss loengusse hilineda on **21 korda kõrgem** kui prillidega üliõpilase šanss loengusse hilineda.
+Prillideta üliõpilase A šanss loengusse hilineda on **21 korda kõrgem** kui prillidega üliõpilase B šanss loengusse hilineda.
 
 ![](imgs/props_odds_or.png)
 
 Aga miks need prillid üldse olulised on?
 
-Põhimõtteliselt oleksime siin võinud rääkida ka lihtsalt üliõpilasest A ja üliõpilasest B. Kui aga paneme selle näite nüüd logistilise regressiooni konteksti ja kujutame ette, et meil on hulga rohkem üliõpilasi, kelle kohta on andmed nende hilinemiste ja prillikandmise kohta, siis oleks loengusse hilinemine kategoriaalne uuritav tunnus väärtustega `hilineb` ja `ei_hiline` ning prillikandmine kategoriaalne seletav tunnus väärtustega `kannab` ja `ei_kanna`. 
+Põhimõtteliselt oleksime siin võinud rääkida ka lihtsalt üliõpilasest A ja üliõpilasest B. Kui aga paneme selle näite nüüd logistilise regressiooni konteksti ja kujutame ette, et meil on hulga rohkem üliõpilasi, kelle kohta on andmed nende hilinemiste ja prillikandmise kohta, siis oleks loengusse hilinemine kategoriaalne **uuritav tunnus** väärtustega `hilineb` ja `ei_hiline` ning prillikandmine kategoriaalne **seletav tunnus** väärtustega `kannab` ja `ei_kanna`. 
 
-Logistilises regressioonis hinnatakse seletava tunnuse mõju uuritava tunnuse ühe taseme esinemise tõenäosusele šansi logaritmi kaudu. Teisisõnu saaksime hinnata logistilise regressiooni mudeliga seda, kuidas üliõpilaste loengusse **hilinemise šansi logaritm** muutub vastavalt sellele, kas tegemist on prillikandjaga või mitte. 
+Logistilises regressioonis hinnatakse seletava(te) tunnus(t)e mõju uuritava tunnuse **ühe taseme esinemise tõenäosusele** šansi logaritmi kaudu. Teisisõnu saaksime hinnata logistilise regressiooni mudeliga seda, kuidas üliõpilaste loengusse **hilinemise šansi logaritm** muutub vastavalt sellele, kas tegemist on prillikandjaga või mitte. 
 
-Šansisuhet aga kasutame siis, kui tõlgendame logistilise regressiooni koefitsiente, mis näitavad, **mitu logaritmitud korda** šansisuhe seletava tunnuse muutumise korral muutub. 
+Šansisuhet aga kasutame siis, kui tõlgendame logistilise regressiooni koefitsiente, mis näitavad, **mitu logaritmitud korda** šanss seletava tunnuse muutumise korral muutub. 
 
 
 ```{r}
 
-# Prillide kandmise mõju hilinemisele 1 loengu põhjal
+# Prillide kandmise mõju hilinemisele 1 loengu andmete põhjal
 
-df <- data.frame(nimi = c("Mari", "Jüri", "Ants", "Toomas", "Kertu",
+df <- data.frame(nimi = c("Mari", "Bruno", "Ants", "Toomas", "Kertu",
                           "Peeter", "Sille", "Marianne", "Juhan", "Oskar",
-                          "Tuuli", "Reelika", "Annika", "Rauno", "Joosep",
+                          "Ahti", "Reelika", "Annika", "Rauno", "Joosep",
                           "Imre", "Sille", "Tauri", "Germo", "Norman"),
                  prillid = c(rep("Jah", 10), rep("Ei", 10)),
                  hilines = c(rep("Jah", 1), rep("Ei", 9), rep("Jah", 7), rep("Ei", 3)))
+
+df
 
 logmod <- glm(factor(hilines) ~ prillid, 
               data = df, 
@@ -339,16 +431,27 @@ summary(logmod)
 
 Näiteks kui
 
-- prillideta üliõpilaste grupis on tõenäosus loengusse hilineda 0,7 ja tõenäosus mitte hilineda 0,3 ning šanss hilineda seega 0,7/0,3=2,33333,    
-- prillidega üliõpilaste grupis on tõenäosus loengusse hilineda 0,1 ja tõenäosus mitte hilineda 0,9 ning šanss hilineda seega 0,1/0,9=0,11111,  
+- prillide**ga** (`prillid == "Jah"`) üliõpilaste grupis on tõenäosus loengusse hilineda 0,1 ja tõenäosus mitte hilineda 0,9 ning šanss hilineda seega 0,1/0,9=0,111111,  
+- prillide**ta** (`prillid == "Ei"`) üliõpilaste grupis on tõenäosus loengusse hilineda 0,7 ja tõenäosus mitte hilineda 0,3 ning šanss hilineda seega 0,7/0,3=2,333333,    
 - siis kui kasutaksime logistilist regressiooni selleks, et uurida, kuidas mõjutab loengusse hilinemist prillikandmine, kusjuures prillikandmise baastase on "Ei",  
-- näitab mudeli vabaliikme väärtus hilinemise **šansi logaritmi** prillideta üliõpilaste seas,  
-- koefitsient šansi muutust logaritmitud kordades (ehk **logaritmitud šansisuhet**), kui vaatame prillikandjate gruppi: mitu (logaritmitud) korda muutub šanss loengusse hilineda, kui muudame seletava tunnuse taset?    
+- näitab mudeli **vabaliige** (*Intercept*) hilinemise **šansi logaritmi** prillide**ta** üliõpilaste seas (sest "Ei" on tähestikus eespool kui "Jah"),  
+- **koefitsient** (`prillidJah`) šansi muutust logaritmitud kordades (ehk **logaritmitud šansisuhet**), kui vaatame prillikandjate gruppi: mitu (logaritmitud) korda muutub šanss loengusse hilineda, kui muudame seletava tunnuse taset?    
+
+
+Võrdle!  
 
 ```{r}
-exp(logmod$coefficients[1]) # prillideta üliõpilaste loengusse hilinemise šanss
-exp(logmod$coefficients[2]) # prillideta üliõpilaste loengusse hilinemise šansi ja prillidega üliõpilaste loengusse hilinemise šansi suhe/jagatis (mitu korda "rohkem" hilinevad prillidega üliõpilased?)
-exp(logmod$coefficients[1] + logmod$coefficients[2])# prillidega üliõpilaste loengusse hilinemise šanss
+# prillideta üliõpilaste loengusse hilinemise šanss
+0.7/0.3
+exp(logmod$coefficients[1])
+
+# prillidega üliõpilaste loengusse hilinemise šansi ja prillideta üliõpilaste loengusse hilinemise šansi suhe/jagatis (mitu korda "rohkem" hilinevad prillidega üliõpilased?)
+0.111111/2.333333
+exp(logmod$coefficients[2])
+
+# prillidega üliõpilaste loengusse hilinemise šanss
+0.1/0.9
+exp(logmod$coefficients[1] + logmod$coefficients[2])
 ```
 
 <center>
@@ -374,11 +477,11 @@ Sõltuvalt sellest, kas kategoriaalsel tunnusel on kaks või enam taset, nimetat
 - Millest sõltub see, kas vastaja eelistab kohvi või teed? <- Binomiaalne regressioon.
 - Millest sõltub see, kas vastajale meeldivad koerad, kaelkirjakud või molluskid? <- Multinomiaalne regressioon. 
 
-Siin räägime põhiliselt binomiaalsest logistilisest regressioonist, kus on kahe tasemega uuritav tunnus. See on aluseks ka multinomiaalsele regressioonile.  
+Siin räägime põhiliselt binomiaalsest logistilisest regressioonist, kus on kahe tasemega uuritav tunnus. See on aluseks ka multinomiaalsele regressioonile, kus mitme tasemega kategoriaalse uuritava tunnuse puhul võrreldakse kas 1) üht taset kõikide teistega ("muud") või 2) igat taset iga teise tasemega.    
 
 
 Kahe tasemega uuritava tunnuse saab taandada vastanduseks **sündmus toimub** vs. **sündmust ei toimu**, midagi esineb vs. midagi ei esine, midagi on vs. midagi ei ole jne. 
-See uuritava tunnuse tase, mis esindab sündmuse toimumist, saab väärtuseks arvu 1, ning teine, mis esindab sündmuse mittetoimumist, saab väärtuseks arvu 0. Vaikimisi määratakse sündmuse toimumiseks (1) see tunnuse tase, mis on tähestikulises järjekorras **tagapool**. Näiteks tee- ja kohvijoomise eelistuste uurimise puhul oleks teejoomine sündmuse toimumine ja kohvijoomine seega sündmuse mittetoimumine (võib ka vastupidi). 
+See uuritava tunnuse tase, mis esindab sündmuse toimumist, saab väärtuseks arvu 1, ning teine, mis esindab sündmuse mittetoimumist, saab väärtuseks arvu 0. **Vaikimisi määratakse sündmuse toimumiseks (1) see uuritava tunnuse väärtus/klass/tase, mis on tähestikulises järjekorras tagapool**. Näiteks tee- ja kohvijoomise eelistuste uurimise puhul oleks teejoomine sündmuse toimumine ja kohvijoomine seega sündmuse mittetoimumine. 
 
 ```{r}
 levels(kysimustik$lemmikjook)
@@ -391,7 +494,8 @@ Logistilise regressiooniga võib hinnata näiteks
 - teejoojate (vs. kohvijoojate) esinemise tõenäosust kvantitatiivsete meetodite kursusel sõltuvalt nende lemmikloomast ja ülikoolis õpitud aastate arvust;  
 - grippi haigestumise (vs. mittehaigestumise) tõenäosust sõltuvalt vanusest, vaktsineeritusest ja tegevusalast;  
 - konstruktsiooni *laua peal* esinemise (vs. *laual* esinemise) tõenäosust sõltuvalt tegusõnast, millega konstruktsioon koos esineb, ja sõnade pikkusest;  
-- näidendi tragöödiaks klassifitseerimise (vs. komöödiaks klassifitseerimise) tõenäosust sõltuvalt sellest, kui sagedasti seal esineb sõna *vaenlane* ja kui palju tegelasi on keskmiselt korraga ühes stseenis koos.  
+- näidendi tragöödiaks klassifitseerimise (vs. komöödiaks klassifitseerimise) tõenäosust sõltuvalt sellest, kui sagedasti seal esineb sõna *vaenlane* ja kui palju tegelasi on keskmiselt korraga ühes stseenis koos;  
+- sõjaliste konfliktide esinemise (vs. mitteesinemise) tõenäosust sõltuvalt piirkonnast, majanduslikust olukorrast ja valitsevast poliitilisest meelsusest.  
 
 
 ### Lineaarne vs. logistiline regressioon
@@ -468,9 +572,10 @@ Miks siis ikkagi logistiline regressioon ja mitte lineaarne? Näide.
 
 Lisame näiteks prillidega ja prillideta üliõpilaste tabelisse tulba, milles on nende keskmine hinne. Tahame teada, kas üliõpilase hilinemise tõenäosust saab ennustada nt tema keskmise hinde põhjal ülikoolis.  
 
-```{r}
+```{r, warning=F, message=F}
+library(tidyverse)
 # Järjesta tabel tulba "hilines" järgi
-df <- df[order(df$hilines == "Jah"),]
+df <- df %>% arrange(hilines)
 
 # Määra "seeme" juhuslike väärtuste korratavuseks
 set.seed(12)
@@ -478,12 +583,11 @@ set.seed(12)
 df$keskmine <- c(rnorm(12,4,0.4), rnorm(8,3,0.2))
 
 head(df)
+tail(df)
 ```
 
 
 ```{r, warning = F, message = F}
-library(ggplot2)
-
 # Loome graafikule tegelikel vaatlustel
 # põhineva aluskihi, milles hilinemine
 # on konverteeritud tõenäosusteks 1 ja 0.
@@ -554,13 +658,13 @@ Nende tagasiteisenduseks aga mingit eraldi funktsiooni ei ole ning sel juhul tul
 
 
 ```{r, echo = F}
-arvud <- c(1, 4, 8, 15, 30, 70, 100, 200, 500, 900, 2000, 10000)
+arvud <- c(1, 4, 8, 15, 30, 70, 100, 200, 500, 900, 2000, 5000, 7500, 10000)
 df <- data.frame(arv = arvud,
                  log = log(arvud))
 ggplot(df, aes(x = arv, y = log)) +
   geom_text(aes(label = arv)) +
   labs(x = "arv", y = "arvu logaritm") +
-  scale_y_continuous(breaks = seq(0, 10, 2))
+  scale_y_continuous(breaks = round(log(arvud), 2))
 
 ```
 
@@ -570,7 +674,7 @@ Nagu y-teljelt näeme, on logaritmitud sageduste erinevus palju väiksem kui log
 
 ## Ühe seletava tunnusega mudel
 
-Selleks, et natuke paremini aru saada, mis logistilise regressiooni mudelis täpselt ikkagi toimub, laadime andmestiku `ade_peal.RData`. See kujutab endast selle kursuse tarbeks veidi manipuleeritud varianti keeleteaduse andmestikust, mida on kasutatud artiklis Klavan, Jane, Maarja-Liisa Pilvik & Kristel Uiboaed. 2015. The Use of Multivariate Statistical Classification Models for Predicting Constructional Choice in Spoken, Non-Standard Varieties of Estonian. SKY Journal of Linguistics, 28, 187−224. Artiklis uuriti Eesti murrete korpuse andmete põhjal, millest sõltub see, kas kõneleja kasutab kohatähenduses alalütlevat käänet ehk *adessiivi* (nt *laual*) või kaassõna *peal* (nt *laua peal*).  Tegemist on niisiis binaarse (st kahe erineva väärtusega) uuritava tunnusega.  
+Selleks, et natuke paremini aru saada, mis logistilise regressiooni mudelis täpselt ikkagi toimub, laadime andmestiku `ade_peal.RData`. See kujutab endast selle kursuse tarbeks veidi manipuleeritud varianti keeleteaduse andmestikust, mida on kasutatud artiklis Klavan, Jane, Maarja-Liisa Pilvik & Kristel Uiboaed. 2015. The Use of Multivariate Statistical Classification Models for Predicting Constructional Choice in Spoken, Non-Standard Varieties of Estonian. SKY Journal of Linguistics, 28, 187−224. Artiklis uuriti eesti murrete korpuse andmete põhjal, millest sõltub see, kas kõneleja kasutab kohatähenduses alalütlevat käänet ehk *adessiivi* (nt *laual*) või kaassõna *peal* (nt *laua peal*).  Tegemist on niisiis binaarse (st kahe erineva väärtusega) uuritava tunnusega.  
 
 ```{r}
 ade_peal <- read.delim("data/ade_peal.csv", encoding = "UTF-8", stringsAsFactors = TRUE)
@@ -615,21 +719,23 @@ Siin on meil tasakaalustamata valim, mis tähendab seda, et kategooriaid ei esin
 
 
 ```{r}
-# Kaassõna esinemise tõenäosus
+# Kaassõna "peal" esinemise tõenäosus
 (p_peal <- tab[["peal"]]/sum(tab)) # NB! väike p-täht
 
-# Kaassõna esinemise šanss
+# Kaassõna "peal" esinemise šanss
 (P_peal <- p_peal/(1-p_peal)) # NB! suur p-täht
 ```
 ```{r}
-# Kaassõna mitte-esinemise tõenäosus
+# Kaassõna "peal" mitte-esinemise tõenäosus (= alalütleva käände esinemise tõenäosus)
 (p_ade <- tab[["ade"]]/sum(tab))
 
-# Kaassõna mitte-esinemise šanss
+# Kaassõna "peal" mitte-esinemise šanss (= alalütleva käände esinemise šanss)
 (P_ade <- p_ade/(1-p_ade))
 ```
 
 Ainult esinemissageduse põhjalt saame öelda ainult seda, et *peal*-konstruktsiooni kasutamine on murretes üldiselt tõenäolisem. Selleks aga, et kahe alternatiivse konstruktsiooni kasutuse kohta midagi sisukamat öelda, vajame lisaks mingeid teisi tunnuseid, mis võimalikku varieerumist murretes aitaksid seletada.
+
+**(Kuna tegemist on keelekorpusest kogutud andmetega ning ühelt kõnelejalt võib olla ka mitu vaatlust, on tegelikult vaatluste sõltumatuse nõue rikutud ja võiks kasutada hoopis segamudelit, aga sellest ülejärgmises praktikumis.)**  
 
 Vaatame näiteks kõigepealt, kas kohakonstruktsiooni ja mõne teise kategoriaalse tunnuse vahel on mingi seos. Enne mudeldamist võime muidugi teha ükshaaval tunnustega tabeleid, jooniseid ja graafikuid.  
 
@@ -649,7 +755,7 @@ ggplot(data = ade_peal) +
 vcd::assocstats(table(ade_peal$cx, ade_peal$LM_mobiilsus))$cramer
 ```
 
-Ehkki *peal*-konstruktsioon tundub olevat nii liigutatavate kui ka staatiliste "kohtadega" (orientiiridega) sagedam, on staatiliste kohtade puhul kaassõna kasutus oluliselt vähem tõenäoline (nt *heinamaa peal*) kui liigutatavate kohtadega (nt *laua peal*).  
+Ehkki *peal*-konstruktsioon tundub olevat nii liigutatavate kui ka staatiliste "kohtadega" (`LM`) sagedam, on staatiliste kohtade puhul kaassõna kasutus oluliselt vähem tõenäoline (nt *heinamaa peal*) kui liigutatavate kohtadega (nt *laua peal*).  
 
 
 
@@ -674,14 +780,13 @@ Kuna regressioonimudel hindab uuritava tunnuse **ühe taseme esinemise tõenäos
 
 ```{r}
 levels(ade_peal$cx)
-contrasts(ade_peal$cx)
 ```
 
 Sündmuse toimumine (1) on niisiis *peal*-konstruktsiooni kasutus ja mittetoimumine käändekonstruktsiooni kasutus. Mudel ennustab seega tõenäosust, et mingis seletavate tunnuste poolt määratud kontekstis kasutatakse kohasuhte väljendamiseks *peal*-kaassõna konstruktsiooni. Antud juhul siis tahame näha, kas *peal*-konstruktsiooni kasutus kasvab või kahaneb, kui vaatame liigutatavate kohtade (nt *laud*) asemel staatilisi kohti (nt *tänav*).
 
 Läheme nüüd uuesti mudeli väljundi juurde.
 
-**1. Vabaliikme `(Intercept)` koefitsient** `r m.glm$coefficients[[1]]` näitab *peal*-konstruktsiooni esinemise **šansi logaritmi** (*logit*) tunnuse `LM_mobiilsus` baastaseme korral ehk sellises kontekstis, kus kohasõna on mõtteliselt hõlpsasti liigutatav (nt *laud*). Logaritmitud šansi saab teisendada tavaliseks šansiks astendamise funktsiooniga `exp()`. Ehk kui logaritm alusel *e* (Euleri arv, umbes 2,71828) šansist on `r m.glm$coefficients[[1]]`, siis šanss on *e* astmes `r m.glm$coefficients[[1]]`. Vaikimisi kasutatakse niisiis naturaallogaritmi.    
+**1. Vabaliikme `(Intercept)` koefitsient** `r m.glm$coefficients[[1]]` näitab *peal*-konstruktsiooni esinemise **šansi logaritmi** (*logit*) tunnuse `LM_mobiilsus` baastaseme korral. Kategoriaalse seletava tunnuse baastase on vaikimisi tähestikulises järjekorras kõige esimene väärtus (`LM_mobiilsus` tunnuse puhul `liigutatav`, mitte `staatiline`). *Peal*-konstruktsiooni esinemise šansi logaritmi ennustatakse niisiis sellises kontekstis, kus kohasõna on mõtteliselt hõlpsasti liigutatav (nt *laud*). Logaritmitud šansi saab teisendada tavaliseks šansiks astendamise funktsiooniga `exp()`. Ehk kui logaritm alusel *e* (Euleri arv, umbes 2,71828) šansist on `r m.glm$coefficients[[1]]`, siis šanss on *e* astmes `r m.glm$coefficients[[1]]`. Vaikimisi kasutatakse niisiis naturaallogaritmi.    
 
 ```{r}
 # peal-cx esinemise šanss kontekstis,
@@ -730,7 +835,8 @@ Nüüd leiame šansisuhte ja šansisuhte logaritmi.
 P_staat/P_liigut
 log(P_staat/P_liigut)
 ```
-Saime sama tulemuse mis mudelist.
+
+Saime sama tulemuse nagu mudelist.
 
 Arvulise seletava tunnuse puhul väljendaks koefitsient sündmuse toimumise šansi muutust logaritmitud kordades 1-ühikulise muutuse puhul vastava seletava tunnuse väärtuses (nt kui silpide arv kasvab 1 silbi võrra, kui vanus kasvab 1 aasta võrra vmt).   
 
@@ -747,6 +853,17 @@ Selles mudelis on muutus seletavas tunnuses statistiliselt oluline, mis tähenda
 **4. _Null deviance_** näitab, kui suur oleks uuritava tunnuse varieerumise seletamata osa mudelis, kus ei ole ühtegi seletavat tunnust. Selle vabadusastmete arv (*degrees of freedom*) on enamasti vaatluste arv (*n*) - 1. **_Residual deviance_** näitab, kui suur on see seletamata osa, kui mudelis on need seletavad tunnused, mis seal parajasti on. Selle vabadusastmete arv sõltub mudelisse kaasatud tunnuste arvust ja kategoriaalsete tunnuste puhul ka tasemete arvust. Selles mudelis tuleb hinnata ainult ühe tunnuse ühe taseme mõju, seega lahutatakse n-st 1+1. Mida väiksem *Residual deviance* *Null Deviance*'ist on, seda parem, sest seda rohkem meie mudelisse lisatud seletavatel tunnustel uuritava tunnuse varieerumisega pistmist on.  
 
 **5. AIC ehk Akaike Information Criterion** võimaldab hinnata mudeli headust võrdluses teiste mudelitega (väiksem arv on parem). Arvestab valimi suuruse ja mudelisse kaasatud parameetrite arvuga (nagu *adjusted R2* lineaarse regressiooni mudelis). Kui näiteks teeksime veel ühe mudeli, kuhu lisaksime ühe seletava tunnuse juurde, aga AIC väärtus ei läheks oluliselt väiksemaks, siis ei pruugi meie lisatud tunnusel olla uuritava tunnuse varieerumise seletamisel kuigi suur roll ja peaksime valima lihtsama (= vähemate seletavate tunnustega) mudeli.  
+
+
+### Joonised ja mõjude raporteerimine
+
+```{r}
+#library(ggeffects)
+plot(ggpredict(m.glm))
+
+# library(report)
+report_text(m.glm)
+```
 
 
 ### Sõnastame uuesti tulemused
@@ -832,4 +949,4 @@ c) cx ~ LM_mobiilsus, sest selle AIC on väiksem.
 - Interaktsioonidega logistilise regressiooni mudel   
 - Mudelite võrdlemine ja optimaalse mudeli leidmine  
 - Mudeli mõjude visualiseerimine  
-- (Mudeli headuse näitajad)
+- Mudeli headuse näitajad  
