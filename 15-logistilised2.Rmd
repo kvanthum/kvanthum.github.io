@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '15-logistilised2.html'))})
-date: 18.04.2022
+date: 17.04.2023
 output: 
   html_document:
     theme: flatly
@@ -95,13 +95,13 @@ seletavad_kat <- c("TR_liik", "tegusõna_klass", "LM_mobiilsus", "LM_komplekssus
 # ning iga tulba puhul: function(seletav_kat)
 # teha sellest tulbast ning uuritava tunnuse tulbast risttabel: table(seletav_kat, dat$cx)
 # seletav_kat on siinkohal täiesti suvaline nimi, mida kasutame tulpade kohatäitena, 
-# põhimõtteliselt võib see olla ka x, y, tralllallaa või midagi muud
+# põhimõtteliselt võib see olla ka x, y, trallallaa või midagi muud
 # Tulemuseks saame listi, mille iga element on omaette risttabel.
 lapply(dat[,seletavad_kat], function(seletav_kat) table(seletav_kat, dat$cx))
 
 # Teeme korraga uuritava tunnuse joonised kõikide kat. seletavate tunnustega
 dat %>%
-  select(cx, seletavad_kat) %>% # vali uuritava ja kat. seletavate tunnuste tulbad
+  select(cx, all_of(seletavad_kat)) %>% # vali uuritava ja kat. seletavate tunnuste tulbad
   pivot_longer(., 2:length(.), # tee seletavate tunnuse põhjal laiast tabelist pikk
                names_to = "tunnused", # kus tunnuste nimed lähevad ühte tulpa
                values_to = "väärtused") %>% # ja nende tasemed/väärtused teise
@@ -109,7 +109,7 @@ dat %>%
                fill = cx)) + # kuva täitevärviga uuritavat tunnust
   geom_bar(position = "fill") + # tee joonis suhteliste sagedustega
   stat_count(geom = "text", # lisa tekstina ka absoluutarvud
-             aes(label = stat(count)), # tekstisildi jaoks loe kategooriate sagedused kokku
+             aes(label = after_stat(count)), # tekstisildi jaoks loe kategooriate sagedused kokku
              position = position_fill(vjust = 0.5), # aseta sildid tulpade keskele
              colour = "grey40") + # värvi tekst halliks
   facet_wrap("tunnused", scales = "free") + # tee iga tunnusega oma paneel
@@ -143,7 +143,7 @@ ggplot(dat, aes(x = LM_pikkus_log, y = ifelse(cx == "peal", 1, 0))) +
 
 Andmetest kiire esmase ülevaate saamiseks on R-is ka erinevaid pakette, nt [`DataExplorer`](https://cran.r-project.org/web/packages/DataExplorer/vignettes/dataexplorer-intro.html), [`GGally`](https://ggobi.github.io/ggally/index.html) või [`Hmisc`](https://hbiostat.org/R/Hmisc/), mis hõlbustavad oluliselt andmeanalüütiku igapäevatööd.    
 
-Samuti saab mingit esmast kirjeldavat analüüsi teha paketiga [`sjPlot`](https://strengejacke.github.io/sjPlot/reference/index.html), mida kasutame hiljem ka mudeli efektide visualiseerimiseks.  
+Samuti saab esmast kirjeldavat analüüsi küllalt kiiresti teha paketiga [`sjPlot`](https://strengejacke.github.io/sjPlot/reference/index.html), mida kasutame hiljem ka mudeli efektide visualiseerimiseks.  
 
 ```{r, message = F, warning = F}
 #install.packages("sjPlot")
@@ -171,8 +171,8 @@ summary(m1.glm)
 Kordamiseks:  
 
 - Mudel ennustab *peal*-konstruktsiooni esinemise tõenäosust seletavate tunnuste määratud kontekstis, kuna *peal* on tähestikus vaikimisi tagapool kui *ade*.  
-- **Rida `(Intercept)`** väljendab *peal*-konstruktsiooni esinemise tõenäosust seletavate tunnuste baastasemete kontekstis. Mudeli hetkel ainsa seletava tunnuse, `LM_mobiilsus` baastase on vaikimisi tähestiku järjekorras esimene tase `liigutatav`. **Nullhüpotees selle konteksti kohta on, et _peal_-konstruktsioonil on seal võrdsed võimalused esineda ja mitte-esineda.** Kui nullhüpotees kehtiks, oleksid *peal*-konstruktsiooni esinemise ja mitte-esinemise (= *ade*-konstruktsiooni esinemise) tõenäosused kumbki 0.5, *peal*-konstruktsiooni esinemise šanss seega `0.5/0.5=1` ning selle šansi logaritm tulbas `Estimate` `log(1)=0`. Kuna aga `Estimate` tulbas on hoopis nullist suurem väärtus `r as.numeric(m1.glm$coefficients[1])`, on *peal*-konstruktsiooni esinemise šansid liigutatavate kohtadega järelikult suuremad kui 1, täpsemalt `exp(m1.glm$coefficients["(Intercept)"])=2.423358`, ja *peal*-konstruktsiooni tõenäosus seega `plogis(m1.glm$coefficients["(Intercept)"])=0.7078891`. P-väärtus real näitab seda, milline on tõenäosus, et saaksime sellise nullist erineva koefitsiendi juhul, kui nullhüpotees ikkagi kehtiks ja tegelikult alalütleva ja *peal*-konstruktsiooni kasutuses liigutatavate kohtadega erinevust ei ole. Kui p-väärtus on väiksem kui 0.05, on see tõenäosus väga väike ning saamegi öelda, et erinevus kahe kohakonstruktsiooni kasutuses on vabaliikme kontekstis statistiliselt oluline.      
-- **Rida `LM_mobiilsusstaatiline`** väljendab muutust *peal*-konstruktsiooni esinemise tõenäosuses, kui muudame seletavate tunnuste kontekstis reanimes täpsustatud tunnuse taseme ära (antud juhul vaatame liigutatavate kohtade asemel hoopis staatilisi kohti). **Nullhüpotees sellel real on, et _peal_-konstruktsiooni võimalused esineda selles uues kontekstis ei erine tema võimalustest esineda vanas, baastasemete kontekstis.** Kui nullhüpotees kehtiks, oleksid *peal*-konstruktsiooni esinemise šansid nii liigutatavate kui ka staatiliste kohtadega sama suured, nende šansside jagatis seega 1 ja selle jagatise logaritm tulbas `Estimate` `log(1)=0`. Kuna aga `Estimate` tulbas on hoopis nullist väiksem väärtus `r as.numeric(m1.glm$coefficients[2])`, on *peal*-konstruktsiooni esinemise šansid staatiliste kohtadega järelikult väiksemad kui liigutatavate kohtadega, täpsemalt `exp(m1.glm$coefficients["(Intercept)"]+m1.glm$coefficients["LM_mobiilsusstaatiline"])=0.6666667`, ja *peal*-konstruktsiooni esinemise tõenäosus seega `plogis(m1.glm$coefficients["(Intercept)"]+m1.glm$coefficients["LM_mobiilsusstaatiline"])=0.4`.  
+- **Rida `(Intercept)`** väljendab logaritmitud šansi kaudu *peal*-konstruktsiooni esinemise tõenäosust seletavate tunnuste baastasemete kontekstis. Mudeli hetkel ainsa seletava tunnuse, `LM_mobiilsus` baastase on vaikimisi tähestiku järjekorras esimene tase `liigutatav`. **Nullhüpotees selle konteksti kohta on, et _peal_-konstruktsioonil on seal võrdsed võimalused esineda ja mitte-esineda.** Kui nullhüpotees kehtiks, oleksid *peal*-konstruktsiooni esinemise ja mitte-esinemise (= *ade*-konstruktsiooni esinemise) tõenäosused kumbki 0.5, *peal*-konstruktsiooni esinemise šanss seega `0.5/0.5=1` ning selle šansi logaritm tulbas `Estimate` `log(1)=0`. Kuna aga `Estimate` tulbas on hoopis nullist suurem väärtus `r as.numeric(m1.glm$coefficients[1])`, on *peal*-konstruktsiooni esinemise šansid liigutatavate kohtadega järelikult suuremad kui 1, täpsemalt `exp(m1.glm$coefficients["(Intercept)"])=2.423358`, ja *peal*-konstruktsiooni tõenäosus seega `plogis(m1.glm$coefficients["(Intercept)"])=0.7078891`. P-väärtus real näitab seda, milline on tõenäosus, et saaksime sellise nullist erineva koefitsiendi juhul, kui nullhüpotees ikkagi kehtiks ja tegelikult alalütleva ja *peal*-konstruktsiooni kasutuses liigutatavate kohtadega erinevust ei ole. Kui p-väärtus on väiksem kui 0.05, on see tõenäosus väga väike ning saamegi öelda, et erinevus kahe kohakonstruktsiooni kasutuses on vabaliikme kontekstis statistiliselt oluline.      
+- **Rida `LM_mobiilsusstaatiline`** väljendab logaritmitud šansisuhte kaudu **muutust** *peal*-konstruktsiooni esinemise tõenäosuses, kui muudame seletavate tunnuste kontekstis reanimes täpsustatud tunnuse taseme ära (antud juhul vaatame liigutatavate kohtade asemel hoopis staatilisi kohti). **Nullhüpotees sellel real on, et _peal_-konstruktsiooni võimalused esineda selles uues kontekstis ei erine tema võimalustest esineda vanas, baastasemete kontekstis.** Kui nullhüpotees kehtiks, oleksid *peal*-konstruktsiooni esinemise šansid nii liigutatavate kui ka staatiliste kohtadega sama suured, nende šansside jagatis seega 1 ja selle jagatise logaritm tulbas `Estimate` `log(1)=0`. Kuna aga `Estimate` tulbas on hoopis nullist väiksem väärtus `r as.numeric(m1.glm$coefficients[2])`, on *peal*-konstruktsiooni esinemise šansid staatiliste kohtadega järelikult väiksemad kui liigutatavate kohtadega, täpsemalt `exp(m1.glm$coefficients["(Intercept)"]+m1.glm$coefficients["LM_mobiilsusstaatiline"])=0.6666667`, ja *peal*-konstruktsiooni esinemise tõenäosus seega `plogis(m1.glm$coefficients["(Intercept)"]+m1.glm$coefficients["LM_mobiilsusstaatiline"])=0.4`.  
 
 
 Kui lineaarses regressioonis näitab mudeli väljund kohe ka seda, kas **mudel tervikuna on statistiliselt oluline või mitte**, siis glm-mudelite pere (*Generalized Linear Models*), kuhu kuulub ka logistiline regressioon, mudelile ise *p*-väärtust ei omista. Küll aga on võimalik see *p*-väärtus välja arvutada n-ö "käsitsi" funktsiooniga **`pchisq()`**, kasutades nullmudeli (ilma seletavate tunnusteta mudeli) ning tunnustega mudeli hälbimuse näitajaid (*deviance*) ja vabadusastmete arvu (*df*).
@@ -202,13 +202,13 @@ table(ade_peal$cx)
 1310/722
 ```
 
-Kuna mudeli vabaliikme koefitsiendi p-väärtus on väike, peame nullhüpoteesi hülgama ning tõdema, et juhul, kui me ei tea mitte midagi kohakonstruktsioonide esinemiskonteksti kohta, ei ole *peal*- konstruktsiooni ja alalütleva käände konstruktsiooni kasutuse tõenäosused võrdsed.  
+Kuna nullmudeli vabaliikme koefitsiendi *p*-väärtus on väike, peame nullhüpoteesi hülgama ning tõdema, et juhul, kui me ei tea mitte midagi kohakonstruktsioonide esinemiskonteksti kohta, ei ole *peal*- konstruktsiooni ja alalütleva käände konstruktsiooni kasutuse tõenäosused võrdsed.  
 
 ## Mitme seletava tunnusega mudel
 
 Lisame nüüd mudelisse veel tunnuseid.
 
-Nagu varemgi räägitud, on mudelite tegemise puhul kaks põhilist lähenemist:  
+Mudelite tegemise puhul on kaks põhilist lähenemist:  
 
 - **eksploratiivne** lähenemine, kus meil puuduvad tugevad teoreetilised eeldused efektide olulisuse, suuna ja suuruse kohta, püüame leida andmetest uusi seoseid ning optimaalset mudelit, mis ennustaks uuritava tunnuse varieerumist võimalikult hästi;  
 - **konfirmatoorne** lähenemine, kus kontrollime varasemat teooriat või püstitatud hüpoteese ning püüame leida, millistel tunnustel on uuritava tunnuse varieerumisele meie valimi põhjal statistiliselt oluline mõju ja millistel mitte.  
@@ -216,7 +216,7 @@ Nagu varemgi räägitud, on mudelite tegemise puhul kaks põhilist lähenemist:
 
 ### Konfirmatoorne lähenemine
 
-Konfirmatoorse lähenemise puhul võime kõik oma andmestiku tunnused panna korraga mudelisse ning raporteerida lihtsalt, millised neist olid olulised, millised mitte, ja mis suunalised oluliste tunnuste mõjud olid.
+Konfirmatoorse lähenemise puhul võime kõik oma andmestiku tunnused (ja nendevahelised interaktsioonid) panna korraga mudelisse ning raporteerida lihtsalt, millised neist olid olulised, millised mitte, ja mis suunalised oluliste tunnuste mõjud olid.
 
 ```{r}
 mmax.glm <- glm(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + LM_pikkus_log + sõnajärg + murderühm, data = dat, family = "binomial")
@@ -236,7 +236,7 @@ Baastasemete kontekst on selline, kus
 - `sõnajärg` == "lm_tr",  
 - `murderühm` == "Kesk".  
 
-Näiteks võiks baastasemete konteksti moodustada selline andmestikus tegelikult mitte-esinev lause, nagu *käe peal kõnnib see*, mille on öelnud Kesk murderühma kõneleja.  
+Näiteks võiks baastasemete konteksti moodustada selline andmestikus tegelikult mitte-esinev lause, nagu *käe peal kõnnib see*, mille on öelnud Kesk-murderühma kõneleja.  
 
 Sellises kontekstis on *peal*-konstruktsiooni esinemise šansid suuremad kui selle mitte-esinemise (= käändekonstruktsiooni esinemise) šansid, sest `(Intercept)`-real on koefitsient > 0. 
 Iga järgnev rida väljundis hindab nüüd seda, kas *peal*-konstruktsiooni esinemise šansid kasvavad või kahanevad, kui panna baastasemete konteksti selle mingi konkreetse tunnuse väärtus (nt TR_liik=="asesõna" -> TR_liik=="nimisõnafraas"), aga jätta ülejäänud kontekst samaks (nt *käe peal kõnnib __sipelgas__*). 
@@ -290,9 +290,9 @@ car::Anova(glm(cx ~ LM_pikkus_log + sõnajärg + TR_liik + LM_komplekssus + murd
 ```
 
 
-Tulba `LRT` ehk *likelihood-ratio test* põhjal saab nüüd otsustada, et kõige olulisemad tunnused *peal*-konstruktsiooni ja käändekonstruktsiooni valikul on kohasõna liigutatavus, murderühm, kohasõna komplekssus ning tegusõna klass. 
+Tulba `LRT` ehk *likelihood-ratio test* (või `LR Chisq`) põhjal saab nüüd otsustada, et kõige olulisemad tunnused *peal*-konstruktsiooni ja käändekonstruktsiooni valikul on kohasõna liigutatavus, murderühm, kohasõna komplekssus ning tegusõna klass. 
 
-3 või enama tasemega faktorite tasemete omavaheliseks võrdluseks võib teha nüüd samuti mitu mudelit, kus igal pool muudame faktori baastaset, ning jagada p-väärtused läbi võrdluste arvuga (nn Bonferroni parandus).  
+3 või enama tasemega faktorite tasemete omavaheliseks võrdluseks võib teha nüüd samuti mitu mudelit, kus igal pool muudame faktori baastaset, ning jagada *p*-väärtused läbi võrdluste arvuga (nn Bonferroni parandus).  
 Baastasemeteks võib aga määrata ka mingid tunnuste tüüpilised väärtused, nt iga faktori kõige sagedama väärtuse. Nii hindame mudelis parameetreid mingis oletatavasti kõige tüüpilisemas kontekstis. 
 
 ```{r}
@@ -387,9 +387,10 @@ Tundub, et orientiiri pikkus võiks mingit mõju omada koos murderühmaga. Vaata
 
 On oluline, et oskaksime regressioonimudeli väljundeid lugeda ja tõlgendada. Tihtipeale on aga oma tulemuste teistele esitamiseks mugavam kasutada eri visualiseerimisviise. 
 
-Vaatame siin paketti `sjPlot`, mis on loodud sotsiaalteaduste statistiliste analüüside visualiseerimiseks.  
+Vaatame siin paketti `sjPlot`, mis on loodud sotsiaalteaduste statistiliste analüüside visualiseerimiseks. Pakett kasutab tegelikult sama `ggeffects` paketi funktsioone, mida eelmistel kordadel oleme samuti põgusalt vaadanud.    
 
 ```{r}
+#install.packages("sjPlot")
 library(sjPlot)
 ```
 
@@ -450,7 +451,7 @@ plot_model(mmax.glm,
 ```
 
 
-Lisaks üldiste mudeli väljundite kuvamisele saab joonisel näidata ka eraldi konkreetsete tunnuste mõjusid. `type = "pred"` kuvab näiteks peamõjusid, kusjuures y-teljel on nüüd protsentideks arvutatud esinemistõenäosused teiste seletavate tunnuste baastasemete kontekstis (aga arvuliste tunnuste keskväärtuse korral!). Võid kontrollida konteksti käsuga `ggeffects::ggpredict(mmax.glm, terms = "tegusõna_klass")`.  
+Lisaks üldiste mudeli väljundite kuvamisele saab joonisel näidata ka eraldi konkreetsete tunnuste mõjusid (nn *marginal effects*). `type = "pred"` kuvab näiteks peamõjusid, kusjuures y-teljel on nüüd protsentideks arvutatud esinemistõenäosused teiste seletavate tunnuste baastasemete kontekstis (**aga arvuliste tunnuste keskväärtuse korral!**). Võid kontrollida konteksti käsuga `ggeffects::ggpredict(mmax.glm, terms = "tegusõna_klass")`.  
 
 ```{r}
 plot_model(mmax.glm, 
@@ -513,16 +514,12 @@ tab_model(m5.glm,
           use.viewer = F) # ära näita tabelit Vieweris, vaid eraldi brauseris
 ```
 
-Kui mudelis on mingite tunnuste vahel oluline interaktsioon, ei saa mudeli peamõjusid enam üksinda tõlgendada. Nii tuleks pikkuse mõju tõlgendada mudelis `m5.glm` ainult koos murde mõjuga. Kesk-murderühmas pikkusel niisiis mõju ei ole, Lõuna-murderühmas aga kasvab *peale*-konstruktsiooni kasutamise tõenäosus oluliselt iga sõnapikkuse logaritmitud ühiku (ehk iga arvu 2 astme) kohta umbes `exp(-0.14+0.61)=1.599994` korda, Saarte-murderühmas  `exp(-0.14+0.65)=1.665291` korda.  
+Kui mudelis on mingite tunnuste vahel oluline interaktsioon, ei saa mudeli peamõjusid enam üksinda tõlgendada. Nii tuleks pikkuse mõju tõlgendada mudelis `m5.glm` ainult koos murde mõjuga. Pikkusel (`LM_pikkus_log`) ei ole niisiis olulist mõju, **juhul kui** tegemist on Kesk-murderühmaga. Lõuna-murderühm (`murderühmLõuna`) ei erine oluliselt Kesk-murderühmast, **juhul kui** pikkuse logaritm on 0, aga silpide lisandudes muutub erinevus oluliseks (`LM_pikkus_log:murderühmLõuna`). Ranniku-murderühmaga (`murderühmRanniku`) on vastupidi: erinevus Kesk-murderühmaga on statistiliselt oluline **juhul kui** pikkuse logaritm on 0, aga silpide arvu kasvades midagi oluliselt ei muutu. Saarte-murderühm omakorda erineb Kesk-murderühmast mõlemal juhul: murded erinevad väga lühikeste sõnade puhul (mille pikkuse logaritm on 0), samuti erineb murretes pikkuse mõju, sest Kesk-murderühmas pikkuse lisandumine *peal*-konstruktsiooni esinemise šansse eriti ei mõjuta, Saarte-murderühmas aga muutub pikemate sõnadega *peal*-konstruktsiooni esinemine järjest tõenäolisemaks.     
 
 ```{r}
 plot_model(m5.glm, type = "int")
-```
-
-Murrete mõju saame tabelis eraldi hinnata jällegi ainult juhul, kui kohasõna pikkuse logaritm on 0, st 1-silbiliste sõnade puhul. Kui sõnad lähevad pikemaks, peame kohe arvestama ka koosmõjuga.  
-
-```{r}
-plot_model(m5.glm, type = "pred", terms = c("murderühm", "LM_pikkus_log"))
+# või
+plot_model(m5.glm, type = "pred", terms = c("LM_pikkus_log", "murderühm"))
 ```
 
 
@@ -595,7 +592,7 @@ d) Koefitsientide *p*-väärtusi.
 
 #### 3. Teeme kursuse küsimustiku andmete pealt mudeli, mis ennustab vastajate lemmikjooki sünniaasta, ülikoolis õpitud aastate arvu, kvantmeetodite kogemuse, lemmiklooma ja küsimustikule vastamise aasta järgi. Millised peamõjud tuleks mudelisse jätta?
 ```{r}
-load("data/kysimustik_2022.RData")
+load("data/kysimustik_2023.RData")
 kysimustik$aasta <- as.numeric(as.character(kysimustik$aasta))
 m <- glm(lemmikjook ~ synniaasta + kaua_opid + kogemused_kvant + lemmikloom + aasta, data = kysimustik, family = "binomial")
 car::Anova(m)
@@ -605,16 +602,6 @@ a) mitte ühtegi
 b) kogemused_kvant ja vastamise aasta
 c) kogemused_kvant, vastamise aasta ja lemmikloom
 d) kõik
-
-#### 4. Tee kursuse küsimustiku andmete pealt mudel, mis ennustab seda, kas vastajal on kogemusi kvantitatiivsete meetoditega või mitte, vastavalt küsimustikule vastamise aasta ja ülikoolis õpitud aastate arvu järgi. Milline väide on õige?
-```{r}
-m1 <- glm(kogemused_kvant ~ aasta + kaua_opid, data = kysimustik, family = "binomial")
-```
-
-a) Mõlemad seletavad tunnused teevad mudelit oluliselt paremaks.
-b) Ainult vastamise aasta tuleks mudelisse alles jätta.
-c) Ainult õpitud aastad tuleks mudelisse alles jätta.
-d) Tuleks lisada ka aasta ja õpitud aastate interaktsioon.
 
 
 ## Järgmisel korral
