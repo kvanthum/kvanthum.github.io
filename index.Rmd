@@ -30,8 +30,8 @@ output:
 12. [Lineaarse regressiooni mudelid (2)](12-lineaarsed2.html) 
 13. [Lineaarse regressiooni segamudelid](13-lineaarsed_sega.html) 
 14. [Logistilise regressiooni mudelid (1)](14-logistilised1.html)  
-<!--15. [Logistilise regressiooni mudelid (2)](15-logistilised2.html) 
-16. [Logistilise regressiooni mudelid (3) ja logistilise regressiooni segamudelid](16-logistilised3_sega.html)  
+15. [Logistilise regressiooni mudelid (2)](15-logistilised2.html) 
+<!--16. [Logistilise regressiooni mudelid (3) ja logistilise regressiooni segamudelid](16-logistilised3_sega.html)  
 17. [Tingimuslikud otsustuspuud](17-otsustuspuud.html) 
 18. [Juhumetsad](18-juhumetsad.html) -->
 

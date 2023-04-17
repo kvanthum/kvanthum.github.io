@@ -146,7 +146,7 @@ Andmetest kiire esmase ülevaate saamiseks on R-is ka erinevaid pakette, nt [`Da
 Samuti saab esmast kirjeldavat analüüsi küllalt kiiresti teha paketiga [`sjPlot`](https://strengejacke.github.io/sjPlot/reference/index.html), mida kasutame hiljem ka mudeli efektide visualiseerimiseks.  
 
 ```{r, message = F, warning = F}
-#install.packages("sjPlot")
+#install.packages("sjPlot", dependencies = T)
 library(sjPlot)
 
 plot_grpfrq(dat$LM_mobiilsus, dat$cx, drop.empty = TRUE)
@@ -258,6 +258,12 @@ Baastasemete kontekstiga võrreldes **kahandavad** *peal*-konstruktsiooni esinem
 - staatilise kohasõna kasutamine liigutatava kohasõna asemel (nt *laud* -> *heinamaa*),  
 - liitsõnalise kohasõna kasutamine lihtsõnalise kohasõna asemel (nt *laud* -> *heina+maa*),  
 - Ranniku või Saarte murderühma kuuluva keelekasutuse vaatamine.  
+
+
+```{r}
+library(report)
+report(mmax.glm)
+```
 
 
 Kuna aga iga taseme mõju hinnatakse ainult üldise baastasemete konteksti suhtes, ei saa me siit teada, kas tunnustel üldiselt on mingi mõju või mitte. Samuti ei saa me mudeli väljundist teada 3 või enama tasemega kategoriaalsete seletavate tunnuste omavahelisi erinevusi.   
