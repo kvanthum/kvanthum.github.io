@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '16-logistilised3_sega.html'))})
-date: 20.04.2022
+date: 19.04.2023
 output: 
   html_document:
     theme: flatly
@@ -35,12 +35,12 @@ Eelmisel korral lõpetasime tasakaalus alalütleva ja *peal*-kaassõna andmestik
 
 ```{r, warning = F, message=F}
 library(tidyverse)
-library(sjPlot)
+library(sjPlot) # mudeli visualiseerimiseks
 ```
 ```{r}
 ade_peal <- read.delim("data/ade_peal.csv", encoding = "UTF-8", stringsAsFactors = TRUE)
-ade <- ade_peal[ade_peal$cx == "ade",] # ainult alalütleva käände andmed
-peal <- ade_peal[ade_peal$cx == "peal",] # ainult peal-kaassõna andmed
+ade <- droplevels(ade_peal[ade_peal$cx == "ade",]) # ainult alalütleva käände andmed
+peal <- droplevels(ade_peal[ade_peal$cx == "peal",]) # ainult peal-kaassõna andmed
 
 set.seed(1) # seeme juhusliku valiku tegemise korratavuseks
 juh_id <- sample(x = 1:nrow(peal), # võta ridadelt 1 kuni 1310 juhuslik valim,
@@ -48,16 +48,17 @@ juh_id <- sample(x = 1:nrow(peal), # võta ridadelt 1 kuni 1310 juhuslik valim,
                  replace = F) # ära korda ühtegi vaatlust
 
 peal_juhuvalim <- peal[juh_id,] # võta peal-andmestikust ainult juhuslikult valitud read
-dat <- droplevels(rbind(ade, peal_juhuvalim)) # liida kaks andmestikku ridupidi uuesti kokku
+dat <- rbind(ade, peal_juhuvalim) # liida kaks andmestikku ridupidi uuesti kokku
 ```
 
 Teeme sel korral sama mudeli, aga määrame kõigepealt kategoriaalsete tunnuste baastasemeteks nende kõige tüüpilisema (= sagedama) väärtuse ehk moodi.  
 
 ```{r}
-lapply(dat[,c("LM_mobiilsus", "LM_komplekssus", "tegusõna_klass", "murderühm")], function(x) names(which.max(table(x))))
+lapply(dat[,c("LM_mobiilsus", "LM_komplekssus", "tegusõna_klass", "murderühm")], # iga tulba/tunnuse kohta neljast
+       function(x) names(which.max(table(x)))) # leia selle tunnuse mood
 ```
 
-Tüüpiline kontekst oleks niisiis midagi sellist nagu *auto on teel / tee peal*.  
+Tüüpiline kontekst oleks niisiis midagi sellist nagu *auto __on__ __tee__l / __tee__ peal*.  
 
 
 ```{r}
@@ -72,11 +73,22 @@ dat %>%
 
 ```{r}
 m5.glm <- glm(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log*murderühm, data = dat2, family = "binomial")
-plot_model(m5.glm, show.values = T, value.offset = 0.3, 
-           sort.est = T, p.adjust = "holm", 
-           title = "Baaskontekst:\nLM mobiilsus [staatiline], LM komplekssus [lihtsõna], LM pikkus log [0 ehk 1 silp], murderühm [Kesk]", 
-           wrap.title = 100) +
-  theme(plot.title = element_text(size = 10))
+plot_model(m5.glm, 
+           show.values = T, # näita koefitsientide väärtuseid
+           value.offset = 0.3, # punktist veidi ülevalpool
+           sort.est = T, # sorteeri koefitsiendid
+           p.adjust = "holm", # korrigeeri p-väärtuseid
+           title = "Baaskontekst:\nLM mobiilsus [staatiline], LM komplekssus [lihtsõna],\nLM pikkus log [0 ehk 1 silp], murderühm [Kesk]",
+           wrap.title = 150) + # luba pealkirjas ühele reale kuni 150 tähemärki
+  theme(plot.title = element_text(size = 12)) # muuda pealkirja teksti suurust ggplotiga 
+```
+
+```{r}
+# Visualiseerime peamõjusid
+plot_model(m5.glm, type = "pred") -> preds
+preds$LM_mobiilsus
+preds$LM_komplekssus
+preds$tegusõna_klass
 ```
 
 ```{r}
@@ -86,33 +98,34 @@ plot_model(m5.glm, type = "int", grid = T)
 
 
 
-AIC ja `anova` aitasid meil leida olulisima mudeli, st mudeli, kus iga tunnus panustab piisaval määral uuritava tunnuse seletamisse selleks, et seda mudelis sees hoida. Nüüd vaatame ka, **kui hästi selline mudel uuritava tunnuse varieerumist seletada suudab**. 
+AIC ja `anova` aitasid meil leida olulisima mudeli, st mudeli, kus iga tunnus panustab piisaval määral uuritava tunnuse seletamisse selleks, et seda mudelis sees hoida. Nüüd vaatame ka, **kui hästi selline mudel uuritava tunnuse varieerumist seletada suudab**.  
+Logistilises regressioonis ei pakuta meile R-ruutu, mille põhjal mudeli headust ja täpsust hinnata. Küll aga kasutatakse mõnikord erinevaid nn **pseudo-R^2^** variante, nagu nt Nagelkerke R^2^, Cox-Snelli R^2^, McFaddeni R^2^, või Tjuri R^2^ (mida näidatakse ka nt `sjPlot::tab_model()` või `report::report_text()` funktsioonide väljundis). Neid võib pidada ligikaudseteks mudeli headuse näitajateks, ent need on üldjuhul oluliselt madalamad kui lineaarsete mudelite R-ruudud, samuti ei ole nende tõlgendamine nii ühemõtteline, kuna eri pseudo-R-ruudud on erinevalt arvutatud. Sellegipoolest võivad need olla kasulikud inkrementaalsel modelleerimisel samal andmestikul tehtud mudelite võrdlemiseks.   
 
-Kuna logistilises regressioonis ei pakuta meile R-ruutu, mille põhjal mudeli headust ja täpsust hinnata, tuleb kasutada nt klassifitseerimistäpsust ja C-indeksit/AUC-d. Nendest pisut allpool.
+Publitseerimisel raporteeritakse pseudo-R-ruudust enam **klassifitseerimistäpsust** ja **C-indeksit/AUC-d**. Nendest järgmiseks pikemalt.  
 
 
 
 
 ### Klassifitseerimistäpsus
 
-Iga vaatluse kohta andmestikus ennustab mudel mingi tõenäosuse, millega *peal*-konstruktsioon mudelisse kaasatud seletavate tunnuse põhjal esineda võiks. Sisuliselt on mudelis *peal* ja *ade* kodeeritud vastavalt kui 1 (100% *peal*-konstruktsioon) ja 0 (0% *peal*-konstruktsioon). Kui meil on andmestikus rida, kus `cx = "peal"` ja mudel ennustab sellele vaatlusele *peal*-konstruktsiooni esinemise tõenäosuse, mille väärtus on > 0.5, siis ennustab mudel põhimõtteliselt õigesti, sest peab sellises kontekstis *peal*-konstruktsiooni esinemist tõenäolisemaks kui käändekonstruktsiooni esinemist. Kui ennustab väärtuse, mis on < 0.5, siis valesti. **Mudeli klassifitseerimistäpsus näitab nende juhtude osakaalu, kus mudel ennustab vaatlusele õige klassi/taseme.** 
+Iga vaatluse kohta andmestikus ennustab mudel mingi tõenäosuse, millega *peal*-konstruktsioon mudelisse kaasatud seletavate tunnuste põhjal esineda võiks. Sisuliselt on mudelis *peal* ja *ade* kodeeritud vastavalt kui 1 (100% *peal*-konstruktsioon) ja 0 (0% *peal*-konstruktsioon). Kui meil on andmestikus rida, kus `cx = "peal"` ja mudel ennustab sellele vaatlusele *peal*-konstruktsiooni esinemise tõenäosuse, mille väärtus on > 0.5, siis ennustab mudel põhimõtteliselt õigesti, sest peab sellises kontekstis *peal*-konstruktsiooni esinemist tõenäolisemaks kui käändekonstruktsiooni esinemist. Kui ennustab väärtuse, mis on < 0.5, siis valesti. **Mudeli klassifitseerimistäpsus näitab nende juhtude osakaalu, kus mudel ennustab vaatlusele õige klassi/taseme.** 
 
 Ennustatud tõenäosused saab mudelist kätte käsuga `mudel$fitted.values`.
 
 ```{r}
 # Vaatame ennustusi esimesele 6 vaatlusele/reale
 head(m5.glm$fitted.values) # tõenäosused
-head(m5.glm$linear.predictors) # logaritmitud šansid
+head(m5.glm$linear.predictors) # vastavad šansi logaritmid
 
 # Võrdleme seda andmestiku tulba "cx" tegelike väärtustega
-head(dat2$cx)
+head(dat2$cx) # esimesed 6 vaatlust on kõik "ade"
 
 # Tegelikud väärtused (kujul 0 ja 1) on ka mudelis olemas (y viitab uuritavale tunnusele)
-head(m5.glm$y)
+head(m5.glm$y) # esimesed 6 vaaltust on kõik 0
 ```
 
-Näeme, et esimesed 6 vaatlust on käändekonstruktsiooni kasutusjuhud. Kuna panime oma tasakaalus valimi kokku nii, et kõigepealt *ade* andmestik ja siis *peal* andmestik, on tegelikult kõik 722 esimest vaatlust käändekonstruktsioonid. 
-Esimese 6 puhul ennustab mudel 3 juhul õigesti (vaatlused 1-3) ja 3 juhul valesti (vaatlused 4-6), sest viimastele ennustatud *peal*-konstruktsiooni esinemise tõenäosus on suurem kui 0.5, ehkki tegelikult on andmestiku järgi seal kontekstis "ade".
+Näeme, et esimesed 6 vaatlust on käändekonstruktsiooni kasutusjuhud. Kuna panime oma tasakaalus valimi kokku nii, et kõigepealt *ade* andmestik ja siis *peal* andmestik, on tegelikult kõik 722 esimest vaatlust käändekonstruktsioonid.  
+Esimese 6 puhul ennustab mudel 3 juhul õigesti (vaatlused 1-3) ja 3 juhul valesti (vaatlused 4-6), sest viimastele ennustatud *peal*-konstruktsiooni esinemise tõenäosus on suurem kui 0.5, ehkki tegelikult on andmestiku järgi seal kontekstis "ade".  
 
 Võib kasutada ka funktsiooni `predict()`, mis töötab igasuguste mudelitega ning võimaldab küsida siin nii ennustatud tõenäosusi kui ka šansi logaritme. `predict()`-funktsioon on eriti kasulik siis, kui meil on eraldi treeningandmestik, mille põhjal mudelit ehitada, ning testandmestik, mille peal mudelit hinnata. Vaatame seda mudeli valideerimise juures.  
 ```{r}
@@ -140,7 +153,7 @@ enn <- m5.glm$fitted.values
 head(enn)
 
 # "cx" tulp andmestikus
-teg <- as.character(dat2[,"cx"])
+teg <- as.character(dat2$cx)
 head(teg)
 
 # tee uus objekt, milles on sama palju ridu
@@ -188,7 +201,7 @@ klass_tabel
 
 # TPR ja FPR
 TPR <- klass_tabel["peal", "peal"]/sum(klass_tabel["peal",]) # kui palju peal-konstruktsioone mudel õigesti tuvastas?
-FPR <- klass_tabel["ade", "peal"]/sum(klass_tabel["ade",]) # kui palju ade-konstruktsioonde mudel peal-konstruktsioonideks pidas?
+FPR <- klass_tabel["ade", "peal"]/sum(klass_tabel["ade",]) # kui palju ade-konstruktsioonidest mudel peal-konstruktsioonideks pidas?
 
 plot(FPR, TPR, xlim = c(0,1), ylim = c(0,1), main = "ROC-ruum")
 lines(x = 0:1, y = 0:1, lty = "dashed", col = "red")
@@ -200,54 +213,34 @@ Punane katkendjoon on nn ROC-kurv, millel asuvad näitajad siis, kui mudel ennus
 
 ### C-indeks ehk AUC
 
-Selleks, et saada veelgi rohkem infot selle kohta, kui hästi mudel uuritava tunnuse tasemeid eristada suudab, teeme logistilise regressiooni mudeli funktsiooniga `lrm()` paketist `rms`. Selle tulemus on sama, mis glm-mudeliga, ent väljund annab veidi rohkem informatsiooni.
+**C** ehk konkordantsiindeks (ka *Area Under the ROC Curve* ehk AUC. NB! mitte ajada segi AIC-ga!) näitab logistilise mudeli **eristusvõimet**: kui hästi suudab mudel uuritava tunnuse klasse eristada. Teisisõnu näitab *C* nende kordade proportsiooni, mil kõikide võimalike vaatluste paaride korral ennustab meie mudel suuremat sündmuse "1" esinemise tõenäosust vaatlusele, millel on ka päriselt andmetes sündmus "1", ja suuremat sündmuse "0" esinemise tõenäosust vaatlusele, millel on ka päriselt andmetes sündmus "0".  
 
-```{r, message = FALSE, warning = FALSE}
-# install.packages("rms")
-library(rms)
+Näiteks kahe vaatluse puhul, millest ühe tegelik väärtus on *peal* ja teise oma *ade*, võib mudel küll mõlemale ennustada *peal* esinemisele väiksema tõenäosuse kui 0.5, ent kui esimese puhul on see tõenäosus suurem kui teise puhul, eristab mudel neid siiski õigesti.   
 
-# siin ole vaja täpsustada family = "binomial"
-m5.lrm <- lrm(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log*murderühm, data = dat2)
+*C*-d peetakse niisiis täpsemaks ja paindlikumaks mudeli eristusvõime hindajaks kui klassifitseerimistäpsust, kuna see arvestab ennustusi tõenäosustena ehk pidevana, samas kui klassifitseerimistäpsus jagab ennustused lihtsalt 0.5 juurest kahte klassi, hoolimata sellest, kas ennustatud tõenäosus on nt 0.1 või 0.49.  
 
-# ei ole vaja ka eraldi `summary()` käsku
-m5.lrm
+Indeksi skaalat võib tõlgendada nii:  
+- C = 0.5: mudel ei erista, 50-50 tõenäosus täppi panna   
+- 0.5 < C <= 0.7: kehv eristusvõime  
+- 0.7 < C <= 0.8: rahuldav eristusvõime   
+- 0.8 < C <= 0.9: väga hea eristusvõime    
+- C > 0.9: suurepärane eristusvõime    
+
+
+Indeksi arvutamiseks võib kasutada näiteks pakette `pROC` või `Hmisc`.  
+
+```{r}
+# install.packages(c("pROC", "Hmisc"))
+library(pROC)
+auc(dat2$cx, # tegelik uuritava tunnuse tulp andmestikus
+    m5.glm$fitted.values) # igale vaatlusele ennustatud "peal" tõenäosused
+
+library(Hmisc)
+somers2(m5.glm$fitted.values, # igale vaatlusele ennustatud "peal" tõenäosused
+        as.numeric(dat2$cx)-1) # 0ks ja 1ks teisendatud tegelik uuritava tunnuse tulp andmestikus
 ```
-
-Alumises tabelis näeme sama infot, mida ka glm-mudeli väljundis. Ülemises tabelis on aga rida muid näitajaid, mis annavad meile mudeli headuse kohta kasulikku infot.
-
-Neist sagedamini kasutatavad:  
-
-- **Model Likelihood Ratio Test** näitab, kas mudel on statistiliselt oluline (raporteerib statistiku väärtuse, vabadusastmete arvu ja *p*-väärtuse). Nullhüpotees on, et mudeli hälbimus ehk seletamata variatsioon ei erine ühegi seletava tunnuseta mudeli ehk nullmudeli omast.  
-- **R2** on Nagelkerke pseudo-R2 ja viitab logistilises regressioonis mudeli headusele ainult umbkaudselt, aga **ei näita, kui palju mudel variatiivsusest kirjeldab** nagu lineaarses regressioonis!  
-- **C** ehk konkordantsiindeks (ka *Area Under the ROC Curve* ehk AUC. NB! mitte ajada segi AIC-ga!) näitab logistilise mudeli ennustustäpsust: kui hästi suudab mudel uuritava tunnuse klasse eristada. Näitab nende kordade proportsiooni, mil kõikide võimalike vaatluste paaride korral ennustab meie mudel suuremat sündmuse "1" esinemise tõenäosust vaatlusele, millel on ka päriselt andmetes sündmus "1", ja suuremat sündmuse "0" esinemise tõenäosust vaatlusele, millel on ka päriselt andmetes sündmus "0". C-d peetakse täpsemaks ja paindlikumaks mudeli eristusvõime hindajaks kui klassifitseerimistäpsust, kuna see arvestab ennustusi tõenäosustena ehk pidevana, samas kui klassifitseerimistäpsus jagab ennustused lihtsalt 0.5 juurest kahte klassi, hoolimata sellest, kas ennustatud tõenäosus on nt 0.1 või 0.49.  
-  * C = 0.5: mudel ei erista, 50-50 tõenäosus täppi panna  
-  * 0.5 < C <= 0.7: kehv eristusvõime  
-  * 0.7 < C <= 0.8: rahuldav eristusvõime  
-  * 0.8 < C <= 0.9: väga hea eristusvõime  
-  * C > 0.9: suurepärane eristusvõime    
-- **Dxy** on 2*(C−0.5).
-
 
 Kuna meie mudeli *C* on 0.746, võime pidada mudeli eristusvõimet rahuldavaks.  
-
-Saame vastavaid näitajaid küsida ka mudelist ilma mudelit ennast välja trükkimata.  
-```{r}
-# kõik näitajad
-m5.lrm$stats
-
-# C-indeks
-m5.lrm$stats["C"]
-```
-C-indeksi arvutamiseks võib kasutada ka teisi pakette.
-
-```{r, warning = F, message = F}
-library(Hmisc)
-somers2(m5.glm$fitted.values, ifelse(dat2$cx == "peal", 1, 0))["C"]
-
-# või
-library(pROC)
-auc(dat2$cx, m5.glm$fitted.values)
-```
 
 
 Kui mudelil on ideaalne eristusvõime ja see suudab täiuslikult eristada 1sid ja 0e ("peal"-konstruktsioone ja "ade"-konstruktsioone), siis kahe klassi tõenäosusjaotused ei kattu ja ROC-kurv on täisnurkne. Kui mudelil ei ole mingit eristusvõimet (kahe klassi tõenäosusjaotused kattuvad täielikult), siis on ROC-kurv diagonaalne sirge ROC-ruumis. Kui mudel ennustab tegelikele vaatlustele täpselt vastupidiseid klasse, siis on ROC-kurv teistpidi täisnurkne (kahe klassi tõenäosusjaotused ei kattu, aga need on vastupidised).
@@ -258,19 +251,19 @@ xseq <- seq(-0.25, 0.25, .001)
 densities <- dnorm(xseq, 0,1)
 
 par(mfrow = c(3, 2))
-plot(xseq+0.25, densities, col="darkred", xlab="", ylab="", type="l", lwd=2, cex=2, xlim = c(0, 1), main = "Kahe klassi ennustatud\ntõenäosuste jaotus")
+plot(xseq+0.25, densities, col="red", xlab="", ylab="", type="l", lwd=2, cex=2, xlim = c(0, 1), main = "Kahe klassi ennustatud\ntõenäosuste jaotus")
 lines(xseq+0.75, densities, col="darkgreen", xlab="", ylab="", type="l", lwd=2, cex=2)
 
 plot(x = 0:1, y = 0:1, col = "white", xlab = "FPR", ylab = "TPR", main = "Ideaalne eristusvõime\n(uuritava tunnuse väärtuste \ntõenäosusjaotused ei kattu)")
 lines(x = c(rep(0, 10), seq(0, 1, 0.1)), y = c(seq(0, 1, 0.1), rep(1, 10)), lty = "dashed", col = "red")
 
-plot(xseq+0.5, densities, col="darkred", xlab="", ylab="", type="l", lwd=2, cex=2, xlim = c(0, 1), main = "Kahe klassi ennustatud\ntõenäosuste jaotus")
+plot(xseq+0.5, densities, col="red", xlab="", ylab="", type="l", lwd=2, cex=2, xlim = c(0, 1), main = "Kahe klassi ennustatud\ntõenäosuste jaotus")
 lines(xseq+0.51, densities, col="darkgreen", xlab="", ylab="", type="l", lwd=2, cex=2)
 
 plot(x = 0:1, y = 0:1, col = "white", xlab = "FPR", ylab = "TPR", main = "Null eristusvõime\n(uuritava tunnuse väärtuste \ntõenäosusjaotused kattuvad täielikult)")
 lines(x = c(x = seq(0, 1, 0.1)), y = c(seq(0, 1, 0.1)), lty = "dashed", col = "red")
 
-plot(xseq+0.75, densities, col="darkred", xlab="", ylab="", type="l", lwd=2, cex=2, xlim = c(0, 1), main = "Kahe klassi ennustatud\ntõenäosuste jaotus")
+plot(xseq+0.75, densities, col="red", xlab="", ylab="", type="l", lwd=2, cex=2, xlim = c(0, 1), main = "Kahe klassi ennustatud\ntõenäosuste jaotus")
 lines(xseq+0.25, densities, col="darkgreen", xlab="", ylab="", type="l", lwd=2, cex=2)
 
 plot(x = 0:1, y = 0:1, col = "white", xlab = "FPR", ylab = "TPR", main = "Vastupidine eristusvõime\n(uuritava tunnuse väärtuste \ntõenäosusjaotused on valetpidi)")
@@ -283,7 +276,7 @@ Meie mudeli uuritava tunnuse klassidele ennustatud tõenäosuste jaotused näeva
 ```{r, warning = F, message = F}
 data.frame(teg = dat2$cx, enn = m5.glm$fitted.values) %>%
 ggplot(aes(x = enn, color = teg)) +
-  geom_density(alpha = 0.5, adjust = 1.5) +
+  geom_density(alpha = 0.5, linewidth = 1) +
   scale_color_manual(values = c("red", "darkgreen")) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   labs(x = "Ennustatud tõenäosused", 
@@ -344,7 +337,7 @@ head(sort(table(dat$kõneleja), decreasing = TRUE)) # kõige produktiivsemad kõ
 summary(as.numeric(table(dat$kõneleja))) # kui palju kõnelejad üldiselt on vaatlusi panustanud?
 ```
 
-Kõige produktiivsematelt keelejuhtidelt on andmestikus tervelt paarkond vaatlust, samas kui keskmiselt on kõneleja kohta 4-5 vaatlust. Seetõttu on esimene regressiooni eeldus tegelikult rikutud.
+Kõige produktiivsematelt keelejuhtidelt on andmestikus tervelt paarkond vaatlust, samas kui keskmiselt on kõneleja kohta 4-5 vaatlust. Seetõttu on esimene eeldus tegelikult rikutud.
 
 Kui arvuliste tunnuste puhul saame kasutada sellisel juhul ka näiteks tavalist regressioonimudelit keskmistatud andmetega, siis kategoriaalsete tunnustega oleks kohane kasutada segamõjudega mudelit, millest räägime veidi aja pärast.
 
@@ -372,9 +365,9 @@ Näeme, et suhe kohafraasi logaritmitud pikkuse ja šansi logaritmi vahel ei ole
 
 Nagu lineaarse regressiooni mudelite puhul juba nägime, võib seletavate tunnuste enda vahel olla tugev korrelatsioon, mis tähendab, et tunnused seletavad (vähemalt osaliselt) sama osa uuritava tunnuse varieerumisest. Seda nimetatakse *multikollineaarsuseks*. 
 
-Multikollineaarsust saab kontrollida funktsiooniga `vif()` paketist `car`. Lühend VIF ehk *Variation Inflation Factor* hindab, kui palju mingi regressioonikoefitsiendi varieeruvus kasvab, kui tunnused on omavahel seotud. Kui VIF on 1, siis ei korreleeru tunnus ühegi teise seletava tunnusega mudelis. VIF, mis on väiksem kui 5, näitab, et multikollineaarsust olulisel määral ei esine. 5-10 näitab juba sellist seotust, mis võib olla problemaatiline. Kui VIF on suurem kui 10, siis võib eeldada, et regressioonikoefitsientide hinnangud on tugevalt kallutatud, kuna esineb multikollineaarsust. Kui ühel tunnusel on kõrge VIF-skoor, peab olema veel vähemalt üks tunnus, millel on samamoodi kõrge skoor.  
+Multikollineaarsust saab kontrollida funktsiooniga `vif()` paketist `car`. Lühend VIF ehk *Variation Inflation Factor* hindab, kui palju mingi regressioonikoefitsiendi (= parameetri) varieeruvus kasvab, kui tunnused on omavahel seotud. Kui VIF on 1, siis ei korreleeru tunnus ühegi teise seletava tunnusega mudelis. VIF, mis on väiksem kui 5, näitab, et multikollineaarsust olulisel määral ei esine. 5-10 näitab juba sellist seotust, mis võib olla problemaatiline. Kui VIF on suurem kui 10, siis võib eeldada, et regressioonikoefitsientide hinnangud on tugevalt kallutatud, kuna esineb multikollineaarsust. Kui ühel tunnusel on kõrge VIF-skoor, peab olema veel vähemalt üks tunnus, millel on samamoodi kõrge skoor.  
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 car::vif(m5.glm)
 ```
 
@@ -389,7 +382,8 @@ Saame kollineaarsust hinnata ka funktsiooni `check_collinearity()` abil paketist
 library(performance)
 check_collinearity(m5.glm)
 ```
-`performance` pakett pakub veel mitmeid funktsioone mudeli diagnostika tegemiseks, täpsuse leidmiseks jpm-ks.  
+
+[`performance`](https://easystats.github.io/performance/) pakett pakub veel mitmeid funktsioone mudeli diagnostika tegemiseks, täpsuse leidmiseks jpm-ks ning seda saab kasutada mitmesuguste regressioonimudelite puhul.  
 
 
 ### Jäägid
@@ -439,23 +433,26 @@ dat %>%
 
 
 
-## Mudeli valideerimine
+## LISA: Mudeli valideerimine
 
 Eeskätt eksploratiivse mudeldamise käigus võib juhtuda, et meie mudel n-ö ülesobitab (ingl *overfitting*). See tähendab, et mudel sobitub küll meie andmetega, st andmetega, millel teda on treenitud, aga ei suuda uue valimi puhul enam kuigi palju seletada. Ülesobitamist võib juhtuda eriti näiteks siis, kui meil on vähe vaatlusi/ridu, aga palju seletavaid tunnuseid. 
 
 Ülesobitamise kontrollimiseks jagatakse piisavalt suure andmestiku olemasolul enamasti vaatlused kaheks: **treeningandmestikuks** ja **testandmestikuks**. Esimese peal ehitatakse mudelit nii, nagu meie seda oleme teinud, ja teise peal kontrollitakse, kas mudeli tulemused testandmetel on üldjoontes samad, mis treeningandmetel. Konfirmatoorse mudeldamise puhul põhimõtteliselt kontrollime juba olemasolevat teoreetilist mudelit enda andmetel, seega toimib selle strateegia puhul meie valim ainult testandmestikuna.
 
-Alati ei ole andmestike ositamine aga võimalik, sest andmestikus on vähe vaatlusi, seal on kategoriaalseid seletavaid tunnuseid, millel on mitu taset ja mõnd taset esineb oluliselt harvem kui teisi vm. Sellisel juhul saab kasutada ***[bootstrap-meetodit](https://www.statisticshowto.datasciencecentral.com/bootstrap-sample/)***. See tähendab, et algsest andmestikust võetakse hulk juhuslikke valimeid, kuhu mõned algandmestiku vaatlused võivad sattuda mitu korda ja mõned hoopis välja jääda. Kui selliseid valimeid võtta piisavalt palju ja nende peal treenitud mudelite tulemusi üldistada, siis saab lõpuks kokku üsna usaldusväärsed andmed.
+Alati ei ole andmestike ositamine aga võimalik, sest andmestikus on vähe vaatlusi, seal on kategoriaalseid seletavaid tunnuseid, millel on mitu taset ja mõnd taset esineb oluliselt harvem kui teisi vm. Sellisel juhul saab kasutada ***[bootstrap-meetodit](https://www.statisticshowto.datasciencecentral.com/bootstrap-sample/)***. See tähendab, et algsest andmestikust võetakse hulk juhuslikke valimeid, kuhu mõned algandmestiku vaatlused võivad sattuda mitu korda ja mõned hoopis välja jääda. Kui selliseid valimeid võtta piisavalt palju ja nende peal treenitud mudeleid testida, siis saab lõpuks kokku üsna usaldusväärsed üldistused.  
 
-Katsetame mõlemad variandid läbi, aga liigume tagantpoolt ettepoole ehk vaatame kõigepealt *bootstrap*-meetodiga valideerimist.
+Katsetame mõlemad variandid läbi, aga liigume tagantpoolt ettepoole ehk vaatame kõigepealt *bootstrap*-meetodiga valideerimist.  
 
 
 ### Bootstrap
 
-Kuna meie interaktsiooniga mudel on praegu treenitud ja testitud samal andmestikul, siis valideerime mudelit *bootstrap*-meetodiga. Saame kasutada sellest samast `rms` paketist funktsiooni `validate()`, ent esmalt peame oma lrm-mudelisse lisama argumendid `x = TRUE` ja `y = TRUE`. `validate()` funktsiooniga võetakse meie andmestikust hulk juhuslikke sama suuri valimeid, kus mõned algandmestiku read võivad korduda ja mõned read visatakse välja (tekitatakse n-ö juhuslikku varieeruvust). Nendel andmestikel treenitakse mudelid, mille üldistusi testitakse siis terve meie algandmestiku peal.
+Kuna meie interaktsiooniga mudel on praegu treenitud ja testitud samal andmestikul, siis valideerime mudelit *bootstrap*-meetodiga. Saame kasutada `rms` paketist funktsiooni `lrm`, et teha samasugune logistilise regressiooni mudel, nagu meil on juba glm-mudel, ning funktsiooni `validate()`, et oma mudelit valideerida. `validate()` funktsiooniga võetakse meie andmestikust hulk juhuslikke sama suuri valimeid, kus mõned algandmestiku read võivad korduda ja mõned read visatakse välja (tekitatakse n-ö juhuslikku varieeruvust). Nendel andmestikel treenitakse mudelid, mille üldistusi testitakse siis terve meie algandmestiku peal.
+
 
 ```{r}
-m5.lrm <- update(m5.lrm, x = TRUE, y = TRUE)
+# install.packages("rms")
+library(rms)
+m5.lrm <- lrm(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log*murderühm, data = dat2, x = TRUE, y = TRUE)
 
 # valideerimine võtab natuke aega
 # B näitab meie andmestikust juhuslikult
@@ -464,10 +461,10 @@ set.seed(1)
 rms::validate(m5.lrm, B = 200)
 ```
 
-Oluline on tulp `optimism`, mis näitab, kui palju on mudel treeningandmestikel ridade regressioonikordajaid (koefitsiente) üle hinnanud. Meid huvitavad selles tulbas read, kus on mudeli headuse näitajad `Dxy` (seotud mäletatavasti C-indeksiga), `R2`, ja `Slope`, mis peegeldab seletavate tunnuste koefitsientide hinnanguid. `optimism` on tulpade `training` ja `test` vahe.
+Oluline on tulp `optimism`, mis näitab, kui palju on mudel treeningandmestikel ridade regressioonikordajaid (koefitsiente) üle hinnanud. Meid huvitavad selles tulbas read, kus on mudeli headuse näitajad `Dxy` (seotud *C*-indeksiga ehk `2 * (C-0.5)`), `R2`, ja `Slope`, mis peegeldab seletavate tunnuste koefitsientide hinnanguid. `optimism` on tulpade `training` ja `test` vahe.
 `training` tulbas on iga rea statistiku väärtus, mis on üldistatud üle kõikide *bootstrap*-meetodiga tehtud mudelite. `test` tulba statistiku väärtus on saadud siis, kui *bootstrap*-meetoditega saadud mudeleid on testitud terve originaalandmestiku peal.
 Mida lähemal treening- ja testandmete tulemused üksteisele on, seda väiksem on `optimism` ja seda kindlamad võime olla selles, et meie mudel on üldistatav ka väljapoole meie valimit ja seega teaduslikult relevantne. 
-Kui nimetatud statistikute puhul jäävad `optimism`-tulba väärtused alla 0.05, siis peaks kõik korras olema.
+Kui nimetatud statistikute puhul jäävad `optimism`-tulba väärtused alla 0.05, siis peaks kõik korras olema. Loe lähemalt nt [siit](https://thestatsgeek.com/2014/10/04/adjusting-for-optimismoverfitting-in-measures-of-predictive-ability-using-bootstrapping/).  
 
 
 ### Treening- ja testandmestik
@@ -518,27 +515,51 @@ somers2(enn, ifelse(test$cx == "peal", 1, 0))["C"]
 Mudeli esitamisel on hea tava esitada koefitsientide tabel, mõni mudeli headuse näitaja (nt AUC) ning erinevus nullmudeli ja seletavate tunnustega mudeli hälbimuse (*deviance*) vahel. 
 
 ```{r}
-tab_model(m5.glm, transform = NULL, show.ci = F, show.se = T, show.r2 = F, show.loglik = T, show.stat = T, show.dev = T, show.reflvl = T, p.adjust = "holm", title = "(AUC = 0.746, null deviance = 2002)", string.stat = "z")
+tab_model(m5.glm, 
+          transform = NULL, 
+          show.ci = F, 
+          show.se = T, 
+          show.r2 = F, 
+          show.loglik = T, 
+          show.stat = T, 
+          show.dev = T, 
+          show.reflvl = T, 
+          p.adjust = "holm", 
+          title = "(AUC = 0.746, null deviance = 2001.809)", 
+          string.stat = "z")
 ```
 
 Samuti võiks lisada mõned joonised seletavate tunnuste mõjude kohta.  
 
+
 ## Segamudelid
 
-Nagu 13. praktikumis räägitud, siis siis segamudel arvestab sellega, et osa mõõtmisi võib tulla korduvatelt subjektidelt ning võimaldab mudelisse kaasata nii fikseeritud faktoreid kui ka juhuslikke faktoreid. **Fikseeritud faktoril** on teada kindel hulk tasemeid, mille mõju kaudu me otseselt seletame uuritava tunnuse varieerumist. **Juhuslikul faktoril** võib olla määramata hulk tasemeid ja meie valimis on nendest juhuslik valik, millel võib ka olla mõju uuritava tunnuse varieerumisele ja millega tuleb seetõttu arvestada, ent mis ei seleta ise otseselt uuritava tunnuse varieerumist ega paku uurijale omaette huvi.
-
-Lisame oma regressioonimudelisse individuaalse kõneleja kui juhusliku faktori. Saame kasutada tunnust `kõneleja`. 
+Nagu 13. praktikumis räägitud, siis siis segamudel arvestab sellega, et osa mõõtmisi võib tulla korduvatelt subjektidelt ning võimaldab mudelisse kaasata nii fikseeritud faktoreid kui ka juhuslikke faktoreid. **Fikseeritud faktoril** on teada kindel hulk tasemeid, mille mõju kaudu me otseselt seletame uuritava tunnuse varieerumist. **Juhuslikul faktoril** võib olla määramata hulk tasemeid ja meie valimis on nendest juhuslik valik, millel võib ka olla mõju uuritava tunnuse varieerumisele ja millega tuleb seetõttu arvestada, ent mis ei seleta ise otseselt uuritava tunnuse varieerumist ega paku (enamasti) uurijale omaette huvi.  
 
 
-Tegeleme siin **juhuslike vabaliikmetega** (*random intercept*), mis korrigeeritakse iga juhusliku faktori taseme jaoks (nt iga indiviidi jaoks algaks koefitsientide võrdlemine natuke erinevalt tasemelt). Mudelisse võib lisada ka juhuslikke kaldeid (*random slope*) mis korrigeerivad valitud fikseeritud faktori efekti vastavalt iga juhusliku faktori tasemele (nt iga indiviidi kohta on mingi tunnuse mõju erinev). 
+Tegeleme siin **juhuslike vabaliikmetega** (*random intercept*), mis korrigeeritakse iga juhusliku faktori taseme jaoks (nt iga indiviidi jaoks algaks koefitsientide võrdlemine natuke erinevalt tasemelt, sest igal kõnelejal on oma tõenäosuslik keelemudel, mille põhjal ta käändekonstruktsiooni ja *peal*-konstruktsiooni vahel valib).  
+Mudelisse võib aga lisada ka juhuslikke kaldeid (*random slope*), mis korrigeerivad valitud **fikseeritud tunnuse** efekti vastavalt iga juhusliku faktori tasemele (nt iga indiviidi kohta on mingi tunnuse mõju erinev, mõni kõneleja on näiteks tegusõna klassi mõju suhtes tundlikum kui mõni teine kõneleja).  
 
-```{r, message = FALSE}
+Lisame oma regressioonimudelisse individuaalse kõneleja kui juhusliku faktori. Saame kasutada tunnust `kõneleja`.  
+
+```{r}
 library(lme4)
 # mudeli tegemine võib võtta pisut aega
-# mudelis võiks täpsustada ka argumendi `control = glmerControl(optimizer = "bobyqa"))`,
-# vastasel juhul võib saada veateate, et "model failed to converge"
+m1.glmer <- glmer(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log * murderühm + (1|kõneleja), data = dat2, family = "binomial")
+```
 
-m1.glmer <- glmer(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log * murderühm + (1|kõneleja), data = dat2, family = "binomial", control = glmerControl(optimizer= "bobyqa"))
+Kui saame teate, et *Model failed to converge*, tähendab see seda, et mudeli algoritm ei suutnud mudeli parameetreid optimaalselt hinnata, mudeli tulemusi ei saa usaldada ja neid ei peaks nt publikatsioonides raporteerima. See võib juhtuda näiteks siis, kui mudel on andmete hulka arvestades liiga kompleksne või kui andmestikus on mingeid erindeid, mis parameetrite hindamist oluliselt raskendavad. Ent vahel võib olukorda parandada see, kui vahetada mudeli optimeerimise algoritmi. Sobiva leidmiseks võib kasutada näiteks funktsiooni `allFit()`.       
+
+```{r, warning=FALSE, message=FALSE}
+allFit(m1.glmer)
+```
+
+Sagedasti kasutatakse nt `bobyqa` optimeerijat.  
+
+```{r}
+m1.glmer <- glmer(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log * murderühm + (1|kõneleja), 
+                  data = dat2, family = "binomial", 
+                  control = glmerControl(optimizer= "bobyqa"))
 summary(m1.glmer)
 ```
 
