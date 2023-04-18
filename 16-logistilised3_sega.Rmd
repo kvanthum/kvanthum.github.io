@@ -23,9 +23,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 - Mudelite headuse näitajad  
 - Logistilise regressiooni eelduste kontroll  
-- Mudeli valideerimine  
+- (Mudeli valideerimine)  
 - Segamudelid  
-
 
 
 
@@ -121,13 +120,14 @@ head(m5.glm$linear.predictors) # vastavad šansi logaritmid
 head(dat2$cx) # esimesed 6 vaatlust on kõik "ade"
 
 # Tegelikud väärtused (kujul 0 ja 1) on ka mudelis olemas (y viitab uuritavale tunnusele)
-head(m5.glm$y) # esimesed 6 vaaltust on kõik 0
+head(m5.glm$y) # esimesed 6 vaatlust on kõik 0
 ```
 
 Näeme, et esimesed 6 vaatlust on käändekonstruktsiooni kasutusjuhud. Kuna panime oma tasakaalus valimi kokku nii, et kõigepealt *ade* andmestik ja siis *peal* andmestik, on tegelikult kõik 722 esimest vaatlust käändekonstruktsioonid.  
 Esimese 6 puhul ennustab mudel 3 juhul õigesti (vaatlused 1-3) ja 3 juhul valesti (vaatlused 4-6), sest viimastele ennustatud *peal*-konstruktsiooni esinemise tõenäosus on suurem kui 0.5, ehkki tegelikult on andmestiku järgi seal kontekstis "ade".  
 
 Võib kasutada ka funktsiooni `predict()`, mis töötab igasuguste mudelitega ning võimaldab küsida siin nii ennustatud tõenäosusi kui ka šansi logaritme. `predict()`-funktsioon on eriti kasulik siis, kui meil on eraldi treeningandmestik, mille põhjal mudelit ehitada, ning testandmestik, mille peal mudelit hinnata. Vaatame seda mudeli valideerimise juures.  
+
 ```{r}
 # Ennustatud tõenäosused
 head(predict(m5.glm, type = "response"))
@@ -229,7 +229,7 @@ Indeksi skaalat võib tõlgendada nii:
 
 Indeksi arvutamiseks võib kasutada näiteks pakette `pROC` või `Hmisc`.  
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 # install.packages(c("pROC", "Hmisc"))
 library(pROC)
 auc(dat2$cx, # tegelik uuritava tunnuse tulp andmestikus
@@ -425,7 +425,7 @@ car::influencePlot(m5.glm)
 Kontrollida võiks andmestikust niisiis neid ridu, kus on korraga nt kas suur jääk ja suur Cooki kaugus või suur *hat*-väärtus ja suur Cooki kaugus, ja need andmestikust välja jätta, kui see on põhjendatud (alati ei ole).  
 
 ```{r}
-dat %>%
+dat2 %>%
   mutate(enn = m5.glm$fitted.values) %>%
   filter(rownames(.) %in% c("461", "1089", "1840", "1137"))
 ```
@@ -449,7 +449,7 @@ Katsetame mõlemad variandid läbi, aga liigume tagantpoolt ettepoole ehk vaatam
 Kuna meie interaktsiooniga mudel on praegu treenitud ja testitud samal andmestikul, siis valideerime mudelit *bootstrap*-meetodiga. Saame kasutada `rms` paketist funktsiooni `lrm`, et teha samasugune logistilise regressiooni mudel, nagu meil on juba glm-mudel, ning funktsiooni `validate()`, et oma mudelit valideerida. `validate()` funktsiooniga võetakse meie andmestikust hulk juhuslikke sama suuri valimeid, kus mõned algandmestiku read võivad korduda ja mõned read visatakse välja (tekitatakse n-ö juhuslikku varieeruvust). Nendel andmestikel treenitakse mudelid, mille üldistusi testitakse siis terve meie algandmestiku peal.
 
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 # install.packages("rms")
 library(rms)
 m5.lrm <- lrm(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log*murderühm, data = dat2, x = TRUE, y = TRUE)
@@ -493,7 +493,7 @@ Teeme treeningandmetel mudeli.
 ```{r}
 m_trenn.glm <- glm(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log * murderühm, data = trenn, family = "binomial")
 
-car::Anova(m_trenn.glm)
+car::Anova(m_trenn.glm, type = "III")
 ```
 
 Arvutame nüüd treenitud mudeli headuse näitajad testandmestiku peal. C-indeksi (AUC) jaoks peame nüüd kasutama funktsioone paketist `ROCR` või `Hmisc`, sest me ei saa vaadata treeningmudeli enda C-d, vaid peame vaatama testandmestiku ennustuste pealt arvutatud näitajat. 
@@ -506,7 +506,7 @@ enn_bin <- ifelse(enn > 0.5, "peal", "ade")
 (klass_acc <- sum(diag(table(teg, enn_bin)))/sum(table(teg, enn_bin)))
 
 # C-indeks/AUC
-somers2(enn, ifelse(test$cx == "peal", 1, 0))["C"]
+somers2(enn, as.numeric(test$cx)-1)["C"]
 ```
 
 
@@ -542,19 +542,22 @@ Mudelisse võib aga lisada ka juhuslikke kaldeid (*random slope*), mis korrigeer
 
 Lisame oma regressioonimudelisse individuaalse kõneleja kui juhusliku faktori. Saame kasutada tunnust `kõneleja`.  
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(lme4)
 # mudeli tegemine võib võtta pisut aega
 m1.glmer <- glmer(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log * murderühm + (1|kõneleja), data = dat2, family = "binomial")
 ```
 
-Kui saame teate, et *Model failed to converge*, tähendab see seda, et mudeli algoritm ei suutnud mudeli parameetreid optimaalselt hinnata, mudeli tulemusi ei saa usaldada ja neid ei peaks nt publikatsioonides raporteerima. See võib juhtuda näiteks siis, kui mudel on andmete hulka arvestades liiga kompleksne või kui andmestikus on mingeid erindeid, mis parameetrite hindamist oluliselt raskendavad. Ent vahel võib olukorda parandada see, kui vahetada mudeli optimeerimise algoritmi. Sobiva leidmiseks võib kasutada näiteks funktsiooni `allFit()`.       
+Kui saame teate, et *Model failed to converge*, tähendab see seda, et mudeli algoritm ei suutnud mudeli parameetreid optimaalselt hinnata, mudeli tulemusi ei saa usaldada ja neid ei peaks nt publikatsioonides raporteerima. See võib juhtuda näiteks siis, kui mudel on andmete hulka arvestades liiga kompleksne või kui andmestikus on mingeid erindeid, mis parameetrite hindamist oluliselt raskendavad. Ent vahel võib olukorda parandada see, kui vahetada mudeli optimeerimise algoritmi. Sobiva leidmiseks võib kasutada näiteks funktsiooni `allFit()`. Funktsioon tuleb samuti paketist `lme4`, ent lisaks võidakse nõuda, et installitakse ka paketid `optimx` ja `dfoptim`.         
 
 ```{r, warning=FALSE, message=FALSE}
-allFit(m1.glmer)
+#install.packages(c("optimx", "dfoptim"))
+allFit(m1.glmer, verbose = F) -> allfits
+summary(allfits)$which.OK
+summary(allfits)$msgs
 ```
 
-Sagedasti kasutatakse nt `bobyqa` optimeerijat.  
+Sagedasti kasutatakse nt `bobyqa` (*Bound Optimization BY Quadratic Approximation*) optimeerijat.  
 
 ```{r}
 m1.glmer <- glmer(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log * murderühm + (1|kõneleja), 
@@ -563,10 +566,10 @@ m1.glmer <- glmer(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikk
 summary(m1.glmer)
 ```
 
-Mudeli väljundist näeme juba paljusid tuttavaid asju. Lisaks on seal tabel juhuslike mõjude kohta (*Random effects*), mis näitab vabaliikme varieerumist juhusliku faktori väärtuste vahel (dispersiooni ja standardhälvet). Mida väiksem varieeruvus on, seda sarnasemad on meie juhusliku mõju väärtused üksteisega (antud juhul kõnelejad) ning seda väiksem mõju juhuslikul faktoril mudelis on. 
+Mudeli väljundist näeme juba paljusid tuttavaid asju. Lisaks on seal tabel juhuslike mõjude kohta (*Random effects*), mis näitab siin vabaliikme hinnangulist varieerumist juhusliku faktori väärtuste vahel (dispersiooni ja standardhälvet). Mida väiksem varieeruvus on, seda sarnasemad on meie juhusliku mõju väärtused üksteisega (antud juhul kõnelejad) ning seda väiksem mõju juhuslikul faktoril mudelis on. 
 
 Mudeli tõlgendus on sarnane tavalise logistilise regressiooni mudeli tõlgendamisega, ent koefitsientide tõlgendamisel tuleb nüüd lisaks teiste juhuslike mõjude fikseerituna (st nende baastasemetel või nullis) hoidmisele hoida ka juhuslik mõju fikseerituna.
-See tähendab, et näiteks `LM_mobiilsusliigutatav` koefitsient näitab šansside logaritmitud muutust JUHUL, KUI kohasõna on lihtsõna, tegusõna väljendab olemist, kõneleja on Kesk murderühma kõneleja, kohafraasi pikkus on 1 silp (`log2(1) = 0`) JA **tegu on ühe ja sama kõnelejaga või teise kõnelejaga, kellel on täpselt samasugune juhuslik mõju**. Aga kui mitte konkreetsetest šansisuhetest rääkida, siis võib tõlgendamisse suhtuda veidi vabamalt.
+See tähendab, et näiteks `LM_mobiilsusliigutatav` koefitsient näitab šansside logaritmitud muutust JUHUL, KUI kohasõna on lihtsõna, tegusõna väljendab olemist, kõneleja on Kesk-murderühma kõneleja, kohafraasi pikkus on 1 silp (`log2(1) = 0`) JA **tegu on ühe ja sama kõnelejaga või teise kõnelejaga, kellel on täpselt samasugune juhuslik mõju**. Aga kui mitte konkreetsetest šansisuhetest rääkida, siis võib tõlgendamisse suhtuda veidi vabamalt.
 
 
 ```{r}
@@ -574,7 +577,7 @@ See tähendab, et näiteks `LM_mobiilsusliigutatav` koefitsient näitab šanssid
 tab_model(m5.glm, m1.glmer, show.aic = T)
 ```
 
-Tundub, et AIC läheb väiksemaks ning parameetrite hinnangutes ja statistilises olulises erilisi muutuseid ei toimu. Võib-olla võiks kaaluda kohafraasi pikkuse ja murderühma interaktsiooni väljajätmist, kuna seal kaoksid ilmselt pärast Bonferroni või Holmi-Bonferroni parandusi statistiliselt olulised erinevused. Jätame selle praegu siiski mudelisse alles.    
+Tundub, et AIC läheb väiksemaks ning parameetrite hinnangutes ja statistilises olulises erilisi muutuseid ei toimu. Võib-olla võiks kaaluda kohafraasi pikkuse ja murderühma interaktsiooni väljajätmist, kuna seal kaoksid pärast Bonferroni või Holmi-Bonferroni parandusi statistiliselt olulised erinevused. Jätame selle praegu siiski mudelisse alles.    
 
 Vaatame ka mudeli headuse näitajaid.
 
@@ -590,17 +593,19 @@ klass_tabel <- table(teg, enn_bin)
 **C-indeks (AUC)**
 ```{r}
 library(Hmisc)
-somers2(enn, ifelse(dat2$cx == "peal", 1, 0))["C"]
+somers2(enn, as.numeric(dat2$cx)-1)["C"]
 ```
+
 Mudeli headuse näitajad on läinud oluliselt paremaks!  
 
 
-Vaatame ka juhuslike mõjude jaotumist funktsiooniga `ranef()`. Tegemist on juhuslike vabaliikmete kohandustega ehk vahega mudeli üldistatud vabaliikme ning iga indiviidi jaoks ennustatud vabaliikme vahel. Teisisõnu näitavad need väärtused, kui palju mingi informant *peal*-konstruktsiooni kasutamises keskmisest *peal*-kasutamisest erineb.
+Vaatame ka juhuslike mõjude jaotumist funktsiooniga `ranef()`. Tegemist on juhuslike vabaliikmete kohandustega ehk vahega mudeli üldistatud vabaliikme ning iga indiviidi jaoks ennustatud vabaliikme vahel. Teisisõnu näitavad need väärtused, kui palju mingi kõneleja *peal*-konstruktsiooni kasutamises keskmisest *peal*-kasutamisest erineb.
+
 ```{r, message = FALSE}
 juh <- ranef(m1.glmer, condVar = TRUE)
 head(juh$kõneleja)
-mean(juh$kõneleja$`(Intercept)`) # keskmine on 0 lähedal
-median(juh$kõneleja$`(Intercept)`) # mediaan on 0 lähedal
+mean(juh$kõneleja$`(Intercept)`) # keskmine on alati 0 lähedal
+median(juh$kõneleja$`(Intercept)`) # mediaan on alati 0 lähedal
 hist(juh$kõneleja$`(Intercept)`) 
 ```
 
@@ -649,14 +654,13 @@ data.frame(juh) %>%
   geom_vline(xintercept = 0, color = "red", linetype = "dashed")
 ```
 
-Tundub, et mudelis on olulisem murdeala kui juhuslik kõneleja ise. See tähendab, et kohandused vabaliikmes ei tee enam sama asja, mida juba murderühm fikseeritud mõjuna.  
-
+  
 Võime hinnata ka seda, kui suure osa juhuslik mõju mudelis uuritava tunnuse varieerumisest ära seletab. Selleks kasutame funktsiooni `icc()` paketist `performance`.  
 ```{r, message = F, warning = F}
 performance::icc(m1.glmer)
 ```
 
-Kohandatud ICC-väärtus (*Adjusted ICC*) on seotud ainult juhuslike mõjudega, tingimuslik ICC (*Conditional ICC*) aga arvestab ka fikseeritud mõjudega. Kui huvi pakuvad ainult juhuslikud mõjud, siis tuleks vaadata kohandatud ICC-d. ICC väärtus ulatub 0st 1ni. Kui juhuslik mõju ei toimi andmetes üldse mingi grupeeriva tunnusena (= kõik vaatlused on ikkagi erinevad), siis on indeksi väärtus 0, ja kui kõik vaatlused kuuluvad ühte gruppi, on indeksi väärtus 1. 
+ICC väärtus ulatub 0st 1ni. Kui juhuslik mõju ei toimi andmetes üldse mingi grupeeriva tunnusena, siis on indeksi väärtus 0, ja kui juhuslik mõju kirjeldab ära kogu uuritava tunnuse varieerumise, on indeksi väärtus 1. Kui gruppe ehk juhusliku faktori tasemeid on vähe, võib tavaline ICC juhusliku faktori mõju ülehinnata. Kui gruppe on palju (nagu meil), võib tavaline ICC juhusliku faktori mõju jällegi alahinnata. Kohandatud ICC (*Adjusted ICC*) võtab arvesse aga ka seda, kui palju gruppe ehk juhusliku faktori tasemeid on, ning on seega üldjuhul täpsem mõõdik. 
 Juhusliku faktori poolt kirjeldatud osa varieerumisest on siin ~0.14 ehk 14%. 
 
 
@@ -679,18 +683,9 @@ car::vif(m1.glmer)
 Siin võiksime vaadata parempoolses tulbas olevaid, standardiseeritud ja võrreldavaid GVIF-skoore. Need on < 5, seega ei pea tunnuste omavahelise seotuse pärast muretsema.
 
 
-Juhuslikke kaldeid tunnuse `kõneleja` põhjalt on keeruline lisada, kuna meil on `kõneleja`l väga palju tasemeid, mudelis mitu mitme tasemega fikseeritud tunnust ning esineb väga harvu tunnusekombinatsioone. Võiksime ju näiteks oletada, et kuna informandid on oma murdetaustast ja üldkeelest erineval määral mõjutatud, on ka murdeala mõju keelekasutusele varieeruv. Kui üritame aga seda juhusliku kaldena mudeldada, saame teate, et mudel ei suuda parameetreid hinnata, sest meil pole selleks lihtsalt piisavalt palju andmeid. Mudel küll tehakse ära ja saame selle väljundit vaadata, ent me ei saa olla päris kindlad selle täpsuses.
+Juhuslikke kaldeid tunnuse `kõneleja` põhjalt on keeruline lisada, kuna meil on tunnusel `kõneleja` väga palju tasemeid, mudelis mitu mitme tasemega fikseeritud tunnust ning seega esineb väga harvu tunnusekombinatsioone. 
 
-```{r}
-# mudeli tegemine võib võtta natuke aega
-m2.glmer <- glmer(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log * murderühm + (1 + murderühm|kõneleja), data = dat2, family = "binomial", control = glmerControl(optimizer = "bobyqa"))
-summary(m2.glmer)
-```
-
-Sellisel juhul tuleks proovida mudelist ükshaaval välja visata juhuslikke mõjusid ja fikseeritud mõjusid ja vaadata, milline mudel lõpuks kõige paremini sobitab. Võib juhtuda näiteks, et kui visata kaks fikseeritud tunnust välja ja jätta juhuslik mõju sisse, võib mudel sobitada paremini kui siis, kui visata juhuslik mõju välja. 
-
-
-Küll aga võiksime proovida lisada mudelisse juhusliku mõjuna ka kohasõna lemma `LM_lemma`, kuna käände- või *peal*-konstruktsiooni kasutus võib sõltuda osaliselt ka sellest, mis sõnad on meie andmestikku sattunud.  
+Küll aga võiksime proovida lisada mudelisse juhusliku vabaliikmena ka kohasõna lemma `LM_lemma`, kuna käände- või *peal*-konstruktsiooni kasutus võib sõltuda osaliselt ka sellest, mis sõnad on meie andmestikku sattunud.    
 
 ```{r}
 m2.glmer <- glmer(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log * murderühm + (1|kõneleja) + (1|LM_lemma), data = dat2, family = "binomial", control = glmerControl(optimizer = "bobyqa"))
