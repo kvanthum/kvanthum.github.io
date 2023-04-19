@@ -57,7 +57,7 @@ lapply(dat[,c("LM_mobiilsus", "LM_komplekssus", "tegusõna_klass", "murderühm")
        function(x) names(which.max(table(x)))) # leia selle tunnuse mood
 ```
 
-Tüüpiline kontekst oleks niisiis midagi sellist nagu *auto __on__ __tee__l / __tee__ peal*.  
+Tüüpiline kontekst oleks niisiis midagi sellist nagu *auto on teel / tee peal*.  
 
 
 ```{r}
@@ -70,7 +70,7 @@ dat %>%
 
 
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 m5.glm <- glm(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikkus_log*murderühm, data = dat2, family = "binomial")
 plot_model(m5.glm, 
            show.values = T, # näita koefitsientide väärtuseid
@@ -220,6 +220,7 @@ Näiteks kahe vaatluse puhul, millest ühe tegelik väärtus on *peal* ja teise 
 *C*-d peetakse niisiis täpsemaks ja paindlikumaks mudeli eristusvõime hindajaks kui klassifitseerimistäpsust, kuna see arvestab ennustusi tõenäosustena ehk pidevana, samas kui klassifitseerimistäpsus jagab ennustused lihtsalt 0.5 juurest kahte klassi, hoolimata sellest, kas ennustatud tõenäosus on nt 0.1 või 0.49.  
 
 Indeksi skaalat võib tõlgendada nii:  
+
 - C = 0.5: mudel ei erista, 50-50 tõenäosus täppi panna   
 - 0.5 < C <= 0.7: kehv eristusvõime  
 - 0.7 < C <= 0.8: rahuldav eristusvõime   
@@ -597,6 +598,12 @@ somers2(enn, as.numeric(dat2$cx)-1)["C"]
 ```
 
 Mudeli headuse näitajad on läinud oluliselt paremaks!  
+
+```{r}
+report::report_text(m1.glmer)
+```
+
+Ka siin on nimetatud mudeli headuse näitajatena pseudo-R-ruutusid, mille arvutamiseks leiab valemi nt [siit](https://rdrr.io/cran/MuMIn/man/r.squaredGLMM.html). Tingimuslik (*conditional*) R-ruut arvestab seletatud varieerumise hulga puhul nii fikseeritud kui ka juhuslikke mõjusid, tavaline R-ruut ainult fikseeritud mõjusid.  
 
 
 Vaatame ka juhuslike mõjude jaotumist funktsiooniga `ranef()`. Tegemist on juhuslike vabaliikmete kohandustega ehk vahega mudeli üldistatud vabaliikme ning iga indiviidi jaoks ennustatud vabaliikme vahel. Teisisõnu näitavad need väärtused, kui palju mingi kõneleja *peal*-konstruktsiooni kasutamises keskmisest *peal*-kasutamisest erineb.
