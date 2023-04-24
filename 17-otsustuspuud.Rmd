@@ -120,7 +120,7 @@ plot(fit, uniform=TRUE, main="Classification Tree for Kyphosis", margin = 1/8)
 text(fit, use.n=TRUE, all=TRUE, cex=.9)
 ```
 
-Selles näites omakorda seletatakse küfoosi (lülisamba kõverdumine) olemasolu lapspatsientidel pärast korrigeerivat operatsiooni sõltuvalt patsiendi vanusest operatsiooni tegemise ajal (kuudes), selgroolülide arvust, mida operatsioon puudutas, ning sellest, mitmendast selgroolülist alates operatsiooni tehti. Patsientidest 17 oli küfoos ka pärast operatsiooni ja 64-l ei olnud (seepärast ennustatakse kogu valimile pigem klassi *absent*). Kui kõige ülemise lüli järjekorranumber, mida operatsioon puudutas, oli 8 või väiksem (mudel käsitleb seda pideva tunnusena ja seepärast lubab ka väärtust 8.5), jäi küfoos pigem alles (8-l lapsel puudu, 11-l olemas). Kui alustati sellest altpoolt (eriti kui altpoolt kui 14. lüli), siis saadi haigusest pigem lahti, ehkki rolli mängis ka see, mis vanuses operatsioon tehti.      
+Selles näites omakorda seletatakse küfoosi (lülisamba kõverdumine) olemasolu lapspatsientidel pärast korrigeerivat operatsiooni sõltuvalt patsiendi vanusest operatsiooni tegemise ajal (kuudes), selgroolülide arvust, mida operatsioon puudutas, ning sellest, mitmendast selgroolülist alates operatsiooni tehti. Patsientidest 17-l oli küfoos ka pärast operatsiooni ja 64-l ei olnud (seepärast ennustatakse kogu valimile pigem klassi *absent*). Kui kõige ülemise lüli järjekorranumber, mida operatsioon puudutas, oli 8 või väiksem (mudel käsitleb seda pideva tunnusena ja seepärast lubab ka väärtust 8.5), jäi küfoos pigem alles (8-l lapsel puudu, 11-l olemas). Kui alustati sellest altpoolt (eriti kui altpoolt kui 14. lüli), siis saadi haigusest pigem lahti, ehkki rolli mängis ka see, mis vanuses operatsioon tehti.      
 
 <center>
 <p><i>https://www.statmethods.net/advstats/cart.html</i></p>
@@ -132,7 +132,7 @@ Probleeme klassikaliste otsustuspuu algoritmidega:
 
 - Võivad kergesti **ülesobitada** ja jaguneda nii kaua, kuni puu vastab igale andmestiku nüansile. See tähendab aga ka, et need mudelid pole enam hästi üldistatavad mõne teise valimi jaoks. Selle vältimiseks peaks puid **"trimmima"** (ingl *pruning*).   
   + Eeltrimmimise puhul tuleb enne puu kasvatamist teha mõned otsused, nt otsustada, et on mingi kindel arv lehti, mis puul võib lõpuks olla, või et igas lehes peab olema kindel hulk vaatlusi. Samuti võib otsustada, et lõpetame puu kasvatamise, kui mingi tingimus on saavutatud, nt kui kõik vaatlused igas lehes on samast klassist.   
-  + Järeltrimmimise puhul vaadatakse, kas mingid alamjagunemised puus annavad kokkuvõttes paremaid tulemusi, kui see, kui asendada need lihtsalt lehega, kus on arvulise uuritava tunnuse puhul tunnuse keskväärtus või kategoriaalse uuritava tunnuse puhul selle sagedasem tase/klass.   
+  + Järeltrimmimise puhul vaadatakse, kas mingid alamjagunemised puus annavad kokkuvõttes paremaid tulemusi kui see, kui asendada need lihtsalt lehega, kus on arvulise uuritava tunnuse puhul tunnuse keskväärtus või kategoriaalse uuritava tunnuse puhul selle sagedasem tase/klass.   
 - Kalduvad sõlmedes **eelistama tunnuseid**, mis viiksid võimalikult suure puuni, st arvulisi tunnuseid ja selliseid kategoriaalseid tunnuseid, millel on rohkem tasemeid, sest need annavad justkui rohkem infot.  
 
 
@@ -172,7 +172,7 @@ dat <- droplevels(rbind(ade, peal_juhuvalim)) # liida kaks andmestikku ridupidi 
 
 
 ```{r}
-library(partykit)
+#library(partykit)
 
 # Teeme puumudeli
 puu1 <- ctree(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + LM_pikkus_log + sõnajärg + murderühm, 
@@ -660,30 +660,22 @@ hist(enn)
 
 shapiro.test(teg)
 shapiro.test(enn)
-
-# Aga logaritmides?
-hist(log(teg))
-hist(log(enn))
-
-shapiro.test(log(teg))
-shapiro.test(log(enn))
-par(mfrow=c(1,1))
 ```
 
-Kuna meil ei ole tegemist päris lineaarse seosega ja logaritmimine lähendab normaaljaotusele ainult tegelike reaktsiooniaegade jaotust, siis oleks hea kontrollida mudeli headuse hindamisel seost ka Spearmani korrelatsioonikordajaga.
+Kuna meil ei ole tegemist päris lineaarse seosega, siis oleks hea kontrollida mudeli headuse hindamisel seost ka Spearmani korrelatsioonikordajaga.
 
 ```{r}
 cor(enn, teg, method = "spearman")
 ```
 
-Selleks, et puumudeli (ligikaudset) headust võiks võrrelda ka nt lineaarse regressioonimudeli omaga, võib korrelatsioonikordaja põhjal leida mudeli poolt seletatud varieerumise protsendi **R^2^**.
+Selleks, et puumudeli (ligikaudset) headust võiks võrrelda ka nt lineaarse regressioonimudeli omaga, võib Pearsoni korrelatsioonikordaja põhjal leida mudeli poolt seletatud varieerumise protsendi **R^2^**.
 
 ```{r}
 cor(enn, teg, method = "pearson")^2
 ```
 
 
-Teine variant jõuda sellesama Pearsoni-põhise R^2^-ni on lahutada 1st **koguruutude summa** (*Total Sum of Squares*) ja **jääkide ruutude summa** (*Residual Sum of Squares*) jagatis.
+Teine variant jõuda sellesama Pearsoni R^2^-ni on lahutada 1st **koguruutude summa** (*Total Sum of Squares*) ja **jääkide ruutude summa** (*Residual Sum of Squares*) jagatis.
 ```{r}
 # koguruutude summa (Total Sum of Squares): 
 # seletamata variatsioon andmetes
@@ -749,10 +741,11 @@ teg_probs <- ifelse(test$cx == "peal", 1, 0)
 somers2(enn_probs, teg_probs)["C"]
 ```
 
-Antud juhul sobib mudel enam-vähem kirjeldama ka testandmestikku, ent kui headuse näitajad test- ja treeningandmestiku vahel on väga erinevad, siis võib proovida mudelit erinevate parameetrite abil trimmida (vt `control = ctree_control()`).
+Antud juhul sobib mudel kirjeldama ka testandmestikku, ent kui headuse näitajad test- ja treeningandmestiku vahel on väga erinevad, siis võib proovida mudelit erinevate parameetrite abil trimmida (vt `control = ctree_control()`).
 
 
 Teine variant ennustustes kindlamaks saamiseks on kasutada nn **ansamblimeetodeid** (*ensemble methods*) nagu juhumetsad, millest räägime järgmises praktikumis.
+
 
 
 ## Kordamisküsimused
