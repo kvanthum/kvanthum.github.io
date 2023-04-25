@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '18-juhumetsad.html'))})
-date: 27.04.2022
+date: 26.04.2023
 output: 
   html_document:
     theme: flatly
@@ -20,12 +20,12 @@ knitr::opts_chunk$set(echo = TRUE)
 # Juhumetsad {.tabset .tabset-pills}
 
 ## Tänases praktikumis
-- Juhumetsad
-- Juhumetsade visualiseerimine
-- Juhumetsade headuse näitajad
+- Juhumetsad  
+- Juhumetsade visualiseerimine  
+- Juhumetsade headuse näitajad  
 
 
-Nagu eelmises praktikumis räägitud, ei pruugi üksikud otsustuspuud olla väga stabiilised. Ehkki need sobivad hästi andmestiku visualiseerimiseks ja nendes esinevate olulisemate seoste tuvastamiseks, ei ole need uue valimi pealt ennustamiseks kõige paremad, eriti kui puid ei ole trimmitud. Üks variant otsustuspuude valideerimiseks oli kasutada treening- ja testandmestikke. Teine variant on aga kasutada nn **ansamblimeetodeid** (*ensemble methods*), mis kasutavad sageli *[bootstrap](https://www.statisticshowto.com/bootstrap-sample/)*-valikut ning milles lõplik ennustus uuritava tunnuse väärtustele üldistatakse mitmete üksikute puumudelite põhjal. Ka ansamblimeetoditele on palju algoritme, põhilistena eristatakse nn *bagging*- ja *boosting*-algoritme.
+Nagu eelmises praktikumis räägitud, ei pruugi üksikud otsustuspuud olla väga stabiilised. Ehkki need sobivad hästi andmestiku visualiseerimiseks ja nendes esinevate olulisemate seoste tuvastamiseks, ei ole need uue valimi pealt ennustamiseks alati kõige paremad, eriti kui puid ei ole trimmitud. Üks variant otsustuspuude valideerimiseks oli kasutada treening- ja testandmestikke. Teine variant on aga kasutada nn **ansamblimeetodeid** (*ensemble methods*), mis kasutavad sageli *[bootstrap](https://www.statisticshowto.com/bootstrap-sample/)*-valikut ning milles lõplik ennustus uuritava tunnuse väärtustele üldistatakse mitmete üksikute puumudelite põhjal. Ka ansamblimeetoditele on palju algoritme, põhilistena eristatakse nn *bagging*- ja *boosting*-algoritme.
 
 - ***Bagging***-algoritmides treenitakse paralleelselt mitut mudelit mitme üksteisest pisut erineva juhusliku valimi peal ning üldistatakse lõpuks nende mudelite ennustused.  
 - ***Boosting***-algoritmides treenitakse mudeleid järjekorras ja iga järgmine mudel saab midagi eelmiselt mudelilt õppida. Ühes puus valesti klassifitseeritud vaatlused saavad järgmises puus suurema kaalu.    
@@ -54,8 +54,8 @@ Lõpliku ennustuse saamiseks puud "hääletavad" iga tegeliku vaatluse ennustatu
 ![Juhumets, https://miro.medium.com/max/2000/1*jXkT3mj1mCqMaX5SqU1wNw.png](https://miro.medium.com/max/2000/1*jXkT3mj1mCqMaX5SqU1wNw.png)
 </center>
 
-Kasutame endiselt andmestikke `ade_peal.csv` ja `kandidaadid.RData`.  
-```{r}
+Kasutame endiselt andmestikke `ade_peal.csv` ja `kandidaadid2019.RData`.  
+```{r ade_peal}
 ade_peal <- read.delim("data/ade_peal.csv", encoding = "UTF-8", stringsAsFactors = TRUE)
 ade <- ade_peal[ade_peal$cx == "ade",] # ainult alalütleva käände andmed
 peal <- ade_peal[ade_peal$cx == "peal",] # ainult peal-kaassõna andmed
@@ -69,16 +69,15 @@ peal_juhuvalim <- peal[juh_id,] # võta peal-andmestikust ainult juhuslikult val
 dat <- droplevels(rbind(ade, peal_juhuvalim)) # liida kaks andmestikku ridupidi uuesti kokku
 ```
 
-```{r}
-load("data/kandidaadid.RData")
+```{r kandidaadid}
+load("data/kandidaadid2019.RData")
 # Teeme juurde tunnused "kasutab_meili", "nime_pikkus" ja "vanus"
-kandidaadid$kasutab_meili <- as.factor(ifelse(grepl("@", kandidaadid$kontaktandmed), 
-                                              "jah", 
-                                              "ei"))
+kandidaadid2019$kasutab_meili <- factor(ifelse(grepl("@", kandidaadid2019$kontakt), 
+                                               "jah", 
+                                               "ei"))
 
-kandidaadid$nime_pikkus <- nchar(kandidaadid$nimi)
-kandidaadid$vanus <- 2019 -as.numeric(substr(kandidaadid$sunniaeg,
-                                             1, 4))
+kandidaadid2019$nime_pikkus <- nchar(kandidaadid2019$nimi)
+kandidaadid2019$vanus <- 2019 -as.numeric(substr(kandidaadid2019$sünniaeg, 1, 4))
 ```
 
 
@@ -86,22 +85,22 @@ kandidaadid$vanus <- 2019 -as.numeric(substr(kandidaadid$sunniaeg,
 
 Kasutame alustuseks funktsiooni `randomForest()` samanimelisest paketist. See on kõige põhilisem juhumetsade tegemise pakett, kuna on kasutajasõbralik, lihtne õppida ja arvutuslikult võrdlemisi kiire.
 
-Funktsiooni miinuseks on see, et puid vaikimisi ei trimmita ning need võivad ülesobitada. Samuti kalduvad puud eelistama sõlmedes arvulisi tunnuseid ja kategoriaalseid tunnuseid, millel on palju tasemeid. Selles paketis ei tehta niisiis tingimuslikke otsustuspuid, mis kasutavad sõlmedes jagunemiseks valitavate tunnuste määramiseks *p*-väärtuseid, vaid tavalisi regressiooni- ja klassifikatsioonipuid (vt ka 17. praktikumi materjale).
+Funktsiooni miinuseks on see, et puid vaikimisi ei trimmita ning need võivad ülesobitada. Samuti kalduvad puud eelistama sõlmedes arvulisi tunnuseid ja kategoriaalseid tunnuseid, millel on palju tasemeid. Selles paketis ei tehta niisiis tingimuslikke otsustuspuid, mis kasutavad sõlmedes jagunemiseks valitavate tunnuste määramiseks *p*-väärtuseid, vaid tavalisi regressiooni- ja klassifitseerimispuid (vt ka 17. praktikumi materjale).
 
-```{r, message = FALSE, warning = FALSE}
+```{r rf_install, message = FALSE, warning = FALSE}
 # install.packages("randomForest")
 library(randomForest)
 ```
 
 
-```{r}
+```{r rf_kat_mudel}
 # Kategoriaalne uuritav tunnus
 
 # Kuna juhumetsade mudelid sisaldavad juhuslikkust, tuleks tulemuste korratavuse huvides mudeldamisel alati määrata ka seeme (seed), mis tagab juhuslikkuses teatud fikseeritud seisu. Seemneks sobib mis tahes arv.
 set.seed(100)
 mets_kat_rf <- randomForest(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + LM_pikkus_log + sõnajärg + murderühm, 
-                        data = dat, 
-                        importance = TRUE)
+                            data = dat, 
+                            importance = TRUE)
 # Argumendi `importance` lisamine võimaldab meil hiljem võrrelda tunnuste olulisust nii nende täpsuse kui ka klasside puhtuse suurendamise seisukohalt.
 
 
@@ -116,38 +115,41 @@ Metsamudeli lõplik klassifitseerimistäpsus üldistatakse seejärel kõikide pu
 
 `randomForesti` mudel annab väljundis automaatselt ka õigete ja valede ennustuste risttabeli ehk *confusion matrix*'i (ridades tegelikud vaatlused ning tulpades ennustatud klassid) ning lisaks iga klassi eksimismäära eraldi (`class.error`). See on kasulik, kuna vahel võib juhtuda, et mudel suudab ennustada väga hästi üht, aga mitte teist klassi. 
 
-```{r}
+```{r rf_kat_confusion}
 mets_kat_rf$confusion
 ```
 
 
-Saame binaarse kategoriaalse uuritava tunnusega metsamudeli ennustuste põhjal leida jällegi ka **C/AUC**.
+Saame kategoriaalse uuritava tunnusega metsamudeli ennustuste põhjal leida jällegi ka **C/AUC**.
 
-```{r, message = FALSE, warning = FALSE}
-# Leiame metsamudeli ennustatud tõenäosused
+```{r rf_kat_predictions, message = FALSE, warning = FALSE}
+# Leiame metsamudeli ennustatud tõenäosused "peal"-konstruktsioonile
 enn_probs <- predict(mets_kat_rf, type = "prob")[,"peal"]
 head(enn_probs)
 
 # Teisendame uuritava tunnuse tegelikud väärtused
 # samuti tõenäosusteks 0 ("ade") ja 1 ("peal")
 teg_probs <- ifelse(dat$cx == "peal", 1, 0)
-# Sama, mis nt (dat[["cx"]] == "peal") + 0
 head(teg_probs)
 
 # C-indeks
 library(Hmisc)
-somers2(enn_probs, teg_probs)["C"]
+somers2(enn_probs, teg_probs)["C"] # enn, teg, mõlemad argumendid arvulised
+
+# või
+library(pROC)
+auc(dat$cx, enn_probs) # teg, enn, tegelikud väärtused kategooriatena
 ```
 
 
 
 Vaatame ka arvulise uuritava tunnusega mudeli väljundit.  
 
-```{r}
+```{r rf_num_mudel}
 # Arvuline uuritav tunnus
 set.seed(100)
-mets_num_rf <- randomForest(log(haali_kokku) ~ haridus + sugu + sodiaak + kasutab_meili + nime_pikkus + vanus, 
-                            data = kandidaadid,
+mets_num_rf <- randomForest(log(hääli_kokku) ~ haridus + sugu + tähtkuju + kasutab_meili + nime_pikkus + vanus, 
+                            data = kandidaadid2019,
                             subset = haridus != "Algharidus",
                             importance = TRUE)
 
@@ -157,7 +159,7 @@ mets_num_rf
 ```
 
 Arvulise uuritava tunnusega tehakse samuti 500 puud, ent regressioonipuude metsas valitakse igas sõlmes vaatluste jaotamiseks *p*/3 seletava tunnuse vahel, kus *p* on seletavate tunnuste arv. Kuna siin on seletavate tunnuste arv mudelis 6, siis proovitakse igas sõlmes jagunemiseks 6/3=2 juhuslikult valitud tunnust.  
-Regressioonipuud näitavad klassifitseerimistäpsuse asemel **seletatud varieerumise protsenti** *% Var explained*, mis on põhimõtteliselt sama, mis R^2^ (tegelikult pseudo-R^2^). *Mean of squared residuals* näitab ruutu võetud jääkide keskmist. Selle absoluutarv sõltub uuritava arvulise tunnuse skaalast. Siin on arvuline tunnus logaritmitud häältesaak, mille väärtused võivad üldse varieeruda ainult 0 ja 9.907 vahel (vt `range(log(kandidaadid$haali_kokku))`). Seepärast on väike ka ruutu võetud jääkide keskmine, võrreldes näiteks reaktsiooniaegade andmestikuga, kus uuritav tunnus on mõõdetud millisekundites ja ruutu võetud jääkide keskmine võib olla seega tuhandetes. Sama andmestiku peal tehtud mudelite võrdlusel on aga väiksem *Mean of squared residuals* parem.
+Regressioonipuud näitavad klassifitseerimistäpsuse asemel **seletatud varieerumise protsenti** *% Var explained*, mis on põhimõtteliselt sama, mis R^2^ (tegelikult pseudo-R^2^). *Mean of squared residuals* näitab ruutu võetud jääkide keskmist. Selle absoluutarv sõltub uuritava arvulise tunnuse skaalast. Siin on arvuline tunnus logaritmitud häältesaak, mille väärtused võivad üldse varieeruda ainult 0 ja 9.907 vahel (vt `range(log(kandidaadid2019$hääli_kokku))`). Seepärast on väike ka ruutu võetud jääkide keskmine, võrreldes näiteks reaktsiooniaegade andmestikuga, kus uuritav tunnus on mõõdetud millisekundites ja ruutu võetud jääkide keskmine võib olla seega tuhandetes. Sama andmestiku peal tehtud mudelite võrdlusel on aga väiksem *Mean of squared residuals* parem.
 
 
 
@@ -171,7 +173,7 @@ Juhumetsade mudelite üks suuri plusse on see, et need võimaldavad hinnata mude
 Vaatame esmalt jällegi kategoriaalse uuritava tunnusega mudelit.  
 Juhul, kui `randomForest()`-funktsioonis on metsamudeli tegemisel eelnevalt täpsustatud argument `importance = TRUE`, saame lisaks Gini-informatsioonikriteeriumile ka nn permutatsiooniolulisuse.  
 
-```{r}
+```{r rf_kat_importance}
 importance(mets_kat_rf)
 ```
 
@@ -186,7 +188,7 @@ Kaks esimest tulpa tabelis (`ade` ja `peal`) näitavad, kui palju kasvas mingi t
 
 "Toored" permutatsiooniolulisuse skoorid saadakse nii, et iga puu puhul lahutatakse "puutumata" OOB-vaatluste õigesti klassifitseeritud juhtude arvust permuteeritud OOB-vaatluste õigesti klassifitseeritud juhtude arv ning leitakse saadud arvu kõikide puude keskmine. `importance()`-funktsioon näitab aga permutatsiooniolulisuse puhul vaikimisi nn [*z*-skoore](https://www.statisticshowto.com/probability-and-statistics/z-score/) ehk jagab permutatsiooniolulisuse mõõdikud läbi nende standardvigadega. Vahel on soovitatud kasutada siiski neid "tooreid", standardiseerimata (`scale = FALSE`) olulisusmõõdikuid, kuna *z*-skoorid on tundlikumad valimi suuruse ja puude arvu suhtes.   
 
-```{r}
+```{r rf_kat_importance_unscaled}
 # standardiseerimata mõõdikud
 importance(mets_kat_rf, scale = FALSE)
 ```
@@ -194,7 +196,7 @@ importance(mets_kat_rf, scale = FALSE)
 
 Tunnuste olulisust esitatakse tihtipeale ka graafikul. Paketil `randomForest` on selleks sisse-ehitatud funktsioon `varImpPlot()`.
 
-```{r}
+```{r rf_kat_importance_plots}
 varImpPlot(mets_kat_rf, 
            main = "Tunnuste olulisus (vasakul z-skoorid)")
 varImpPlot(mets_kat_rf, 
@@ -208,7 +210,7 @@ varImpPlot(mets_kat_rf,
 
 Tunnuste olulisust võib visualiseerida ka nt `ggplot2`-ga.
 
-```{r}
+```{r rf_kat_importance_ggplots}
 library(ggplot2)
 
 # Tee olulisuse mõõdikutest andmetabel
@@ -219,11 +221,11 @@ head(df)
 ggplot(data = df, 
        aes(x = reorder(rownames(df), MeanDecreaseAccuracy), # x-teljele tabeli df reanimed tunnustega, mis on järjestatud permutatsiooniolulisuse skoori järgi
            y = MeanDecreaseAccuracy)) + # y-teljele perm.olulisus
-  geom_bar(stat = "identity") + # tulpdiagramm
+  geom_col() + # tulpdiagramm
   labs(x = "", y = "",
        title = "Tunnuste permutatsiooniolulisus juhumetsa mudelis",
        subtitle = "(standardiseerimata)",
-       caption = "R-i paketiga randomForest") +
+       caption = "R-i paketiga randomForest (Liaw & Wiener 2002)") +
   coord_flip() # püstise tulpdiagrammi asemel külili diagramm
 
 
@@ -236,9 +238,10 @@ ggplot(data = df,
   scale_fill_gradient(low = "steelblue4", # mitteoluliste värv
                       high = "tomato2") + # oluliste värv
   labs(x = "",
+       y = "",
        title = "Tunnuste permutatsiooniolulisus juhumetsa mudelis",
        subtitle = "(standardiseerimata)",
-       caption = "R-i paketiga randomForest") +
+       caption = "R-i paketiga randomForest (Liaw & Wiener 2002)") +
   theme_minimal() +
   theme(text = element_text(size = 14),
         panel.grid.minor = element_blank(),
@@ -250,12 +253,13 @@ ggplot(data = df,
 
 Vaatame ka arvulise uuritava tunnusega metsamudeli tunnuste olulisust.  
 
-```{r}
+```{r rf_num_importance}
 importance(mets_num_rf)
 ```
 
 Arvulise uuritava tunnusega metsamudeli puhul näitab esimene tulp `%IncMSE` seda, kui palju mingi seletava tunnuse permuteerimine (segiajamine) suurendab nn keskmist ruutviga (*mean squared error*) ehk OOB-vaatluste põhjal ennustatud väärtuste ja algandmestiku tegelike väärtuste keskmisi erinevusi. Mida suurem selle tulba väärtus on, seda rohkem mõjutab vastav tunnus seda, kui hästi me mudeliga vaatluste uuritava tunnuste väärtusi saame ennustada, ning seda olulisem tunnus on. Sellega on osaliselt seotud ka teine tulp, `IncNodePurity`, mis näitab, kui palju mingi tunnuse põhjal andmete ositamine puudes suurendab puu sõlmedes uuritava tunnuse väärtuste homogeensust ehk ühetaolisust ning erinevust teistes sõlmedes olevate vaatluste uuritava tunnuse väärtustest. Mida suurem on mingi seletava tunnuse `IncNodePurity` väärtus, seda erinevamad on selle tunnuse alusel binaarsel ositamisel tekkivad rühmad üksteisest ning seda sarnasemad rühmadesse kuuluvad vaatlused omavahel. `IncNodePurity`'t peetakse aga suhteliselt kallutatud mõõdikuks, sest seegi eelistab arvulisi tunnuseid ning mitme tasemega kategoriaalseid tunnuseid, nii et enamasti võiks seletavate tunnuste olulisuse hindamisel eelistada `%IncMSE`-d.  
-```{r}
+
+```{r rf_num_importance_plots}
 varImpPlot(mets_num_rf)
 ```
 
@@ -266,7 +270,7 @@ varImpPlot(mets_num_rf)
 
 Nagu öeldud, teeb R vaikimisi mudeli, kus kasvatatakse 500 puud ja proovitakse iga puu igas sõlmes nii mitut juhuslikult valitud tunnust, kui suur on ruutjuur seletavate tunnuste arvust (arvulistel tunnustel seletavate tunnuste arv / 3). Neid parameetreid saab aga soovi korral muuta vastavalt argumentidega `ntree` ja `mtry`. 
 
-```{r}
+```{r rf_ntree_mtry}
 mets_kat_rf$ntree
 mets_kat_rf$mtry
 ```
@@ -274,17 +278,17 @@ mets_kat_rf$mtry
 
 Vaatame, kas mudeli täpsus paraneb, kui proovime sõlmedes erineval hulgal seletavaid tunnuseid.
 
-```{r}
+```{r rf_different_mtrys}
 # Teeme tühja vektori
 tapsused <- vector()
 
 # Teeme tsükli, kus
-for(i in 2:5){ # iga arvu i kohta 2st 5ni (i = 2, i = 3, i = 4, i = 5)
+for(i in 2:7){ # iga arvu i kohta 2st 7ni (i = 2, i = 3, i = 4, i = 5, i = 7)
   
   set.seed(100)
   # teeme mudeli, kus seletavate tunnuste arv võrdub i-ga
   # (nt mudel, kus mtry = 1; mudel, kus mtry = 2 jne,
-  # kuni mudelini, kus mtry = 5)
+  # kuni mudelini, kus mtry = 7)
   mudel <- randomForest(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + LM_pikkus_log + sõnajärg + murderühm, 
                         data = dat,
                         mtry = i)
@@ -298,7 +302,7 @@ for(i in 2:5){ # iga arvu i kohta 2st 5ni (i = 2, i = 3, i = 4, i = 5)
 
 tapsused
 
-plot(2:5, tapsused, 
+plot(2:7, tapsused, 
      cex = 1.5, 
      xlab = "Juhuslike tunnuste arv sõlmes", 
      ylab = "Mudeli klassifitseerimistäpsus", 
@@ -311,7 +315,7 @@ Näeme, et 2 tunnust igas sõlmes on meie mudeli jaoks tõepoolest optimaalne v�
 
 Vaatame, kas mudeli täpsus paraneb, kui kasvatame erineval hulgal puid. 
 
-```{r}
+```{r rf_different_ntrees}
 # Võtab natuke aega...
 tapsused2 <- vector()
 puude_arv <- c(10, 100, 500, 1000, 1500, 2000, 3000, 4000)
@@ -351,7 +355,7 @@ Tingimuslikud otsustuspuud on tavalistest klassifikatsiooni- ja regressioonipuud
 
 `cforest()`-funktsioon on ka `party` paketis, ent seal tuleb parameetreid sättida pisut teistmoodi. Vaatame siin `partykit`-paketi funktsiooni. 
 
-```{r, message = F, warning = F}
+```{r cf_kat_mudel, message = F, warning = F}
 library(partykit)
 # Kuna cforest nõuab palju arvutusmahtu, teeme hetkel mudeli 100 puuga.
 
@@ -363,10 +367,10 @@ mets_kat_cf <- cforest(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komple
 class(mets_kat_cf)
 ```
 
-```{r, message = F, warning = F}
+```{r cf_num_mudel, message = F, warning = F}
 set.seed(100)
-mets_num_cf <- cforest(log(haali_kokku) ~ haridus + sugu + sodiaak + kasutab_meili + nime_pikkus + vanus, 
-                       data = kandidaadid, 
+mets_num_cf <- cforest(log(hääli_kokku) ~ haridus + sugu + tähtkuju + kasutab_meili + nime_pikkus + vanus, 
+                       data = kandidaadid2019, 
                        subset = haridus != "Algharidus", 
                        ntree = 100)
 
@@ -374,23 +378,22 @@ mets_num_cf <- cforest(log(haali_kokku) ~ haridus + sugu + sodiaak + kasutab_mei
 
 `cforest()` kasutab samuti vaikimisi ühes sõlmes testitavate tunnuste arvuna ruutjuurt kõikide mudelisse kaasatud seletavate tunnuste arvust (sh ka arvuliste tunnuste puhul), ent ümardab väärtuse ülespoole.
 
-```{r, collapse = TRUE}
-mets_kat_cf$info$control$mtry
-mets_num_cf$info$control$mtry
+```{r cf_mudelid_mtry, collapse = TRUE}
+mets_kat_cf$info$control$mtry # ülespoole ümardatud ruutjuur 6st
+mets_num_cf$info$control$mtry # ülespoole ümardatud ruutjuur 7st
 ```
 
 ### Mudeli headuse näitajad
 
 Leiame kategoriaalse uuritava tunnusega mudeli **klassifitseerimistäpsuse ja C**. Kuna `cforest()` ei väljasta ise õigete ja valede ennustuste risttabelit, tuleb klassifitseerimistäpsuseni jõuda jälle ennustatud väärtuste ja tegelike väärtuste võrdlemise kaudu.
 
-```{r}
+```{r cf_kat_accuracy}
 # Klassifitseerimistäpsus
 enn <- predict(mets_kat_cf)
 head(enn)
 teg <- dat$cx
 head(teg)
-t <- table(teg, enn)
-t
+(t <- table(teg, enn))
 (t["peal", "peal"]+t["ade", "ade"])/sum(t)
 # või sum(diag(t))/sum(t)
 
@@ -401,12 +404,17 @@ head(enn_probs)
 teg_probs <- ifelse(dat$cx == "peal", 1, 0)
 head(teg_probs)
 somers2(enn_probs, teg_probs)["C"]
+
+# või
+# library(pROC)
+auc(dat$cx, enn_probs)
+
 ```
 
 Nagu näha, saame `cforest()`-funktsiooniga oluliselt täpsema mudeli ka väiksema arvu puudega. 
 Sellised näitajad saame aga ilmselt ainult juhul, kui kasutame oma treeningandmeid ühtlasi ka testandmestikuna. Tegelikult võiksime aga kasutada OOB-vaatlusi. 
 
-```{r}
+```{r cf_kat_oob_accuracy}
 # Klassifitseerimistäpsus
 enn <- predict(mets_kat_cf, OOB = T)
 teg <- dat$cx
@@ -424,9 +432,9 @@ Saime ikkagi pisut paremad tulemused kui `randomForest` funktsiooniga.
 
 Arvuliste uuritavate tunnustega juhumetsadega saab hinnata metsa headust ligikaudselt R^2^ järgi.
 
-```{r}
+```{r cf_num_rsq}
 enn <- predict(mets_num_cf, OOB = TRUE)
-teg <- log(kandidaadid$haali_kokku[kandidaadid$haridus != "Algharidus"])
+teg <- log(kandidaadid2019$hääli_kokku[kandidaadid2019$haridus != "Algharidus"])
 (R2 <- cor(enn, teg)^2)
 ```
 
@@ -437,7 +445,7 @@ Selle põhjal ei saa aga metsamudelite puhul päriselt öelda, et mudel seletab 
 
 **Tunnuste olulisust** (permutatsiooniolulisust) saab `cforest`-objektist kätte funktsiooniga `varimp()`. `cforest` väljastab ainult tunnuste permutatsiooniolulisuse.
 
-```{r}
+```{r cf_kat_varimp1}
 # Tunnuste olulisus
 imps <- varimp(mets_kat_cf)
 imps
@@ -451,7 +459,7 @@ head(imps_df)
 # Teeme joonise
 ggplot(data = imps_df,
        aes(x = reorder(tunnus, olulisus), y = olulisus)) +
-  geom_bar(stat = "identity") +
+  geom_col() +
   coord_flip()
 
 
@@ -464,7 +472,7 @@ ggplot(data = imps_df,
   scale_fill_gradient(low = "steelblue4", high = "tomato2") +
   labs(x = "",
        title = "Tunnuste permutatsiooniolulisus juhumetsa mudelis",
-       caption = "R-i paketiga partykit") +
+       caption = "R-i paketiga partykit (Hothorn & Zeileis 2015)") +
   theme_minimal() +
   theme(text = element_text(size = 14),
         panel.grid.minor = element_blank(),
@@ -474,17 +482,17 @@ ggplot(data = imps_df,
 
 Tavaline permutatsiooniolulisus võib ülehinnata omavahel seotud/korreleeruvate seletavate tunnuste olulisust. Selle vältimiseks on `partykit`-paketis võimalik hinnata tunnuste **tingimuslikku olulisust** (*conditional importance*, `conditional = TRUE`). Kuna see on arvutusmahukas protsess ja võtab omajagu aega, paneme siia ainult koodi (soovi korral võid enda arvutis läbi jooksutada, aga arvesta tavalises sülearvutis vähemalt tunnise ajakuluga). 
 
-```{r, eval = FALSE}
+```{r cf_kat_varimp2, eval = FALSE}
 # Tunnuste tingimuslik olulisus (NB! võib võtta kaua aega)
-imps2 <- varimp(mets_kat_cf, conditional = TRUE)
-imps2
+imps_cond <- varimp(mets_kat_cf, conditional = TRUE)
+imps_cond
 
 # Teeme olulisusest andmetabeli
-imps2_df <- data.frame(olulisus = imps2, tunnus = names(imps2), row.names = NULL)
-head(imps2_df)
+imps_cond_df <- data.frame(olulisus = imps_cond, tunnus = names(imps_cond), row.names = NULL)
+head(imps_cond_df)
 
 # Teeme joonise
-ggplot(data = imps2_df, 
+ggplot(data = imps_cond_df, 
        aes(x = reorder(tunnus, olulisus), y = olulisus)) +
   geom_point(aes(fill = olulisus), size = 4, shape = 22, show.legend = FALSE) +
   scale_fill_gradient(low = "steelblue4", high = "tomato2") +
@@ -500,21 +508,43 @@ ggplot(data = imps2_df,
 ```
 
 
-Võiksime teha ka juhumetsa, kus trimmime üksikuid puid samade parameetrite järgi, nagu tegime `ctree()`-ga (nt `minbucket`, `alpha` jne). 
+Kolmas tunnuste olulisuse liik on nn **AUC**-olulisus, mis sobib paremini siis, kui uuritava tunnuse üks väärtus on andmestikus oluliselt sagedasem kui teine/teised. Selle kasutamiseks on aga puu vaja ehitada mitte `partykit` paketiga, vaid hoopis `party` paketiga. 
 
-```{r}
+```{r cf_kat_varimp3, message=F, warning=F}
+#install.packages(c("party", "varImp"))
+
+# desaktiveerime paketi "partykit"
+detach("package:partykit", unload = T)
+
+# laadime paketi "party"
+library(party)
 set.seed(100)
-mets_kat_cf.2 <- cforest(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + LM_pikkus_log + sõnajärg + murderühm, 
-                       data = dat, 
-                       ntree = 100, 
-                       control = ctree_control(alpha = 0.01, minbucket = 50))
+mets_kat_cf_party <- cforest(cx ~ TR_liik + tegusõna_klass + LM_mobiilsus + LM_komplekssus + LM_pikkus_log + sõnajärg + murderühm, 
+                             data = dat, 
+                             controls = cforest_control(ntree = 100, mtry = 2))
+imps_auc <- varImp::varImpAUC(mets_kat_cf_party)
+
+# Teeme olulisusest andmetabeli
+imps_auc_df <- data.frame(olulisus = imps_auc, tunnus = names(imps_auc), row.names = NULL)
+head(imps_auc_df)
+
+# Teeme joonise
+ggplot(data = imps_auc_df, 
+       aes(x = reorder(tunnus, olulisus), y = olulisus)) +
+  geom_point(aes(fill = olulisus), size = 4, shape = 22, show.legend = FALSE) +
+  scale_fill_gradient(low = "steelblue4", high = "tomato2") +
+  labs(x = "", y = "",
+       title = "Tunnuste AUC-olulisus\njuhumetsa mudelis",
+       caption = "R-i paketiga party (Hothorn & Zeileis 2006)") +
+  theme_minimal() +
+  theme(text = element_text(size = 14),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  coord_flip()
+
+detach("package:party", unload = T)
 ```
 
-```{r}
-par(mar = c(5.1, 8.1, 4.1, 2.1))
-barplot(sort(varimp(mets_kat_cf.2)), horiz = T, las = 1)
-par(mar = c(5.1, 4.1, 4.1, 2.1))
-```
 
 
 
@@ -524,13 +554,13 @@ par(mar = c(5.1, 4.1, 4.1, 2.1))
 
 Üldjuhul kasutatakse juhumetsi kõige olulisemate tunnuste väljaselgitamiseks ning parima mudeli tegemiseks, mida saaks praktikas uute vaatluste klasside/väärtuste ennustamiseks kasutada. Juhumets on oma olemuselt nn musta kasti mudel ega võimalda vaadata metsa sisse samamoodi nagu üksikute puude puhul. Seega ei näe me, mil moel täpselt mingid tunnused uuritava tunnuse väärtust mõjutavad.
 
-On siiski mõned visualiseerimistehnikad, mis võimaldavad seletavate tunnuste üldmõjusid ja interaktsioone visualiseerida sarnaselt regressioonimudelitele. Üheks selliseks tehnikaks on nn **osasõltuvusgraafikud** (*partial dependence plots*), mis visualiseerivad korraga ühe seletava tunnuse (või tunnustevahelise interaktsiooni) mõju uuritavale tunnusele.
+On siiski mõned visualiseerimistehnikad, mis võimaldavad seletavate tunnuste üldmõjusid ja interaktsioone visualiseerida sarnaselt regressioonimudelitega. Üheks selliseks tehnikaks on nn **osasõltuvusgraafikud** (*partial dependence plots*), mis visualiseerivad korraga ühe seletava tunnuse (või tunnustevahelise interaktsiooni) mõju uuritavale tunnusele.
 
 Vaatame funktsiooni `plotmo()` võimalusi samanimelises [paketis](https://cran.r-project.org/web/packages/plotmo/plotmo.pdf).  
 Selle kõige lihtsamas versioonis hoitakse ühe seletava tunnuse mõju hindamisel teiste arvuliste seletavate tunnuste väärtused nende mediaani peal ning kategoriaalsete tunnuste väärtused nende kõige sagedamal/tüüpilisemal tasemel. Määrates funktsioonis argumendi `trace = 1`, näitab funktsioon ka seda, millised need väärtused täpsemalt on. Neid väärtusi saab muuta funktsioonis argumentidega `grid.func` ja `grid.levels` (vt lähemalt paketi dokumentatsioonist). `plotmo` paketi tegijad ise nimetavad seda ka "vaese mehe osasõltuvusgraafikuks". See on kiirem ning annab enam-vähem ülevaate tunnustevahelistest sõltuvussuhetest.
 
 
-```{r, message = F, warning = F}
+```{r cf_kat_plotmo1, message = F, warning = F}
 # install.packages("plotmo")
 library(plotmo)
 
@@ -545,7 +575,7 @@ Lisaks üksikute tunnuste mõjude kuvamisele näitab `plotmo` 3D-graafikul ka ol
 Nii näiteks näeb, et ehkki nii liigutatavate kui ka staatiliste kohasõnade referentidega ennustatakse (teiste tunnuste fikseeritud kontekstis) pigem *peal*-konstruktsioone (joonis "3 LM_moblss"), siis olukorras, kus trajektori liik on verbifraas ja tegemist on staatilisele kohale viitava orientiiriga, ennustatakse siiski *ade*-konstruktsiooni (joonis "1 TR_liik: LM_moblss"). Nooled näitavad, mispidi tunnuse väärtused graafikul muutuvad: arvuliste tunnuste puhul suunab nool väiksemast väärtusest suuremani ning kategoriaalsete tunnuste puhul tähestiku järjekorras esimesest tasemest tagumiseni.
 
 Ilmselt oleks aga informatiivsem vaadata graafikuid mitte ennustatud klasside, vaid tõenäosuste põhjal, kuna see võimaldab paindlikumat analüüsi. Selleks lisame funktsiooni argumendi `type = "prob"`.     
-```{r cache = TRUE}
+```{r cf_kat_plotmo2, cache = TRUE, message = F, warning = F}
 plotmo(object = mets_kat_cf, 
        trace = 1, 
        type = "prob")
@@ -555,7 +585,7 @@ Näeme, et tõenäosustena esitatuna ei ole erinevused *ade* ja *peal*-konstrukt
 
 Kui tahaksime kuvada interaktsioone 3D-graafikute asemel näiteks toonide kaudu, võime kasutada funktsioonis lisaks argumenti `type2 = "image"`, kus tumedamad toonid näitavad väiksemat tõenäosust ning heledamad suuremat.
 
-```{r, cache = TRUE}
+```{r cf_kat_plotmo3, cache = TRUE, message = F, warning = F}
 plotmo(object = mets_kat_cf, 
        trace = 1, 
        type = "prob", 
@@ -565,7 +595,7 @@ plotmo(object = mets_kat_cf,
 
 Võime valida ka ainult kindlad graafikud, mida näha tahame. Peamõjude valimiseks saab kasutada argumenti `degree1` ning interaktsioonide jaoks argumenti `degree2`.
 
-```{r, eval = FALSE}
+```{r cf_kat_plotmo4, eval = FALSE, message = F, warning = F}
 plotmo(object = mets_kat_cf, 
        trace = 1, 
        type = "prob", 
@@ -577,7 +607,7 @@ plotmo(object = mets_kat_cf,
 
 `plotmo`-paketiga saab teha ka n-ö päris osasõltuvusgraafikuid, kus iga konkreetse seletava tunnuse juures kõikide teiste seletavate tunnuste tasemete mõju keskmistatakse selle asemel, et määrata lihtsalt läbivalt mingi fikseeritud taustakontekst. Need graafikud annavad seega pisut adekvaatsema pildi üksikute seletavate tunnuste marginaalsest mõjust, kuna ei arvesta ainult mingit üht spetsiifilist konteksti. Osasõltuvusgraafikute jaoks määrame argumendi `pmethod` väärtuseks `partdep`. Kuna tunnuseid on mitu ning meetod komplekssem ja arvutusmahukam, läheb sellise graafiku tegemiseks ka rohkem aega. Kuvame siin seega ressursi kokkuhoiu mõttes ainult peamõjud ning jätame interaktsioonid kuvamata (`degree2 = FALSE`).
 
-```{r, eval = FALSE}
+```{r cf_kat_plotmo5, eval = F}
 plotmo(object = mets_kat_cf, 
        trace = 1, 
        pmethod = "partdep", 
@@ -586,12 +616,12 @@ plotmo(object = mets_kat_cf,
 ```
 
 Üldjoontes näeme samasuguseid trende nagu regressioonimudelis: trajektori liigil, kohafraasi pikkusel ja sõnajärjel ei ole olulist seost *ade*- ja *peal*-konstruktsioonide valikuga.
-*peal*-konstruktsiooni tõenäosus on suurem koos liigutatavatele kohtadele viitavate sõnadega (*laua peal*), lihtsõnadega, tegusõnadega, mis ei viita liikumisele. Samuti on Kesk- ja Lõuna-murderühmad oluliselt *peal*-konstruktsioonilembesemad kui Ranniku- ja Saarte-murderühma murded.
+*peal*-konstruktsiooni tõenäosus on suurem koos liigutatavatele kohtadele viitavate sõnadega (*laua peal*), lihtsõnadega, tegusõnadega, mis ei viita liikumisele. Samuti on Kesk- ja Lõuna-murderühmad oluliselt *peal*-konstruktsiooni lembesemad kui Ranniku- ja Saarte-murderühma murded.
 
 
 Osasõltuvusgraafikute tegemiseks on ka teisi pakette, nt `pdp`, `ICEbox` ja `edarf`. Ka `randomForest`-paketil on tegelikult sisseehitatud `partialPlot()` funktsioon, ent sellega saab korraga kuvada ainult üht tunnust ning y-teljel ei ole kuvatud mitte tõnäosused, vaid tunnuse väärtuste suhteline mõju uuritavale tunnusele (negatiivsel poolel "peal" esinemisele, positiivsel poolel "ade" esinemisele).
 
-```{r}
+```{r rf_partialplots, fig.height=10, message = F, warning = F}
 par(mfrow = c(4,2))
 randomForest::partialPlot(mets_kat_rf, x.var = "TR_liik", pred.data = dat)
 randomForest::partialPlot(mets_kat_rf, x.var = "tegusõna_klass", pred.data = dat)
@@ -602,18 +632,6 @@ randomForest::partialPlot(mets_kat_rf, x.var = "sõnajärg", pred.data = dat)
 randomForest::partialPlot(mets_kat_rf, x.var = "murderühm", pred.data = dat)
 ```
 
-Teeme lõpetuseks ühe joonise ka oma arvulise uuritava tunnusega mudeli jaoks, et näha, kuidas selle graafik välja näeks.
-
-```{r}
-kandidaadid$haali_kokku_log <- log(kandidaadid$haali_kokku)
-
-set.seed(100)
-mets_num_cf.2 <- cforest(haali_kokku_log ~ haridus + sugu + vanus, data = kandidaadid, subset = haridus != "Algharidus", ntree = 100)
-
-plotmo(object = mets_num_cf.2, 
-       trace = 1, 
-       pmethod = "partdep", type2 = "image")
-```
 
 
 

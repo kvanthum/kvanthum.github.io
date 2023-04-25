@@ -363,9 +363,9 @@ ldt %>%
 Vaatame nüüd uuesti ka 2019. a valimiste andmeid.
 
 ```{r}
-load("data/kandidaadid.RData")
-puu4 <- ctree(haali_kokku ~ sugu + haridus + sodiaak, 
-              data = kandidaadid, 
+load("data/kandidaadid2019.RData")
+puu4 <- ctree(hääli_kokku ~ sugu + haridus + tähtkuju, 
+              data = kandidaadid2019, 
               subset = haridus != "Algharidus")
 plot(puu4)
 ```
@@ -373,8 +373,8 @@ plot(puu4)
 Kuna häältesaak on tugevalt madalamate väärtuste poole kaldu, siis on parem ka puumudelis kasutada logaritmitud uuritavat tunnust, et vähendada erandlikult palju hääli saanud kandidaatide mõju.
 
 ```{r}
-puu5 <- ctree(log(haali_kokku) ~ sugu + haridus + sodiaak, 
-              data = kandidaadid, 
+puu5 <- ctree(log(hääli_kokku) ~ sugu + haridus + tähtkuju, 
+              data = kandidaadid2019, 
               subset = haridus != "Algharidus")
 plot(puu5)
 ```
@@ -389,17 +389,17 @@ puu5
 Teeme mõned seletavad tunnused juurde ja proovime neid ka mudelisse panna.  
 ```{r}
 # Kas kandidaat kasutab meili?
-kandidaadid$kasutab_meili <- as.factor(ifelse(grepl("@", kandidaadid$kontaktandmed), "jah", "ei"))
+kandidaadid2019$kasutab_meili <- as.factor(ifelse(grepl("@", kandidaadid2019$kontakt), "jah", "ei"))
 
 # Kui pikk on kandidaadi nimi
-kandidaadid$nime_pikkus <- nchar(kandidaadid$nimi)
+kandidaadid2019$nime_pikkus <- nchar(kandidaadid2019$nimi)
 
 # Kui vana kandidaat on?
-kandidaadid$vanus <- 2019 -as.numeric(substr(kandidaadid$sunniaeg, 1, 4))
+kandidaadid2019$vanus <- 2019 -as.numeric(substr(kandidaadid2019$sünniaeg, 1, 4))
 
-puu6 <- ctree(log(haali_kokku) ~ sugu + haridus + sodiaak + kasutab_meili + 
+puu6 <- ctree(log(hääli_kokku) ~ sugu + haridus + tähtkuju + kasutab_meili + 
                 nime_pikkus + vanus, 
-              data = kandidaadid, 
+              data = kandidaadid2019, 
               subset = haridus != "Algharidus")
 plot(puu6)
 ```
