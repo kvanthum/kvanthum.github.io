@@ -33,7 +33,7 @@ output:
 15. [Logistilise regressiooni mudelid (2)](15-logistilised2.html) 
 16. [Logistilise regressiooni mudelid (3) ja logistilise regressiooni segamudelid](16-logistilised3_sega.html)  
 17. [Tingimuslikud otsustuspuud](17-otsustuspuud.html) 
-<!--18. [Juhumetsad](18-juhumetsad.html) -->
+18. [Juhumetsad](18-juhumetsad.html)
 
 
 ![](imgs/HITSA_logo.png){width=20%}
