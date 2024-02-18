@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '1-sissejuhatus.html'))})
-date: 20.02.2023 
+date: 19.02.2024 
 output: 
   html_document:
     theme: flatly
@@ -32,8 +32,8 @@ blockquote {
 
 -   **E** 14.15-15.45, **K** 10.15-11.45.  
 -   Kokku 20 kohtumist.  
--   Toimumisnädalad 26-30, 32-35, 37.  
--   See tähendab, et praktikume **EI** toimu 27. ja 29. märtsil ning 1. ja 3. mail.  
+-   Toimumisnädalad 25-29, 31-34, 37.  
+-   See tähendab, et praktikume **EI** toimu 25. ja 27. märtsil ning 29. aprillil, 1., 6. ja 8. mail.  
 -   Kui vähegi võimalik, püüame kohtuda kohapeal. Jätame võimaluse osaleda ka Zoomi kaudu, ent praktikume ei salvestata.  
 -   Kohalkäimine (sh virtuaalne) ei ole kohustuslik, küll aga tungivalt soovituslik. 
 -   Kõik õppematerjalid on [Moodle](https://moodle.ut.ee/course/view.php?id=3774)'is.    
@@ -41,16 +41,16 @@ blockquote {
 -   Kursus on arvestuslik (arvestatud/mittearvestatud).  
 -   Arvestuse saamiseks vajalik esitada **kõik** kursuse jooksul antud kodutööd ja lõpuprojekt.  
 -   3 kodutööd:  
-    -   Andmetüübid - tidyverse, tähtaeg **19.03.2023**.
-    -   Valim ja populatsioon - Mittearvuliste tunnuste vahelised seosed, tähtaeg **02.04.2023**.
-    -   Lineaarse regressiooni mudelid - Logistilise regressiooni segamudelid, tähtaeg **30.04.2023**.
--   Lõpuprojekt: iseseisev töö, milles kasutatakse mõnd kursusel käsitletud meetodit mõnel kursusel mitte kasutatud andmestikul. Peab sisaldama nii koodi, analüüsi kui ka järeldusi. Kokku u 5 lk. Kursuse viimasel nädalal saab enda projektist, sellega kaasnenud probleemidest jms-st lühidalt (u 5 minutit) ka teistele rääkida. Võib edasi arendada teiste ainete raames tehtud projekte, kui on selgelt välja toodud, mis analüüse olete selle aine põhjal lisanud ning kuidas need aitavad uuritavat nähtust kirjeldada ja seletada. Esitamise tähtaeg **05.05.2023**.  
+    -   Andmetüübid - tidyverse, tähtaeg **17.03.2024**.
+    -   Valim ja populatsioon - Mittearvuliste tunnuste vahelised seosed, tähtaeg **31.03.2024**.
+    -   Lineaarse regressiooni mudelid - Logistilise regressiooni segamudelid, tähtaeg **28.04.2024**.
+-   Lõpuprojekt: iseseisev töö, milles kasutatakse mõnd kursusel käsitletud meetodit mõnel kursusel mitte kasutatud andmestikul. Peab sisaldama nii koodi, analüüsi kui ka järeldusi. Kokku u 5 lk. Kursuse viimasel nädalal saab enda projektist, sellega kaasnenud probleemidest jms-st lühidalt (u 5 minutit) ka teistele rääkida. Võib edasi arendada teiste ainete raames tehtud projekte, kui on selgelt välja toodud, mis analüüse olete selle aine põhjal lisanud ning kuidas need aitavad uuritavat nähtust kirjeldada ja seletada. Esitamise tähtaeg **10.05.2024**.  
 
 
 Selleks, et mõne nädala pärast kursuse materjalid pilla-palla kõiksugu salajastes kohtades laiali ei oleks ning et andmestike sisselugemine, jooniste salvestamine jms oleks võimalikult hõlbus, võiks kasutada selget kaustade ja failide struktuuri. Näiteks midagi sellist:  
 
 ```
-kvanthum2023  
+kvanthum2024  
     /materjalid  
         /praktikum1.html  
         /praktikum1.Rmd  
@@ -63,8 +63,8 @@ kvanthum2023
         /andmed.RData  
         /...  
     /skriptid  
-        /praks1_skript.R  
-        /praks2_skript.R  
+        /praktikum1_skript.R  
+        /praktikum2_skript.R  
         /...  
     /kodutööd  
         /kodutöö1  
@@ -81,12 +81,12 @@ kvanthum2023
 
 ## Kvantitatiivne andmeanalüüs humanitaarteadustes
 
-- Mõõtmis- ja loendusandmed: arvud
+- Kvantitatiivne -> arvud: mõõtmis- ja **loendusandmed**    
 - Empiirilisus   
-- Suurtes andmehulkades orienteerumine  
+- Suurtes andmehulkades orienteerumine   
 - Nähtuste kirjeldamine, koosesinemise mustrid ja põhjuslikud seosed  
     - <http://www.tylervigen.com/spurious-correlations>  
-- Sagedused, tõenäosused, varieerumise modelleerimine  
+- Sagedused, tõenäosused, varieerumise mudelid    
 
 
 <br>
@@ -117,14 +117,13 @@ _________________________________________
 Selle kursuse aluseks on põhiliselt õpikud 
 
 - Natalia Levshina (2015) "How to do Linguistics with R",  
-- Richard McElreath (2015) "Statistical Rethinking",  
-- Bodo Winter (2020) "Statistics for linguists: An introduction using R".  
+- Bodo Winter (2019) "Statistics for Linguists: An Introduction Using R".  
 
-<center>![](imgs/levshina.jpg){width=30%} ![](imgs/mcelreath.jpg){width=30%} ![](imgs/winter.jpg){width=30%}</center>
+<center>![](imgs/levshina.jpg){width=40%} ![](imgs/winter.jpg){width=40%}</center>
 
 <br>
 
-Õpikuid ja ülevaateid humanitaar- ja sotsiaalteaduste meetodite kohta aga ilmub üha enam. Springeri kirjastusel näiteks on terve sari [***Quantitative Methods in the Humanities and Social Sciences***](https://www.springer.com/series/11748?detailsPage=titles), mille alt on hetkeseisuga ilmunud juba tervelt 18 raamatut.  
+Õpikuid ja ülevaateid humanitaar- ja sotsiaalteaduste meetodite kohta aga ilmub üha enam. Springeri kirjastusel näiteks on terve sari [***Quantitative Methods in the Humanities and Social Sciences***](https://www.springer.com/series/11748?detailsPage=titles), mille alt on hetkeseisuga ilmunud juba tervelt 21 raamatut.  
 
 <center>![](imgs/springerseries.jpg){width=30%}</center>
 
@@ -136,37 +135,47 @@ Ajaloolasi võib huvitada ka näiteks Claire Lemercier & Claire Zalc (2019) [***
 
 <!-- Tegeleme rakendusliku statistikaga, kirjeldava ja järeldavaga. Ei tegele stilomeetria, dimensioonide vähendamise tehnikatega -->
 
+
+## Sellel kursusel  
+
+<center>![](imgs/statskeem.png){width=100%}</center>
+
+
 ## Miks R?
 
-<center>![](imgs/excel_r.jpg){width=70%}</center>
+<center>![](imgs/excel_r.jpg){width=50%}</center>
 <!-- kuupäevad, filtritega piiratud tegevused, paremad graafikud, suured andmestikud ja nende muutmine -->
 
 <br>
 <br>
 
-- Vabavaraline  
-- Palju erinevaid pakette ja abimaterjale  
-- Võrdlemisi lihtne süntaks   
-- Võimaldab kasutada väga paljusid andmeformaate  
-- Spetsialiseerunud pigem andmeanalüüsile  
+- Vabavaraline ja avatud lähtekoodiga    
 - Koodid taaskasutatavad ja jagatavad  
 - Muudab analüüsi läbipaistvaks ja korratavaks      
+- Võrdlemisi lihtne süntaks   
+- Spetsialiseerunud pigem andmeanalüüsile  
+- Palju erinevaid pakette ja abimaterjale  
+- Võimaldab kasutada väga paljusid andmeformaate  
 - Andmeid saab koguda, puhastada, analüüsida ja visualiseerida ühes keskkonnas (RStudio abil ka ühes programmiaknas)   
-- Palju lisavõimalusi (slaidid, dokumendid, interaktiivsed rakendused, veebilehed)   
+- RStudio kaudu palju lisavõimalusi (slaidid, dokumendid, interaktiivsed rakendused, veebilehed)   
+- Integreeritav teiste keskkondade ja programmeerimiskeeltega (nt Python)  
 
 R-iga seotud uudistega, pakettide ning funktsioonidega kursis olemiseks tasub silma peal hoida leheküljel [R-Bloggers](https://www.r-bloggers.com/).
 
+<!-- visualiseerimine parem kui Excelis, pikalt oli parem ka Pythonist-->  
+<!-- Excelil andmestiku suurusele limiit, suurte andmetega töötamisel muutub väga aeglaseks -->
+<!-- Excelis piiratud andmete puhastamise ja ümberstruktureerimise võimalused -->
 
 ## RStudio
 
 RStudio on R-i integreeritud arenduskeskkond (IDE), mis võimaldab mugavamalt R-iga töötada. R-i võib kasutada ka ilma RStudiota, aga RStudiot ei saa kasutada ilma R-ita.  
-RStudiost on praeguseks olemas nii lokaalne, töölauaversioon, millega meie töötame, kui ka pilvepõhine, brauseris kasutatav versioon RStudio Cloud, mis sobib hästi lühemateks kursusteks ja kollaboratiivseks tööks.   
+RStudiost on praeguseks olemas nii lokaalne, töölauaversioon, millega meie töötame, kui ka pilvepõhine, brauseris kasutatav versioon [Posit Cloud](https://posit.cloud/), mis sobib hästi lühemateks kursusteks ja kollaboratiivseks tööks.   
 
 <!-- paketid, graafika, töölaua ülevaade jne-->
 <!-- kohandatav kasutajaliides, sisse-ehitatud lisapaketid, koodi lõpetamine -->
 <!-- praeguseks võimaldab juba kasutada ka teisi programmeerimiskeeli, nt Python -->
 
-Kasutame sel kursusel [R-i](https://www.r-project.org/) ja [RStudio](https://posit.co/download/rstudio-desktop/) viimaseid versioone (vastavalt R 4.2.2 ja RStudio 2022.12.0). 
+Kasutame sel kursusel [R-i](https://www.r-project.org/) ja [RStudio](https://posit.co/download/rstudio-desktop/) viimaseid versioone (vastavalt R 4.3.2 ja RStudio 2023.12.1). 
 
 
 ### Nippe ja trikke
@@ -235,25 +244,36 @@ Samuti võib otsida pakette tutvustavaid näiteid koos seletava tekstiga.
 Kõiksugu praktikas ettetulevate probleemide korral aitab kõige paremini mõistagi guugeldamine, mis viib sageli lehele [Stackoverflow](https://stackoverflow.com/questions/tagged/r).  
 
 
+### ChatGPT ja suured keelemudelid
+
+Abi võib küsida põhimõtteliselt ka suurtelt keelemudelitelt (*Large Language Models* ehk LLM), nagu ChatGPT, Copilot, Claude, Llama jm. Muu hulgas on võimalik suuri keelemudeleid kasutada RStudios, näiteks paketiga [`gptstudio`](https://michelnivard.github.io/gptstudio/) (ja seda täiendava paketiga [`gpttools`](https://jameshwade.github.io/gpttools/)), [`RTutor`](https://github.com/gexijin/RTutor) või [`chattr`](https://mlverse.github.io/chattr/).    
+
+Suuri keelemudeleid saab RStudios kasutada APIde kaudu ning selleks on vaja esmalt luua vastavat keelemudelit pakkuvas keskkonnas uus API võti (*API key*) ning seadistada see RStudios. Keelemudelite kasutamine APIde võib olla tasuline.  
+
+<center>![](imgs/chatgpt.png){width=100%}</center>
+
+
+
+
 ## Ülesanne 1
 
-- Määrame enda kodukataloogiks kursuse kausta (nt `kvanthum2023`).  
-- Teeme uue skripti, kuhu sisestame alloleva koodijupi. Loodud funktsioon võtab kasutajalt sisendi ning teeb kõikide sisestatud sõnade esitähed suureks.  
+- Määrame RStudios enda kodukataloogiks kursuse kausta (nt `kvanthum2024`). Seda võib teha kas konsoolis käsuga `setwd()`, ülamenüüs `Session` -> `Set Working Directory` -> `Choose Directory...` või paneelil `File, Plots, Packages, Help...`.   
+- Teeme uue skripti (`File` -> `New File` -> `R Script`), kuhu sisestame alloleva koodijupi. Loodud funktsioon võtab kasutajalt sisendi ning teeb kõikide sisestatud sõnade esitähed suureks.  
 
 ```{r, eval = FALSE}
 suured <- function(){
-sisend <- readline(prompt = "Sisesta sõnad: ")
-          sonad <- unlist(strsplit(sisend, split = " "))
-paste(toupper(substring(sonad, 1, 1)),
-        tolower(substring(sonad, 2)), 
-                           sep = "", collapse = " ")
+    sisend <- readline(prompt = "Sisesta sõnad: ")
+    sonad <- unlist(strsplit(sisend, split = " "))
+    paste(toupper(substring(sonad, 1, 1)),
+          tolower(substring(sonad, 2)), 
+          sep = "", collapse = " ")
 }
 ```
 
-- Korrastame skriptis koodi taanded ning salvestame skripti enda kodukausta skriptide kausta (nt `kvanthum2023/skriptid`) nimega *praks1_skript.R*. Paneme skriptifaili kinni.    
-- Trükime RStudio konsooli `source("skriptid/praks1_skript.R")` ning seejärel `suured()`. Vaatame, kas funktsioon annab sisestatud sõnade esisuurtähelised vasted.  
+- Salvestame skripti enda kodukausta skriptide kausta (nt `kvanthum2024/skriptid`) nimega *praktikum1_skript.R*. Paneme skriptifaili kinni.    
+- Trükime RStudio konsooli `source("skriptid/praktikum1_skript.R")` ning seejärel `suured()`. Vaatame, kas funktsioon annab sisestatud sõnade esisuurtähelised vasted.  
 
-Uurime ka abimaterjalidest, mida teevad funktsioonis kasutatud käsud `readline`, `unlist`, `strsplit`, `toupper`, `substring` ja `tolower`.   
+Uurime ka abimaterjalidest, mida teevad funktsioonis kasutatud käsud `readline`, `unlist`, `strsplit`, `toupper`, `substring` ja `tolower`. Kirjutame nende kasutuse kohta lühikese kommentaari iga vastava skriptirea ette.  
 
 
 ## Ülesanne 2
@@ -261,9 +281,11 @@ Uurime ka abimaterjalidest, mida teevad funktsioonis kasutatud käsud `readline`
 Teeme joonise R-i pakettide arvust läbi aastate.
 
 ```{r, eval = F}
-# Installime ja laadime vajalikud paketid
-paketid1 <- c("rvest", "tidyverse")
-sapply(paketid1, function(pakett) if(!pakett %in% installed.packages()) install.packages(pakett))
+# Installime vajalikud paketid
+install.packages("rvest")
+install.packages("tidyverse")
+
+# Laadime vajalikud paketid  
 library(rvest)
 library(tidyverse)
 
@@ -275,8 +297,7 @@ paketitabel <- html_table(paketileht)[[1]]
 # Teeme joonise
 paketitabel %>%
   mutate(aasta = format.Date(Date, "%Y")) %>% # teeme kuupäevast aasta
-  group_by(aasta) %>% # grupeerime andmed aasta kaupa
-  tally() %>% # loeme kokku igal aastal lisandunud paketid
+  count(aasta) %>% # loeme kokku igal aastal lisandunud paketid
   mutate(n = cumsum(n)) %>% # liidame igale aastale eelmiste aastate arvud
   ggplot(aes(x = aasta, y = n)) + # teeme ggploti joonise
   geom_col() + # tulpdiagrammina
@@ -286,12 +307,16 @@ paketitabel %>%
 
 ## Ülesanne 3
 
-Võtame ühe Exceli faili (Ott Velsberg 2022, <https://avaandmed.eesti.ee/datasets/arvamuskusitlus-tehisintellekti-laiema-kasutuse-kohta-(12.202104.2022)>), salvestame selle kursuse andmestike kausta (nt `kvanthum2023/andmestikud`), impordime selle RStudiosse ning loome kiire ülevaate andmestiku tunnustest ja nende jaotumisest.
+Võtame ühe Exceli faili (Ott Velsberg 2022, <https://avaandmed.eesti.ee/datasets/arvamuskusitlus-tehisintellekti-laiema-kasutuse-kohta-(12.202104.2022)>), salvestame selle kursuse andmestike kausta (nt `kvanthum2024/andmestikud`), impordime selle RStudiosse ning loome kiire ülevaate andmestiku tunnustest ja nende jaotumisest.
 
 ```{r, eval = F}
-# Installime ja laadime vajalikud paketid
+# Installime vajalikud paketid
+# Siin teeme esmalt loendi vajaminevatest pakettidest
+# ning seejärel installime paketid ainult juhul, kui need ei ole veel juba installitud pakettide nimekirjas
 paketid2 <- c("readxl", "gtsummary", "esquisse")
 sapply(paketid2, function(pakett) if(!pakett %in% installed.packages()) install.packages(pakett))
+
+# Laadime vajalikud paketid
 library(readxl)
 library(gtsummary)
 library(esquisse)
@@ -315,6 +340,7 @@ esquisser()
 
 Täida ära küsimustik, mis asub lehel <https://survey.ut.ee/index.php/347927?lang=et> (aega u 5 minutit).
 
+
 ## R-i test
 
 Tee Moodle'is R-i baasoskusi puudutav test. Ära muretse, kui vastata ei oska, test ei ole hindeline ega mõjuta kuidagi lõpparvestuse saamist.
@@ -322,4 +348,4 @@ Tee Moodle'is R-i baasoskusi puudutav test. Ära muretse, kui vastata ei oska, t
 
 ## Järgmisel korral
 
-Andmetüübid ja objektitüübid
+Andmetüübid ja objektitüübid.
