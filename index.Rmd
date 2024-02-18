@@ -6,7 +6,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
-date: kevad 2023 
+date: kevad 2024 
 author: Maarja-Liisa Pilvik, Pärtel Lippus (Tartu Ülikool)
 output: 
   html_document:
