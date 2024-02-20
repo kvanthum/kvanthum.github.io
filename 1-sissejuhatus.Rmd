@@ -248,7 +248,7 @@ Kõiksugu praktikas ettetulevate probleemide korral aitab kõige paremini mõist
 
 Abi võib küsida põhimõtteliselt ka suurtelt keelemudelitelt (*Large Language Models* ehk LLM), nagu ChatGPT, Copilot, Claude, Llama jm. Muu hulgas on võimalik suuri keelemudeleid kasutada RStudios, näiteks paketiga [`gptstudio`](https://michelnivard.github.io/gptstudio/) (ja seda täiendava paketiga [`gpttools`](https://jameshwade.github.io/gpttools/)), [`RTutor`](https://github.com/gexijin/RTutor) või [`chattr`](https://mlverse.github.io/chattr/).    
 
-Suuri keelemudeleid saab RStudios kasutada APIde kaudu ning selleks on vaja esmalt luua vastavat keelemudelit pakkuvas keskkonnas uus API võti (*API key*) ning seadistada see RStudios. Keelemudelite kasutamine APIde võib olla tasuline.  
+Suuri keelemudeleid saab RStudios kasutada APIde kaudu ning selleks on vaja esmalt luua vastavat keelemudelit pakkuvas keskkonnas uus API võti (*API key*) ning seadistada see RStudios. Keelemudelite kasutamine APIde kaudu võib olla tasuline.  
 
 <center>![](imgs/chatgpt.png){width=100%}</center>
 

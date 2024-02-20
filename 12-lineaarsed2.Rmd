@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '12-lineaarsed2.html'))})
-date: 5.04.2023
+date: 03.04.2024
 output: 
   html_document:
     theme: flatly
