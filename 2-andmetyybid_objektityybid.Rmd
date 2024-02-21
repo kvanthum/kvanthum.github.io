@@ -739,16 +739,27 @@ Järgmises praktikumis arvulised andmed ja nende visualiseerimine.
 - `c()` - *concatenate*, kombineerib üksikud väärtused või mitmest elemendist koosnevad vektorid üheks vektoriks 
 - `class()` - küsib objekti andmestruktuuri/andmetüüpi 
 - `data.frame()` - kombineerib üksikud vektorid või maatriksid kokku andmetabeliks  
-- `factor()` - teeb tavalisest vektorist piiratud hulga väärtustega faktori    
+- `dim()` - küsib kahemõõtmelise R-i objekti (maatriksi või tabeli) ridade ja tulpade arvu   
+- `factor()` - teeb tavalisest vektorist piiratud hulga väärtustega faktori   
+- `head()` - kuvab R-i objekti esimesi elemente (andmetabelis nt vaikimisi esimest 6 rida)  
 - `is.character()` - küsib, kas objekti andmetüüp on tekst   
 - `is.logical()` - küsib, kas objekti andmetüüp on loogiline väärtus  
 - `is.numeric()` - küsib, kas objekti andmetüüp on arv  
 - `length()` - küsib, mitu elementi vektoris on. Kui kasutada data.frame'il, siis annab tabeli tulpade arvu   
 - `levels()` - küsib, millised on faktori tasemed ehk unikaalsed väärtused  
 - `list()` - teeb listi või muudab olemasoleva(d) objekti(d) listiks    
+- `load()` - laadib RData formaadis salvestatud andmestikke   
 - `matrix()` - teeb maatriksi või muudab olemasoleva(d) objekti(d) (nt vektori(d)) maatriksiks  
 - `mode()` - küsib objekti andmetüüpi  
-- `paste()` - kleebib üksikud väärtused või vektorid kokku üheks tekstijadaks (*string*'iks) 
+- `paste()` - kleebib üksikud väärtused või vektorid kokku üheks tekstijadaks (*string*'iks)   
+- `read.csv()` - loeb failist (nt) txt- või csv-formaadis andmetabeli    
+- `read.csv2()` - loeb failist (nt) txt- või csv-formaadis andmetabeli    
+- `read.delim()` - loeb failist (nt) txt- või csv-formaadis andmetabeli    
+- `read.table()` - loeb failist (nt) txt- või csv-formaadis andmetabeli    
+- `summary()` - annab R-i objektist ülevaate (andmetabelite puhul nt kõikide tunnuste/tulpade kokkuvõtted)  
+- `str()` - kuvab R-i objekti sisemise struktuuri ja struktuuris kasutatavad andmetüübid  
+- `tail()` - kuvab R-i objekti viimaseid elemente (andmetabelis nt vaikimisi viimast 6 rida)  
 - `vector()` - teeb vektori   
+- `View()` - kuvab andmetabeli eraldi vaates  
 
 
