@@ -345,7 +345,7 @@ __Tõeväärtus__ (*logical*) on binaarne muutuja, millel on kaks võimalikku v�
 
 Milleks tõeväärtusi vaja on? 
 
-Tõeväärtused saame vastuseks, kui testime, kas mingi tingimus on täidetud. Võrratusi läheb meil vaja siis, kui meil on näiteks suuremast andmestikust vaja leida kindlatele tunnustele vastav alamosa (näiteks võtta tabelist välja ainult read, kus tulbas `Sugu` on väärtus *mees*, või read, kus tulbas `Vanus` on suurem väärtus kui 50). Tõeväärtustega saab ka matemaatilisi tehteid teha.  
+Tõeväärtused saame vastuseks, kui testime, kas mingi tingimus on täidetud. Tingimuste kontrolli läheb meil vaja siis, kui meil on näiteks suuremast andmestikust vaja leida kindlatele tunnustele vastav alamosa (näiteks võtta tabelist välja ainult read, kus tulbas `Sugu` on väärtus *mees*, või read, kus tulbas `Vanus` on suurem väärtus kui 50). Tõeväärtustega saab ka matemaatilisi tehteid teha.  
 
 ```{r}
 üks <- 1 # objektile 'üks' omistatakse väärtus 1, midagi välja ei trükita
