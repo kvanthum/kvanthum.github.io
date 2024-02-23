@@ -37,10 +37,10 @@ knitr::opts_chunk$set(echo = TRUE)
     * histogramm  
     * hajuvusdiagramm
 
-Kasutame andmestikku `kysimustik_2023.RData`.
+Kasutame esimeses praktikumis läbi viidud küsitluse andmestikku.
 
 ```{r}
-load("data/kysimustik_2023.RData")
+load("data/kysimustik_2024.RData")
 ```
 
 ## Aritmeetiline keskmine
@@ -257,6 +257,18 @@ sqrt(dispersioon)
 
 See, kas jagatises, millega ruutude summat korrutatakse, on nimetajas vaatluste arv või tuleb vaatluste arvust lahutada 1 (nagu meie näites), sõltub sellest, kas meil on tegu kõikse valimiga (st meie valim ammendab kõik võimalikud vaatlused) või mitte (meie valimis on juhuslik hulk kõikidest võimalikest). Kui meil oleks kõikide sellel kursusel osalenute vastused, siis võiksime öelda, et meil on kõikne valim (saame selle abil kirjeldada ära iga viimsegi kursusel osaleja), ent kuna meil kõikide vastuseid ei ole, siis peame eeldama, et meil on juhuslik väiksem valim üldisest populatsioonist.  
 
+Paneme valemi ühele reale kokku:
+
+```{r}
+dispersioon <- sum((kysimustik$synniaasta - mean(kysimustik$synniaasta))^2) / (length(kysimustik$synniaasta)-1)
+standardhälve <- sqrt(sum((kysimustik$synniaasta - mean(kysimustik$synniaasta))^2) / (length(kysimustik$synniaasta)-1))
+
+# See on sama, mis
+var(kysimustik$synniaasta) # dispersiooni funktsioon
+# ja standardhälve on ruutjuur dispersioonist
+sqrt(dispersioon)
+```
+
 
 ![](imgs/disp.png)
 
@@ -414,3 +426,20 @@ legend("topright",  # asend ülemises paremas nurgas
 1. Arvuta õppeaja keskmine, mediaan ja standardhälve.
 2. Arvuta samad asjad loomaeelistuse ja tee-kohvi eelistuse kaupa. Kasuta `tapply()` käsku.  
 3. Joonista karpdiagramm õppeaja jaotusest tee-kohvi eelistuse kaupa. Värvi kastid kahe eri värviga.
+
+## Sõnastik
+
+mean()
+median()
+quantile()
+IRQ()
+range()
+
+var()
+sd()
+
+tapply()
+
+plot()
+boxplot()
+hist()
