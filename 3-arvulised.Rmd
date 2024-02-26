@@ -91,10 +91,36 @@ mean(kysimustik$kaua_opid[kysimustik$oppekava == "eesti ja soome-ugri keeleteadu
 # ... jne
 ```
 
-Seda saab ka kombineerides `mean()` käsku `apply()` käsuga. Keskmine ülikoolis õpitud aeg erialati:
+Kuna andmestikus on erinevaid õppekavasid on `r length(unique(kysimustik$oppekava))` tükki, siis ükshaaval neid läbi käia on küllaltki tüütu. Et keskmised õppekavade kaupa ühe korraga kätte saada, on mitmeid võimalusi. Üks võimalus, mis Pythoni kasutajatele võiks tuttav olla, oleks teha tsükkel, mis käib õppekavad läbi ja arvutab keskmise.
+
+```{r, eval = F}
+for(i in levels(kysimustik$oppekava)){
+    keskmine <- mean(kysimustik$kaua_opid[kysimustik$oppekava == i])
+    print(paste0("Õppekaval ", i, " keskmine õppimisaeg on ", keskmine, " aastat."))
+}
+```
+
+
+R-is saab ka kombineerida `mean()` käsku `apply()` käsuga. Keskmine ülikoolis õpitud aeg erialati:
 
 ```{r, eval=T}
+# tapply(vektor_väärtustega, vektor_rühmadega, käsk_mida_rühmiti_väärtustele_rakendada)
 tapply(kysimustik$kaua_opid, kysimustik$oppekava, mean)
+```
+
+
+Ja sama asja saab `tidyverse` ja `flextable` pakettidega. `tidyverse` paketist tuleb juttu ülejärgmises praktikumis, mistõttu siin pikemalt selle süntaksil ei peatu.
+
+```{r, message=F}
+library(tidyverse)
+library(flextable)
+
+kysimustik %>% 
+    group_by(Õppekava = oppekava) %>% 
+    summarise(Keskmine = round(mean(kaua_opid),1)) %>% 
+    flextable() %>% 
+    set_table_properties( layout = "autofit") %>% 
+    set_caption(caption = "Keskmine õppimisaeg õppekavade kaupa.")
 ```
 
 
@@ -123,6 +149,19 @@ Miinused:
   + nt gruppidel [1, 1, 50, 100, 100] ja [50, 50, 50, 50, 50] on sama mediaan.
 
 
+Proovime ühe lühema vektori peal:
+
+```{r}
+arvud = c(1,2,3,4,5,7,9,11,13)
+length(arvud) # üheksa arvu, seega mediaan on suurusejärjekorras 5. väärtus
+mean(arvud)
+median(arvud)
+arvud = c(1,2,3,4,5,7,90,110,1300)
+mean(arvud)
+median(arvud) # mediaan on endiselt 5
+```
+
+
 Sünniaasta mediaan:
 
 ```{r, echo=T}
@@ -142,6 +181,19 @@ Ja seda saab sama moodi kombineerida `tapply()` käsuga:
 tapply(kysimustik$kaua_opid, kysimustik$oppekava, median)
 ```
 
+Ja lisame `tidyverse` paketiga tabelisse:
+
+```{r}
+kysimustik %>% 
+    group_by(Õppekava = oppekava) %>% 
+    summarise(Osalejaid = n(),
+              Keskmine = round(mean(kaua_opid),1),
+              Mediaan = round(median(kaua_opid), 1)) %>% 
+    flextable() %>% 
+    set_table_properties( layout = "autofit") %>% 
+    set_caption(caption = "Keskmine õppimisaeg õppekavade kaupa.")
+```
+
 
 ## Kvantiilid
 
@@ -151,8 +203,6 @@ Kui mediaan on see keskmine punkt andmete jaotusest, millest nii suuremaid kui k
 ```{r, eval = FALSE}
 quantile(kysimustik$synniaasta)
 ```
-
-25%, 50% ja 75% kvantiile nimetatakse **kvartiilideks** selle järgi, et need jagavad andmestiku neljaks võrdseks osaks. Kvartiile kokku on 3. Mediaan on 50% kvantiil ehk 2. kvartiil.
 
 Andmestikku võib jagada aga ka vähemateks või enamateks osadeks.
 
@@ -177,6 +227,23 @@ quantile(kysimustik$synniaasta,
                    8/10, 9/10, 10/10))
 
 ```
+
+Siin näites on osad esitatud murruna, aga `probs` väärtuse võib sisestada ka kümnendmurruna.
+```{r}
+# mediaan
+median(kysimustik$synniaasta)
+# on sama mis 50% kvantiil
+quantile(kysimustik$synniaasta, probs = 0.5)
+# ja 0.5 on sama mis 1/2 või 50/100 või 2024/4048...
+quantile(kysimustik$synniaasta, probs = 1/2)
+```
+
+25%, 50% ja 75% kvantiile nimetatakse **kvartiilideks** selle järgi, et need jagavad andmestiku neljaks võrdseks osaks. Kvartiile kokku on 3. Mediaan on 50% kvantiil ehk 2. kvartiil.
+
+```{r}
+quantile(kysimustik$synniaasta)
+```
+
 
 Esimese ja kolmanda kvartiili (ehk 25% ja 75% kvantiili) vahe saab leida funktsiooniga **`IQR()`**.
 ```{r, eval = FALSE}
@@ -275,6 +342,21 @@ sqrt(dispersioon)
 Dispersioon ehk hajuvus on hälvete ruutude aritmeetiline keskmine ehk teisisõnu keskmine vaatluste erinevus keskmisest väärtusest. Mida suurem on dispersioon, seda suurem on hajuvus. Sagedamini raporteeritakse uurimustes standardhälvet, kuna ruutjuure võtmine võimaldab vaadelda hajuvust originaalühikutes (antud juhul nt aastates).
 
 
+Ja lisame `tidyverse` paketiga tabelisse ka standardhälbe:
+
+```{r}
+kysimustik %>% 
+    group_by(Õppekava = oppekava) %>% 
+    summarise(Osalejaid = n(),
+              Keskmine = round(mean(kaua_opid),1),
+              Mediaan = round(median(kaua_opid), 1),
+              St.hälve = round(sd(kaua_opid),1)) %>% 
+    flextable() %>% 
+    set_table_properties( layout = "autofit") %>% 
+    set_caption(caption = "Keskmine õppimisaeg õppekavade kaupa.")
+```
+
+
 ## Karpdiagramm
 
 Karpdiagramm ehk kastdiagramm (*boxplot*) esitab arvulise tunnuse kvartiiljaotuse (vt [Kvantiilid]).
@@ -346,7 +428,7 @@ Histogramm ehk astmikdiagramm sobib arvuliste andmete visualiseerimiseks ning es
 hist(kysimustik$synniaasta)
 ```
 
-Jooniselt näeme, et kõige enam on neid tudengeid, kes on sündinud 1990ndate esimesel poolel. Üksikud tudengid on sündinud vahemikus 1965-1970 ja 1970-1975, kõige nooremad 2000-2005. R arvestab piiripealsed väärtused enamasti sellele eelnenud klassi (nt aastal 1990 sündinud on klassis 1985-1990, mitte 1990-1995).
+Jooniselt näeme, et kõige enam on neid tudengeid, kes on sündinud 1990ndate teisel poolel. Üksikud tudengid on sündinud vahemikus 1965-1970 ja 1970-1975, kõige nooremad 2000-2005. R arvestab piiripealsed väärtused enamasti sellele eelnenud klassi (nt aastal 1990 sündinud on klassis 1985-1990, mitte 1990-1995).
 
 ```{r}
 # Teeme 4 numbrivektorit
@@ -427,19 +509,22 @@ legend("topright",  # asend ülemises paremas nurgas
 2. Arvuta samad asjad loomaeelistuse ja tee-kohvi eelistuse kaupa. Kasuta `tapply()` käsku.  
 3. Joonista karpdiagramm õppeaja jaotusest tee-kohvi eelistuse kaupa. Värvi kastid kahe eri värviga.
 
-## Sõnastik
+## Funktsioonide sõnastik
 
-mean()
-median()
-quantile()
-IRQ()
-range()
+- `mean()` - aritmeetiline keskmine
+- `median()` - mediaan
+- `quantile()` - kvantiilid
+- `IRQ()` - kvartiilhaare
+- `range()` - haare (miinimum- ja maksimumväärtused)
+- `diff()` - vahe
+- `min()` - miinimum
+- `max()` - maksimum
+- `tapply(kirjeldatav_tunnus, rühmitav_tunnus, funktsioon)` - *apply* funktsioon, mis võimaldab mingit käsku rakendada vektorile mingi (nt mõnda eelnevatest) rühmitava tunnuse kaupa
 
-var()
-sd()
+- `var()` - dispersioon
+- `sd()` - standardhälve
 
-tapply()
 
-plot()
-boxplot()
-hist()
+- `plot()` - baasgraafika kõige üldisem joonistamise käsk. Üliselt tahab x ja y telje sisendiks arvulisi vektoreid (nagu excelis *scatterplot*), aga võib muudel juhtudel geneeriliselt muid väljundeid anda.
+- `boxplot()` - joonistab karpdiagrammi, sisendiks üks arvuline tunnus ja üks või mitu kategoriaalset rühmitavat tunnust.
+hist() - joonistab histogrammi, sisendiks üks arvuline tunnus.
