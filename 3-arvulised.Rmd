@@ -91,7 +91,7 @@ mean(kysimustik$kaua_opid[kysimustik$oppekava == "eesti ja soome-ugri keeleteadu
 # ... jne
 ```
 
-Kuna andmestikus on erinevaid õppekavasid on `r length(unique(kysimustik$oppekava))` tükki, siis ükshaaval neid läbi käia on küllaltki tüütu. Et keskmised õppekavade kaupa ühe korraga kätte saada, on mitmeid võimalusi. Üks võimalus, mis Pythoni kasutajatele võiks tuttav olla, oleks teha tsükkel, mis käib õppekavad läbi ja arvutab keskmise.
+Kuna andmestikus on erinevaid õppekavasid `r length(unique(kysimustik$oppekava))` tükki, siis ükshaaval neid läbi käia on küllaltki tüütu. Et keskmised õppekavade kaupa ühe korraga kätte saada, on mitmeid võimalusi. Üks võimalus, mis Pythoni kasutajatele võiks tuttav olla, oleks teha tsükkel, mis käib õppekavad läbi ja arvutab keskmise.
 
 ```{r, eval = F}
 for(i in levels(kysimustik$oppekava)){
@@ -181,7 +181,7 @@ Ja seda saab sama moodi kombineerida `tapply()` käsuga:
 tapply(kysimustik$kaua_opid, kysimustik$oppekava, median)
 ```
 
-Ja lisame `tidyverse` paketiga tabelisse:
+Ja lisame mediaani ka `tidyverse` paketiga tabelisse:
 
 ```{r}
 kysimustik %>% 
@@ -506,8 +506,10 @@ legend("topright",  # asend ülemises paremas nurgas
 ## Harjutusi
 
 1. Arvuta õppeaja keskmine, mediaan ja standardhälve.
-2. Arvuta samad asjad loomaeelistuse ja tee-kohvi eelistuse kaupa. Kasuta `tapply()` käsku.  
-3. Joonista karpdiagramm õppeaja jaotusest tee-kohvi eelistuse kaupa. Värvi kastid kahe eri värviga.
+
+2. Arvuta samad asjad loomaeelistuse ja tee-kohvi eelistuse kaupa. Kasuta `tapply()` käsku. Kui on korraga kaks rühmitavat tunnust, siis `tapply()` käsul rühmitava tunnuse sisendiks võib olla list ja sellisel juhul on tulemuseks risttabel. Proovi umbes nii `tapply(kirjeldatav_tunnus, list(rühmitav1, rühmitav2), funktsioon)`.
+
+3. Joonista karpdiagramm (*boxplot*) õppeaja jaotusest tee-kohvi eelistuse kaupa. Värvi kastid kahe eri värviga.
 
 ## Funktsioonide sõnastik
 
@@ -527,4 +529,4 @@ legend("topright",  # asend ülemises paremas nurgas
 
 - `plot()` - baasgraafika kõige üldisem joonistamise käsk. Üliselt tahab x ja y telje sisendiks arvulisi vektoreid (nagu excelis *scatterplot*), aga võib muudel juhtudel geneeriliselt muid väljundeid anda.
 - `boxplot()` - joonistab karpdiagrammi, sisendiks üks arvuline tunnus ja üks või mitu kategoriaalset rühmitavat tunnust.
-hist() - joonistab histogrammi, sisendiks üks arvuline tunnus.
+- `hist()` - joonistab histogrammi, sisendiks üks arvuline tunnus.
