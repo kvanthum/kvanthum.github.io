@@ -513,20 +513,18 @@ legend("topright",  # asend ülemises paremas nurgas
 
 ## Funktsioonide sõnastik
 
-- `mean()` - aritmeetiline keskmine
-- `median()` - mediaan
-- `quantile()` - kvantiilid
-- `IRQ()` - kvartiilhaare
-- `range()` - haare (miinimum- ja maksimumväärtused)
-- `diff()` - vahe
-- `min()` - miinimum
-- `max()` - maksimum
-- `tapply(kirjeldatav_tunnus, rühmitav_tunnus, funktsioon)` - *apply* funktsioon, mis võimaldab mingit käsku rakendada vektorile mingi (nt mõnda eelnevatest) rühmitava tunnuse kaupa
+- `boxplot()` - joonistab karpdiagrammi, sisendiks üks arvuline tunnus ja üks või mitu kategoriaalset rühmitavat tunnust  
+- `diff()` - leiab kahe või enama arvulise väärtuse vahe(d)  
+- `hist()` - joonistab histogrammi, sisendiks üks arvuline tunnus    
+- `IQR()` - leiab kvartiilhaarde  
+- `max()` - leiab vektori või tabeli suurima väärtuse    
+- `mean()` - arvutab arvulise tunnuse aritmeetilise keskmise  
+- `median()` - arvutab arvulise tunnuse mediaani  
+- `min()` - leiab vektori või tabeli vähima väärtuse   
+- `plot()` - baasgraafika kõige üldisem joonistamise käsk. Üliselt tahab x ja y telje sisendiks arvulisi vektoreid (nagu Excelis *scatterplot*), aga võib muudel juhtudel geneeriliselt muid väljundeid anda.  
+- `quantile()` - leiab kvantiilid  
+- `range()` - leiab haarde (miinimum- ja maksimumväärtused)  
+- `sd()` - arvutab arvulise tunnuse standardhälbe ehk keskmise erinevuse keskmisest  
+- `tapply(kirjeldatav_tunnus, rühmitav_tunnus, funktsioon)` - *apply* funktsioon, mis võimaldab mingit käsku rakendada vektorile mingi (nt mõnda eelnevatest) rühmitava tunnuse kaupa  
+- `var()` - arvutab arvulise tunnuse dispersiooni ehk hajuvuse  
 
-- `var()` - dispersioon
-- `sd()` - standardhälve
-
-
-- `plot()` - baasgraafika kõige üldisem joonistamise käsk. Üliselt tahab x ja y telje sisendiks arvulisi vektoreid (nagu excelis *scatterplot*), aga võib muudel juhtudel geneeriliselt muid väljundeid anda.
-- `boxplot()` - joonistab karpdiagrammi, sisendiks üks arvuline tunnus ja üks või mitu kategoriaalset rühmitavat tunnust.
-- `hist()` - joonistab histogrammi, sisendiks üks arvuline tunnus.
