@@ -33,14 +33,14 @@ knitr::opts_chunk$set(echo = TRUE)
 Kasutame jätkuvalt andmestikku `kysimustik_2023.RData`.
 
 ```{r}
-load("data/kysimustik_2023.RData")
+load("data/kysimustik_2024.RData")
 ```
 
 
 
 ## Valim ja populatsioon
 
-**Populatsiooni** ehk **üldkogumi** moodustavad uurimisobjekti kõik esindajad. Enamasti on populatsioon nii suur ja raskesti kättesaadav, et ei ole võimalik uurida kogu populatsiooni. Näiteks kui uurime inimkäitumist, siis populatsioon on kogu inimkond, kui uurime eesti keelt, siis kõik eesti keele kõnelejad või kõik eesti keeles kirjutatud tekstid.
+**Populatsiooni** ehk **üldkogumi** moodustavad uurimisobjekti kõik esindajad. Enamasti on populatsioon nii suur ja raskesti kättesaadav, et ei ole võimalik uurida kogu populatsiooni. Näiteks kui uurime inimkäitumist, siis populatsioon on kogu inimkond, kui uurime eesti keelt, siis kõik eesti keele kõnelejad ja kõik, mis nad iganes räägivad, või kõik eesti keeles kirjutatud tekstid. Sõltuvalt uurimisküsimustest võib muidugi ka populatsioon olla hoomatavam: näiteks kui uurime Anton Hansen Tammsaare loomingut, siis kogu populatsiooni moodustavad kõik tema teosed.
 
 **Valim** on mingite kriteeriumite alusel tehtud valik uurimisobjektidest, mis uuringus vaatluse alla võetakse ja mille omadusi kogu populatsioonile laiendatakse.
 
@@ -339,7 +339,7 @@ Jaotuse normaalsuse testimiseks on võimalik:
 
 - vaadata histogrammi ja visuaalselt hinnata (`hist()`)
 - võrrelda tegelikku ja teoreetilist kvantiilide jaotust (`qqnorm()` ja `qqline()`)
-- kasutada normaaljaotuse testi (Shapiro-Wilki, Kolmogorovi–Smirnovi test)
+- kasutada normaaljaotuse testi (Shapiro-Wilk, Anderson-Darling või Kolmogorovi–Smirnovi test)
 
 ### Histogramm
 
@@ -379,6 +379,18 @@ shapiro.test(pikkus)
 ```
 
 Tasub tähele panna, et *p*-väärtuse tõlgendamine selles testis käib seega mõnes mõttes teistpidi kui teistes testides, millega järgmistel kordadel tegeleme, kui tahame näha võimalikult väikseid p-väärtusi. *p*-väärtuse tõlgendamine tuleneb otseselt nullhüpoteesist.
+
+### Anderson-Darling
+
+Anderson-Darlingi test on Shapiro-Wilki testile sarnane, aga väidetavasti natuke leebem.
+
+```{r}
+# install.packages('nortest')
+library(nortest)
+
+ad.test(pikkus)
+```
+
 
 
 ## Normaaljaotuse testimine (2. näide)
@@ -529,3 +541,13 @@ Gruppidevaheliste erinevuste hindamine (arvuline sõltuv tunnus ~ kategoriaalne 
 - mitteparameetrilised testid (kui pole normaaljaotus)
   * Wilcoxoni test (kaks rühma)
   
+  
+## Funktsioonide sõnastik
+
+- `rnorm(n, mean, sd)` - genereerib n-pikkuse vektori juhuslikest normaaljaotusega arvudest, millel on ette antud keskmine ja standardhälbe väärtus
+- `hist()` - joonistab histogrammi
+- `qqnorm()` ja `qqline()` kvantiiljaotuse joonis
+- `shapiro.test()` - Shapiro-Wilki test
+- `nortest::ad.test()` - Anderson-Dralingi test
+
+- `t.test()` - t-testi käsk, sellest rohkem järgmine kord
