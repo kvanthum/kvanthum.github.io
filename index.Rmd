@@ -33,7 +33,7 @@ body {
 2. [Andmetüübid ja objektitüübid](2-andmetyybid_objektityybid.html)  
 3. [Arvulised andmed ja nende visualiseerimine](3-arvulised.html)
 4. [Kategoriaalsed andmed ja nende visualiseerimine](4-kategoriaalsed.html)  
-5. <span class="vana">[Pakett `ggplot2` andmete visualiseerimiseks](5-ggplot2.html)</span>  
+5. [Pakett `ggplot2` andmete visualiseerimiseks](5-ggplot2.html)  
 6. <span class="vana">[Pakett `tidyverse` andmete töötlemiseks](6-tidyverse.html)</span>  
 7. <span class="vana">[Valim ja populatsioon. Hüpoteesid ja tõenäosus](7-valim_hypoteesid.html)</span>  
 8. <span class="vana">[Parameetrilised ja mitteparameetrilised testid](8-parameetrilised_mitteparameetrilised.html)</span>  
