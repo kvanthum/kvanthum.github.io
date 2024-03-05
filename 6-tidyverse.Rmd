@@ -28,7 +28,7 @@ Pakett `tidyverse` on andmeanalüüsi n-ö komplekspakett, mis koondab enda alla
 ![](imgs/tidyverse.jpg){width=50%}
 </center>
 
-*Tidyverse*'i pakette saab mõistagi installida ka ükshaaval (nt `install.packages("tidyr")`). Kiire ülevaate üksikute pakettide põhifunktsioonidest saad nt erinevatest spikritest:  
+*Tidyverse*'i pakette saab installida ka ükshaaval (nt `install.packages("tidyr")`). Kiire ülevaate üksikute pakettide põhifunktsioonidest saad nt erinevatest spikritest:  
 
 - [`ggplot2` spikker](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf)  
 - [`dplyr` spikker](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-transformation.pdf)  
@@ -60,8 +60,9 @@ valimised <- read.delim("data/kandidaadid_2023.csv")
 
 ## Torud  
 
-*Tidyverse*'i pakette ühendab sarnane kindlas järjekorras asjade tegemise loogika. Üks paketi oluline omadus on võimalus kasutada nn **torusid** ehk *pipe*'e (sümbol `%>%`), mille funktsioon tuleb tegelikult `tidyverse`'iga koos installitavast ja laaditavast paketist nimega `magrittr`. Torud lubavad tõsta R-i n-ö pesastatud funktsioonidest funktsioone välja nende käivitamise järjekorra alusel, suunates iga eelmise käsu väljundi järgmisse käsku.  
-Kui R-i baaspaketis on kõige viimane käsk graafiliselt kõige esimene, siis torud lubavad teha neid asju loogilisemas järjekorras. Võrdle näiteks:  
+*Tidyverse*'i pakette ühendab sarnane kindlas järjekorras asjade tegemise loogika. Üks paketi oluline omadus on võimalus kasutada nn **torusid** ehk *pipe*'e (sümbol `%>%`), mille funktsioon tuleb tegelikult `tidyverse`'iga koos installitavast ja laaditavast paketist nimega `magrittr`.  
+Torud lubavad tõsta R-i n-ö pesastatud funktsioonidest funktsioone välja nende **käivitamise järjekorra alusel**, suunates iga eelmise käsu väljundi järgmisse käsku.  
+Kui R-i baaspaketis on kõige viimane käsk graafiliselt kõige esimene, siis torud lubavad teha neid asju loogilisemas järjekorras. Näiteks kui tahame 1) võtta tabelist kandidaatide soo tulba, 2) teha soo tunnuse väärtustest sagedustabeli, 3) leida absoluutsageduste põhjal suhtelised sagedused, siis oleks baaspaketi ja `tidyverse` paketi lahenduskäigud graafiliselt justkui peegelpildis.   
 
 ```{r, eval = F}
 # Leia mees- ja naiskandidaatide suhtelised sagedused
@@ -69,22 +70,22 @@ Kui R-i baaspaketis on kõige viimane käsk graafiliselt kõige esimene, siis to
 prop.table(table(valimised$sugu))
 
 # tidyverse
-valimised$sugu %>%
-  table() %>%
-  prop.table()
+valimised$sugu %>% table() %>% prop.table()
 
 # Kui saad teate 'could not find function "%>%"', tähendab see seda, 
 # et tidyverse'i pakett on ilmselt lihtsalt library(tidyverse) käsuga laadimata jäänud.
 ```
 
+Või kui tahaksime lahendada natuke keerulisemat ülesannet, nt leida kandidaatide ametinimetustes (vaba tekstiga tunnus) esinevad 50 sagedamat sõna, oleks baaspaketi käsk üpris keeruliselt loetav. 
+
+
 ```{r, eval = F}
-# Leia ametinimetustes esinevad 50 sagedamat sõna
 # baaspakett
-head(sort(table(gsub("[[:punct:]]", "", tolower(unlist(strsplit(valimised$amet, " "))))), decreasing = T), 50)
+head(sort(table(gsub("[[:punct:]]", "", tolower(unlist(str_split(valimised$amet, " "))))), decreasing = T), 50) 
 
 # tidyverse
 valimised$amet %>% # võta valimiste andmestikust tulp "amet"
-  strsplit(" ") %>% # lõika ameti kirjeldused tühikute koha pealt sõnadeks
+  str_split(" ") %>% # lõika ameti kirjeldused tühikute koha pealt sõnadeks
   unlist() %>% # tee sõnalistist tavaline vektor
   tolower() %>% # tee kõik vektori sõnad väiketähelisteks
   gsub("[[:punct:]]", "", .) %>% # kustuta sõnade küljest kirjavahemärgid
@@ -93,12 +94,29 @@ valimised$amet %>% # võta valimiste andmestikust tulp "amet"
   head(50) # võta sorteeritud tabelist esimesed 50 sõna
 ```
 
+Lisame koodi ühe rea, mis jätaks ametinimetustest alles ainult viimase sõnavormi (nt *Riigikogu liige* -> *liige*).  
+
+```{r}
+# tidyverse
+valimised$amet %>% 
+  str_split(" ") %>% 
+  lapply(., function(x) x[length(x)]) %>% # igast ametinimetusest võta ainult viimane sõnavorm
+  unlist() %>% 
+  tolower() %>%
+  gsub("[[:punct:]]", "", .) %>% 
+  table() %>%
+  sort(decreasing = T) %>%
+  head(50)
+```
+
 Nagu baaspaketis ei ole vahet, kas komadega eraldatud argumendid on eraldi ridadel või ühel real, ei ole seda vahet ka *tidyverse*'is. Samuti ei ole vahet, kas torudega eraldatud funktsioonid jätta samale reale või viia need eraldi ridadele. 
 *Tidyverse*'i toru kiiremaks kasutamiseks võid kasutada ka klahvikombinatsiooni `Ctrl+Shift+M` (Macis `Shift+Cmd+M`).  
 
 Tõele au andes on uuemates R-i versioonides ka baaspaketis juba oma *toru* `|>`, mis töötab enam-vähem samamoodi nagu *tidyverse*'i toru. Selles aga ei saa näiteks viidata funktsioonis andmetele tagasi punktiga.      
 
 ```{r, eval = F}
+# Mitu erinevat eesnime kandidaatide hulgas leidub?
+
 # töötab
 gsub("^([^ ]+?) .*$", "\\1", valimised$nimi) |>
   unique() |>
@@ -185,7 +203,7 @@ valimised %>%
 ```
 
 
-Kui tahame pärast toru võtta mingi tulba välja vektorina (või faktorina), saame viidata tabelile punktiga: `... %>% .$tulp`. Punkt on nn *placeholder*, mis laseb torudega toimetades viidata vahetult eelmise käsu väljundile.  
+Kui tahame pärast toru võtta mingi tulba välja vektorina (või faktorina), saame viidata tervele tabelile punktiga: `... %>% .$tulp`. Punkt on nn *placeholder*, mis laseb torudega toimetades viidata vahetult eelmise käsu väljundile.  
 
 
 ```{r, eval = F}
@@ -266,7 +284,7 @@ valimised %>%
 
 **Harjutus 2**  
 
-Laadi RStudiosse kursuse küsimustiku andmestik. Leia torusid kasutades, millisel aastal on olnud kursusel kõige rohkem kohvijoojaid. Ärme esialgu sellepärast muretseme, kui palju osalejaid mingil aastal üldse kursuselt läbi käis.  
+Laadi RStudiosse kursuse küsimustiku andmestik. Leia torusid kasutades, millisel aastal on olnud kursusel kõige rohkem kohvijoojaid. Ärme esialgu sellepärast muretseme, kui palju osalejaid mingil aastal üldse kursuselt läbi käis, ehkki see mõjutab oluliselt ka kohvijoojate absoluutarve.  
 
 1. Filtreeri andmetest ainult kohvijoojate read.  
 2. Võta välja ainult aasta tulp.  
@@ -327,6 +345,7 @@ valimised %>%
 Kui tahame, et lisatud tulbad ka andmestikku alles jääksid, peame andmestiku kas üle kirjutama või suunama lisatud tulpadega tabeli uude objekti.
 
 ```{r}
+# kirjutame andmestiku "valimised" üle nii, et sinna on lisatud tulp paberhäälte arvuga
 valimised %>%
   mutate(hääli_paberil = hääli_kokku-e.hääli) -> valimised
 ```
@@ -335,16 +354,17 @@ valimised %>%
 
 ## Jooniste tegemine
 
-*Tidyverse*'i üks suuri plusse on see, et me ei pea vaheväljundeid eraldi objektidesse salvestama, kui tahame neid hiljem millekski muuks kasutada. Nii võime ka kogu andmete puhastamise ja korrastamise protsessi väljundi suunata otse graafikule.  
+*Tidyverse*'i üks suuri plusse on see, et me ei pea vaheväljundeid eraldi objektidesse salvestama, kui tahame neid ainult korraks konkreetseks eesmärgiks kasutada. Nii võime ka kogu andmete puhastamise ja korrastamise protsessi väljundi suunata otse graafikule.  
 
 
 ```{r}
 # Kuva karpdiagrammil paberhäälte protsendi jaotumist valimisnimekirjades
 valimised %>%
   mutate(paberhäälte_protsent = hääli_paberil/hääli_kokku*100) %>%
-  ggplot(aes(y = reorder(nimekiri, paberhäälte_protsent), # järjesta nimekirjad protsendi tunnuse alusel 
+  ggplot(aes(y = reorder(nimekiri, paberhäälte_protsent), # järjesta nimekirjad protsendi tunnuse alusel (vaikimisi rühma keskmise järgi) 
              x = paberhäälte_protsent)) +
-  geom_boxplot()
+  geom_boxplot() +
+  labs(y = "Nimekiri", x = "Paberhäälte protsent")
 ```
 
 
@@ -361,11 +381,10 @@ Näita joonisel, milline oli kandidaatide vanuste jaotus erakondades ning kas va
 valimised %>%
   ggplot() +
   geom_boxplot(aes(y = nimekiri, x = vanus)) +
-  geom_vline(aes(xintercept = median(vanus)), color = "red", linetype = "dashed", linewidth = 1) +
-  labs(x = "vanus")
+  geom_vline(aes(xintercept = median(vanus)), color = "red", linetype = "dashed", linewidth = 1)
 ```
 
-2. Tee joonisel näidatud hajuvusdiagramm vanuse ja häältesaagi vahelise suhte kohta nii, et häältesaaki ei näidataks mitte absoluutarvudes, vaid logaritmituna (`log(tunnus)`). Punktide läbipaistvust saab kontrollida argumendiga `alpha`, mille väärtus saab jääda 0 (täiesti läbipaistev) ja 1 (täiesti läbipaistmatu) vahele.   
+2. Tee joonisel näidatud hajuvusdiagramm vanuse ja häältesaagi vahelise suhte kohta nii, et häältesaaki ei näidataks mitte absoluutarvudes, vaid logaritmituna (`log(tunnus)`). Punktide läbipaistvust saab kontrollida argumendiga `alpha`, mille väärtus saab jääda 0 (täiesti läbipaistev) ja 1 (täiesti läbipaistmatu) vahele. Nn trendijoone saab joonistada funktsiooniga `geom_smooth()`.     
 
 ```{r, results = 'hide', class.source = 'fold-hide', message=F}
 valimised %>%
@@ -379,13 +398,13 @@ valimised %>%
 
 **Harjutus 4**  
 
-Oletame, et keegi küsib meilt Keskerakonna nimekirjas kandideerinute meiliaadresse. Meiliaadressid on tulbas `kontaktandmed`, aga seal on ka telefoninumbrid, tavalised aadressid, Facebooki lehed jm. Peaksime niisiis kasutama pisut regulaaravaldisi, et need eraldi kätte saada ja uude tulpa lisada. Ära muretse, kui sa regulaaravaldisi veel ei tunne.      
+Oletame, et keegi küsib meilt Keskerakonna nimekirjas kandideerinute meiliaadresse. Meiliaadressid on tulbas `kontaktandmed`, aga seal on ka telefoninumbrid, tavalised aadressid, Facebooki lehed jm. Peaksime niisiis kasutama pisut regulaaravaldisi, et meiliaadressid eraldi kätte saada ja uude tulpa lisada. Ära muretse, kui sa regulaaravaldisi veel ei tunne.      
 
 1. Jäta alles ainult read, kus tunnuse `nimekiri` väärtus on "Eesti Keskerakond".  
-2. Tee uus tulp nimega `meil`, kuhu saad väärtused käsuga `ifelse(test = grepl("@", kontakt), yes = strsplit(kontakt, "; ") %>% unlist() %>% .[grepl("@", .)], no = "")`. Käsus küsitakse esmalt, kas kandidaadi kontaktandmetes on üldse \@-märki, kui on, siis lõigatakse kontaktandmed semikooloni ja tühiku järjendi koha pealt tükkideks ja jäetakse alles ainult see tükk, mis sisaldab ka \@-märki. Kui meiliaadressi kontaktandmetes ei ole, jäetakse tulpa tühi väärtus.  
+2. Tee uus tulp nimega `meil`, kuhu saad väärtused käsuga `ifelse(test = grepl("@", kontakt), yes = str_split(kontakt, "; ") %>% unlist() %>% .[grepl("@", .)], no = "")`. Käsus küsitakse esmalt, kas kandidaadi kontaktandmetes on üldse \@-märki, kui on, siis lõigatakse kontaktandmed semikooloni ja tühiku järjendi koha pealt tükkideks ja jäetakse alles ainult see tükk, mis sisaldab ka \@-märki. Kui meiliaadressi kontaktandmetes ei ole, jäetakse tulpa tühi väärtus.  
 3. Vali ainult nimede ja meiliaadresside tulbad.  
 4. Jäta alles ainult read, kus tunnuse `meil` väärtus ei ole tühi (`""`).  
-5. Kirjuta tabel faili nimega `Keskerakonna_meiliaadressid.txt` nii, et tulpasid eraldaks tabulaator, teksti ümber ei oleks jutumärke, reanimesid ei kirjutataks faili kaasa ning faili kodeering oleks UTF-8.   
+5. Kirjuta tabel faili nimega `Keskerakonna_meiliaadressid.txt` nii, et tulpasid eraldaks tabulaator `\t`, teksti ümber ei oleks jutumärke, reanimesid ei kirjutataks faili kaasa ning faili kodeering oleks UTF-8.   
 
 ```{r, eval = F, class.source = 'fold-hide'}
 valimised$kontakt # millise struktuuriga kontaktandmed on esitatud?
@@ -393,7 +412,7 @@ valimised$kontakt # millise struktuuriga kontaktandmed on esitatud?
 valimised %>%
   filter(nimekiri == "Eesti Keskerakond") %>%
   mutate(meil = ifelse(test = grepl("@", kontakt), # kui kontaktandmetes on @-sümbol,
-                       yes = strsplit(kontakt, "; ") %>% # siis lõika kontaktandmete tekst semikooloni ja tühiku järjendi koha pealt tükkideks,
+                       yes = str_split(kontakt, "; ") %>% # siis lõika kontaktandmete tekst semikooloni ja tühiku järjendi koha pealt tükkideks,
                          unlist() %>% # tee tulemuseks saadud listist tavaline vektor
                          .[grepl("@", .)], # ja jäta alles ainult see tükk, mis sisaldab @-sümbolit
                        no = "")) %>% # kui @-sümbolit ei ole, ära pane meili tulpa midagi
@@ -408,13 +427,20 @@ valimised %>%
 ## Grupeerimine ja kokkuvõtted
 
 
-Kõige lihtsam viis teha kokkuvõtteid, on lugeda väärtusi kokku. Kiireim viis selleks on kasutada funktsiooni **`count()`**, mis loeb täpsustatud tunnuste alusel (gruppides) vaatlused kokku ja esitab nende sagedused uues tabelis.  
+Kõige lihtsam viis teha kokkuvõtteid, on lugeda väärtusi kokku. Kiireim viis selleks on kasutada funktsiooni **`count()`**, mis loeb täpsustatud **tunnuste alusel (gruppides) vaatlused kokku** ja esitab nende sagedused uues tabelis.  
 
 ```{r, eval = F}
 valimised %>% count()
 valimised %>% count(nimekiri)
 valimised %>% count(sugu)
 valimised %>% count(nimekiri, sugu)
+```
+
+Kui tahame täpsustada ka, mis on sagedustega tulba nimi (vaikimisi on selleks `n`), saame `count()` funktsioonis kasutada argumenti `name`.  
+
+```{r, eval = F}
+valimised %>% count(name = "kandidaate_kokku")
+valimised %>% count(nimekiri, sugu, name = "arv")
 ```
 
 
@@ -424,7 +450,7 @@ Funktsioon **`summarise()`** laseb teha meie andmetest kokkuvõtteid lisaks vaat
 # kandidaatide arv kokku
 valimised %>%
   summarise(kandidaate_kokku = n()) # funktsioon n() loeb vaatlusi kokku
-# see töötab samamoodi nagu valimised %>% count(), ainult et siin saame määrata ka tulbanime, millesse sagedused lisatakse
+# see töötab samamoodi nagu valimised %>% count(name = "kandidaate_kokku")
 
 # kandidaatide arv, keskmine vanus, mediaanvanus
 valimised %>%
@@ -435,10 +461,10 @@ valimised %>%
 # erinevate eesnimede ja perekonnanimede arv
 valimised %>%
   summarise(eesnimesid = gsub("^([^ ]+?) .*$", "\\1", nimi) %>% unique() %>% length(),
-            perenimesid = gsub("^.* ([^ ]+)$", "\\1", nimi) %>% unique() %>% length())
+            perekonnanimesid = gsub("^.* ([^ ]+)$", "\\1", nimi) %>% unique() %>% length())
 ```
 
-Samad andmed saaksime tabelita kujul kätte ka ilma `summarise()`-funktsioonita.
+Samad arvandmed saaksime tabelita kujul kätte ka ilma `summarise()`-funktsioonita.
 
 ```{r, eval = F}
 nrow(valimised)
@@ -452,14 +478,6 @@ length(unique(gsub("^.* ([^ ]+)$", "\\1", valimised$nimi)))
 Oluliselt kasulikumaks muutub `summarise()` funktsioon aga siis, kui seda kasutada koos funktsiooniga **`group_by()`**, mis grupeerib andmeid ühe või enama tunnuse põhjal ning laseb kokkuvõtteid teha iga grupi kohta eraldi.
 
 ```{r, eval = F}
-# Kandidaatide arv valimisnimekirjades
-valimised %>%
-  group_by(nimekiri) %>%
-  summarise(kandidaate_kokku = n())
-# kuna loeme siin jällegi lihtsalt vaatlusi kokku,
-# siis sama asja teevad valimised %>% count(nimekiri)
-# ja valimised %>% group_by(nimekiri) %>% tally()
-
 # Kandidaatide arv, keskmine vanus ja mediaanvanus valimisnimekirjades
 valimised %>%
   group_by(nimekiri) %>%
@@ -484,7 +502,7 @@ tapply(valimised$vanus, valimised$nimekiri, mean)
 tapply(valimised$vanus, list(valimised$nimekiri, valimised$sugu), mean)
 ```
 
-Vahe on selles, et `tapply()` käsu väljund on vektor või maatriks, aga `group_by()`+`summarise()` annavad väljundiks nn pika andmetabeli, kus iga grupeerivate tunnuste kombinatsioon on omaette real (nt Eesti Keskerakond + M, Eesti Keskerakond + N, Isamaa Erakond + M, Isamaa Erakond + N jne) ning kuhu võib lisada ka muid kokkuvõtteid.  
+Vahe on selles, et `tapply()` käsu väljund on vektor või maatriks, aga `group_by()`+`summarise()` annavad väljundiks *data.frame* tüüpi nn pika andmetabeli, kus iga grupeerivate tunnuste kombinatsioon on omaette real (nt Eesti Keskerakond + M, Eesti Keskerakond + N, Isamaa Erakond + M, Isamaa Erakond + N jne) ning kuhu võib lisada ka muid kokkuvõtteid.  
 
 Nagu ülal näidatud, võib grupeerida andmeid ka mitme tunnuse põhjal. `group_by()`+`summarise()` kombinatsioon hülgab pärast oma töö lõpetamist ühe grupeerimise aluseks oleva tunnuse, aga kui meil on grupeerimise aluseks mitu tunnust, siis teised jätab alles. Nii et pärast `summarise()` funktsiooni jooksutamist on meie andmed edasi grupeeritud ainult tunnuse `nimekiri` põhjal. Seega saame küsida iga nimekirja põhjal ainult seda rida (meeste või naiste rida), kus keskmine häältesaak on suurem. Tulemuseks saame tabeli, kus on erakonnad, kus mehed said keskmiselt rohkem hääli, ja erakonnad, kus naised said keskmiselt rohkem hääli.    
 
@@ -498,7 +516,7 @@ valimised %>%
 
 Kui me loobuksime pärast `summarise()` funktsiooni kõikidest gruppidest (`.groups = "drop"` või `ungroup()`), saaksime vastuseks ainult ühe valimisnimekirja rea, kus on kõikide nimekirjade ja sugude lõikes kõige suurem keskmine häältesaak.  
 
-```{r, eval = F}
+```{r, eval = F, results='hold'}
 valimised %>%
   group_by(nimekiri, sugu) %>%
   summarise(keskmine_häältesaak = mean(hääli_kokku),
@@ -513,45 +531,56 @@ valimised %>%
   filter(keskmine_häältesaak == max(keskmine_häältesaak))
 ```
 
-Funktsioonid `group_by()`+`summarise()`, `group_by()`+`tally()` ja `count()` ja  teevad väärtusi kokku lugedes sisuliselt sama asja, ainult et `count()` ei jäta andmeid kunagi grupeerituks.    
+Funktsioonid `group_by()`+`summarise()` ja `count()` ja  teevad **väärtusi kokku lugedes** sisuliselt sama asja, ainult et `count()` ei jäta andmeid kunagi grupeerituks. Samuti on `group_by()`+`summarise()` väljundiks nn [*tibble*](https://r4ds.had.co.nz/tibbles.html)-tüüpi tabel, `count()` väljundiks tavaline *data.frame*-tüüpi tabel.     
 
-```{r, eval = F}
-valimised %>% group_by(nimekiri) %>% summarise(n = n())
-valimised %>% group_by(nimekiri) %>% tally()
-valimised %>% count(nimekiri)
-```
-
-```{r, eval = F}
+```{r}
 valimised %>% group_by(nimekiri, sugu) %>% summarise(n = n()) # andmed jäävad nimekirja järgi grupeerituks
-valimised %>% group_by(nimekiri, sugu) %>% tally() # andmed jäävad nimekirja järgi grupeerituks
 valimised %>% count(nimekiri, sugu) # andmed ei jää grupeerituks
 ```
 
 
-**Üsna hiljutine uuendus** on võimalus grupeerida andmeid ka `summarise()` funktsiooni sees, ilma `group_by()`-funktsiooni kasutamata. Sellisel juhul tuleb `summarise()`-funktsiooni sisse lisada argument `.by =`, mis täpsustab, mis tunnuse alusel andmeid rühmitatakse. Ka sellise kasutuse puhul ei jää andmed pärast funktsiooni kasutamist ühegi tunnuse alusel grupeerituks.     
+
+**Üsna hiljutine uuendus** on võimalus grupeerida andmeid ka teiste funktsioonide sees, ilma `group_by()`-funktsiooni kasutamata. Sellisel juhul tuleb funktsiooni sisse lisada argument `.by =`, mis täpsustab, mis tunnuse alusel andmeid rühmitatakse. Ka sellise kasutuse puhul ei jää andmed pärast funktsiooni kasutamist ühegi tunnuse alusel grupeerituks.     
 
 ```{r, eval = F}
+# Teeme kokkuvõttest täiesti uue andmetabeli
 valimised %>%
-  summarise(keskmine_häältesaak = mean(hääli_kokku), .by = c(nimekiri, sugu))
+  summarise(keskmine_häältesaak = mean(hääli_kokku), .by = nimekiri)
+
+# Lisame algsesse andmetabelisse kokkuvõttega uue tulba
+valimised %>%
+  mutate(nimekirja_keskmine_häältesaak = mean(hääli_kokku), .by = nimekiri)
 ```
 
 
-Harjutuses 2 saadud vastus selle kohta, mis aastal on kursusel olnud kõige rohkem kohvijoojaid, ei rahulda meid päriselt, sest see on esitatud absoluutarvuna ega võta arvesse seda, kui palju mingil aastal üldse osalejaid oli. `group_by()` ja `summarise()` aitavad meil aga arvutada kohvijoojate **osakaalu** iga aasta kohta eraldi.
+Harjutuses 2 saadud vastus selle kohta, mis aastal on kursusel olnud kõige rohkem kohvijoojaid, ei rahulda meid päriselt, sest see on esitatud absoluutarvuna ega võta arvesse seda, kui palju mingil aastal üldse osalejaid oli. Grupeerimine aitab meil aga arvutada kohvijoojate **osakaalu** iga aasta kohta eraldi.
 
-
+<div style = "display: flex;">
+<div style = "flex: 50%; padding-right: 10px;">
 ```{r, eval = F}
-# Millisel aastal on olnud kõige suurem kohvijoojate osakaal?
 kysimustik %>%
   group_by(aasta, lemmikjook) %>%
-  summarise(vastajaid = n()) %>% # andmed jäävad aasta järgi grupeerituks
-  mutate(prop = vastajaid/sum(vastajaid)) %>% # arvuta kohvi- ja teejoojate osakaalud iga aasta kohta ja lisa tulemus uude tulpa
+  summarise(vastajaid = n()) %>% 
+  mutate(prop = vastajaid/sum(vastajaid)) %>%
   ungroup() %>%
   filter(lemmikjook == "Kohv") %>%
   filter(prop == max(prop)) %>%
   pull(aasta) %>%
   as.character()
 ```
-
+</div>
+<div style = "flex: 50%; padding-left: 10px;">
+```{r, eval = F}
+kysimustik %>%
+  count(aasta, lemmikjook, name = "vastajaid") %>%
+  mutate(prop = vastajaid/sum(vastajaid), .by = aasta) %>%
+  filter(lemmikjook == "Kohv") %>%
+  filter(prop == max(prop)) %>%
+  .$aasta %>%
+  as.character()
+```
+</div>
+</div>
 
 Lisaks funktsioonile `n()`, mis loeb vaatlusi kokku, ning juba tuttavatele funktsioonidele `min()`, `max()`, `mean()`, `median()` jm, on kasulik mh ka näiteks funktsioon **`n_distinct()`**, mis loeb kokku mingi tunnuse kõik unikaalsed väärtused kas siis terves andmestikus või selle alamosades.  
 
@@ -587,6 +616,13 @@ valimised %>%
   ungroup() %>%
   filter(tähtkuju == "Kalad") %>%
   filter(prop == max(prop))
+
+# või
+valimised %>%
+  count(nimekiri, tähtkuju) %>%
+  mutate(prop = n/sum(n), .by = nimekiri) %>%
+  filter(tähtkuju == "Kalad") %>%
+  filter(prop == max(prop))
 ```
 
 
@@ -598,7 +634,7 @@ Nii valimiste kui ka küsimustiku andmestikes on iga osaleja eraldi real ning ig
 
 Pika ja laia tabeli erinevust ilmestavad hästi näiteks just `group_by()`+`summarise()` ja `tapply()` funktsioonide väljundid.  
 
-```{r, eval = F}
+```{r}
 valimised %>%
   group_by(nimekiri, sugu) %>%
   summarise(hääli_kokku = sum(hääli_kokku)) # pikk tabel
@@ -618,8 +654,8 @@ Laiast tabelist pika tegemiseks saab kasutada funktsiooni **`pivot_longer()`** n
 ```{r, eval = F}
 # laiast pikk
 tapply(valimised$hääli_kokku, list(valimised$nimekiri, valimised$sugu), sum) %>%
-  as.data.frame() %>%
-  rownames_to_column(var = "nimekiri") %>%
+  as.data.frame() %>% # maatriksist data.frame-tüüpi objekt
+  rownames_to_column(var = "nimekiri") %>% # reanimed tulpa "nimekiri"
   pivot_longer(data = ., # andmetabel eelmiste funktsioonide väljundist
                cols = c("M", "N"), # tulbad, mida ühe tunnuse alla koondada
                names_to = "sugu", # uus tulbanimi, kuhu tunnuse kategooriad (nt "M" ja "N") panna
@@ -650,169 +686,28 @@ table(valimised$sugu) %>%
 **NB!** `ggplot2` tahab, et tegemist oleks pika tabeliga!
 
 
-
-
-## Näide ja harjutused
-
-Andmestikus `kiltsi_protokollid.xlsx` on ajaloolase Kersti Lusti koostatud andmestik Kiltsi vallakohtuprotokollide hagejate ja kostjate kohta aastatest 1872-1890. 
-Tabelis on märgitud järgmised tunnused:  
-
-- protokolli unikaalne ID (`protokolli_id`),  
-- aasta (`aasta`),  
-- kuu (`kuu`),  
-- päev (`päev`),  
-- teema (`teema`), 
-- hagejate (H) ja kostjate (K)  
-  - unikaalne ID (nt `H1_ID`),  
-  - elukoht (`H1_vald`),  
-  - sugu (`H1_sugu`),  
-  - amet (`H1_amet`).  
-  
-Praegu on andmestik laias formaadis, st iga protokolli kohta on üks rida ning selle osaliste info (ükskõik kui palju neid osalisi on) on laiali eraldi tulpades. See tähendab, et kui ühes protokollis võib olla tervelt 10 kostjat, on 10 kostja tulbad olemas kõikide protokollide jaoks, ehkki enamiku protokollide puhul on kohtuloos olnud ainult 1-2 kostjat korraga. Korrastame selle laias formaadis tabeli pikka formaati nii, et iga protokolli osaleja oleks eraldi real. Nii et kui protokollis on näiteks ainult üks hageja ja üks kostja, oleks selle protokolli kohta 2 rida; kui protokollis on üks hageja ja kaks kostjat, siis 3 rida jne.     
-
-Kasutame nii funktsiooni `pivot_longer()` kui ka `pivot_wider()`.   
-
-Selleks, et Exceli faile otse R-i lugeda, saab kasutada näiteks paketti `xlsx`, `readxl` või `openxlsx`.  
-
-```{r}
-# install.packages("readxl")
-kiltsi <- readxl::read_excel("data/kiltsi_protokollid.xlsx", col_types = "text") # loeb tühjad lahtrid sisse NA-dena
-```
-
-Teeme esmalt laiast tabelist pika nii, et kõik Kiltsi tabeli tulpade pealkirjad, milles H-le või K-le järgneb 1-2 numbrit ning alakriips (nt `H1_amet`, `K10_sugu`), lõigatakse alakriipsu koha pealt pooleks ning enne alakriipsu olev osa (nt `H1`, `K10`) pannakse uude tulpa `nimi` ja pärast alakriipsu olev osa (`amet`, `sugu`) tulpa `klass`. Tabeli lahtrite väärtused pannakse tulpa `väärtused`.    
-
-```{r}
-kiltsi %>%
-  pivot_longer(., # tee andmestikust pikk tabel
-               cols = starts_with(c("H", "K"), ignore.case = F), # vali pika tabeli jaoks tunnused, mis algavad suure "H" või "K"-ga
-               names_sep = "_", # lõika tulbanimed alakriipsu koha pealt pooleks
-               names_to = c("nimi", "klass"), # esimene pool pane tulpa "nimi" ja teine tulpa "klass"
-               values_to = "väärtused") # algsed laia tabeli lahtrite väärtused pane tulpa "väärtused"
-```
-
-
-Järgmiseks jätame andmestikust välja need read, kus tulbas `väärtused` on puuduvad väärtused (`NA`).  
-
-
-```{r}
-kiltsi %>%
-  pivot_longer(.,
-               cols = starts_with(c("H", "K"), ignore.case = F),
-               names_sep = "_",
-               names_to = c("nimi", "klass"),
-               values_to = "väärtused") %>%
-  filter(!is.na(väärtused)) # jäta välja read, kus tulbas "väärtused" on NA-d
-```
-
-
-Nüüd teeme meie eriti pikast tabelist uuesti laiema tabeli, kus kõik erinevad väärtused tulbas `klass` saaksid omaette tulpadeks (nt `ID`, `sugu`, `amet`), mille lahtritesse pannakse väärtused tulbast `väärtused`.  
-
-```{r}
-kiltsi %>%
-  pivot_longer(.,
-               cols = starts_with(c("H", "K"), ignore.case = F),
-               names_sep = "_",
-               names_to = c("nimi", "klass"),
-               values_to = "väärtused") %>%
-  filter(!is.na(väärtused)) %>%
-  pivot_wider(., # tee andmestikust uuesti lai(em) tabel
-              names_from = "klass", # kus lisatavate tulpade nimed võetakse tulbast "klass"
-              values_from = "väärtused") # ja nende tulpade väärtused tulbast "väärtused"
-```
-
-Lõpuks lisame tabelisse tulba `roll`, mille väärtuseks saab `hageja`, kui samal real on tulbas `nimi` täht H, ja `kostja`, kui samal real on tulbas `nimi` täht K. Nime tulba kustutame ära. Suuname lõppväljundi uude objekti nimega `kiltsi_puhas`.     
-
-```{r}
-kiltsi %>%
-  pivot_longer(.,
-               cols = starts_with(c("H", "K"), ignore.case = F),
-               names_sep = "_",
-               names_to = c("nimi", "klass"),
-               values_to = "väärtused") %>%
-  filter(!is.na(väärtused)) %>%
-  pivot_wider(.,
-              names_from = "klass",
-              values_from = "väärtused") %>%
-  mutate(roll = case_when(grepl("^H", nimi) ~ "hageja", 
-                          grepl("^K", nimi) ~ "kostja")) %>%
-  select(-nimi) -> kiltsi_puhas
-```
-
-
-Proovi lahendada järgmised ülesanded! Arvesta muidugi, et vastused ei ole tegelikult õiged, sest tegeleme juhuslikult sassi aetud andmetega.  
-
-**Harjutus 6**
-
-Uuri tulpdiagrammil, kas Kiltsi protokollides esinevate hagejate ja kostjate sooline jaotumine on erinev. Jäta välja kummagi tunnuse puhul puuduvad väärtused.  
-
-```{r, class.source = 'fold-hide'}
-kiltsi_puhas %>%
-  filter(!is.na(sugu), !is.na(roll)) %>%
-  ggplot() +
-  geom_bar(aes(x = roll, fill = sugu), position = "fill")
-
-```
-
-**Harjutus 7**
-
-Kas naisi hakkas meestega võrreldes aastate jooksul rohkem kohtus käima? Kas see erineb rolliti (hageja vs. kostja rollis)? Püüa vastata tulpdiagrammiga.   
-
-Aasta on andmestikus vaikimisi sisse loetud tekstilise tunnusena.    
-
-```{r, class.source = 'fold-hide'}
-kiltsi_puhas %>%
-  filter(!is.na(sugu)) %>%
-  ggplot() +
-  geom_bar(aes(fill = sugu, y = aasta), position = "fill")
-
-kiltsi_puhas %>%
-  filter(!is.na(sugu), !is.na(roll)) %>%
-  ggplot() +
-  geom_bar(aes(fill = sugu, y = aasta), position = "fill") +
-  facet_wrap("roll")
-```
-
-Käsitleme aastat arvulise tunnusena ja kuvame ainult naiste osakaalusid.  
-
-```{r, class.source = 'fold-hide', message=F, warning=F}
-kiltsi_puhas %>%
-  group_by(aasta, sugu) %>%
-  summarise(n = n()) %>%
-  mutate(prop = n/sum(n)) %>%
-  ungroup() %>%
-  filter(sugu == "naine") %>%
-  ggplot(aes(x = as.numeric(aasta), y = prop)) +
-  geom_point() +
-  geom_smooth() +
-  ylim(c(0, 1))
-
-kiltsi_puhas %>%
-  group_by(aasta, roll, sugu) %>%
-  summarise(n = n()) %>%
-  mutate(prop =n/sum(n)) %>%
-  ungroup() %>%
-  filter(sugu == "naine") %>%
-  ggplot(aes(x = as.numeric(aasta), y = prop, color = roll)) +
-  geom_point() +
-  geom_smooth() +
-  ylim(c(0, 1))
-```
-
-
 ## Kasutatud funktsioonide sõnastik
 
-`filter()` - vali andmestikust ridu   
-`select()` - vali andmestikust tulpasid  
-`pull()` - vali andmestikust tulp vektorina  
-`arrange()` - järjesta andmestik mingi tunnuse alusel  
-`mutate()` - lisa andmestikku uus tulp  
-`group_by()` - grupeeri andmestiku vaatlused mingi(te) tunnus(t)e alusel   
-`summarise()` - tee andmestikust kokkuvõtteid  
-`count()` - loe andmestikus vaatlusi kokku  
-`n()` - loe vaatlusi kokku  
-`n_distinct()` - leia *erinevate* väärtuste arv    
-`pivot_longer()` - tee laiast tabelist pikk  
-`pivot_wider()` - tee pikast tabelist lai  
+- `arrange()` - järjesta andmestik mingi tunnuse alusel  
+- `count()` - loe andmestikus vaatlusi kokku  
+- `filter()` - vali andmestikust ridu   
+- `group_by()` - grupeeri andmestiku vaatlused mingi(te) tunnus(t)e alusel   
+- `gsub()` - asenda mingi sümbol või sümbolite järjend vektoris teise sümboli või sümbolite järjendiga  
+- `lapply()` - rakenda mingit funktsiooni kõikidele vektori või listi elementidele (tulemuseks vaikimisi list)  
+- `mutate()` - lisa andmestikku uus tulp  
+- `n()` - loe vaatlusi kokku  
+- `n_distinct()` - leia *erinevate* väärtuste arv    
+- `pivot_longer()` - tee laiast tabelist pikk  
+- `pivot_wider()` - tee pikast tabelist lai  
+- `pull()` - vali andmestikust tulp vektorina  
+- `rownames_to_column()` - tee andmetabeli reanimedest omaette andmestiku tulp  
+- `select()` - vali andmestikust tulp(asid) (tulemuseks jääb `data.frame` objekt, mitte vektor)  
+- `str_split()` - lõika tekst mingi sümboli, nt tühiku koha pealt eraldi elementideks (tulemuseks vaikimisi list)  
+- `summarise()` - tee andmestikust kokkuvõtteid (tulemuseks uus tabel)   
+- `tolower()` - tee vektori elemendid läbivalt väiketäheliseks  
+- `ungroup()` - tühista andmetabeli vaatluste rühmitus(ed)  
+- `unique()` - küsi ainult vektori unikaalseid (st erinevaid) väärtusi  
+- `unlist()` - tee list-tüüpi objektist tavaline vektor  
 
 
 ## Järgmisel korral
