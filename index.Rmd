@@ -34,7 +34,7 @@ body {
 3. [Arvulised andmed ja nende visualiseerimine](3-arvulised.html)
 4. [Kategoriaalsed andmed ja nende visualiseerimine](4-kategoriaalsed.html)  
 5. [Pakett `ggplot2` andmete visualiseerimiseks](5-ggplot2.html)  
-6. <span class="vana">[Pakett `tidyverse` andmete töötlemiseks](6-tidyverse.html)</span>  
+6. [Pakett `tidyverse` andmete töötlemiseks](6-tidyverse.html)  
 7. <span class="vana">[Valim ja populatsioon. Hüpoteesid ja tõenäosus](7-valim_hypoteesid.html)</span>  
 8. <span class="vana">[Parameetrilised ja mitteparameetrilised testid](8-parameetrilised_mitteparameetrilised.html)</span>  
 9. <span class="vana">[Arvuliste tunnuste vahelised seosed](9-arvuliste_seosed.html)</span>   
