@@ -30,12 +30,12 @@ Pakett `tidyverse` on andmeanalüüsi n-ö komplekspakett, mis koondab enda alla
 
 *Tidyverse*'i pakette saab installida ka ükshaaval (nt `install.packages("tidyr")`). Kiire ülevaate üksikute pakettide põhifunktsioonidest saad nt erinevatest spikritest:  
 
-- [`ggplot2` spikker](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf)  
-- [`dplyr` spikker](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-transformation.pdf)  
-- [`tidyr` spikker](https://raw.githubusercontent.com/rstudio/cheatsheets/main/tidyr.pdf)  
-- [`purr` spikker](https://raw.githubusercontent.com/rstudio/cheatsheets/main/purrr.pdf)  
+- [`ggplot2` spikker](https://github.com/rstudio/cheatsheets/blob/main/data-visualization.pdf)  
+- [`dplyr` spikker](https://github.com/rstudio/cheatsheets/blob/main/data-transformation.pdf)  
+- [`tidyr` spikker](https://github.com/rstudio/cheatsheets/blob/main/tidyr.pdf)  
+- [`purr` spikker](https://github.com/rstudio/cheatsheets/blob/main/purrr.pdf)  
 - [`readr` spikker](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-import.pdf)  
-- [`stringr` spikker](https://raw.githubusercontent.com/rstudio/cheatsheets/main/strings.pdf)  
+- [`stringr` spikker](https://github.com/rstudio/cheatsheets/blob/main/strings.pdf)  
 - [`forcats` spikker](https://raw.githubusercontent.com/rstudio/cheatsheets/main/factors.pdf)  
 
 
