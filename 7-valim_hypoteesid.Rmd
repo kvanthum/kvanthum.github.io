@@ -30,12 +30,64 @@ knitr::opts_chunk$set(echo = TRUE)
 - Hüpoteeside testimine: parameetrilised testid  
 
 
-Kasutame jätkuvalt andmestikku `kysimustik_2023.RData`.
+Lisaks varem kasutatud küsimustikule kasutame üllatusküsimuste andmestikku.
 
 ```{r}
 load("data/kysimustik_2024.RData")
+load("data/yllatuskysimused_koneleja_keskmised.Rda")
 ```
 
+
+## Üllatusküsimuste andmestik
+
+Andmed on pärit üllatus- ja infoküsimuste prosoodilise markeerimise uurimusest. Uurimuse eesmärk oli uurida, kuidas kõnes tähistatakse üllatust. Infoküsimused on kannoonilised küsilaused, mille eesmärk on küsida infot. Üllatusküsimuste esmane eesmärk on väljendada imestust või üllatust. Katse tulemused on avaldatud artiklis
+
+Asu, Eva Liina, Heete Sahkai & Pärtel Lippus. 2024. The prosody of surprise questions in Estonian. Journal of Linguistics 60(1). 7–27. https://doi.org/10.1017/S0022226723000014.
+
+Katse viidi läbi nii, et katseisikutele näidati kõigepealt ekraanil lühikest olukorrakirjeldust ja seejärel paluti lugeda kõva häälega küsimus nii, nagu see sobiks kirjeldatud situatsiooni.
+
+```{r, echo=F, message=F}
+library(tidyverse)
+library(flextable)
+data.frame(`Infokontekst` = c("Saad sõbra juures head veini. Tahad teada, mis vein see on, et seda järgmisel korral külalistele pakkuda.", "Su kolleeg on kutsutud ühte gümnaasiumisse ettekannet pidama. Sa tahad teada, mis teemal ta ettekande teeb."),
+           `Üllatuskontekst` = c("Sa tuled koos abikaasaga poest ja leiad poekotist punase veini. Sa oled üllatunud, sest sinu mäletamist mööda ostsite te hoopis valge veini.", "Su sõber jääb kohtumisele pool tundi hiljaks. Kui ta lõpuks kohale jõuab, hakkab ta sinu üllatuseks ja pahameeleks vabandamise asemel hoopis sind süüdistama."),
+           Küsimus = c("Mis vein see on?", "Mida sa räägid?")) %>%     flextable() %>% 
+    set_table_properties( layout = "autofit") %>% 
+    set_caption(caption = "Näide kontekstidest ja küsimustest.")
+```
+
+Stiimulitena varieeriti 12 erinevat *mis*-küsimust ja 12 *mida*-küsimust. *Mis*-küsimused olid kõik struktuuriga *Mis NOOMEN see on?* ning *mida*-küsimused *Mida sa VERB?*. Kõik küsimused esitati kord info- ja kord üllatuskontekstis. Seega 2 x 2 x 12 = 48 stiimulit. Katseisikuid oli kokku 21 (kõik naised), seega kokku 1008 on andmestikus 1008 esitatud küsimust. Kõva häälega loetud küsimused salvestati ja mõõdeti lausungi kestust ja põhitooni.
+
+Kogu andmestik on vabalt allalaetav [Open Science Framework'i repositooriumist](https://osf.io/knygh/).
+
+```{r, eval = F}
+load("data/Est_SQ-ISQ_dataset_JLing.Rda")
+```
+
+Sellisel kujul tuleme selle andmestiku juurde tagasi mõne nädala pärast, kui teeme tutvust segamudelitega. Kuna esialgu kasutame statistikuid, mis eeldavad sõltumatuid mõõtmisi (sellest räägime järgmises praktikumis), siis teisendame andmed sellisele kujule, et meil oleks igalt katseisikult üks keskmistatud mõõtmine iga katse konditsiooni kohta. Seda kõike siin ei pea läbi tegema, Moodlist leiab koondandmestiku valmis kujul. Võtame suurest andmestikust kaasa:
+
+- lausungi kestuse
+- põhitooni keskmine 
+- põhitooni ulatus
+- põhitooni kõrgus lausungi alguses
+- põhitooni kõrgus lausungi lõpus
+
+Kestus on mõõdetud sekundites, põhitoon hertsides ning teisendatud ka pooltoonideks kõneleja keskmise põhitooni kõrguse suhtes.
+
+```{r, eval=F}
+dat %>% 
+    group_by(sp, tyyp1, kysisona) %>% 
+    summarise(kestus = mean(phr_dur), 
+              f0_kesk_Hz = mean(phr_f0_mean), 
+              f0_ulat_Hz = mean(phr_f0_q95-phr_f0_q05),
+              f0_alg_Hz = mean(phr_f0_start, na.rm=T), 
+              f0_lopp_Hz = mean(phr_f0_stop, na.rm=T), 
+              f0_kesk_sem = mean(phr_sem_mean, na.rm = T),
+              f0_ulat_sem = mean(phr_sem_q95-phr_sem_q05),
+              f0_alg_sem = mean(phr_sem_start, na.rm=T),
+              f0_lopp_sem = mean(phr_sem_stop, na.rm=T)) -> ylla
+save(ylla, file = "data/yllatuskysimused_koneleja_keskmised.Rda")
+```
 
 
 ## Valim ja populatsioon
@@ -174,12 +226,12 @@ Kui nüüd kahe grupi keskmisi võrdleva testi *p*-väärtus oleks 0,03, siis t�
 
 ## Ühe- ja kahepoolsed hüpoteesid
 
-**Kahepoolne hüpotees**: uurijad tahavad näidata lihtsalt keskmise erinevust nende valitud konstandist/teisest keskmisest.
+**Kahepoolne hüpotees**: kui tahame näidata seda, et keskmine on erinev mingist konstandist (nt populatsiooni keskmine) või ühe rühma keskmine on erinev teise rühma keskmisest.
 
 - H0: keskmine = a VÕI keskmine1 = keskmine2
 - H1: keskmine ≠ a VÕI keskmine1 ≠ keskmine2
 
-Kui aga teooriast on teada, milline see erinevus peaks olema, siis saab kontrollida **ühepoolset hüpoteesi**.
+Kui aga teooriast on teada, milline see erinevus peaks olema, siis saab kontrollida **ühepoolset hüpoteesi**. Sellisel juhul kontrollime seda, kas rühma keskmine on suurem kui populatsiooni keskmine. Või kahe rühma korral kas ühe rühma keskmine on suurem teise rühma keskmisest.
 
 - H0: keskmine >= a VÕI keskmine1 >= keskmine2
 - H1: keskmine < a VÕI keskmine1 < keskmine2
@@ -188,6 +240,46 @@ Kui aga teooriast on teada, milline see erinevus peaks olema, siis saab kontroll
 ### Näiteid: t-test (keskmiste võrdlemine)
 
 T-testist tuleb põhjalikumalt juttu järgmises praktikumis. See on test, millega võrrelda kahe rühma arvulise tunnuse keskmisi väärtusi, test näitab, kui tõenäone on, et vaadeldavad rühmad on samast populatsioonist juhuslikult võetud valimit. 
+
+Üllatusküsimuste andmestikus vaatasime lausungi kestust ja leidsime, et nagu mitmetes teistes keeltes, on eesti keeles üllatusküsimused (*surprise question*, SQ) pikemad kui infoküsimused (*information-seeking question*, ISQ). 
+
+Seame hüpoteesid kahepoolsetena:
+
+- H0: ISQ = SQ (kahe rühma kestused on võrdsed)
+- H1: ISQ ≠ SQ (kahe rühma kestused ei ole võrdsed)
+
+```{r}
+t.test(kestus ~ tyyp1, data = ylla, var.equal = T, alternative = "less")
+```
+
+Kuna meil on varasemast teada teiste keelte kohta, et üllatusküsimused on pikema kestusega kui infoküsimused, võiksime sõnastada hüpoteesid ühepoolsetena:
+
+- H0: ISQ >= SQ (esimese rühma keskmine on suurem või võrdne teisega)
+- H1: ISQ < SQ (esimese rühma keskmine on väiksem kui teisel)
+
+Teeme t-testi, kus alternatiivhüpotees on, et esimese rühma keskmine on väiksem kui teise rühma oma:
+
+```{r}
+t.test(kestus ~ tyyp1, data = ylla, var.equal = T, alternative = "less")
+```
+
+Nii saame poole väiksema p-väärtuse, mistõttu see tundub ju parem. Siin peab aga arvestama, et kahepoolne hüpotees peaks loogiliselt olema välistatud, ning peab hoolega jälgima, kumba poolt hüpoteesist testime. Sest näiteks kui sama andmestiku peal teha t-testi teist pidi ühepoolsete hüpoteesidega, siis saame tulemuseks, et olulist erinevust rühmade vahel ei ole:
+
+- H0: ISQ <= SQ
+- H1: ISQ > SQ (infoküsimused on pikema kestusega kui üllatusküsimused)
+
+```{r}
+t.test(kestus ~ tyyp1, data = ylla, var.equal = T, alternative = "greater")
+```
+
+
+```{r}
+ggplot(data = ylla) +
+  geom_boxplot(aes(x = tyyp1, y = kestus)) +
+  labs(y = "Lausungi kestus (sek)", x = "Küsimuse tüüp")
+```
+
+## Paar näidet ühe- ja kahepoolsetest hüpoteesidest
 
 Meil on küsimustikule vastanute seas nii kohvi- kui teejoojaid. Testime, kas nad kuuluvad samasse üliõpilaste populatsiooni näiteks õppimisaja poolest. Hüpoteesid on järgnevad:
 
@@ -205,12 +297,8 @@ Vaatame esialgu lihtsalt *p*-väärtust, mis on `r round(t.test(kaua_opid ~ lemm
 
 Sama näeme ka karpdiagrammilt.  
 
-```{r, echo =F}
-boxplot(kaua_opid ~ lemmikjook, data = kysimustik)
-```
+
 ```{r}
-# ggplotiga; nagu näha, siis see, kuidas vurre arvutatakse, on baasgraafikas ja ggplotis pisut erinev, nii et on pisut erinev arv erindeid.
-library(ggplot2)
 ggplot(data = kysimustik) +
   geom_boxplot(aes(x = lemmikjook, y = kaua_opid)) +
   labs(y = "Ülikoolis õppimise aeg (aastates)", x = "Lemmikjook")
@@ -392,6 +480,140 @@ ad.test(pikkus)
 ```
 
 
+## Normaaljaotuse testimine (1. näide)
+
+Me juba kasutasime t-testi, et võrrelda info- ja üllatusküsimuste kestust. T-test aga on parameetriline test, mis eeldab andmetelt normaaljaotust (sellest lähemalt järgmisel korral). Seega peaksime enne testi kasutamist veenduma, et kestus on normaaljaotusega.
+
+
+
+### Histogramm
+
+Kas jaotus on sümmeetriline?
+
+```{r, eval=T}
+hist(ylla$kestus)
+```
+
+Normaaljaotuse puhul peaks kõige kõrgem tulp jääma joonise keskele ning tulpade kõrgus kahanema enam-vähem ühtlaselt mõlema skaala äärmuse suunas. Sellel joonisel tundub, et ülemine ots on natuke välja venitatud ja võib-olla ei ole tegemist ideaalse normaalaotusega. 
+
+### Kvantiilide võrdlemine
+
+Üks võimalus on võrrelda andmete kvantiiljaotust. Kas teoreetiline ja tegelik jaotus lähevad kokku?
+```{r, eval=T}
+ggplot(data = ylla, 
+       aes(sample = kestus)) +
+  geom_qq() +
+  geom_qq_line()
+```
+
+Vasakul, y-teljel näeme tegelikke kvantiile, x-teljel teoreetilisi kvantiile (väärtused standardhälvetes). Seega -1 ja 1 standardhälbe vahemikus, kuhu peaks jääma 66.7% andmetest, on teotreetiliste ja tegelike andmete jaotus üsna sarnane, aga mõlemal pool otstes lähevad jaotused lahku. Tegelik jaotus on küll enam-vähem sümmeetriline, aga natuke paremale välja venitatud.
+
+
+### Milline võiks jaotus välja näha, kui andmed oleksid normaaljaotusega?
+
+Saame genereerida teoreetilised väärtused keskmise ja standardhälbe põhjal.
+
+```{r}
+# Tegelike andmete keskmine
+(kesk <- mean(ylla$kestus))
+# Tegelike andmete standardhälve
+(shalve <- sd(ylla$kestus))
+```
+
+```{r}
+# Tegelikud väärtused, mis hõlmavad 99%, 95% ja 68% andmetest
+quantile(ylla$kestus, probs = c(0.005, 0.025, 0.16, 0.5, 0.84, 0.975, 0.995))
+# Kolm, kaks ja üks standardhälvet keskmisest
+round(c(kesk-3:1*shalve, kesk, kesk+1:3*shalve),3)
+```
+
+Siin kõrvuti tegelik jaotus (must joon) ja teoreetiline normaaljaotus samade mõõtmistearvu, keskmise ja standardhälbe korral (punane joon):
+
+```{r, echo=F}
+set.seed(1)
+plot(density(rnorm(n = length(ylla$kestus), 
+             mean = mean(ylla$kestus), 
+             sd = sd(ylla$kestus))), col="red",     main = "Tegelik vs. teoreetiline normaaljaotus")
+lines(density(ylla$kestus),
+ xlim=c(kesk-3*shalve, max(ylla$kestus)))
+```
+
+
+### Normaalajotuse testid
+
+Shapiro-Wilki test hindab *tõenäosust, et valim on pärit normaaljaotusega populatsioonist*. Testi nullhüpotees on, et valim **on** pärit normaaljaotusega populatsioonist. Tulemuse tõlgendamisel on tavaliselt *α* = 0.05 ehk kui *p* > 0.05, võib otsustada, et on normaaljaotus (me ei saa nullhüpoteesi ümber lükata), kui *p* < 0.05, siis ei ole (on alust vastu võtta alternatiivne hüpotees: valim ei ole pärit normaaljaotusega populatsioonist). 
+
+```{r, eval=F}
+shapiro.test(ylla$kestus)
+```
+
+Nagu ka joonistelt juba näha oli, ei ole lausungite kestused normaaljaotusega: *p*-väärtus on `r shapiro.test(ylla$kestus)$p.value` ehk on `r round(shapiro.test(ylla$kestus)$p.value*100, 1)`-protsendiline tõenäosus, et saaksime sama suure (enamasti see tähendab lihtsalt, et nullist erineva) statistiku väärtuse juhul, kui nullhüpotees ikkagi kehtib. See on väga väike tõenäosus, seega hülgame nullhüpoteesi.
+
+Võib ka proovida Anderson-Darlingi testi, mis on natuke leebem ja piiripealsetel juhtudel võime sellega saada oodatuma tulemuse.
+
+```{r}
+nortest::ad.test(ylla$kestus)
+```
+
+Ja tõepoolest, testi tulemus ütleb, et on `r round(nortest::ad.test(ylla$kestus)$p.value*100, 1)`% tõenäosus, et tegemist on normaaljaotusega, mis lubab jääda 0-hüpoteesi juurde ja väita, et tegemist on normaaljaotusega.
+
+### Kui ei ole normaalajaotus, mis siis saab?
+
+- Ürita andmeid normaliseerida VÕI
+- kasuta mitteparameetrilist testi.
+
+Enamasti, kui  andmed on paremale kallutatud (*right-skewed*) ehk väikeseid väärtusi on rohkem kui suuri ning mood ja mediaan on seega väiksemad kui aritmeetiline keskmine (mida tuleb ette tihti, kui mõõdame millegi kestust, pikkust vms suurust), siis võib jaotuse normaliseerida see, kui andmed logaritmida. Logaritmimine on astendamise pöördtehe ehk kui astendades leiame mingi väärtuse $a^b=c$, siis logaritmides leiame hoopis astendaja $log_{a}c=b$. Näiteks $2^3=8$ (ehk `2*2*2=8`)ja $log_28=3$. Mingeid väärtusi logaritmides teisendame need seega mingi kokkulepitud väärtuse (nt *`e`*, 10, 2 vm) astendajateks ning vähendame seeläbi suurte erinevuste mõju väärtuste vahel.
+
+```{r}
+# Võtame nt 2 arvu: 10 ja 100.
+# Teine on esimesest 10 korda suurem.
+100/10
+
+# Kui mõlemat logaritmida,
+# on erinevus ainult kahekordne.
+log(100)/log(10)
+```
+
+Logaritmimiseks on R-is niisiis käsk `log()`, mis vaikimisi kasutab kokkulepitud väärtuse ehk alusena (valemis $a$) Euleri arvu *`e`*, mis on `2.71828`. Võib kasutada ka funktsiooni `log2()`, mille alus on 2, `log10()`, mille alus on 10, või kui andmetes on väärtus 0, siis `log1p()`. Viimane liidab igale väärtusele 1 juurde. Seda seepärast, et logaritm mis tahes alusel arvust 0 on negatiivne lõpmatus, millega pole midagi pihta hakata. **Logaritmida saab ainult positiivseid arve!**
+
+```{r}
+log(0)
+```
+
+Ja teisipidi, kui andmed oleks vasakule kaldu, saaks kasutada logaritmimise pöördtehet ehk astendamist, milleks on R-is käsk `exp()`.
+
+
+Vaatame nüüd lausungite kestuste logaritmitud väärtuste jaotust. Kui kestuse mediaanväärtus on `r median(ylla$kestus)`, siis selle logaritm oleks `r log(median(ylla$kestus))`, sest `2.71828^``r log(median(ylla$kestus))` on `r 2.71828^log(median(ylla$kestus))`.  
+
+```{r, eval=F}
+hist(log(ylla$kestus))
+
+qqnorm(log(ylla$kestus))
+qqline(log(ylla$kestus))
+
+shapiro.test(log(ylla$kestus))
+```
+
+Kas logaritmimine aitas meil saavutada uuritava tunnuse normaaljaotuse?
+
+ - kui *p* > 0.05, siis jääme nullhüpoteesi juurde, mille kohaselt andmed on normaaljaotusega.
+ - Kui *p* < 0.05, lükkame nullhüpoteesi ümber ja järeldame, et andmed **ei ole normaaljaotusega**.
+
+
+Tegelik vs. teoreetiline normaaljaotus logaritmitud andmetega:
+
+```{r, echo=F}
+set.seed(1)
+plot(density(rnorm(n = length(ylla$kestus), 
+             mean = mean(log(ylla$kestus)), 
+             sd = sd(log(ylla$kestus)))), col="red", main = "Tegelik vs. teoreetiline normaaljaotus")
+lines(density(log(ylla$kestus)))
+```
+
+
+
+Aga peale selle, et üritada andmeid normaliseerida, tasuks kontrollida, palju andmeid oligi.  Parameetriliste testide puhul peaks normaaljaotuse nõudesse rangemalt suhtuma juhul, kui mõõtmisi on vähem kui 30. Kui mõõtmisi on alla 30 ja andmed ei ole normaaljaotusega ka normaliseerides, siis peaks valima mitteparameetrilise testi. Kui andmeid on rohkem, siis võib ka mitte normaaljaotusega andmestikuga parameetrilist testi teha.
+
 
 ## Normaaljaotuse testimine (2. näide)
 
@@ -461,30 +683,9 @@ shapiro.test(kysimustik$kaua_opid)
 
 Nagu ka joonistelt juba näha oli, ei ole ülikoolis käidud aastate arv normaaljaotusega: *p*-väärtus on `r shapiro.test(kysimustik$kaua_opid)$p.value` ehk on `r shapiro.test(kysimustik$kaua_opid)$p.value*100`-protsendiline tõenäosus, et saaksime sama suure (enamasti see tähendab lihtsalt, et nullist erineva) statistiku väärtuse juhul, kui nullhüpotees ikkagi kehtib. See on väga väike tõenäosus, seega hülgame nullhüpoteesi.
 
-### Kui ei ole normaalajaotus, mis siis saab?
+### Kas on võimalik normaliseerida?
 
-- Ürita andmeid normaliseerida VÕI
-- kasuta mitteparameetrilist testi.
-
-Enamasti, kui  andmed on paremale kallutatud (*right-skewed*) ehk väikeseid väärtusi on rohkem kui suuri ning mood ja mediaan on seega väiksemad kui aritmeetiline keskmine (mida tuleb ette tihti, kui mõõdame millegi kestust, pikkust vms suurust), siis võib jaotuse normaliseerida see, kui andmed logaritmida. Logaritmimine on astendamise pöördtehe ehk kui astendades leiame mingi väärtuse $a^b=c$, siis logaritmides leiame hoopis astendaja $log_{a}c=b$. Näiteks $2^3=8$ (ehk `2*2*2=8`)ja $log_28=3$. Mingeid väärtusi logaritmides teisendame need seega mingi kokkulepitud väärtuse (nt *`e`*, 10, 2 vm) astendajateks ning vähendame seeläbi suurte erinevuste mõju väärtuste vahel.
-
-```{r}
-# Võtame nt 2 arvu: 10 ja 100.
-# Teine on esimesest 10 korda suurem.
-100/10
-
-# Kui mõlemat logaritmida,
-# on erinevus ainult kahekordne.
-log(100)/log(10)
-```
-
-Logaritmimiseks on R-is niisiis käsk `log()`, mis vaikimisi kasutab kokkulepitud väärtuse ehk alusena (valemis $a$) Euleri arvu *`e`*, mis on `2.71828`. Võib kasutada ka funktsiooni `log2()`, mille alus on 2, `log10()`, mille alus on 10, või kui andmetes on väärtus 0, siis `log1p()`. Viimane liidab igale väärtusele 1 juurde. Seda seepärast, et logaritm mis tahes alusel arvust 0 on negatiivne lõpmatus, millega pole midagi pihta hakata. **Logaritmida saab ainult positiivseid arve!**
-
-```{r}
-log(0)
-```
-
-Vaatame nüüd ülikoolis õpitud aastate logaritmitud väärtuste jaotust. Kui õpitud aastate mediaanväärtus on `r median(kysimustik$kaua_opid)`, siis selle logaritm oleks `r log(median(kysimustik$kaua_opid))`, sest `2.71828^``r log(median(kysimustik$kaua_opid))` on `r 2.71828^log(median(kysimustik$kaua_opid))`.  
+Kuna meil on andmed jälle paremale kallutatud (*right-skewed*) ehk väikeseid väärtusi on rohkem kui suuri ning mood ja mediaan on seega väiksemad kui aritmeetiline keskmine, siis võib jaotuse normaliseerida see, kui andmed logaritmida. 
 
 ```{r, eval=F}
 hist(log(kysimustik$kaua_opid))
@@ -512,7 +713,6 @@ lines(density(log(kysimustik$kaua_opid)))
 ```
 
 
-
 Aga peale selle, et üritada andmeid normaliseerida, tasuks kontrollida, palju andmeid oligi.  Parameetriliste testide puhul peaks normaaljaotuse nõudesse rangemalt suhtuma juhul, kui mõõtmisi on vähem kui 30. Kui mõõtmisi on alla 30 ja andmed ei ole normaaljaotusega ka normaliseerides, siis peaks valima mitteparameetrilise testi. Kui andmeid on rohkem, siis võib ka mitte normaaljaotusega andmestikuga parameetrilist testi teha.
 
 ```{r}
@@ -523,11 +723,12 @@ length(kysimustik$kaua_opid)
 
 ### Harjutusi
 
-Proovime `kysimustik` andmestiku peal:
+Proovi `kysimustik` ja `ylla` andmestike peal:
 
 - Millistelt tunnustelt võiks üldse normaaljaotust eeldada?
 - Vaata nende tunnuste histogrammi, qq-graafikut ja tee Shapiro test.
 - Kas andmed on normaaljaotusega?
+- Kui ei, kas logaritmimisega on võimalik normaliseerida?
 
 
 ### Järgmisel korral
@@ -550,4 +751,7 @@ Gruppidevaheliste erinevuste hindamine (arvuline sõltuv tunnus ~ kategoriaalne 
 - `shapiro.test()` - Shapiro-Wilki test
 - `nortest::ad.test()` - Anderson-Dralingi test
 
+- `log()` - naturaallogaritm
+- `log1p()` - liidab enne logaritmimist väärtustele ühe (kui andmetes on 0-väärtusi)
+- exp() - astendamine, logaritmimise pöördtehe
 - `t.test()` - t-testi käsk, sellest rohkem järgmine kord
