@@ -252,7 +252,7 @@ Seame hüpoteesid kahepoolsetena:
 - H1: ISQ ≠ SQ (kahe rühma kestused ei ole võrdsed)
 
 ```{r}
-t.test(kestus ~ tyyp1, data = ylla, var.equal = T, alternative = "less")
+t.test(kestus ~ tyyp1, data = ylla, var.equal = T, alternative = "two.sided")
 ```
 
 Kuna meil on varasemast teada teiste keelte kohta, et üllatusküsimused on pikema kestusega kui infoküsimused, võiksime sõnastada hüpoteesid ühepoolsetena:
