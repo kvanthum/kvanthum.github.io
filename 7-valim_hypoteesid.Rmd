@@ -58,16 +58,24 @@ data.frame(`Infokontekst` = c("Saad sõbra juures head veini. Tahad teada, mis v
 
 Stiimulitena varieeriti 12 erinevat *mis*-küsimust ja 12 *mida*-küsimust. *Mis*-küsimused olid kõik struktuuriga *Mis NOOMEN see on?* ning *mida*-küsimused *Mida sa VERB?*. Kõik küsimused esitati kord info- ja kord üllatuskontekstis. Seega 2 x 2 x 12 = 48 stiimulit. Katseisikuid oli kokku 21 (kõik naised), seega kokku 1008 on andmestikus 1008 esitatud küsimust. Kõva häälega loetud küsimused salvestati ja mõõdeti lausungi kestust ja põhitooni.
 
+<<<<<<< HEAD
 
 ### Täisandmestikust koondandmestik
 
 **Seda kõike siin ei pea läbi tegema**, kui sul on Moodlist võimalik alla laadida koondandmestik valmis kujul (fail `yllatuskysimused_koneleja_keskmised.Rda`). Kui ei või kui tahad proovida kõik sammud järjest läbi, siis kogu andmestik on vabalt allalaetav [Open Science Framework'i repositooriumist](https://osf.io/knygh/). Sealt tuleks alla laadida fail `Est_SQ-ISQ_dataset_JLing.Rda`.
+=======
+Kogu andmestik on vabalt allalaetav [Open Science Framework'i repositooriumist](https://osf.io/knygh/).
+>>>>>>> 27b7118e2a6665ca2ddd5d24895466159bfb3e22
 
 ```{r, eval = F}
 load("data/Est_SQ-ISQ_dataset_JLing.Rda")
 ```
 
+<<<<<<< HEAD
 Sellisel kujul tuleme selle andmestiku juurde tagasi mõne nädala pärast, kui teeme tutvust segamudelitega. Kuna esialgu kasutame statistikuid, mis eeldavad sõltumatuid mõõtmisi (sellest räägime järgmises praktikumis), siis teisendame andmed sellisele kujule, et meil oleks igalt katseisikult üks keskmistatud mõõtmine iga katse konditsiooni kohta. Võtame suurest andmestikust kaasa:
+=======
+Sellisel kujul tuleme selle andmestiku juurde tagasi mõne nädala pärast, kui teeme tutvust segamudelitega. Kuna esialgu kasutame statistikuid, mis eeldavad sõltumatuid mõõtmisi (sellest räägime järgmises praktikumis), siis teisendame andmed sellisele kujule, et meil oleks igalt katseisikult üks keskmistatud mõõtmine iga katse konditsiooni kohta. Seda kõike siin ei pea läbi tegema, Moodlist leiab koondandmestiku valmis kujul. Võtame suurest andmestikust kaasa:
+>>>>>>> 27b7118e2a6665ca2ddd5d24895466159bfb3e22
 
 - lausungi kestuse
 - põhitooni keskmine 
@@ -252,7 +260,11 @@ Seame hüpoteesid kahepoolsetena:
 - H1: ISQ ≠ SQ (kahe rühma kestused ei ole võrdsed)
 
 ```{r}
+<<<<<<< HEAD
 t.test(kestus ~ tyyp1, data = ylla, var.equal = T, alternative = "two.sided")
+=======
+t.test(kestus ~ tyyp1, data = ylla, var.equal = T, alternative = "less")
+>>>>>>> 27b7118e2a6665ca2ddd5d24895466159bfb3e22
 ```
 
 Kuna meil on varasemast teada teiste keelte kohta, et üllatusküsimused on pikema kestusega kui infoküsimused, võiksime sõnastada hüpoteesid ühepoolsetena:
@@ -756,5 +768,9 @@ Gruppidevaheliste erinevuste hindamine (arvuline sõltuv tunnus ~ kategoriaalne 
 
 - `log()` - naturaallogaritm
 - `log1p()` - liidab enne logaritmimist väärtustele ühe (kui andmetes on 0-väärtusi)
+<<<<<<< HEAD
 - `exp()` - astendamine, logaritmimise pöördtehe
+=======
+- exp() - astendamine, logaritmimise pöördtehe
+>>>>>>> 27b7118e2a6665ca2ddd5d24895466159bfb3e22
 - `t.test()` - t-testi käsk, sellest rohkem järgmine kord
