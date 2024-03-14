@@ -1,0 +1,58 @@
+---
+title: Kvantitatiivse andmeanalüüsi alused humanitaarteadlastele ja rakendustarkvara
+  R (FLFL.00.009)
+knit: (function(input_file, encoding) {
+    out_dir <- 'docs';
+    rmarkdown::render(input_file,
+      encoding=encoding,
+      output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
+date: kevad 2024 
+author: Maarja-Liisa Pilvik, Pärtel Lippus (Tartu Ülikool)
+output: 
+  html_document:
+    theme: flatly
+    highlight: tango
+    self_contained: true
+---
+
+<style>
+body {
+    font-size: 18px; 
+}
+.vana {
+    color: lightgrey;
+}
+.vana a {
+    color: inherit;
+}
+</style>
+
+<script src="search.js"></script>
+
+1. [Sissejuhatus](1-sissejuhatus.html)  
+2. [Andmetüübid ja objektitüübid](2-andmetyybid_objektityybid.html)  
+3. [Arvulised andmed ja nende visualiseerimine](3-arvulised.html)
+4. [Kategoriaalsed andmed ja nende visualiseerimine](4-kategoriaalsed.html)  
+5. [Pakett `ggplot2` andmete visualiseerimiseks](5-ggplot2.html)  
+6. [Pakett `tidyverse` andmete töötlemiseks](6-tidyverse.html)  
+7. [Valim ja populatsioon. Hüpoteesid ja tõenäosus](7-valim_hypoteesid.html) 
+8. <span class="vana">[Parameetrilised ja mitteparameetrilised testid](8-parameetrilised_mitteparameetrilised.html)</span>  
+9. <span class="vana">[Arvuliste tunnuste vahelised seosed](9-arvuliste_seosed.html)</span>   
+10. <span class="vana">[Mittearvuliste tunnuste vahelised seosed](10-mittearvuliste_seosed.html)</span>    
+11. <span class="vana">[Lineaarse regressiooni mudelid (1)](11-lineaarsed1.html)</span>   
+12. <span class="vana">[Lineaarse regressiooni mudelid (2)](12-lineaarsed2.html)</span>  
+13. <span class="vana">[Lineaarse regressiooni segamudelid](13-lineaarsed_sega.html)</span>  
+14. <span class="vana">[Logistilise regressiooni mudelid (1)](14-logistilised1.html)</span>   
+15. <span class="vana">[Logistilise regressiooni mudelid (2)](15-logistilised2.html)</span>  
+16. <span class="vana">[Logistilise regressiooni mudelid (3) ja logistilise regressiooni segamudelid](16-logistilised3_sega.html)</span>   
+17. <span class="vana">[Tingimuslikud otsustuspuud](17-otsustuspuud.html)</span>  
+18. <span class="vana">[Juhumetsad](18-juhumetsad.html)</span> 
+
+
+![](imgs/HITSA_logo.png){width=20%}
+
+<input type="text" id="searchInput" placeholder="Otsi märksõna järgi">
+<button onclick="search()">Otsi</button>
+
+<div id="searchResults">
+</div>
