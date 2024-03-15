@@ -179,7 +179,7 @@ Selles andmestikus on ainult 5 tunnust: `X` (sõna ise), `Length` (sõna pikkus 
 Tahaksime teada, kas sõna-mittesõna otsuse tegemiseks kuluv aeg sõltub sõna pikkusest. Meie hüpotees on, et pikemate sõnade äratundmiseks kuluv aeg on pikem.
 ```{r, fig.show='hold'}
 # Teeme kõigepealt joonise
-plot(ldt$Length, ldt$Mean_RT)
+plot(x = ldt$Length, y = ldt$Mean_RT)
 # või
 # plot(ldt$Mean_RT ~ ldt$Length)
 # või
@@ -191,8 +191,7 @@ Lisame ka regressioonijoone, mis lihtsustatult öeldes näitab üldist suundumus
 ```{r, fig.show='hold'}
 plot(Mean_RT ~ Length, ldt)
 abline(lm(Mean_RT ~ Length, ldt), col = "red")
-# abline-funktsioon peab alati järgnema
-# joonise funktsioonile
+# abline-funktsioon peab alati järgnema joonise funktsioonile
 ```
 ```{r}
 # Sama asi ggplotiga
@@ -619,3 +618,12 @@ Siin saame t-testiga statistiliselt ebaolulise tulemuse (olulisuse nivool 0.05) 
 ## Järgmises praktikumis
 
 Mittearvuliste tunnuste vahelised seosed.
+
+## Funktsioonide sõnastik
+
+- `cor(x, y)` - annab ainult korrelatsioonikordaja
+- `cor.test(x, y)` - korrelatsiooni test
+
+- plot(y~x) - kahe arvulise tunnusega joonis
+- abline() - lisab sirge joone sirge joone, sisendiks võib olla kas horisontaalse või vertikaalse koordinaadi väärtus või regressioonijoone joonistamiseks lineaarse regressiooni funktsioon:
+- abline(lm(y~x)) - lineaarne regressioonijoon joonisele; lineaarsest regressioonist ülejärgmises praktikumis
