@@ -43,11 +43,11 @@ Nüüd liigume edasi kahe tunnuse vaheliste seoste juurde ning vaatleme korrelat
 - korrelatsioonide visualiseerimine
 - testi võimsus  
 
-Andmestikud, mida see kord kasutame: `ldt.csv` ja `DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt`.
+Andmestikud, mida see kord kasutame: uus andmestik `ldt.csv` ja eelmisest korrast tuttav üllatusküsimused.
 
 ```{r}
 ldt <- read.csv("data/ldt.csv")
-dr <- read.delim("data/DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt", encoding = "UTF-8")
+load("data/yllatuskysimused_koneleja_keskmised.Rda")
 ```
 
 ## Sõltuvuse tüübid
@@ -179,7 +179,7 @@ Selles andmestikus on ainult 5 tunnust: `X` (sõna ise), `Length` (sõna pikkus 
 Tahaksime teada, kas sõna-mittesõna otsuse tegemiseks kuluv aeg sõltub sõna pikkusest. Meie hüpotees on, et pikemate sõnade äratundmiseks kuluv aeg on pikem.
 ```{r, fig.show='hold'}
 # Teeme kõigepealt joonise
-plot(ldt$Length, ldt$Mean_RT)
+plot(x = ldt$Length, y = ldt$Mean_RT)
 # või
 # plot(ldt$Mean_RT ~ ldt$Length)
 # või
@@ -191,8 +191,7 @@ Lisame ka regressioonijoone, mis lihtsustatult öeldes näitab üldist suundumus
 ```{r, fig.show='hold'}
 plot(Mean_RT ~ Length, ldt)
 abline(lm(Mean_RT ~ Length, ldt), col = "red")
-# abline-funktsioon peab alati järgnema
-# joonise funktsioonile
+# abline-funktsioon peab alati järgnema joonise funktsioonile
 ```
 ```{r}
 # Sama asi ggplotiga
@@ -398,53 +397,46 @@ Spearmani ja Kendalli korrelatsioonikordaja olulisuse testimisel on kaks eeldust
 
 Ilmselgelt peab tegemist olema ka monotoonse seosega, vastasel juhul ei ole korrelatsioonikordajal mingit sisu.
 
-## Korrelatsioon doktoritööde bibliograafia näitel
+## Korrelatsioon üllatusküsimuste näitel
 
-Vaatleme näiteks, kas eesti ja üldkeeleteaduse instituudis aastatel 1994-2021 kaitstud doktoritööd on läinud aastatega mahukamaks?
+Siin osas me nüüd ei vaata arvuliste tunnuste erinevusi (või seoseid) kahe küsimustüübi rühma vahel vaid kahe arvulise tunnuse vahelisi seoseid rühmast sõltumata. Võtame vaadeldavateks tunnusteks kestuse ja põhitooni ulatuse: kas põhitooni liikumine lausungi jooksul võiks olla seotud lausungi kestusega?
+
+H0: kestuse ja põhitooni ulatuse vahel seos puudub
+H1: pikema kestusega lausungitel on suurem põhitooni ulatus
+
+
 ```{r}
-dr <- read.csv("data/DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt", 
-               encoding = "UTF-8", head = TRUE, sep = "\t")
-plot(dr$aasta, dr$lk); abline(lm(dr$lk ~ dr$aasta))
+load("data/yllatuskysimused_koneleja_keskmised.Rda")
+plot(f0_ulat_sem~kestus, data = ylla); abline(lm(f0_ulat_sem~kestus, data = ylla))
 ```
+
 
 Kontrollime, kas tunnused on normaaljaotusega.
 ```{r, eval = FALSE}
-hist(dr$aasta)
-shapiro.test(dr$aasta)
+# mäletame eelmisest korrast, et ei ole
+hist(ylla$kestus)
+shapiro.test(ylla$kestus)
 
-hist(dr$lk)
-shapiro.test(dr$lk)
+hist(ylla$f0_ulat_sem)
+shapiro.test(ylla$f0_ulat_sem)
 ```
 
 Kuna tunnused ei ole kumbki normaaljaotusega, oleks parem kasutada Spearmani või Kendalli korrelatsioonikordajat.
 
 ```{r}
-cor.test(dr$aasta, dr$lk, method = "spearman", alternative = "greater")
+cor.test(ylla$f0_ulat_sem, ylla$kestus, method = "spearman", alternative = "greater")
 # kui pole otsest eeldust, mille kohaselt negatiivne korrelatsioon ei tohiks võimalik olla,
 # võiks tegelikult testida kahepoolset hüpoteesi
-cor.test(dr$aasta, dr$lk, method = "spearman", alternative = "two.sided")
+cor.test(ylla$f0_ulat_sem, ylla$kestus, method = "spearman", alternative = "two.sided")
 ```
 
-Nende andmete põhjal ei saa me väita, et korrelatsioon oleks ei tugev ega ka statistiliselt oluline.
-
-Aga kas pealkirjad on läinud pikemaks?
-```{r}
-dr$pealp <- nchar(dr$pealkiri)
-plot(dr$pealp ~ dr$aasta)
-abline(lm(dr$pealp ~ dr$aasta))
-```
-
-```{r}
-cor.test(dr$aasta, dr$pealp, 
-         method = "spearman", 
-         alternative = "greater")
-```
+Seos on oluline ja positiivne: pikema kestusega küsimustel on suurem põhitooni ulatus.
 
 Arvutame ka Kendalli tau.
 ```{r}
-cor.test(dr$aasta, dr$pealp, 
+cor.test(ylla$f0_ulat_sem, ylla$kestus, 
          method = "kendall",
-         alternative = "greater")
+         alternative = "two.sided")
 ```
 
 
@@ -454,28 +446,26 @@ Selle üle vaieldakse ja tavaliselt valitakse see, mis vastavas uurimisvaldkonna
 Vaatame veel lõpuks, kas meil oli tegu ikka puhtalt monotoonse seosega.
 
 ```{r}
-ggplot(data = dr, 
-       aes(x = aasta, y = pealp)) +
+ggplot(data = ylla, 
+       aes(x = kestus, y = f0_ulat_sem)) +
   geom_point(shape = 1) +
   geom_smooth(method = "loess")
 ```
 
-Tundub, et tegelikult on doktoritööde pealkirjade pikkus pisut kasvanud ainult 2016. aastani, pärast seda aga jälle langenud ning siis jälle üles läinud.
-
-Aga äkki on eesti- ja ingliskeelsete doktoritööde hulgas suhe erinev? Jagame eesti- ja ingliskeelsed tööd eri ggploti paneelidele ja lisame kummalegi paneelile `ggpubr`-paketist korrelatsioonikordaja ja *p*-väärtuse.  
+Pigem on monotoonne: mittelineaarne regressioonijoon teeb küll väikse jõnksu alla umbes 0.8 sekundi pikkuste lausungite juures, aga see jõnks ei pruugi olla oluline. Võimalik et jõnks on tingitud kahetipulisest jaotusest: mäletatavasti on infoküsimustel keskmiselt lühem kestus kui üllatusküsimustel. Jagame info- (ISQ) ja üllatusküsimused (SQ) eri ggploti paneelidele ja lisame kummalegi paneelile `ggpubr`-paketist korrelatsioonikordaja ja *p*-väärtuse.  
 
 ```{r}
 # install.packages("ggpubr")
 library(ggpubr)
 
-ggplot(data = dr, 
-       aes(x = aasta, y = pealp)) +
+ggplot(data = ylla, 
+       aes(x = kestus, y = f0_ulat_sem)) +
   geom_point(shape = 1) +
   geom_smooth(method = "lm") +
-  facet_wrap("keel") +
+  facet_wrap("tyyp1") +
   stat_cor(method = "spearman", 
            cor.coef.name = "rho",
-           alternative = "greater") 
+           alternative = "two.sided") 
 ```
 
 ## Kuidas korrelatsioonitesti tulemust raporteerida
@@ -484,7 +474,7 @@ Nagu t-testi puhul, saame ka siin kasutada paketti `report`.
 
 ```{r, warning=F, message=F}
 library(report)
-report(cor.test(dr$aasta, dr$pealp, method = "spearman", alternative = "greater"))
+report(cor.test(ylla$f0_ulat_sem, ylla$kestus, method = "spearman", alternative = "two.sided"))
 ```
 
 
@@ -540,7 +530,7 @@ Eelkõige küsitluste puhul on meil sageli mitu järjestusskaalal tunnust ning t
 ```{r}
 #Andmestik Euroopa linnade meelelahutuskohtade, söögikohtade, 
 # vaatamisväärsuste jm hinnangute kohta.
-load(url("http://www.ms.ut.ee/mart/andmeteadus/ratings.RData"))
+load(url("https://www-1.ms.ut.ee/mart/andmeteadus/ratings.RData"))
 head(ratings)
 ```
 ```{r, message = FALSE, warning = FALSE}
@@ -600,7 +590,7 @@ Testi võimsuse analüüs aitab nõnda näiteks aru saada, kas statistiliselt eb
 Ka t-testile on `pwr` paketis oma funktsioon.
 
 ```{r, results='hold'}
-load("data/kysimustik_2023.RData")
+load("data/kysimustik_2024.RData")
 t.test(log(kysimustik$kaua_opid) ~ kysimustik$kogemused_kvant, 
        var.equal = TRUE)
 
@@ -619,3 +609,12 @@ Siin saame t-testiga statistiliselt ebaolulise tulemuse (olulisuse nivool 0.05) 
 ## Järgmises praktikumis
 
 Mittearvuliste tunnuste vahelised seosed.
+
+## Funktsioonide sõnastik
+
+- `cor(x, y)` - annab ainult korrelatsioonikordaja
+- `cor.test(x, y)` - korrelatsiooni test
+
+- plot(y~x) - kahe arvulise tunnusega joonis
+- abline() - lisab sirge joone sirge joone, sisendiks võib olla kas horisontaalse või vertikaalse koordinaadi väärtus või regressioonijoone joonistamiseks lineaarse regressiooni funktsioon:
+- abline(lm(y~x)) - lineaarne regressioonijoon joonisele; lineaarsest regressioonist ülejärgmises praktikumis
