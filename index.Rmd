@@ -37,7 +37,7 @@ body {
 6. [Pakett `tidyverse` andmete töötlemiseks](6-tidyverse.html)  
 7. [Valim ja populatsioon. Hüpoteesid ja tõenäosus](7-valim_hypoteesid.html) 
 8. [Parameetrilised ja mitteparameetrilised testid](8-parameetrilised_mitteparameetrilised.html)  
-9. <span class="vana">[Arvuliste tunnuste vahelised seosed](9-arvuliste_seosed.html)</span>   
+9. [Arvuliste tunnuste vahelised seosed](9-arvuliste_seosed.html)   
 10. <span class="vana">[Mittearvuliste tunnuste vahelised seosed](10-mittearvuliste_seosed.html)</span>    
 11. <span class="vana">[Lineaarse regressiooni mudelid (1)](11-lineaarsed1.html)</span>   
 12. <span class="vana">[Lineaarse regressiooni mudelid (2)](12-lineaarsed2.html)</span>  
