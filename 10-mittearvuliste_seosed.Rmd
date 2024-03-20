@@ -69,7 +69,25 @@ tab <- matrix(c(43, 77, 377, 343), # koosesinemise sagedused
 tab
 ```
 
-(Kui meil oleks vormikasutuse kohta põhjalikum andmestik, saaks risttabelit saaks mõistagi teha ka andmestiku tunnustest, nt `table(andmed$tunnus1, andmed$tunnus2)`.)
+Kui meil oleks vormikasutuse kohta põhjalikum andmestik, saaks risttabelit saaks mõistagi teha ka andmestiku tunnustest, nt `table(andmed$tunnus1, andmed$tunnus2)`.
+
+```{r, message=F, results = 'hold', warning=F}
+library(tidyverse)
+
+# teeme esmalt table-objektist data.frame-objekti
+df_pikk <- tab %>% # võtame table-tüüpi objekti
+  as.data.frame() %>% # teisendame selle data.frame-tüüpi objektiks
+  rownames_to_column(var = "Vorm") %>% # paneme pakutud reanimed tulpa "Vorm"
+  pivot_longer(cols = c("Pärisnimi", "Üldnimi"), # teeme laiast tabelist "pika", nii et võtame pärisnime ja üldnime tulbad,
+               names_to = "Liik", # paneme need tulbanimed ("Pärisnimi", "Üldnimi") pika tabeli tulpa "Liik" 
+               values_to = "Sagedus") %>% # tulpades olevad sagedused pika tabeli tulpa "Sagedus"
+  slice(rep(1:n(), times = Sagedus)) %>% # korda igat rida nii mitu korda kui on väärtus sama rea tulbas "Sagedus"
+  select(-Sagedus) # eemalda tulp "Sagedus"
+df_pikk
+
+table(df_pikk$Vorm, df_pikk$Liik)
+```
+
 
 
 Visualiseerime sagedusi.  
@@ -90,30 +108,27 @@ par(mfrow = c(1, 1)) # vii sätted uuesti algsele kujule
 ```
 
 
-Kui meil on kasutada ainult sagedustabel (st meil pole algandmeid, kus ridades on vaatlused ja tulpades on tunnused, nt `vorm` ja `nimelisus`), siis peame ggploti kasutamiseks sagedustabeli esmalt pikaks `data.frame` tüüpi tabeliks teisendama.  
+Kui meil on kasutada ainult sagedustabel (st meil pole algandmeid, kus ridades on vaatlused ja tulpades on tunnused, nt `vorm` ja `nimelisus`), siis peame ggploti kasutamiseks sagedustabeli esmalt `data.frame` tüüpi tabeliks teisendama.  
 
-
-```{r, message=F, results = 'hold', warning=F}
-library(tidyverse)
-
-# teeme esmalt table-objektist data.frame-objekti
-tab_pikk <- tab %>% # võtame table-tüüpi objekti
+```{r}
+df <- tab %>% # võtame table-tüüpi objekti
   as.data.frame() %>% # teisendame selle data.frame-tüüpi objektiks
   rownames_to_column(var = "Vorm") %>% # paneme pakutud reanimed tulpa "Vorm"
-  pivot_longer(cols = c("Pärisnimi", "Üldnimi"), # teeme laiast tabelist pika, nii et võtame pärisnime ja üldnime tulbad,
+  pivot_longer(cols = c("Pärisnimi", "Üldnimi"), # teeme laiast tabelist "pika", nii et võtame pärisnime ja üldnime tulbad,
                names_to = "Liik", # paneme need tulbanimed ("Pärisnimi", "Üldnimi") pika tabeli tulpa "Liik" 
-               values_to = "Sagedus") # tulpades olevad sagedused pika tabeli tulpa "Sagedus"
+               values_to = "Sagedus")
 ```
+
 
 ```{r}
 # esimene joonis:
-ggplot(tab_pikk) +
+ggplot(df) +
   geom_col(aes(x = Liik, y = Sagedus, fill = Vorm), position = "dodge") +
   scale_fill_manual(values = c("gold1", "grey50")) +
   theme(legend.position = "top") -> p1
 
 # teine joonis:
-ggplot(tab_pikk) +
+ggplot(df) +
   geom_col(aes(x = Liik, y = Sagedus, fill = Vorm), position = "fill", show.legend = F) +
   scale_fill_manual(values = c("gold1", "grey50")) +
   labs(y = "Suhteline sagedus") -> p2
@@ -237,7 +252,7 @@ Hii-ruut-test ise ütleb lihtsalt, et kahe kategoriaalse tunnuse vahel on statis
 t$residuals
 ```
 
-Kui jääk on positiivne, on tegelik sagedus suurem kui oodatud ja konkreetne tunnuste kombinatsioon esineb oluliselt sagedamini kui marginaalsageduste põhjal võiks oletada. Kui jääk on negatiivne, on tegelik sagedus väiksem kui oodatud. Näiteks pärisnimed esinevad oodatust harvemini lühikeses sisseütlevas käändes (nt *läksin Tartu*).
+Kui jääk on positiivne, on tegelik sagedus suurem kui oodatud ja konkreetne tunnuste kombinatsioon esineb sagedamini kui marginaalsageduste põhjal võiks oletada. Kui jääk on negatiivne, on tegelik sagedus väiksem kui oodatud. Näiteks pärisnimed esinevad oodatust harvemini lühikeses sisseütlevas käändes (nt *läksin Tartu*).
 
 Teeme jääkide graafiku.
 
@@ -360,6 +375,8 @@ pwr.chisq.test(w = w, N = N, df = df, sig.level = 0.05)
 ```
 
 
+Siin näiteks on tõenäosus, et me **ei tee teist tüüpi viga** (ütleme, et seost ei ole, kui tegelikult on), ~92%. See on päris hea.   
+
 ## Harjutus 2
 
 Leia, millised soo ja valimisnimekirja kombinatsioonid panustavad kõige enam hii-ruut-testi tulemusse (standardiseeritud **jäägid**), kui tugev on **seos** soo ja valimisnimekirja vahel ning milline on testi **võimsus**.  
@@ -437,7 +454,7 @@ Näiteks kui oodatud sagedustega tabel näeb välja selline:
 ```{r}
 chisq.test(tab2)$expected
 ```
-siis kolm juhuslikult genereeritud tabelit näeksid välja sellised:  
+siis kolm juhuslikult genereeritud tabelit võiksiv välja näha umbes sellised:  
 
 ```{r}
 (ts1 <- matrix(c(3,6,1,4,368,410,19,29), nrow= 2, 
