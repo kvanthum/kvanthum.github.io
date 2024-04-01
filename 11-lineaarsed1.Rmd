@@ -27,10 +27,10 @@ knitr::opts_chunk$set(echo = TRUE)
 - ANOVA
 - Post-hoc test (Tukey HSD)
 
-Kasutame vanu tuttavaid andmestikke: 
+Kasutame andmestikke: 
 
 - `ldt.csv`
-- `DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt`
+- `teke2` (loeme otse dataDOI repositooriumist, ei pea faili alla laadima)
 - `kandidaadid2019.RData`
 
 
@@ -93,7 +93,20 @@ summary(m)
 
 ### Kas mudeli jäägid on normaaljaotusega?
 
-Mudeli jäägid (*residuals*) on see osa uuritava tunnuse väärtustest, mis jääb mudelis kirjeldavate tunnuste kaudu seletamata. See on siis iga mõõtmispunkti kaugus regressioonijoonest. Lineaarse mudeli eeldus on, et mudeli jäägid on normaaljaotusega. Testime:
+Mudeli jäägid (*residuals*) on see osa uuritava tunnuse väärtustest, mis jääb mudelis kirjeldavate tunnuste kaudu seletamata. See on siis iga mõõtmispunkti kaugus regressioonijoonest. 
+
+```{r}
+plot(Mean_RT~Length, data=ldt2);abline(lm(m), col = "red")
+for (i in 1:nrow(ldt2)) {
+  lines(rep(ldt2$Length[i], 
+            length(ldt2$Mean_RT[i]:m$fitted[i])),
+        ldt2$Mean_RT[i]:m$fitted[i],
+        lty = "dashed")
+}
+```
+
+Lineaarse mudeli eeldus on, et mudeli jäägid on normaaljaotusega. Testime:
+
 ```{r}
 hist(residuals(m))
 shapiro.test(residuals(m))
@@ -132,24 +145,33 @@ Vabaliige on y telje väärtus, kui x on 0, kalle on y väärtuse muutus, kui x 
 
 ## Harjutus
 
-### Harjutus e Näide 2: Kas doktoritööde maht on aastatega kahanenud?
+### Harjutus e Näide 2: Kas kõnetempo sõltub vanusest?
 
-1) Loeme sisse tabeli eesti keele eriala doktoritööde bibliograafiaga failist `DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt`. Kuna see on tabulatsioonidega eristatud tabelifail, siis võib selle lugemiseks kasutada `read.table()` alamkäsku `read.delim()`. Funktsioon on sama, argumentide vaikeväärtused on veidi erinevad, mistõttu tabulatsioonidega eristatud väljadega ja päisereaga andmestiku puhul peab vähem argumente lisama. Siiski kui tahame, et teksti sisaldavad tulbad loetaks kohe sisse faktoritena, siis alates R versioonist 4 peaks lisama argumendi stringsAsFactors = T.
+Kasutame kõnetempo andmestikku artiklist Lippus, Pilvik, Lõo & Lindström 2024 (ilmub aprillis Rakenduslingvistika Ühingu aastaraamatus) ja vaatame, kas kõnetempo sõltub vanusest.
 
-```{r, echo=F}
-dokt <- read.delim("data/DISSERTATIONES_PHILOLOGIAE_ESTONICAE.txt", stringsAsFactors = T)
+1) Loeme DataDOI repositooriumist TeKE korpusel põhineva teismeliste kõnelejate spontaanse kõne andmestiku.
+
+```{r, echo=T}
+load(url("https://datadoi.ee/bitstream/handle/33/592/teke_globaalne_konetempo.Rda?sequence=21&isAllowed=y"))
 ```
+
+Arvutame kõnetempo, mis peaks olema kõneleja silpide arv jagatud tema kõnevoorude kestusega:
+
+```{r, echo=T}
+teke2$konetempo <- teke2$silpide_arv/teke2$kestus
+```
+
 2) Kontrollime mudeli eeldusi:
 
-- Sõltumatute tunnuste eeldus kehtib: mõõtmised on sõltumatud, iga rida andmestikus on üks iseseisev dissertatsioon, korduvaid autoreid või korduvaid väitekirju ei esine.
-- kas lehekülgede arv ja ilmumisaasta on normaaljaotusega? Kontrollime qqnorm ja Shapiro testiga.
+- Sõltumatute tunnuste eeldus: iga vestluse iga kõneleja kohta on andmestikus küll üks rida, aga on suurem osa kõnelejaid osalesid rohkem kui ühes vestluses. Õigem oleks kasutada segamudelit.
+- Mis jaotusega on kõnetempo ja vanus? Kontrollime qqnorm ja Shapiro testiga.
 
 3) Mis võiks olla uuritav tunnus, mis kirjeldav? Sõnastame hüpoteesid. 
 
 4) Teeme lineaarse mudeli.
 
 ```{r, echo=F}
-mudel <- lm(lk~aasta, data=dokt)
+mudel <- lm(konetempo~vanus, data=teke2)
 ```
 
 5) Kas mudeli jäägid on normaaljaotusega?
@@ -163,7 +185,7 @@ mudel <- lm(lk~aasta, data=dokt)
 7) Teeme joonise ka
 
 ```{r, echo=F, eval=F}
-plot(lk~aasta, data=dokt, main="Eesti keele doktoritööde maht")
+plot(konetempo~vanus, data=teke2, main="Kõnetempo teismelistel")
 abline(mudel)
 ```
 
@@ -176,15 +198,14 @@ mudel$coefficients
 ```
 
 
-Miks mudeli vabaliige (Intercept) on negatiivne? Sest mudel arvestab seda lõikumisena 0-punktis ja seletava tunnuse *aasta* mõõdetud väärtused on 0-punktist väga kaugel. Kui eeldada lineaarset suhet, siis mudeli järgi oli aastal 0 doktoritööde maht `r round(mudel$coefficients["(Intercept)"])` lehekülge. Eeldades lineaarset kasvu, hindaks see mudel, et kasvades iga aastaga `r round(mudel$coefficients["aasta"],3)` lehekülje võrra, jõudis tööde maht 1994. aastaks `r round(mudel$coefficients["(Intercept)"] + 1994*mudel$coefficients["aasta"])` leheküljeni ja 2022. aastaks `r round(mudel$coefficients["(Intercept)"] + 2022*mudel$coefficients["aasta"])` leheküljeni.
+Mis on mudeli vabaliige (Intercept) väärtus? Mudel arvestab seda lõikumisena 0-punktis ehk et see väärtus oleks uuritaval tunnusel siis, kui seletava tunnuse *vanus* oleks 0. Tegelikult meil algavad vaatlused alles väärtusest 10. Kui eeldada lineaarset suhet, siis mudeli järgi oli vanuses 0 doktoritööde maht `r round(mudel$coefficients["(Intercept)"])` silpi/sek. Eeldades lineaarset kasvu, hindaks see mudel, et kasvades iga eluaastaga `r round(mudel$coefficients["vanus"],3)` silpi/sek võrra, jõudis tööde maht 10. eluaastaks `r round(mudel$coefficients["(Intercept)"] + 10*mudel$coefficients["vanus"])` silp/sek ja 18. eluaastaks `r round(mudel$coefficients["(Intercept)"] + 18*mudel$coefficients["vanus"])` silp/sek.
 
 ```{r}
-plot(lk~aasta, data=dokt, main="Eesti keele doktoritööde maht", xlim=c(0, 2020), ylim=c(-4700, 500))
+plot(konetempo~vanus, data=teke2, main="Kõnetempo teismelistel", xlim=c(0, 80), ylim=c(3,16))
 abline(mudel)
 ```
 
-Tegelikult ei peaks muidugi vaatama mudelit tegelike andmete muutumispiirkonnast väljaspool. Mõningatel juhtudel on kasulik teisendada andmeid nii, et 0 oleks näiteks esimene vaadeldav aasta, kust meil on mõõtmisi (st aasta 1994, kui toimusid esimesed doktoritööde kaitsmised), sellisel juhul on vabaliige ja kirjeldavate tunnuste efektid paremini interpreteeritavad. 
-
+Tegelikult ei peaks muidugi vaatama mudelit tegelike andmete muutumispiirkonnast väljaspool. Mõningatel juhtudel on kasulik teisendada andmeid nii, et 0 oleks näiteks esimene vaadeldav aasta, kust meil on mõõtmisi (st siin 10-aastased), sellisel juhul on vabaliige ja kirjeldavate tunnuste efektid paremini interpreteeritavad. Siin andmestikus väga suurt nihet sellega pole, aga kui me näiteks vanuse asemel hindaks sünniaastat ja need algaksid umbes 2000. aastast, siis lineaarne kasv `r round(mudel$coefficients["vanus"],3)` silpi/sek võrra aastas eeldaks, et 0 aastal oli kõnetempo `r round(mudel$coefficients["(Intercept)"] + -2000*mudel$coefficients["vanus"])` silpi sekundis, mis ei meigi mingit senssi.
 
 ## Seletav tunnus nominaalne
 
@@ -204,7 +225,7 @@ load("data/kandidaadid2019.RData")
 ```
 Kas mudeli eeldused on täidetud?
 
-- Mäletatavasti tunnus hääli_kokku ei ole normaaljaotusega, aga kui see logaritmida, siis vastab normaaljaotuse tunnustele. Kuna kandidaate oli rohkem kui 30, siis võiks ka normaaljaotuse eeldust ignoreerida, aga kui logaritmimine aitab normaalajotust saavutada, siis võiks seda ikkagi teha.
+- Tunnus hääli_kokku ei ole normaaljaotusega, aga kui see logaritmida, siis vastab normaaljaotuse tunnustele. Kuna kandidaate oli rohkem kui 30, siis võiks ka normaaljaotuse eeldust ignoreerida, aga kui logaritmimine aitab normaalajotust saavutada, siis võiks seda ikkagi teha.
 - Mõõtmised on sõltumatud: iga kandidaat on individuaalne isik ja esindatud andmestikus ühe reaga.
 
 Sõltuva ja sõltmatu tunnuse määramisel ei ole siin ilmselt vaja pikalt mõelda, sest juba tehniliselt kui me tahame kasutada lineaarset mudelit, siis uuritav tunnus peab olema arvuline. Ja kui oleks võimalus, et kandidaadi sugu võiks mõjutada see, kui palju ta hääli sai, siis peaksime valima hoopis logistilise regressioonimudeli, millest tuleb juttu umbes üle-ülejärgmises praktikumis :)
@@ -481,3 +502,12 @@ d) kordustestid rohkem kui kahe tasemega faktori olulisuse kontrollimiseks
 - Mitme tunnusega lineaarsed mudelid
 - Interaktsioonid
 - Mudelite võrdlemine ja optimaalse mudeli leidmine
+
+## Funktsioonide sõnastik
+
+- `lm(y ~ x)` -- lineaarne mudel
+- `summary(lm())` -- lineaarse mudeli väljund
+- `anova(lm())` -- anova test
+- `summary(aov())` -- anova test (sama mis eelmine)
+- `TukeyHSD(aov())` -- Tukey test (post-hoc)
+- `p.adjust()` -- p-väärtuste korrigeerimine (Bonferroni, Holm)
