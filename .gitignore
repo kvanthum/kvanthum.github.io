@@ -50,3 +50,6 @@ vignettes/*.pdf
 # Homework
 /kodutood/
 /lopuprojektid/
+
+# MacOs files
+.DS_Store

@@ -105,13 +105,9 @@ for (i in 1:nrow(ldt2)) {
 }
 ```
 
-<<<<<<< HEAD
 
 Mudeli väljund on oma olemuselt list (vt `mode(m)` ja `str(m)`). Mudeli jäägid on vektorina ..$residuals all ja selle vektori iga väärtus vastab ühele andmestiku mõõtmispunktile.
 
-
-=======
->>>>>>> 1fc50a16818610f4724df42d202e97b61fe44781
 Lineaarse mudeli eeldus on, et mudeli jäägid on normaaljaotusega. Testime:
 
 ```{r}
@@ -206,18 +202,11 @@ mudel$coefficients
 
 
 Mis on mudeli vabaliige (Intercept) väärtus? Mudel arvestab seda lõikumisena 0-punktis ehk et see väärtus oleks uuritaval tunnusel siis, kui seletava tunnuse *vanus* oleks 0. Tegelikult meil algavad vaatlused alles väärtusest 10. Kui eeldada lineaarset suhet, siis mudeli järgi oli vanuses 0 doktoritööde maht `r round(mudel$coefficients["(Intercept)"])` silpi/sek. Eeldades lineaarset kasvu, hindaks see mudel, et kasvades iga eluaastaga `r round(mudel$coefficients["vanus"],3)` silpi/sek võrra, jõudis tööde maht 10. eluaastaks `r round(mudel$coefficients["(Intercept)"] + 10*mudel$coefficients["vanus"])` silp/sek ja 18. eluaastaks `r round(mudel$coefficients["(Intercept)"] + 18*mudel$coefficients["vanus"])` silp/sek.
-<<<<<<< HEAD
-
 
 Eeldades, et seos on lineaarne, saame me selle kehtimist laiendada näiteks inimese elueale 0-90 eluaastani
 
 ```{r}
 plot(konetempo~vanus, data=teke2, main="Kõnetempo muutumine sõltuvalt vanusest", xlim=c(0, 90), ylim=c(3,18))
-=======
-
-```{r}
-plot(konetempo~vanus, data=teke2, main="Kõnetempo teismelistel", xlim=c(0, 80), ylim=c(3,16))
->>>>>>> 1fc50a16818610f4724df42d202e97b61fe44781
 abline(mudel)
 ```
 
@@ -523,14 +512,9 @@ d) kordustestid rohkem kui kahe tasemega faktori olulisuse kontrollimiseks
 
 - `lm(y ~ x)` -- lineaarne mudel
 - `summary(lm())` -- lineaarse mudeli väljund
-<<<<<<< HEAD
 - `anova(lm())` -- ANOVA test
 - `summary(aov())` -- ANOVA test (sama mis eelmine)
 - `TukeyHSD(aov())` -- Tukey test (post-hoc ANOVAle)
 - `p.adjust()` -- p-väärtuste korrigeerimine (Bonferroni, Holm ...)
-=======
-- `anova(lm())` -- anova test
-- `summary(aov())` -- anova test (sama mis eelmine)
-- `TukeyHSD(aov())` -- Tukey test (post-hoc)
-- `p.adjust()` -- p-väärtuste korrigeerimine (Bonferroni, Holm)
->>>>>>> 1fc50a16818610f4724df42d202e97b61fe44781
+
+
