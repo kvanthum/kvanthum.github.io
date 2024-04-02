@@ -40,14 +40,14 @@ Loeme sisse `ldt.csv` andmestiku, kust eelmisel korral vaatasime reaktsiooniaja 
 ```{r}
 ldt <- read.csv("data/ldt.csv")
 # Jätame alles ainult read, kus Mean_RT < 1200 ms
-ldt1 <- ldt[ldt$Mean_RT < 1200,]
+ldt2 <- ldt[ldt$Mean_RT < 1200,]
 ```
 Nüüd proovime, kas mudel läheb paremaks, kui me lisame sinna seletavaid tunnuseid. Üks sõnade äratundmiseks kuluvat reaktsiooniaega mõjutav tunnus võiks lisaks sõna pikkusele olla sõna sagedus: võiks oletada, sagedasemaid sõnu tunneme me ära kiiremini kui vähemsagedasi.
 
 Enne mudelisse lisamist vaatame selle faktori jaotust. 
 
 ```{r}
-hist(ldt1$Freq)
+hist(ldt2$Freq)
 ```
 
 Sagedus on tugevalt paremale kaldu, seda on juba histogrammilt näha. Proovime logaritmida. 
@@ -65,9 +65,9 @@ log(1:3); log1p(0:2)
 
 Testime normaaljaotust logaritmitud väärtustega:
 ```{r}
-qqnorm(log1p(ldt1$Freq))
-qqline(log1p(ldt1$Freq))
-shapiro.test(log1p(ldt1$Freq))
+qqnorm(log1p(ldt2$Freq))
+qqline(log1p(ldt2$Freq))
+shapiro.test(log1p(ldt2$Freq))
 ```
 
 
@@ -77,8 +77,8 @@ Läheme edasi mudeliga. Mudelis lisatakse sõltumatud tunnused +-märgiga. Kui e
 
 
 ```{r}
-ldt1.mod1 <- lm(Mean_RT ~ Length + log1p(Freq), 
-               data = ldt1)
+ldt2.mod1 <- lm(Mean_RT ~ Length + log1p(Freq), 
+               data = ldt2)
 ```
 
 
@@ -86,7 +86,7 @@ ldt1.mod1 <- lm(Mean_RT ~ Length + log1p(Freq),
 ## Kuidas mudelit lugeda?
 
 ```{r}
-summary(ldt1.mod1)
+summary(ldt2.mod1)
 ```
 
 - Samamoodi nagu ühe seletava tunnusega mudeli puhul tuleks vaadata kõige pealt väljundi viimast rida, et kas mudel on oluline. See mudel on, p<0.001
@@ -101,7 +101,7 @@ Vaatame nüüd koefitsientide tabelit (*Coefficients*).
 
 Me võime mudelit testida, arvutades välja prognoosi seletavate tunnuste keskmiste väärtuste korral ning võrrelda seda reaalse andmestiku keskmisega. Tegelikud keskmised väärtused on:
 ```{r}
-apply(ldt1[,-1], 2, mean)
+apply(ldt2[,-1], 2, mean)
 ```
 paneme need valemisse <br>
 **RT = 762 + 19 \*  pikkus - 21 \* log1p(sagedus)**
@@ -111,38 +111,38 @@ paneme need valemisse <br>
 
 Mudeli prognoose võime muidugi ka otse mudelist lugeda ja valemites rakendada. Vaatame `lm()` käsuga saadud objekti, et saada natuke aimu, mis struktuuriga objekt see on:
 ```{r, eval=F}
-str(ldt1.mod1); names(ldt1.mod1$coefficients)
+str(ldt2.mod1); names(ldt2.mod1$coefficients)
 ```
 
 Käsk `str()` aitab ehk kõige paremini lm objekti lahti muukida: tegemist on listilaadse objektiga, kus element "coefficients" on vektor mudeli prognooside väärtustega. Kasutame nüüd neid koefitsentide väärtusi, et arvutada mudeliprognoose. Nii saame arvutada, mis võiks olla reaktsiooniaeg keskmise pikkusega keskmise sagedusega sõna korral:
 
 ```{r, eval=T}
-ldt1.mod1$coefficients["(Intercept)"] + 
-  mean(ldt1$Length) * ldt1.mod1$coefficients["Length"] + 
-  log1p(mean(ldt1$Freq)) * ldt1.mod1$coefficients["log1p(Freq)"]
+ldt2.mod1$coefficients["(Intercept)"] + 
+  mean(ldt2$Length) * ldt2.mod1$coefficients["Length"] + 
+  log1p(mean(ldt2$Freq)) * ldt2.mod1$coefficients["log1p(Freq)"]
 ```
 
 
 Joonistame mudeli põhjal regressioonijooned nii, et teise tunnuse väärtus oleks keskmine, mitte 0.
 ```{r, fig.align = 'center'}
 par(mfcol = c(1,2)) # Kuva järgmised joonised ühes reas, kahes tulbas
-plot(Mean_RT ~ Length, data = ldt1, 
+plot(Mean_RT ~ Length, data = ldt2, 
      xlab = "Sõna pikkus", ylab = "Keskmine reaktsioonikiirus", 
      main = "Sõna pikkuse mõju\nkeskmise sagedusega sõnadel")
 lines(x = 3:14, 
-      y = (ldt1.mod1$coefficients["(Intercept)"] + 
-               3:14 * ldt1.mod1$coefficients["Length"] +
-               log1p(mean(ldt1$Freq)) * ldt1.mod1$coefficients["log1p(Freq)"]), 
+      y = (ldt2.mod1$coefficients["(Intercept)"] + 
+               3:14 * ldt2.mod1$coefficients["Length"] +
+               log1p(mean(ldt2$Freq)) * ldt2.mod1$coefficients["log1p(Freq)"]), 
       col = "red")
 
-plot(Mean_RT ~ log1p(Freq), data = ldt1, 
+plot(Mean_RT ~ log1p(Freq), data = ldt2, 
      xlab = "Sõna sagedus", ylab = "Keskmine reaktsioonikiirus", 
      main = "Sõna sageduse mõju\nkeskmise pikkusega sõnadel", 
      axes=F)
 lines(x = 0:12, 
-      y = (ldt1.mod1$coefficients["(Intercept)"] + 
-               mean(ldt1$Length) * ldt1.mod1$coefficients["Length"] + 
-               0:12 * ldt1.mod1$coefficients["log1p(Freq)"]), 
+      y = (ldt2.mod1$coefficients["(Intercept)"] + 
+               mean(ldt2$Length) * ldt2.mod1$coefficients["Length"] + 
+               0:12 * ldt2.mod1$coefficients["log1p(Freq)"]), 
       col = "red")
 # Samuti arvestame sellega, et sagedus oli logaritmitud, aga joonisel tahaks päris väärtusi näha.
 box(); axis(side = 2); axis(side = 1, at = 0:12, labels = round(exp(0:12)-1))
@@ -153,39 +153,41 @@ Sama ggplotiga:
 
 ```{r}
 library(ggplot2)
-ggplot(data = ldt1, aes(x = Length, y = Mean_RT)) +
+library(gridExtra) # pakett, millega saab erinevaid jooniseid paneelidena ühe joonise peale kokku panna
+paneel1 <- ggplot(data = ldt2, aes(x = Length, y = Mean_RT)) +
     geom_point(shape = 1) +
-    geom_abline(intercept = ldt1.mod1$coefficients["(Intercept)"] + 
-                    log1p(mean(ldt1$Freq)) * ldt1.mod1$coefficients["log1p(Freq)"],
-                slope = ldt1.mod1$coefficients["Length"],
+    geom_abline(intercept = ldt2.mod1$coefficients["(Intercept)"] + 
+                    log1p(mean(ldt2$Freq)) * ldt2.mod1$coefficients["log1p(Freq)"],
+                slope = ldt2.mod1$coefficients["Length"],
                 color = "red") +
     labs(x = "Sõna pikkus", y = "Keskmine reaktsioonikiirus",
          title = "Sõna pikkuse mõju keskmise sagedusega sõnadel")
 
 
-ggplot(data = ldt1, aes(x = log1p(Freq), y = Mean_RT)) +
+paneel2 <- ggplot(data = ldt2, aes(x = log1p(Freq), y = Mean_RT)) +
     geom_point(shape = 1) +
-    geom_abline(intercept = ldt1.mod1$coefficients["(Intercept)"] + 
-                    mean(ldt1$Length) * ldt1.mod1$coefficients["Length"], 
-                slope = ldt1.mod1$coefficients["log1p(Freq)"],
+    geom_abline(intercept = ldt2.mod1$coefficients["(Intercept)"] + 
+                    mean(ldt2$Length) * ldt2.mod1$coefficients["Length"], 
+                slope = ldt2.mod1$coefficients["log1p(Freq)"],
                 color = "red") +
     scale_x_continuous(breaks = seq(0,12,1),  
                        labels = round(exp(seq(0,12,1)))-1) + # Kuva tavalised sagedused
     labs(x = "Sõna sagedus", y = "Keskmine reaktsioonikiirus",
          title = "Sõna sageduse mõju keskmise pikkusega sõnadel")
+grid.arrange(paneel1, paneel2, ncol=2)
 ```
 
 
 
 Kui tahame sageduse skaalat joonisele lineaarsena (st x-telje intervallid on ühesuurused), siis tuleb regressioonijoon joonistada kõverana.
 ```{r, fig.align = 'center', eval=T, fig.height=5}
-plot(Mean_RT  ~Freq, data = ldt1, 
+plot(Mean_RT  ~Freq, data = ldt2, 
      xlab="Sõna sagedus", ylab="Keskmine reaktsioonikiirus", main="Sõna sagedus", 
      xlim=c(0, 5000))
 
-lines(x = 0:5000, y = (ldt1.mod1$coefficients["(Intercept)"] + 
-                           mean(ldt1$Length) * ldt1.mod1$coefficients["Length"] + 
-                           log1p(0:5000) * ldt1.mod1$coefficients["log1p(Freq)"]), 
+lines(x = 0:5000, y = (ldt2.mod1$coefficients["(Intercept)"] + 
+                           mean(ldt2$Length) * ldt2.mod1$coefficients["Length"] + 
+                           log1p(0:5000) * ldt2.mod1$coefficients["log1p(Freq)"]), 
       col="red")
 box(); axis(side=2); axis(side=1, at=0:12, labels = round(exp(0:12)-1))
 ```
@@ -193,18 +195,37 @@ box(); axis(side=2); axis(side=1, at=0:12, labels = round(exp(0:12)-1))
 
 
 
-Mudeleid saab visualiseerida ka ggploti laiendavate pakettide abil.  
+Mudeleid saab visualiseerida ka ggploti laiendavate pakettide abil. 
 
-```{r, warning = FALSE}
+```{r, warning = FALSE, message=F}
 # install.packages("ggeffects")
 library(ggeffects)
-plot(ggpredict(model = ldt1.mod1), facets = T, add.data = T) + labs(x = "")
+# plot(ggpredict(model = ldt2.mod1), facets = T, add.data = T) + labs(x = "") # see andis veateadet millegi pärast, paketis on vist midagi muutunud?
+paneel1 = plot(ggpredict(model = ldt2.mod1), add.data = T)$Length
+paneel2 = plot(ggpredict(model = ldt2.mod1), add.data = T)$Freq
+grid.arrange(paneel1, paneel2, ncol=2)
 ```
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, eval = F}
 # install.packages("sjPlot")
 library(sjPlot)
-plot_model(ldt1.mod1, type = "pred", grid = T) + labs(x = "")
+plot_model(ldt2.mod1, type = "pred", grid = T) + labs(x = "") #[Maarja-Liisa, see annab veateadet]  
+```
+
+
+### Väike lõbus vahepala: interaktiivsed joonised
+
+Paketiga `plotly` saab ggploti joonised teha interaktiivseks, nii et RStuudios Viewer aknas või RMarkdownist genereeritud html-dokumendis saab joonisel hiirega üle sõites näha punktide väärtuseid ning saab sisse ja välja zoomida:
+
+```{r, warning=F, message=F}
+# install.packages("plotly")
+library(plotly)
+ggplotly(paneel1)
+```
+
+Ja kaks paneeli kõrvuti:
+```{r}
+subplot(ggplotly(paneel1), ggplotly(paneel2))
 ```
 
 
@@ -243,9 +264,9 @@ y ~ x1 + x2 + x3 + x4 +<br>
 Kui enne vaatasime ainult peamõjudega sõna pikkuse ja sageduse efekti reaktsiooniajale, siis nüüd lisame ka interaktsiooni. R-i `lm()` süntaksis võiks selleks kasutada lihtsalt tärni (*), aga kirjutame siin praegu pikalt välja:
 
 ```{r}
-ldt1.mod2 <- lm(Mean_RT ~ Length + log1p(Freq) + Length:log1p(Freq), 
-               data=ldt1)
-summary(ldt1.mod2)
+ldt2.mod2 <- lm(Mean_RT ~ Length + log1p(Freq) + Length:log1p(Freq), 
+               data=ldt2)
+summary(ldt2.mod2)
 ```
 
 Mudeli väljundisse lisandub rida Length:log1p(Freq). Antud juhul see interaktsiooni efekt ei ole oluline, p on suurem kui 0.05.
@@ -266,28 +287,28 @@ Ja see tähendaks, et reaktsiooniaeg on:
 
 ```{r, fig.align = 'center', echo=F, fig.width=15}
 par(mfcol = c(1,2))
-plot(Mean_RT ~ Length, data = ldt1, xlab = "Sõna pikkus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna pikkus")
-for (i in log1p(quantile(ldt1$Freq))) lines(x = 3:14, y = (ldt1.mod1$coefficients["(Intercept)"] + 3:14 * ldt1.mod1$coefficients["Length"] + i * ldt1.mod1$coefficients["log1p(Freq)"]), col="red")
+plot(Mean_RT ~ Length, data = ldt2, xlab = "Sõna pikkus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna pikkus")
+for (i in log1p(quantile(ldt2$Freq))) lines(x = 3:14, y = (ldt2.mod1$coefficients["(Intercept)"] + 3:14 * ldt2.mod1$coefficients["Length"] + i * ldt2.mod1$coefficients["log1p(Freq)"]), col="red")
 
-plot(Mean_RT ~ log1p(Freq), data = ldt1, xlab = "Sõna sagedus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna sagedus", axes = F)
-for(i in quantile(ldt1$Length)) lines(x = 0:12, y= (ldt1.mod1$coefficients["(Intercept)"] + i * ldt1.mod1$coefficients["Length"] + 0:12 * ldt1.mod1$coefficients["log1p(Freq)"]), col = "red")
+plot(Mean_RT ~ log1p(Freq), data = ldt2, xlab = "Sõna sagedus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna sagedus", axes = F)
+for(i in quantile(ldt2$Length)) lines(x = 0:12, y= (ldt2.mod1$coefficients["(Intercept)"] + i * ldt2.mod1$coefficients["Length"] + 0:12 * ldt2.mod1$coefficients["log1p(Freq)"]), col = "red")
 box(); axis(side = 2); axis(side = 1, at = 0:12, labels = round(exp(0:12)-1))
 ```
 Kui faktorite vahel ei ole interaktsioone, siis on ühe tunnuse regressioonijooned teise tunnuse erinevate tasemete puhul paralleelsed.
 
 **Peamõjud interaktsiooniga**
 
-Kuna interaktsioon mudelis `ldt1.mod2` ei olnud oluline, siis selleks et interaktsiooni efekti illustreerida, toome paar **fiktiivset** näidet: Esiteks oletame, et pikkuse ja sageduse vahel on positiivne interaktsioon, näiteks:
+Kuna interaktsioon mudelis `ldt2.mod2` ei olnud oluline, siis selleks et interaktsiooni efekti illustreerida, toome paar **fiktiivset** näidet: Esiteks oletame, et pikkuse ja sageduse vahel on positiivne interaktsioon, näiteks:
 <br><br>
 **RT = 700 + 15\*pikkus + -25\*sagedus + 3\*pikkus\*sagedus**
 <br><br>
 ```{r, fig.align = 'center', echo=F, fig.width=15}
 par(mfcol = c(1,2))
-plot(Mean_RT ~ Length, type="n", data = ldt1, xlab = "Sõna pikkus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna pikkus")
-for(i in log1p(quantile(ldt1$Freq))) lines(x = 3:14, y = (700 + 15*3:14 + i * -25 + 3:14*i*3), col = which(quantile(log1p(quantile(ldt1$Freq))) == i))
+plot(Mean_RT ~ Length, type="n", data = ldt2, xlab = "Sõna pikkus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna pikkus")
+for(i in log1p(quantile(ldt2$Freq))) lines(x = 3:14, y = (700 + 15*3:14 + i * -25 + 3:14*i*3), col = which(quantile(log1p(quantile(ldt2$Freq))) == i))
 
-plot(Mean_RT ~ log1p(Freq), type="n", data = ldt1, xlab = "Sõna sagedus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna sagedus", axes = F)
-for(i in quantile(ldt1$Length)) lines(x = 0:12, y = (700 + i * 15 + 0:12 * -25 + i*0:12*3), col = which(quantile(ldt1$Length)==i))
+plot(Mean_RT ~ log1p(Freq), type="n", data = ldt2, xlab = "Sõna sagedus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna sagedus", axes = F)
+for(i in quantile(ldt2$Length)) lines(x = 0:12, y = (700 + i * 15 + 0:12 * -25 + i*0:12*3), col = which(quantile(ldt2$Length)==i))
 box(); axis(side=2); axis(side=1, at=0:12, labels = round(exp(0:12)-1))
 ```
 Niisiis, positiivse interaktsiooni mõjul on madala sagedusega sõnadel pikkusel väiksem efekt (must joon vasakul), aga sagedasemate sõnade korral on pikkuse efekt tugevam (järsem kalle, helesinine joon). Sõna sagedusele, mille peaefekt oli negatiivne, mõjub interaktsioon vastupidiselt.
@@ -298,11 +319,11 @@ Ja kui interaktsioon oleks negatiivne:
 <br><br>
 ```{r, fig.align = 'center', echo=F, fig.width=15}
 par(mfcol = c(1,2))
-plot(Mean_RT ~ Length, data = ldt1, type="n", xlab = "Sõna pikkus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna pikkus")
-for(i in log1p(quantile(ldt1$Freq))) lines(x = 3:14, y = (1000 + 3:14 * 15 + i * -25 + 3:14*i*-3), col = which(quantile(log1p(quantile(ldt1$Freq))) == i))
+plot(Mean_RT ~ Length, data = ldt2, type="n", xlab = "Sõna pikkus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna pikkus")
+for(i in log1p(quantile(ldt2$Freq))) lines(x = 3:14, y = (1000 + 3:14 * 15 + i * -25 + 3:14*i*-3), col = which(quantile(log1p(quantile(ldt2$Freq))) == i))
 
-plot(Mean_RT ~ log1p(Freq), data = ldt1, type="n", xlab = "Sõna sagedus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna sagedus", axes = F)
-for(i in quantile(ldt1$Length)) lines(x = 0:12, y = (1000 + i * 15 + 0:12 * -25 + i*0:12*-3), col = which(quantile(ldt1$Length) == i))
+plot(Mean_RT ~ log1p(Freq), data = ldt2, type="n", xlab = "Sõna sagedus", ylab = "Keskmine reaktsioonikiirus", main = "Sõna sagedus", axes = F)
+for(i in quantile(ldt2$Length)) lines(x = 0:12, y = (1000 + i * 15 + 0:12 * -25 + i*0:12*-3), col = which(quantile(ldt2$Length) == i))
 box(); axis(side=2); axis(side=1, at=0:12, labels = round(exp(0:12)-1))
 ```
 
@@ -319,27 +340,34 @@ Aga veelkord, need on fiktiivsed näited, mistõttu ei lähe jooned joonistel ka
 
 Mudelite võrdlemiseks on mitu üksteist täiendavat meetodit: võib lihtsalt vaadata, et ei oleks ebaolulisi tunnuseid mudelis, võib vaadata mudeli seletusvõimet R-ruudu näol, võib võrrelda erinevusi mudeli jääkides või teha spetsiaalselt mudelite headuse võrdlemiseks mõeldud teste (mis üldiselt toetuvad ka mudeli jääkide võrdlemisele).
 
-## Võrdleme mudeleid: R-ruut
+## Võrdleme mudeleid: R-ruut, ANOVA ja AIC
 
 
 R-ruut ehk determinatsioonikordaja näitab protsentuaalselt, kui palju uuritava tunnuse varieerumisest mudel kirjeldab. Parem mudel on see, mis rohkem kirjeldab, mille R-ruut on suurem.
 
 R-ruut läheb alati natuke paremaks, kui rohkem seletavaid tunnuseid lisada. Ka siis, kui seletavad tunnused on marginaalse efektiga. Occami habemenoa printsiipi aitab järgida **kohandatud R-ruut**, mis vähendab R-ruudu väärtust iga seletava tunnuse lisamisel: täiendava tunnuse lisamisest saadav efekt mudeli seletusvõimele peab olema suurem, kui "karistus" selle lisamise eest.
 
-- Esimese, ilma interaktsioonideta mudeli R-ruut on `r round(summary(ldt1.mod1)$r.squared, 5)` ja kohandatud R-ruut  `r round(summary(ldt1.mod1)$adj.r.squared, 5)`. 
-- Teise, interaktsioonidega mudeli R-ruut on `r round(summary(ldt1.mod2)$r.squared,5)` ja kohandatud R-ruut `r round(summary(ldt1.mod2)$adj.r.squared,5)`.
+- Esimese, ilma interaktsioonideta mudeli R-ruut on `r round(summary(ldt2.mod1)$r.squared, 5)` ja kohandatud R-ruut  `r round(summary(ldt2.mod1)$adj.r.squared, 5)`. 
+- Teise, interaktsioonidega mudeli R-ruut on `r round(summary(ldt2.mod2)$r.squared,5)` ja kohandatud R-ruut `r round(summary(ldt2.mod2)$adj.r.squared,5)`.
 
 Seega interaktsiooni lisamisest üldine mudeli seletusvõime kasvas küll 0,007%, aga see on liiga vähe, et ühte lisafaktorit mudelisse lisada, mistõttu kohandatud R-ruut langes. Parem mudel on seega ilma interaktsioonita mudel.
 
 Kohandatud R-ruutu vaatame siis, kui mudeleid võrdleme. Siis, kui oleme parima mudeli välja valinud ja raporteerime, kui hea kirjeldusvõimega mudelit esitame, siis peaks vaatama tavalist R-ruutu.
 
-## Võrdleme mudeleid: ANOVA
+### ANOVA test mudeli jääkidele
 
 Anova testiga saab ka võrrelda mudeleid, täpsemalt mudeli jääkide (*residuals*) jaotust. Niimoodi peaks aga võrdlema samal andmestikul põhinevaid ühe faktori võrra erinevaid mudeleid.
 ```{r}
-anova(ldt1.mod1, ldt1.mod2)
+anova(ldt2.mod1, ldt2.mod2)
 ```
 Kui kahe mudeli jääkides ei ole olulist erinevust, siis peaks valima lihtsama mudeli. Kui erinevus on oluline, tähendab see, et mudeli seletusvõime muutus faktori lisamisest oluliselt ja peaks valima keerukama mudeli. Siin võrreldud mudelite ANOVA tulemus on p=0.9 ehk olulist erinevust mudelite vahel pole ja peaksime neist valima lihtsama.
+
+### Akaike informatsioonikriteerium
+
+AIC ehk Akaike informatsioonikriteerium on alternatiiv R-ruudule hinnata mudeli headust. Erinevalt R-ruudust on tulemus lihtsalt üks number, mis ei paigutu mingile skaalale ja on võrreldav ainult sama andmestiku pealt tehtud mudelite piires. Mida väiksem AIC, seda parem mudel. 
+```{r}
+AIC(ldt2.mod1, ldt2.mod2)
+```
 
 ## Inkrementaalne modelleerimine
 
@@ -348,7 +376,139 @@ Lähtudes printsiibist, et parim mudel on võimalikult lihtne, peaks mudelist k�
 Sageli kasutatakse ka hoopis **inkrementaalset** meetodit, st alustatakse 0-mudelist, kus ei ole ühtegi seletavat faktorit, ning hakatakse ükshaaval lisama tunnuseid ja nende interaktsioone seni, kuni saavutatakse optimaalne mudel. Mõlemal juhul on eesmärk leida võimalikult lihtne, aga samas kõiki olulisi faktoreid sisaldav mudel.
 
 
-## Näide 3: Mis mõjutab valimistulemust?
+
+## Näide 3: täiskasvanud kõnelejate kõnetempot mõjutavad tegurid
+
+Kasutame Lippus, Pilvik, Lõo & Lindström 2024 kõnetempo repositooriumist täiskasvanute spontaanse kõne andmestikku fonkorp2:
+
+```{r}
+load(url("https://datadoi.ee/bitstream/handle/33/592/fonkorp_globaalne_konetempo.Rda?sequence=23&isAllowed=y"))
+```
+
+Arvutame kõneleja ja vestluspartneri kõnetempo:
+
+```{r, echo=T}
+fonkorp2$konetempo <- fonkorp2$silpide_arv/fonkorp2$kestus
+fonkorp2$kaaskoneleja_konetempo <- fonkorp2$kaaskoneleja_silpide_arv/fonkorp2$kaaskoneleja_kestus
+```
+
+Testime kõnetempo varieerumist (uuritava tunnusena). Alustame 0-mudelist ja lisame kõigepealt kõneleja vanuse, soo ja nende interaktsiooni.
+
+```{r}
+mod0 <- lm(konetempo ~ 1, data = fonkorp2)
+mod1a <- lm(konetempo ~ vanus, data = fonkorp2)
+mod1b <- lm(konetempo ~ sugu, data = fonkorp2)
+```
+
+Testime 0-mudelit ühe seletava tunnusega muutuja vastu:
+```{r}
+anova(mod0, mod1a)
+anova(mod0, mod1b)
+```
+
+Anova testi põhjal võiks öelda praegu, et sugu on oluline kõnetempo mõjutaja, vanus mitte. Aga vaatame edasi:
+
+```{r}
+mod2 <- lm(konetempo ~ sugu+vanus, data = fonkorp2)
+mod3 <- lm(konetempo ~ sugu*vanus, data = fonkorp2)
+```
+
+```{r}
+anova(mod1b, mod2)
+anova(mod2, mod3)
+```
+
+ANOVA testi põhjal jääks vanus ikkagi välja. Aga vaatame ka Aikaike informatsioonikriteeriumit. AIC käsule võime sisse panna kõik (samal andmestikul põhinevad) mudelid korraga. Võidab see, kellel on kõige väiksem AIC väärtus.
+
+```{r}
+AIC(mod0, mod1a, mod1b, mod2, mod3)
+```
+
+AIC põhjal on parim soo ja vanuse interaktsiooni sisaldav mudel. Vaatame nüüd selle väljundit:
+
+```{r}
+summary(mod3)
+```
+
+Mudeli väljundist näeme, et soo efekt nüüd on ebaoluline, aga on vanuse efekt on oluline ning peaaegu-et-oluline on ka soo ja vanuse interaktsioon. 
+
+Kuna *sugu* on faktor, siis *Intercept* ja teiste tunnuste peaefektid kehtivad *soo* baastaseme ehk M korral. Seega *vanuse* efekt meestel on `r round(mod3$coefficients["vanus"],3)` silp/sek aasta kohta. Naistel peaks vanuse efekti ja interaktsiooni kokku liitma ja `r round(mod3$coefficients["vanus"],3)` + `r round(mod3$coefficients["suguN:vanus"],3)` = `r round(sum(mod3$coefficients[c("vanus","suguN:vanus")]),3)`
+
+```{r, message = F}
+joonis <- ggplot(fonkorp2, aes(y = konetempo, x = vanus, col = sugu))+
+    geom_point()+
+    geom_smooth(method = "lm")
+ggplotly(joonis)
+```
+
+## Multikollineaarsus
+
+Kui meil on rohkem sõltumatuid tunnuseid, mida mudelis testida, on oluline kontrollida, et sõltumatud tunnused ei oleks omavahel liiga tugevasti seotud, sest mitu väga sarnaselt käituvat faktorit teevad mudeli kehvemaks.
+
+- Kui andmestikus on mitu sama tunnuse teisendit (nt sünniaasta ja vanus), siis peaks valima neist ainult ühe.
+- Sarnaselt käituvate tunnuste puhul tuleks samuti valida üks, mis kõige paremini seletab.
+- Võib testida tunnustevahelist korrelatsiooni.
+- VIF ehk Variance Inflation Factor (nt car::vif(model1))
+
+```{r}
+cov2cor(cov(fonkorp2[,c("kaaskoneleja_konetempo","vanus","kaaskoneleja_vanus", "vanusevahe")]))
+```
+
+Vanusevahe on nii kõneleja kui vestluspartneri vanusega tugevas korrelatsioonis, seega mudelisse võiks võtta kas vanusevahe või kummagi kõneleja vanused. Muud tunnused on nõrgalt korreleeruvad ja võivad koos mudelis olla.
+
+## Stepwise protseduur
+
+Selle asemel, et ise ükshaaval mudelisse faktoreid juurde lisada või ära võtta ja vahesamme testida, võib seda lasta ka R-il automaatselt teha. 
+
+Käsk `step()` kasutab Akaike informatsioonikriteeriumit (AIC), et ehitada samm-sammuliselt faktoreid kas lisades või eemaldades optimaalne mudel. Proovime leida faktoreid lisades parima mudeli täiskasvanud kõnelejate kõnetempo seletamiseks.
+
+- Alustame 0-mudelist ja liigume keerukama suunas. Nullmudeli valemiks on `y ~ 1`, see läheb käsu `step()` objektiks.
+- Teine argument on `scope`, kuhu praegusel juhul paneme maksimaalse mudeli, st kõikide faktorite ja nendevaheliste interaktsioonidega.
+- Kolmas argument on `direction`, mis määrab faktorite lisamise suuna. Variandid on "both", "backward", "forward", siit praegu valime viimase, mis tähendab, et alustatakse kõige väiksemast mudelist ja lisatakse sellele faktoreid seni, kuni mudel ei lähe enam paremaks. "Backward" tähendaks, et alustatakse maksimaalsest ja faktoreid võetakse vähemaks seni, kuni mudel ei lähe enam paremaks, ja nii võib tulemus tulla veidi erinev.
+
+Tulemuseks saadud mudelis ei pruugi kõik faktorid olla olulised p-väärtuse poolest, sest mudeleid võrreldakse ainult AIC põhjal.
+
+Testime seletavate tunnustena kõneleja vanust ja sugu ning vestluspartneri vanust, sugu ja kõnetempot ning kõigi tunnuste vahelist interaktsiooni.
+
+```{r}
+mod_step <- step(lm(konetempo ~ 1, data = fonkorp2), scope = konetempo ~ vanus * sugu * kaaskoneleja_konetempo * kaaskoneleja_sugu * kaaskoneleja_vanus, direction = "forward")
+summary(mod_step)
+```
+
+Kuidas mudelit tõlgendada? Alustama peaks olulistest peaefektidest.
+
+- kõnetempot mõjutab kaaskõneleja kõnetempo: kui vestluspartner on 1 silp/sek kiirem, siis on ka kõneleja keskmiselt `r round(mod_step$coefficients["kaaskoneleja_konetempo"], 3)` silpi/sek kiirem.
+- vanusel on negatiivne efekt: kui vanus kasvab 1 aasta võrra, on kõneleja vanus keskmiselt `r round(mod_step$coefficients["vanus"],3)` aeglasem, aga siin on ka (peaaegu-et-oluline) interaktsioon: kui kõneleja on naine, siis vanuse kasvades 1 aasta võrra muutub kõnetempo ainult `r round(mod_step$coefficients["vanus"],3)` + 
+`r round(mod_step$coefficients["suguN:vanus"],3)` = `r round(sum(mod_step$coefficients[c("vanus","suguN:vanus")]),3)` võrra.
+- lisaks on vestluspartneri vanuse efekt: kui vestluspartneri vanus kasvab 1 aasta võrra, kasvab kõneleja kõnetempo `r round(mod_step$coefficients["kaaskoneleja_vanus"],3)` võrra.
+
+Ja lõpetuseks teeme paar rehkendust selle mudeli põhjal: 
+
+1) Mis võiks olla minu kõnetempo, kui olen 44-aastane mees ja räägin 25-aastase kiire kõnelejaga (3.5 silpi/sek)?
+
+```{r}
+ 2.60221810 + # vabaliige on alati sama
+    3.5 * 0.48613842 + # vestluspartneri tempo 3.5
+    0 * -0.21794464 + # minu sugu M ehk M == N on FALSE ehk 0
+    44 * -0.01858738 + # minu vanus 44
+    25 * 0.01002157 + # kaasvestleja vanus 25
+    0 * 44 * 0.01317365 # on kokku 0, interaktsioon ei rakendu, sest sugu pole N
+```
+
+2) Mis võiks olla minu kõnetempo, kui olen 80-aastane naine ja räägin 44-aastase aeglase kõnelejaga (5.5 silpi/sek)?
+
+```{r}
+ 2.60221810 + # vabaliige
+    5.5 * 0.48613842 + # vestluspartneri tempo 5.5
+    1 * -0.21794464 + # minu sugu N ehk N == N on TRUE ehk 1
+    80 * -0.01858738 + # minu vanus 80
+    44 * 0.01002157 + # kaasvestleja vanus 44
+    1 * 80 * 0.01317365 # N == N on TRUE ehk 1 * minu vanus 80
+```
+
+
+
+## Näide 4: Mis mõjutab valimistulemust?
 
 Loeme valimistulemuste andmestiku R-i.
 ```{r}
@@ -358,22 +518,17 @@ Vaatasime eelmisel korral eraldi soo ja vanuse efekti häältesaagile ja leidsim
 ```{r}
 colnames(kandidaadid2019)
 ```
-## Ettevalmistused suuremaks mudeliks
+### Ettevalmistused suuremaks mudeliks
 
 Enne suurema mudeli juurde asumist tuleks natuke ettevalmistusi teha ja võimalikud seletavad tunnused üle vaadata.
 
 ### Multikollineaarsus
 
-Kui meil on rohkem sõltumatuid tunnuseid, mida mudelis testida, on oluline kontrollida, et sõltumatud tunnused ei oleks omavahel liiga tugevasti seotud, sest mitu väga sarnaselt käituvat faktorit teevad mudeli kehvemaks.
-
-- Kui andmestikus on mitu sama tunnuse teisendit (nt sünniaasta ja vanus), siis peaks valima neist ainult ühe.
-- Sarnaselt käituvate tunnuste puhul tuleks samuti valida üks, mis kõige paremini seletab (nt ei ole mõtet kandidaatide mudelisse lisada nii parteilist kuuluvust kui valimisnimekirja).
-- Võib testida tunnustevahelist korrelatsiooni.
+Kui andmestikus on mitu sama tunnuse teisendit (nt sünniaasta ja vanus), siis peaks valima neist ainult ühe. Sarnaselt käituvate tunnuste puhul tuleks samuti valida üks, mis kõige paremini seletab (nt ei ole mõtet kandidaatide mudelisse lisada nii parteilist kuuluvust kui valimisnimekirja).
 
 ```{r}
 cov2cor(cov(kandidaadid2019[,c("e.hääli", "hääli_välisriigist", "kokku_ringkonnas","nr")]))
 ```
-- VIF ehk Variance Inflation Factor (nt car::vif(model1))
 
 ### Vaatame enne mudeldamist üle ülejäänud tunnused
 
@@ -420,7 +575,8 @@ is(kandidaadid2019$sünniaeg)
 head(kandidaadid2019$sünniaeg)
 kandidaadid2019$vanus <- 2019 -as.numeric(substr(kandidaadid2019$sünniaeg, 1,4))
 ```
-## Modelleerimise sammud
+### Modelleerimise sammud
+
 ### Null-mudel ilma ühegi seletava tunnuseta
 
 Kui mudelil ei ole ühtegi seletavat tunnust, uuritava tunnuse varieerumist seletab tema varieerumine ise, siis sellise mudeli valemiks on y ~ 1.
@@ -490,7 +646,7 @@ Ja põhiharidusega naise hääled siis vastavalt exp(4.5352 - 0.6330 - 0.6541 - 
 
 ```{r, warning=FALSE, message=FALSE}
 library(ggplot2)
-df <- ggpredict(m3, terms = c("haridus", "sugu"))
+df <- ggeffects::ggpredict(m3, terms = c("haridus", "sugu"))
 
 str(df)
 
@@ -546,40 +702,6 @@ See sisaldab 8 faktori peamõju, 28 kahe faktori interaktsiooni, 56 kolme faktor
 
 Tõenäoliselt enamik neist interaktsioonidest ja osa peamõjudest ei ole olulised, aga nende läbitestimine on üsna aeganõudev ning nii keeruka mudeli sisukas seletamine võib olla raske.
 
-## Akaike informatsioonikriteerium
-
-AIC ehk Akaike informatsioonikriteerium on alternatiiv R-ruudule hinnata mudeli headust. Erinevalt R-ruudust on tulemus lihtsalt üks number, mis ei paigutu mingile skaalale ja on võrreldav ainult sama andmestiku pealt tehtud mudelite piires. Mida väiksem AIC, seda parem mudel. 
-```{r}
-AIC(m0, m1, m2, m3, m4)
-```
-
-## Stepwise protseduur
-
-Selle asemel, et ise ükshaaval mudelisse faktoreid juurde lisada või ära võtta ja vahesamme testida, võib seda lasta ka R-il automaatselt teha. 
-
-Käsk `step()` kasutab Akaike informatsioonikriteeriumit (AIC), et ehitada samm-sammuliselt faktoreid lisades või eemaldades optimaalne mudel. Proovime leida faktoreid lisades parima mudeli valimistulemuste seletamiseks.
-
-- Alustame 0-mudelist ja liigume keerukama suunas. Nullmudeli valemiks on `y ~ 1`, see läheb käsu `step()` objektiks.
-- Teine argument on `scope`, kuhu praegusel juhul paneme maksimaalse mudeli, st kõikide faktorite ja nendevaheliste interaktsioonidega.
-- Kolmas argument on `direction`, mis määrab faktorite lisamise suuna. Variandid on "both", "backward", "forward", siit praegu valime viimase, mis tähendab, et alustatakse kõige väiksemast mudelist ja lisatakse sellele faktoreid seni, kuni mudel ei lähe enam paremaks. "Backward" tähendaks, et alustatakse maksimaalsest ja faktoreid võetakse vähemaks seni, kuni mudel ei lähe enam paremaks, ja nii võib tulemus tulla veidi erinev.
-
-Teeme kiire katse leida olulised faktorid, mis mõjutasid 2023. aasta valimiste tulemusi.
-
-```{r}
-kandidaadid2023 <- read.delim("data/kandidaadid_2023.csv")
-```
-
-
-```{r, eval=T}
-m_step <- step(lm(log(hääli_kokku) ~ 1, data = kandidaadid2023), scope = log(hääli_kokku) ~ nimekiri * ringkond * haridus * sugu * vanus * tähtkuju, direction = "forward")
-```
-
-Vaatame tulemust:
-```{r, eval=T}
-summary(m_step)
-anova(m_step)
-```
-Tulemuseks saadud mudelis ei pruugi kõik faktorid olla olulised p-väärtuse poolest, sest mudeleid võrreldakse ainult AIC põhjal.
 
 
 
@@ -647,7 +769,7 @@ d) rühmasid võrreldakse baastasemega
 
 #### 6. Vaata Näites 2 esitatud lineaarset mudelit sõnade äratundmise reaktsiooniaja ja sõna pikkuse seosest:
 ```{r, echo = F}
-summary(ldt1.mod2)$coefficients
+summary(ldt2.mod2)$coefficients
 ```
 #### 7. Mis võiks olla reaktsiooniaeg, kui sõnas on 26 tähemärki ja sõna on keskmise sagedusega?
 
@@ -660,3 +782,14 @@ d) keskmise sagedusega sõnad ei ole kunagi nii pikad
 ## Järgmisel korral
 
 - Lineaarse regressiooni segamudelid
+
+
+## Funktsioonide sõnastik
+
+- `lm()` -- lineaarne mudel
+- `anova()` -- anova test (vaikimisi I tüüpi)
+-` AIC()` -- Aikaike informatsioonikriteerium
+- `step()` -- stepwise protseduur parima mudeli valimiseks
+- `car::Anova(lm(), type="III")` -- kolmandat tüüpi anova
+- `cov2cor(cov())` -- tunnuste vahelise konrrelatsiooni testimine
+- `car::vif(model1)` -- VIF ehk Variance Inflation Factor

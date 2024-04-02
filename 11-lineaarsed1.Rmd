@@ -516,5 +516,6 @@ d) kordustestid rohkem kui kahe tasemega faktori olulisuse kontrollimiseks
 - `summary(aov())` -- ANOVA test (sama mis eelmine)
 - `TukeyHSD(aov())` -- Tukey test (post-hoc ANOVAle)
 - `p.adjust()` -- p-väärtuste korrigeerimine (Bonferroni, Holm ...)
-
+- `C(mingi_faktor, base = taseme_number)` -- vahetab faktori baastaset. NB! suure tähega `C()` ei ole sama käsk mis väikse tähega `c()`.
+- `droplevels(faktor)` -- jätab faktori tasemetest välja andmestikus esindamata tasemed.
 
