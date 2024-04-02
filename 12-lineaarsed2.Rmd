@@ -29,7 +29,8 @@ Andmestikud endiselt:
 
  - `ldt.csv`
  - `kandidaadid2019.RData`
- - `kandidaadid2023.csv`
+ - `fonkorp2` (loeme otse DataDOIst, ei pea alla laadima) 
+
 
 ## Kaks arvulist tunnust
 
