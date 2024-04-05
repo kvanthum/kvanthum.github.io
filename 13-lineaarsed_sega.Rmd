@@ -28,7 +28,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Andmestikud:
 
-- `creaky_data_r_course.txt` (Moodle'is)
+ - `fonkorp2` (loeme otse DataDOIst, ei pea alla laadima) 
 - välteandmestik (loeme otse DataDOI-st)
 
 ## Segamudelid
@@ -50,84 +50,102 @@ __Juhuslik kalle__ (*random slope*) tähendaks, et lisaks fikseeritud faktori ef
 
 
 
-## Näide 1: Kõneleja häälekõrgus ja sugu
+## Näide 1: Millest sõltub kõneleja aktiivsus vestluses?
 
+See näide lähtub artiklis Aare, K., & Lippus, P. (2017). Some gender patterns in Estonian dyadic conversations. J. E. Abrahamsen, J. Koreman, & W. van Dommelen (Toim), Nordic Prosody. Proceedings of the XIIth Conference, Trondheim 2016 (lk 29–38). Peter Lang. https://doi.org/10.13140/RG.2.2.17105.94568
 
-Failis `creaky_data_r_course.txt` on andmestik, mis on kogutud TÜ eesti keele spontaanse kõne foneetilisest korpusest, seda on kasutatud artiklis Aare, K., & Lippus, P. (2017). Some gender patterns in Estonian dyadic conversations. J. E. Abrahamsen, J. Koreman, & W. van Dommelen (Toim), Nordic Prosody. Proceedings of the XIIth Conference, Trondheim 2016 (lk 29–38). Peter Lang. https://doi.org/10.13140/RG.2.2.17105.94568
+Selles uurimuses on vaadatud mitmeid üldiseid hääle kõrgust ja häälelaadi kirjeldavaid parameetreid seoses kõneleja soo ja vanuse ning vestluspartneri vastavate tunnustega. Korpus, mille põhjal on uurimus tehtud, sisaldab kahe kõneleja vaheliste vestluste salvestusi. Iga vestlus kestab umbes pool tundi ja iga vestluse iga osaleja kohta on salvestuse põhjal mõõdetud tema hääle põhitooni keskmist kõrgust (hertsides), põhitooni ulatust (pooltoonides), kui palju ta selle vestluse jooksul rääkis (% salvestuse ajast) ja kui palju tema hääl sel ajal kärises (% kõneldud ajast). Lisaks häälelaadile vaadati selles artiklis ka seda, kui palju kõneleja üldse vestluse jooksul rääkis. Leiti, et kõnes osalemine sõltus kõneleja soost (mehed räägivad rohkem), vestluspartneri soost (meestega räägitakse vähem) ja kõnelejate vanusevahest (endast vanematega räägitaske vähem).
 
-Selles uurimuses on vaadatud mitmeid üldiseid häälelaadi kirjeldavaid parameetreid seoses kõneleja soo ja vanuse ning vestluspartneri vastavate tunnustega. Korpus, mille põhjal on uurimus tehtud, sisaldab kahe kõneleja vaheliste vestluste salvestusi. Iga vestlus kestab umbes pool tundi ja iga vestluse iga osaleja kohta on salvestuse põhjal mõõdetud tema hääle põhitooni keskmist kõrgust (hertsides), põhitooni ulatust (pooltoonides), kui palju ta selle vestluse jooksul rääkis (% salvestuse ajast) ja kui palju tema hääl sel ajal kärises (% kõneldud ajast).
+!["Aare Lippus 2017"](imgs/aare-lippus_2017_koneaeg.png)
+
+Täiskasvanud kõnelejate kõnetempo andmestik, mida kasutasime eelmises praktikumis, on natuke uuem variant sellest samast andmestikust.
 
 ```{r}
-dat <- read.delim("data/creaky_data_r_course.txt", stringsAsFactors = T)
-str(dat)
+load(url("https://datadoi.ee/bitstream/handle/33/592/fonkorp_globaalne_konetempo.Rda?sequence=23&isAllowed=y"))
 ```
 
-### Testime häälekõrguse varieerumist
+Kui 2016. aastal olid andmestikus andmed 88 eri kõnelejalt, siis nüüd on neid `r length(unique(fonkorp2$koneleja))`. Proovime selle mudeli uuenenud andmete peal läbi mängida, loodetavasti ei ole tulemused kardinaalselt muutunud.
 
-Üldiselt häälekõrgust võiks kõige rohkem seletada kõneleja sugu: meeste häälekurrud on paksemad kui naistel ja üldiselt meeste hääle kõrgus kõnelemisel jääb 75-150 Hz ja naistel 150-300 Hz vahemikku. Lisaks sõltub hääle kõrgus mingil määral vanusest. Meie andmestik sisaldab küll ainult täiskasvanud kõnelejate andmeid, nii et väga suur muutus, mis murdeeas toimub, siin ei kajastu, aga häälekõrgus muutub siiski mingil määral ka täiskasvanuea jooksul. Ja viimaks, mõnevõrra võiks mõjutada kõneleja häälekõrgust see, kellega ta räägib, sest vestluses kohandame end oma vestluspartneri suhtes. Kõneleja ja vestluspartneri tunnustest saaksime testida:
+Arvutame proportsionaalse kõneaja (kõneleja kõnevoorude kestus jagatud vestluse kogukestusega):
 
-1) tema sugu (meie andmestikus 2 taset), 
-2) tema vanus (pidev tunnus), 
+```{r}
+fonkorp2$kestus_prop <- fonkorp2$kestus/fonkorp2$faili_kogukestus
+```
+
+1) kõneleja sugu (meie andmestikus 2 taset), 
+2) kõneleja vanus (pidev tunnus), 
 3) vestluspartneri sugu (2 taset),
-4) vestluspartneri vanus (pidev tunnus).
+4) vestluspartneri vanus (pidev tunnus),
+5) kõnelejate vanusevahe (pidev tunnus).
+
+Kuna Aare ja Lippus (2017) oli soo baastasemeks naine ja fonkorp2 andmestikus on mees, siis vahetame parema võrreldavuse eesmärgil siin ka tasemete järjekorra ära:
+
+```{r}
+fonkorp2$sugu <- factor(fonkorp2$sugu, levels = c("N", "M"))
+fonkorp2$kaaskoneleja_sugu <- factor(fonkorp2$kaaskoneleja_sugu, levels = c("N", "M"))
+```
 
 
 Kas lineaarse mudeli eeldused on täidetud?
 
-- Ei uuritav tunnus ega kirjeldavad arvulised tunnused ei ole normaaljaotusega, siin ei aita ka logaritmimine, aga andmestikus on üle 30 mõõtmispunkti, nii et väga selle pärast ka muretsema ei pea. Õigupoolest ei ole lineaarsel regressioonil eeldust, et uuritav tunnus peaks olema normaaljaotusega (vrd nt Pearsoni korrelatsioonikordaja eeldustega), küll aga peavad mudeli jäägid olema normaaljaotusega. Tihtipeale võib aga juhtuda, et kui arvulised tunnused on väga ühele või teisele poole kaldu, ei ole ka mudeli jääkide jaotus normaalne. Mudeli jääkide jaotust saab aga kontrollida pärast mudeli tegemist.  
+- Uuritav tunnus on üllataval kombel isegi Shapiro testi põhjal normaaljaotusega. Kirjeldavad arvulised tunnused (vanus ja vanusevahe) ei ole normaaljaotusega, siin ei aita ka logaritmimine. Aga õigupoolest huvitab meid rohkem mudeli jääkide jaotus ja iga üksik tunnus ei peagi normaaljaotusega olema. Tihtipeale võib aga juhtuda, et kui arvulised tunnused on väga ühele või teisele poole kaldu, ei ole ka mudeli jääkide jaotus normaalne. Mudeli jääkide jaotust saab aga kontrollida pärast mudeli tegemist.
+- Seletavate tunnuste vahel ei tohiks olla kolineaarsust. Eelmisest korrast mäletame, et kummagi kõneleja vanused olid vanusevahega tugevas korrelatsioonis. Seega kasutame see kord (nagu Aare ja Lippus 2017) vanusevahet.
 - Uuritava tunnuse ja arvulise seletava tunnuse vahel peaks olema lineaarne seos.  
 
 ```{r, message = FALSE, warning=FALSE}
 library(tidyverse)
-# Päris lineaarne pole, aga enam-vähem siiski
-ggplot(data = dat, aes(x = SP1_age, y = f0_mean)) + geom_point() + geom_smooth() + facet_wrap("SP1_gender")
+library(plotly)
+joonis1 <- ggplot(data = fonkorp2, aes(x = vanusevahe, y = kestus_prop, col = kaaskoneleja_sugu)) + geom_point() + geom_smooth(method = "lm") + facet_wrap("sugu")
+ggplotly(joonis1)
 ```
 
 - Iga vestluse iga osaleja kohta on andmestikus üks mõõtmispunkt, mis justkui tähendaks, et mõõtmised on sõltumatud. Üldiselt on igas vestluses osalejad erinevad, aga on üksikuid koruvaid osalejaid. Kuna neid ei ole väga palju, siis me võiksime kasutada tavalist lineaarset mudelit ja kui tahame väga hoolega järgida sõltumatute mõõtmiste nõuet, siis võiksime valida korduvate osalejate salvestustest ühe ja ülejäänud kordused andmestikust eemaldada. Vaatame üle, palju on korduvaid osalejaid:
 
 ```{r}
-table(table(dat$SP1_ID))
+table(table(fonkorp2$koneleja))
 ```
-79 osalejat esineb andmestikus ainult ühe korra ja 9 osalejat osales mitu korda, kolm neist lausa neli korda.
+125 osalejat esineb andmestikus ainult ühe korra, aga 14 osalejat osales mitu korda, üks neist lausa viis korda. (11 null-osalejat on sellest, et välja on jäätud *outlierid*, näiteks üle 70-aastased osalejad, keda oli väga vähe).
 
-Miks see korduvate mõõtmispunktide küsimus on üldse oluline? Selle pärast, et lisaks fikseeritud faktoritele (sugu, vanus) võib kõneleja häälekõrgust mõjutada (õigemini: **mõjutab**) tema individuaalne eripära. Kuna meil on andmestikus mõned korduvad kõnelejad, siis võib nende individuaalne efekt mõjutada fikseeritud faktorite mõju.
+Miks see korduvate mõõtmispunktide küsimus on üldse oluline? Selle pärast, et lisaks fikseeritud faktoritele (sugu, vanus) võib uuritavat tunnust mõjutada (õigemini: **mõjutab**) tema individuaalne eripära. Kuna meil on andmestikus mõned korduvad kõnelejad, siis võib nende individuaalne efekt kallutada fikseeritud faktorite mõju.
 
-Kõneleja isikut me ei saa fikseeritud faktorina mudelisse lisada, sest meil on valimis juhuslikud 88 indiviidi (8 miljardist inimesest või 1 miljonist eestlasest). Pealegi me nii väga ei tahagi konkreetse indiviidi efekti määratleda, me lihtsalt tahame selle olemasoluga arvestada.
+Kõneleja isikut me ei saa fikseeritud faktorina mudelisse lisada, sest meil on valimis juhuslikud 139 indiviidi (8 miljardist inimesest või 1 miljonist eestlasest). Pealegi me nii väga ei tahagi konkreetse indiviidi efekti määratleda, me lihtsalt tahame selle olemasoluga arvestada.
 
 
 ### Testime kõigepealt tavalise lineaarse mudeliga
 
-Kuna lineaarne mudel on tundlik hälbivadte väärtuste suhtes ja meil on andmestikus ainult üksikud üle 70-aastased, siis jätame need välja.
 
 ```{r, eval=F}
-lm0 <- lm(f0_mean ~ 1, data = dat, subset = SP1_age < 70)
+lm0 <- lm(kestus_prop ~ 1, data = fonkorp2)
 # lisame 1. tunnusena kõneleja soo
-lm1 <- lm(f0_mean ~ SP1_gender, data = dat, subset = SP1_age < 70)
+lm1 <- lm(kestus_prop ~ sugu, data = fonkorp2)
 anova(lm0, lm1)
-# see oli oluline, lisame teise tunnusena kõneleja vanuse
-lm2 <- lm(f0_mean ~ SP1_gender + SP1_age, data = dat, subset = SP1_age < 70)
+# see oli oluline, lisame teise tunnusena vestluspartneri soo
+lm2 <- lm(kestus_prop ~ sugu + kaaskoneleja_sugu, data = fonkorp2)
 anova(lm1, lm2)
-# see oli ka oluline, nüüd lisame soo ja vanuse interaktsiooni
-lm3 <- lm(f0_mean ~ SP1_gender * SP1_age, data = dat, subset = SP1_age < 70)
+# see oli ka oluline, nüüd lisame soo ja vestluspartneri soo interaktsiooni
+lm3 <- lm(kestus_prop ~ sugu * kaaskoneleja_sugu, data = fonkorp2)
 anova(lm2, lm3)
-# see oli jälle oluline, nüüd lisame vestluspartneri soo
-lm4 <- lm(f0_mean ~ SP1_gender * SP1_age + SP2_gender, data = dat, subset = SP1_age < 70)
-anova(lm3, lm4)
+# see pole oluline, proovime selle asemel vanusevahe peaefekti
+lm4 <-lm(kestus_prop ~ sugu + kaaskoneleja_sugu + vanusevahe, data = fonkorp2)
+anova(lm2, lm4) # võrdleme 2 peaefektiga mudelit kolme peafektiga mudeliga
+# see on oluline; võiks edasi proovida interaktsioone
+lm5a <-lm(kestus_prop ~ sugu + kaaskoneleja_sugu + vanusevahe + sugu:vanusevahe, data = fonkorp2)
+lm5b <-lm(kestus_prop ~ sugu + kaaskoneleja_sugu + vanusevahe + kaaskoneleja_sugu:vanusevahe, data = fonkorp2)
+anova(lm4, lm5a)
+anova(lm4, lm5b)
+# pole oluline, parim mudel on lm4 kolme faktori peamõjuga ja ilma interaktsioonideta
 ```
 
-Siit edasi võiks testida a) vestluspartneri soo interaktsiooni kõneleja sooga, b) kõneleja vanusega või c) lisada vestluspartneri vanuse peamõju, aga ükski neist võimalustest ei tee mudelit paremaks; veel võiks testida, kas mudelit teeb paremaks see, kui mõni mudelist lm4 midagi vahetada vestluspartneri vanuse vastu. Proovi seda!
 
-
-Parim mudel on siiski see:
+Parim mudel on niisiis see:
 ```{r}
-lm4 <- lm(f0_mean ~ SP1_gender * SP1_age + SP2_gender, data = dat, subset = SP1_age < 70)
+lm4 <-lm(kestus_prop ~ sugu + kaaskoneleja_sugu + vanusevahe, data = fonkorp2)
 summary(lm4)
 ```
 
 ```{r, eval = F}
 ggeffects::ggpredict(lm4)
-sjPlot::plot_model(lm4, type = "pred")
-sjPlot::plot_model(lm4, type = "int")
+sjPlot::plot_model(lm4, type = "pred", show.data = T, terms = c("vanusevahe", "kaaskoneleja_sugu","sugu"))
 ```
 
 Kontrollime jääkide normaalsust.  
@@ -139,7 +157,7 @@ shapiro.test(lm4$residuals) # eeldus on täidetud
 
 
 
-### Sama segamudeliga
+## Näide 1a: Sama lineaarse segamudeliga (lme4 pakett)
 
 Installime ja aktiveerime paketi `lme4`, kus tuleb segamudeli käsk lmer(). Lisaks oleks hea installida ka paket `lmerTest`, mis lisab mudeli väljundile p-väärtused (vaikimis on segamudeli väljund ilma p-väärtusteta).
 
@@ -148,10 +166,10 @@ Installime ja aktiveerime paketi `lme4`, kus tuleb segamudeli käsk lmer(). Lisa
 library(lme4)
 library(lmerTest)
 ```
-Segamudelis peab olema vähemalt üks juhuslik faktor. Lisame juhusliku kõneleja efekti vabaliikmele (random intercept).
+Segamudelis peab olema vähemalt üks juhuslik faktor. Lisame juhusliku kõneleja efekti vabaliikmele (random intercept). `lmer()` mudelis tähistatakse juhuslikku vabaliiget `(1|juhuslik_faktor)`. Muus osas on mudeli sisend täpselt sama, nagu tavalise lineaarse mudeli puhul.
+
 ```{r}
-sm4 <- lmer(f0_mean ~ SP1_gender * SP1_age + SP2_gender + (1|SP1_ID), 
-            data = dat, subset = SP1_age < 70)
+sm4 <- lmer(kestus_prop ~ sugu + kaaskoneleja_sugu + vanusevahe + (1|koneleja), data = fonkorp2)
 ```
 
 
@@ -168,73 +186,88 @@ Segamudel on oluliselt erinev. Vaatame nüüd mudeli väljundit käsuga `summary
 summary(sm4)
 ```
 
+Kuna siin mudelis on seletavate tunnustena kõneleja enda omadused, mis ühe kõneleja puhul korduda ei saa, siis siia juhuslikku kallet lisada ei saa.
+
 Mudeli väljund on üldiselt väga sarnane tavalise lineaarse mudeli väljundile. Mudeli üldist olulisust ei ole küll eraldi real välja toodud, aga on mudeli jääkide jaotus (residuals). Et nullhüpotees hüljata, peaks mudeli jäägid läbima nulli.
 
 Väljundi lõpus on fikseeritud efektide korrelatsioonimaatriks, mille jälgimine võiks aidata multikollineaarsust vältida.
 
-Kõige huvitavam osa on segamudeli väljundis fikseeritud efektide koefitsientide tabel. Selle lugemine ja tõlgendamine on põhimõtteliselt sama nagu tavalise lineaarse mudeli puhul. Kui varasemates näidetes meil on olnud logaritmitud tunnuseid, siis siin on tõlgendamine seda lihtsam, et kõik tunnused on algsetes ühikutes:
+Kõige huvitavam osa on segamudeli väljundis fikseeritud efektide koefitsientide tabel. Selle lugemine ja tõlgendamine on põhimõtteliselt sama nagu tavalise lineaarse mudeli puhul. Ilma `lmerTest` paketi kasutamata ei esitata fikseeritud efektide tabelis p-väärtusi. Sel juhul peaks hindama faktori olulisust statistiku *t* väärtuse alusel: rusikareegel on see, et kui selle absoluutväärtus on suurem kui kaks |t| > 2, siis on faktor oluline.
 
-- vabaliige (intercept) on siis keskmine põhitoon siis, kui kõigi seletavade tunnuste väärtus on 0 või nad on baastasemel. See tähendab siis, et kõneleja keskmine põhitoon võiks olla 222 Hz, kui ta on naine ja vanus on 0. See ei tähenda muidugi, et see oleks põhitooni väärtus sündides, sest meie andmestikus on ainult täisealised, aga kui eeldada lineaarset seost, siis võime ka 0-punkti leida.
-- Kõneleja soo efekt tähendab seda, et baastasemega võrreldes on meeste hääl -110 ehk 222 - 110 = 112 Hz.
-- Kõneleja vanuse efekt tähendab seda, et võrreldes vabaliikmega langeb põhitoon -0.5 Hz aasta kohta. See siis tähendab, et nt 30aastasel naisel võiks häälekõrgus olla keskmiselt 222 - 30\*0.5 = 207 Hz ja 60aastasel naisel 222 - 60\*0.5 = 192 Hz
-- Soo ja vanuse interaktsioon tähendab seda, et meeste puhul toimib vanuse efekt pisut teisiti. Lisaks vanuse üldefektile tuleb meeste puhul liita soo ja vanuse efekt, mis põhimõtteliselt antud juhul muudab vanuse efekti vastupidiseks: -0.5 + 0.7 = 0.2 Hz aastas tõuseb meeste hääl ning näiteks 30aastase mehe hääle kõrgus võiks olla 222 - 110 -30\*0.5 +30\*0.7 = 112 Hz, aga 60aastasel mehel 222 - 110 -60\*0.5 +60\*0.7 = 124 Hz.
-- Vestluspartneri soo efekt on -5 Hz, mis mõjub siis, kui ta on mees, sest naine on baastase. Miks naine on baastase? Sest see on andmestikus tähistatud "F", mis on tähestikus "M"-ist eespool. Kuidas see vestluspartneri efekt mõjub kõneleja soo ja vanusega seoses? Kuna mudelis on see ainult peamõjuna ja ilma interaktsioonideta, siis mõjub see sõltumata kõneleja soost ja vanusest alati ühte moodi: meestega rääkides kasutatakse 5 Hz madalamat häält.
 
-Ilma `lmerTest` paketi kasutamata ei esitata fikseeritud efektide tabelis p-väärtusi. Sel juhul peaks hindama faktori olulisust statistiku *t* väärtuse alusel: rusikareegel on see, et kui selle absoluutväärtus on suurem kui kaks |t| > 2, siis on faktor oluline.
+Kui varasemates näidetes meil on sageli olnud logaritmitud tunnuseid, siis siin on tõlgendamine seda lihtsam, et kõik tunnused on algsetes ühikutes. Võib-olla lihtsam on mudeli efekte hinnata siis, kui teisendame proportsionaalse kestuse protsentideks:
 
-```{r, echo=T}
-# värv = kõneleja sugu, punkti kuju = vestluspartneri sugu; baastase N (must ja ring)
-plot(f0_mean ~ SP1_age, col = SP1_gender, pch = as.numeric(SP2_gender), data = dat, xlim = c(20,70))
-
-sm4coefs <- summary(sm4)$coefficients[,"Estimate"]
-
-for(i in 0:1) {
-  # naiste reg.jooned (must), kui räägivad naistega (pidev), ja kui räägivad meestega (katkend)
-  lines(x = 20:70, y = c(sm4coefs["(Intercept)"] + 
-                             20:70 * sm4coefs["SP1_age"] + 
-                             i * sm4coefs["SP2_genderM"]), 
-        lty = i+1)
-  # meeste reg.jooned (punane): kui räägivad naistega (pidev), meestega (katkend)
-  lines(x = 20:70, y = c(sm4coefs["(Intercept)"] + 
-                             20:70 * sm4coefs["SP1_age"] + 
-                             sm4coefs["SP1_genderM"] + 
-                             20:70 * sm4coefs["SP1_genderM:SP1_age"] + 
-                             i * sm4coefs["SP2_genderM"]), 
-        lty = i+1, col=2)
-}
+```{r}
+ summary(sm4)$coefficients[,"Estimate"] *100
 ```
 
+- vabaliige (intercept) on siis keskmine põhitoon siis, kui kõigi seletavade tunnuste väärtus on 0 või nad on baastasemel. See tähendab siis, et kui vestlesid kaks samavanust naist, rääkis kumbki 48% ajast.
+- Kõneleja soo efekt tähendab seda, et kui mees vestles naisega, siis mees rääkis 48+6 = 54% ajast.
+- Vestluspartneri soo efekt tähendab seda et kui naine vestles mehega, siis naine rääkis 48-8 = 40% ajast.
+- Vanusevahe on andmestikus arvutatud nii, et positiivne vanusevahe tähendab kõnelejast vanemat, negatiivne nooremat vestluspartnerit. Seega endast vanemaga rääkides väheneb kõnelemise aeg 0.45% iga vanusevahe aasta kohta, nii et kui naine räägib endast 30 aastat vanema naisega, räägib ta 48 + 30\*-0.45 = 35% ajast, aga kui näiteks mees räägib endast 30 aastat noorema naisega, siis ta räägib 48 + 6 - 30\*-0.45 =  68% ajast.
 
-Sama ggplotiga:  
 
-```{r, message=FALSE}
-library(tidyverse)
-ggplot(data = dat, aes(x = SP1_age, y = f0_mean, color = SP1_gender, shape = SP2_gender)) +
-    geom_point(size = 2) +
-    scale_shape_manual(values = c(1,2)) +
-    scale_color_manual(values = c("black", "red")) +
-    # naiskõnelejad, kes räägivad naistega
-    geom_abline(intercept = sm4coefs["(Intercept)"],
-                slope = sm4coefs["SP1_age"],
-                color = "black", linetype = "solid") +
-    # naiskõnelejad, kes räägivad meestega
-    geom_abline(intercept = sm4coefs["(Intercept)"] + sm4coefs["SP2_genderM"],
-                slope = sm4coefs["SP1_age"],
-                color = "black", linetype = "dashed") +
-    # meeskõnelejad, kes räägivad naistega
-    geom_abline(intercept = sm4coefs["(Intercept)"] + sm4coefs["SP1_genderM"],
-                slope = sm4coefs["SP1_age"] + sm4coefs["SP1_genderM:SP1_age"],
-                color = "red", linetype = "solid") +
-    # meeskõnelejad, kes räägivad meestega
-    geom_abline(intercept = sm4coefs["(Intercept)"] + sm4coefs["SP1_genderM"] + sm4coefs["SP2_genderM"],
-                slope = sm4coefs["SP1_age"] + sm4coefs["SP1_genderM:SP1_age"],
-                color = "red", linetype = "dashed")
+```{r, warning=FALSE, message=F}
+sjPlot::plot_model(sm4, type = "pred", show.data = T, terms = c("vanusevahe", "kaaskoneleja_sugu","sugu"))
 ```
 
 
 
-Kuna siin mudelis on seletavate tunnustena kõneleja enda omadused, mis ühe kõneleja puhul korduda ei saa, siis siia juhuslikku kallet lisada ei saa.
+### Testime ka mudeli jääke
 
+Lineaarsele segamudelile on endiselt eeldus, et mudeli jäägid on normaaljaotusega:
+
+```{r}
+par(mfcol=c(1,2))
+hist(residuals(sm4))
+qqnorm(residuals(sm4))
+qqline(residuals(sm4))
+par(mfcol=c(1,1))
+shapiro.test(residuals(sm4))
+```
+
+Tundub, et on ilus normaaljaotus.
+
+### Vaatame juhuslikke lõikepunkte
+
+Segamudelis on juhuslik faktor, siin mudelis juhuslik lõikepunkt iga kõneleja kohta. Kui meie mudel hindab seda, kui palju kõneleja vestluses osaleb, siis üldine mudeli fikseeritud lõikepunkt:
+
+```{r}
+ summary(sm4)$coefficients["(Intercept)","Estimate"]
+```
+
+tähendab, et keskmiselt osalesid kõnelejad vestluses 48% ajast, aga juhuslik lõikepunkt kõneleja kohta tähendab seda, et selle võrra erines iga üksik indiviid keskmisest (võttes arvesse tema korduvaid osalemisi erinevate vestluspartneritega). Juhuslikke faktoreid saab mudeli objektist käsuga `ranef()`.
+
+```{r}
+head(ranef(sm4)$koneleja)
+```
+
+Siit näeme siis seda, et KJ1 oli keskmisest 8% vähem jutukas, KJ2 4% ja KJ3 0.4% vähem jutukad, aga KJ4 rääkis keskmisest 9% rohkem.
+
+## Näide 1b: Sama GAM-mudeliga (mgcv pakett)
+
+lme4 on üks populaarsemaid R-i pakette lineaarsete segamudelite jaoks. Teine väga populaarne pakett, millega saab nii lineaarseid segamudeleid kui ka mittelineaarsete seostega üldistatud aditiivseid segamudeleid (*genralised aditive mixed models*, GAMM), on pakett mgcv. Proovime korra sama mudelit teise paketiga:
+
+```{r, message=F}
+#install.packages("mgcv")
+library(mgcv)
+```
+
+Käsu `gam()` süntaks on üldiselt sama nagu eelmistel mudelitel, aga kui `lmer()` juhuslik vabaliige tähistatakse `(1|tunnus)`, siis sama asi gam-is on `s(tunnus, bs="re")`.
+
+```{r}
+gam4 <- gam(kestus_prop ~ sugu + kaaskoneleja_sugu + vanusevahe + s(koneleja, bs = "re"), data = fonkorp2)
+summary(gam4)
+```
+
+GAM-mudelisse on võimalik lisada *smooth*-efektidena mittelineaarseid seoseid. Praegu siin mudelis on fikseeritud efektid lineaarsed, aga juhuslik kõneleja efekt on *smooth* efektina. Proovime korra ka seda, kas vanusevahe efekt võiks olla mittelineaarne:
+
+```{r}
+gam5 <- gam(kestus_prop ~ sugu + kaaskoneleja_sugu + s(vanusevahe) + s(koneleja, bs = "re"), data = fonkorp2)
+summary(gam5)
+```
+
+Mittelineaarsete efektide puhul peaks vaatama edf kordajat: kui see on suurem kui 2, siis on seoses mittelineaarsust, siin mudlis vanusevahe edf = 1, seega tegemist on siiski lineaarse seosega.
 
 ## Näide 2: vokaali kestus ja välde
 
@@ -258,7 +291,7 @@ quantile(table(dat2$SP))
 table(table(dat2$Word))
 ```
 
-Eesti keeles on 3 väldet (nt sada : saada : saada) ja välde kõige rohkem mõjutab rõhulise vokaali kestust. Kui uurida vokaali kestust, siis fikseeritud faktorina võiks kestuse varieerumist seletada:
+Eesti keeles on 3 väldet (nt *sada* : *saada* : *saada*) ja välde kõige rohkem mõjutab rõhulise vokaali kestust. Kui uurida vokaali kestust, siis fikseeritud faktorina võiks kestuse varieerumist seletada:
 
 1) välde, 
 2) lauserõhk (fookus)
@@ -286,7 +319,6 @@ boxplot(V1 ~ Quantity, data = dat2, subset = Struct == "cvcv",
 Kui me tahaks rakendada selle andmestiku peal varasematest praktikumidest tuttavaid meetodeid ehk ilma juhuslike efektideta anovat või lineaarset mudelit, siis selle kuidagi saama kooskõlla eeldusega, et tegemist on sõltumatute mõõtmistega. Üks võimalus selleks on keskmistada nii, et näiteks iga kõneleja kohta oleks iga välte kohta üks mõõtmine. (Umbes nii on ka Lippus jt 2013 artiklis analüüs läbi viidud.)
 
 ```{r, message=F}
-library(tidyverse)
 dat2 %>% 
     filter(Struct == "cvcv") %>% 
     group_by(SP, Quantity) %>% 
@@ -340,15 +372,17 @@ sjPlot::plot_model(m1, type = "re", sort.est = T, grid = F)
 ```
 
 
-
 Siin joonisel on kast-vurrud diagrammina vokaalikestuse jaotused kolmes vältes ja punase joonega on lisatud mudeli hinnang välte efektile:
-```{r}
+```{r, eval=F}
+# baasgraafikaga
 plot(V1 ~ Quantity, data = dat2, subset = Struct=="cvcv")
 coefs <- summary(m1)$coefficients[,"Estimate"]
 lines(y = coefs["(Intercept)"] + c(0, coefs[c("Quantity2", "Quantity3")]), 
       x = 1:3, lwd = 3, col = "red")
 ```
 ```{r}
+#ggplotiga sama
+coefs <- summary(m1)$coefficients[,"Estimate"]
 ggplot() +
     geom_boxplot(data = dat2 %>% filter(Struct=="cvcv"), aes(x = Quantity, y = V1)) +
     geom_line(aes(x = 1:3,
@@ -363,13 +397,17 @@ ggplot() +
 
 Siin joonisel on eri värviga iga kõneleja individuaalne joon, mida on mudeli juhusliku vabaliikme põhjal korrigeeritud:
 
-```{r}
+```{r, eval =F}
+# baasgraafikaga
 plot(V1 ~ Quantity, data = dat2, subset = Struct == "cvcv")
 coefs <- summary(m1)$coefficients[,"Estimate"]
 for(i in 1:nrow(ranef(m1)$SP)) lines(y = ranef(m1)$SP[i,] + coefs["(Intercept)"] + c(0,coefs[c("Quantity2", "Quantity3")]), x = 1:3, col = i)
 ```
 
 ```{r}
+# ggplotiga sama
+coefs <- summary(m1)$coefficients[,"Estimate"]
+
 ranef(m1)$SP %>%
     mutate(koneleja = rownames(.),
            Q1 = coefs["(Intercept)"] + `(Intercept)`,
@@ -385,8 +423,6 @@ ggplot() +
               aes(x = välde, y = kõnetempo, color = koneleja, group = koneleja),
               show.legend = F)
 ```
-
-
 
 
 ## Juhuslik kalle
@@ -418,7 +454,8 @@ sjPlot::plot_model(m2, type = "re")
 
 
 Juhuslike kalletega joonis:
-```{r}
+```{r, eval=F}
+# baasgraafikaga
 plot(V1 ~ Quantity, data = dat2, subset = Struct == "cvcv")
 coefs <- summary(m2)$coefficients[,"Estimate"]
 for(i in 1:nrow(ranef(m2)$SP)) lines(y = coefs["(Intercept)"] + 
@@ -429,6 +466,7 @@ for(i in 1:nrow(ranef(m2)$SP)) lines(y = coefs["(Intercept)"] +
                                      col = i)
 ```
 ```{r}
+# ggplotiga sama
 ranef(m2)$SP %>%
     mutate(koneleja = rownames(.),
            Q1 = coefs["(Intercept)"] + `(Intercept)`,
@@ -497,6 +535,26 @@ summary(glht(m3, linfct = mcp(Quantity = "Tukey")), test = adjusted("holm"))
 ```
 Post-hoc testi tulemusel võib öelda, et vokaali kestus on oluliselt erinev kõigis kolmes vältes p<0.001.
 
+## R-ile ja pakettidele viitamine teadustöös
+
+Kui kasutad oma töös R-i ja selle pakette, siis peaks neile ka viitama, esiteks selle pärast, et meetodi kirjelduses peab täpselt raporteerima, mis vahenditega analüüs on läbi viidud, teiseks selle pärast, et enamik R-i pakette on valminud teadustöö tulemusena ja nende autoreid hinnatakse bibliomeetria ehk viitamiste arvu järgi. Enamasti on paketi metainfos öeldud, kuidas sellele paketile võiks viidata ja R-is saab viite kerge vaevaga kätte käsuga `citation()`. Näiteks:
+
+```{r}
+# baaspakett
+citation()
+
+# LME4 
+citation("lme4")
+citation("lmerTest")
+
+# mgcv
+citation("mgcv")
+
+# sjPlot
+citation("sjPlot")
+```
+
+
 ## Kordamisküsimused
 
 Kordamisküsimuste testi saad teha ka Moodle'is, seal näed peale vastamist ka õigeid vastuseid ja selgitusi.
@@ -551,3 +609,11 @@ d) segamudeliga ei peagi post-hoc testi tegema
 ## Järgmisel korral
 
 - Logistiline regressioon e uuritav tunnus on nominaalne (kahe tasemega).
+
+## Funktsioonide sõnastik
+
+- `lme4::lmer()` -- lineaarne segamudel paketiga lme4
+- `lmer::ranef()` -- segamudeli juhuslikud efektid
+- `residuals()` -- mudeli jäägid (sama mis mudel$residuals)
+- `mgcv::gam()` -- segamudel mgcv paketiga
+- `sjPlot::plot_model` -- mudeli efektide visualiseerimine
