@@ -26,7 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 </center>
 
 ```{r}
-load("data/kysimustik_2023.RData")
+load("data/kysimustik_2024.RData")
 # Jätame välja ühe vaatluse
 kysimustik2 <- droplevels(kysimustik[kysimustik$lemmikloom != "Mulle ei meeldi loomad",])
 
@@ -35,44 +35,69 @@ summary(mod)
 ```
 
 
-- Lineaarne regressioon aitab seletada **arvulise uuritava tunnuse** varieerumist ühe või enama seletava tunnuse põhjal.      
-- **Seletavad tunnused** võivad olla nii  
-    + **arvulised**: kui palju suureneb/väheneb uuritava tunnuse väärtus, kui arvuline tunnus suureneb ühe ühiku võrra?
-    + **kategoriaalsed**: kui palju suureneb/väheneb uuritava tunnuse väärtus, kui muuta tunnuse klassi/taset?  
-- Lineaarse mudeli väljundi **vabaliige** (*intercept*) näitab arvulise uuritava tunnuse ennustatud väärtust kontekstis, kus arvulise seletava tunnuse väärtus on (vaikimisi) 0 ja kategoriaalse seletava tunnuse väärtus on (vaikimisi) tähestikulises järjekorras kõige esimene tase.  
-    + Näiteks tunnuse `kogemused_kvant` baastase on `Ei` ja tunnuse `lemmikloom` baastase on `Glaucus atlanticus`.  
-- Lineaarse mudeli väljundi **koefitsiendid** (*coefficient*) ehk regressioonikordajad näitavad muutust arvulise uuritava tunnuse väärtuses, kui muuta seletava tunnuse väärtust (kas 1 ühiku võrra või 1 taseme võrra).    
-    + Näiteks sellisele osalejale, kellel **ei ole kogemusi kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus**, ennustab mudel iga aasta kohta tema sünniaastas õpitud aastate arvu kahanemist `r abs(mod$coefficients[["synniaasta"]])` aasta võrra. Kui sellise osaleja sünniaasta oleks nt 1987, ennustaks mudel tema ülikoolis õpitud aastate arvuks `844.02405 + 1987 * (-0.42024)` ehk `r 844.02405 + 1987 * (-0.42024)` aastat.  
-    + Sama sünniaastaga osalejale, kellel **on kogemusi kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus**, ennustab mudel õpitud aastate arvuks aga `844.02405 + 1987 * (-0.42024) + 1.33101` ehk `r 844.02405 + 1987 * (-0.42024) + 1.33101` aastat.  
-    + Sama sünniaastaga osalejale, kellel **on kogemusi kvantitatiivsete meetoditega ja kelle lemmikloom on koer**, ennustab mudel õpitud aastate arvuks `844.02405 + 1987 * (-0.42024) + 1.33101 - 2.50429` ehk `r 844.02405 + 1987 * (-0.42024) + 1.33101 - 2.50429`.  
-    + Kategoriaalse seletava tunnuse puhul, millel on > 2 taset ja seega > 1 koefitsienti, hindavad kõik koefitsiendid muutust **võrreldes baastasemega** ega ütle midagi koefitsientide omavahelise suhte kohta.  
-        - Näiteks hindavad kõik tunnuse `lemmikloom` koefitsiendid muutust võrreldes glaucus atlanticusega.  
-    + Erinevuse suunda baastasemest näitab koefitsiendi märk: kui koefitsient on positiivne, siis uuritava tunnuse ennustatud väärtus kasvab, kui koefitsient on negatiivne, siis kahaneb.  
-    + Erinevuse statistilist olulisust näitavad koefitsientide *p*-väärtused. Kui koefitsiendi *p*-väärtus on > 0.05, ei ole statistiliselt olulist erinevust **võrreldes baaskontekstiga** (mis ei tähenda tingimata, et erinevus ei oleks oluline mingite teiste väärtuste vahel).    
-        - Näiteks on ennustatud õpitud aastate arv oluliselt erinev osalejal, kelle hüpoteetiline sünniaasta on 0, ja osalejal, kelle hüpoteetiline sünniaasta on 1. Samuti on ennustatud õpitud aastate arv oluliselt erinev osalejal, kelle lemmikloom on glaucus atlanticus, ja osalejal, kelle lemmikloom on koer (aga me ei tea, kas ka näiteks kaelkirjaku ja koera vahel).  
-    + Tasemete omavahelist erinevust saab hinnata *post-hoc* testide või jooniste abil.  
+Lineaarne regressioon aitab seletada **arvulise uuritava tunnuse** varieerumist ühe või enama seletava tunnuse põhjal.        
+**Seletavad tunnused** võivad olla nii  
+
+- **arvulised**: kui palju suureneb/väheneb uuritava tunnuse ennustatud keskväärtus, kui arvuline tunnus suureneb ühe ühiku võrra?  
+- **kategoriaalsed**: kui palju suureneb/väheneb uuritava tunnuse ennustatud keskväärtus, kui muuta tunnuse klassi/taset?  
+
+<br>
+
+Lineaarse mudeli väljundi **vabaliige** (*intercept*) näitab arvulise uuritava tunnuse ennustatud väärtust kontekstis, kus arvulise seletava tunnuse väärtus on (vaikimisi) 0 ja kategoriaalse seletava tunnuse väärtus on (vaikimisi) tähestikulises järjekorras kõige esimene tase. 
+
+- Näiteks tunnuse `kogemused_kvant` baastase on `Ei` ja tunnuse `lemmikloom` baastase on `Glaucus atlanticus`.  
+
+Lineaarse mudeli väljundi **koefitsiendid** (*coefficient*) ehk regressioonikordajad näitavad muutust arvulise uuritava tunnuse väärtuses, kui muuta seletava tunnuse väärtust (kas 1 ühiku võrra või 1 taseme võrra).    
+
+
+- Näiteks sellisele osalejale, kellel **ei ole kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus, ennustab mudel iga aastase kasvu kohta tema sünniaastas õpitud aastate arvu kahanemist `r abs(mod$coefficients[["synniaasta"]])` aasta võrra. Kui sellise osaleja sünniaasta oleks nt 1987, ennustaks mudel tema ülikoolis õpitud aastate arvuks `716.27254 + 1987 * (-0.35624)` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta']` aastat.  
+- Sama sünniaastaga osalejale, kellel **on kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus, ennustab mudel õpitud aastate arvuks aga `716.27254 + 1987 * (-0.35624) + 1.54848` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta'] + mod$coefficients['kogemused_kvantJah']` aastat.  
+- Sama sünniaastaga osalejale, kellel **on kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on koer, ennustab mudel õpitud aastate arvuks `716.27254 + 1987 * (-0.35624) + 1.54848 -2.34155` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta'] + mod$coefficients['kogemused_kvantJah'] + mod$coefficients['lemmikloomKoer']`. 
+
+<br>
+Mudeli ennustusi konkreetsetele vaatlustele saame küsida ka funktsiooniga `predict()`, kui anname ette andmetabeli seletavate tunnuste väärtustega.  
+
+```{r}
+predict(mod, 
+        data.frame(synniaasta = 1987, kogemused_kvant = "Jah", lemmikloom = "Glaucus atlanticus"))
+predict(mod, 
+        data.frame(synniaasta = 1987, kogemused_kvant = "Jah", lemmikloom = "Koer"))
+```
+
+<br>
+
+Kategoriaalse seletava tunnuse puhul, millel on > 2 taset ja seega > 1 koefitsienti, hindavad kõik koefitsiendid muutust **võrreldes baastasemega** ega ütle midagi koefitsientide omavahelise suhte kohta. Näiteks hindavad kõik tunnuse `lemmikloom` koefitsiendid muutust võrreldes glaucus atlanticusega.  
+<br>
+Erinevuse **suunda** võrreldes baastasemega näitab koefitsiendi märk: kui koefitsient on positiivne, siis uuritava tunnuse ennustatud väärtus kasvab, kui koefitsient on negatiivne, siis kahaneb.  
+Erinevuse **statistilist olulisust** näitavad koefitsientide *p*-väärtused. Kui koefitsiendi *p*-väärtus on > 0.05, ei ole statistiliselt olulist erinevust **võrreldes baaskontekstiga** (mis ei tähenda tingimata, et erinevus ei oleks oluline mingite teiste väärtuste vahel). Näiteks on ennustatud õpitud aastate arv oluliselt erinev osalejal, kelle hüpoteetiline sünniaasta on 0, ja osalejal, kelle hüpoteetiline sünniaasta on 1. Samuti on ennustatud õpitud aastate arv oluliselt erinev osalejal, kelle lemmikloom on glaucus atlanticus, ja osalejal, kelle lemmikloom on koer (aga me ei tea, kas ka näiteks kaelkirjaku ja koera vahel).  
+
+
+Tasemete omavahelist erinevust saab hinnata *post-hoc* testide või jooniste abil.  
     
-```{r, warning=F, message=F}
+```{r, warning=F, message=F, eval = F}
 # https://strengejacke.github.io/ggeffects/articles/introduction_plotmethod.html
 # install.packages("ggeffects")
 library(ggeffects)
 plot(ggpredict(mod))
 ```
+
+```{r, echo = F, fig.width = 10}
+library(ggeffects)
+plot(ggpredict(mod, terms = c("synniaasta"))) -> ps
+plot(ggpredict(mod, terms = c("kogemused_kvant"))) -> pk
+plot(ggpredict(mod, terms = c("lemmikloom"))) -> pl
+library(patchwork)
+ps+pk+pl
+```
+
     
-- **Mudeli üldist headust** näitab R-ruut (mudelite võrdlemisel kohandatud R-ruut), **mudeli statistilist olulisust** mudeli *p*-väärtus.  
+<br>
+    
+- Lineaarse **mudeli üldist headust** näitab R-ruut (mudelite võrdlemisel kohandatud R-ruut), **mudeli statistilist olulisust** mudeli *p*-väärtus.  
 - Samal andmestikul tehtud mudeleid saab **võrrelda** funktsiooniga `anova()`, mis teeb I tüüpi ANOVA.    
 - Mudelisse kaasatud tunnuste üldist statistilist olulisust saab hinnata II või III tüüpi ANOVAga (nt `car::Anova()`), vastavalt sellele, kas mudelis on olulisi interaktsioone (III) või mitte (II). Kui kasutada ainult ühe mudeli tunnuste olulisuse hindamiseks I tüüpi ANOVAt, sõltub tulemus tasakaalustamata andmestikus sellest, mis järjekorras tunnuseid mudelisse on lisatud.   
 
-```{r, eval = F}
-anova(mod)
-car::Anova(mod, type = 2)
-
-# Muudame seletavate tunnuste järjekorda
-mod2 <- lm(kaua_opid ~ kogemused_kvant + lemmikloom + synniaasta, data = kysimustik2)
-anova(mod2) # kogemused_kvant on ka järsku oluline, sest sünniaastat hinnatakse kõige viimasena
-car::Anova(mod2, type = 2)
-```
-
+<br>
 - Ka regressioonimudelite tulemusi saab lasta automaatselt raporteerida.  
 
 ```{r, warning=F, message=F}
@@ -83,11 +108,11 @@ report_text(mod)
 - Kui seletavate tunnuste vahel on oluline **interaktsioon**, tähendab see seda, et ühe seletava tunnuse mõju sõltub sellest, mis on mingi teise tunnuse väärtus.  
 
 ```{r}
-mod3 <- lm(kaua_opid ~ synniaasta*lemmikloom, data = kysimustik2)
-plot(ggpredict(mod3, terms = c("synniaasta", "lemmikloom")))
+mod2 <- lm(kaua_opid ~ synniaasta*lemmikloom, data = kysimustik2)
+plot(ggpredict(mod2, terms = c("synniaasta", "lemmikloom")))
 # Sünniaasta efekt on igal pool negatiivne (= mida suurem sünniaasta, seda vähem ülikoolis õpitud aastaid),
 # aga glaucus atlanticuse valinute puhul on sünniaasta efekt palju suurem (= noorte ja vanade vahel suuremad erinevused õpitud aastates).
-# Lemmiklooma efekt (= glaucus atlanticuse valinud on keskmiselt kauem õppinud) püsib ainult u kuni sünniaastani 1993.   
+# Lemmiklooma efekt (= glaucus atlanticuse valinud on keskmiselt kauem õppinud) püsib ainult u kuni sünniaastani 1995.   
 ```
 
 - Kui lineaarses regressioonimudelis on ka **arvulisi seletavaid tunnuseid** (st tegemist ei ole lihtsalt ANOVAga), võiks kontrollida:  
@@ -101,7 +126,17 @@ plot(ggpredict(mod3, terms = c("synniaasta", "lemmikloom")))
         - 2. Normal Q-Q: kontrollib jääkide normaaljaotust.  
         - 3. Scale-Location: x-teljel mudeli ennustatud väärtused, y-teljel ruutjuur standardiseeritud jääkidest. Kontrollib samuti jääkide homoskedastilisust. Kui jäägid ei haju ühtlaselt sirge joone ümber, võib olla homoskedastilisusega probleeme.  
         - 4. Residuals vs. Leverage Plot: y-teljel standardiseeritud jäägid, x-teljel nn *Leverage*, mis näitab, kui palju mingi konkreetne andmepunkt/vaatlus koefitsientide hinnanguid mõjutab. Kui vaatlusel on suur jääk ja suur *Leverage*'i hinnang, võiks kaaluda selle mudelist väljajätmist.    
-      + Mida komplekssem on mudel, seda keerulisemaks eelduste kontroll läheb (mistõttu seda sageli ei tehta).  
+    + Võib kasutada nt ka paketti `performance`.  
+
+```{r, fig.width=10, fig.height = 14}
+# https://easystats.github.io/performance/articles/check_model.html
+# install.packages("performance")
+library(performance)
+check_model(mod)
+```
+
+
+Mida komplekssem on mudel, seda keerulisemaks eelduste kontroll läheb (mistõttu jäetakse see oluline osa sageli tegemata).  
 - Loe ka nt Ako Sauga (2020). [Statistika õpik majanduseriala üliõpilastele](https://digikogu.taltech.ee/et/Item/bdcc647f-fa18-47c1-b499-99024f8bcc93). 
 
 ## Tänases praktikumis
@@ -215,9 +250,9 @@ Sama tulemuseni jõuame tegelikult siis, kui jagame tõenäosuste asemel absoluu
 
 ```{r}
 # Kogemuse omamise šanss
-54/26
+70/34
 # Teejoomise šanss
-32/48
+43/61
 ```
 
 
@@ -289,7 +324,7 @@ Kui __*P = p/(1-p)*__, siis __*p = P/(1+P)*__.
 <br>
 <br>
 
-**Logit** ehk *šansi logaritm* on - nagu nimigi ütleb - logaritmitud šanss. Selle kaudu hinnatakse logistilises regressioonis uuritava tunnuse ennustatud väärtust mingi seletavate tunnuste kombinatsiooni korral. Kui tõenäosus võib varieeruda nullist üheni [0,1] ja šanss nullist lõpmatuseni [0,∞], siis šansi logaritm võib varieeruda **miinus lõpmatusest pluss lõpmatuseni [-∞,∞]**. See on oluline omadus logistilise regressiooni mudelis!
+**Logit** ehk *šansi logaritm* on - nagu nimigi viitab - logaritmitud šanss. Selle kaudu hinnatakse logistilises regressioonis uuritava tunnuse ennustatud väärtust mingi seletavate tunnuste kombinatsiooni korral. Kui tõenäosus võib varieeruda nullist üheni [0,1] ja šanss nullist lõpmatuseni [0,∞], siis šansi logaritm võib varieeruda **miinus lõpmatusest pluss lõpmatuseni [-∞,∞]**. See on oluline omadus logistilise regressiooni mudelis!
 
 
 ### Võtame veel ühe näite.
@@ -674,7 +709,7 @@ Nagu y-teljelt näeme, on logaritmitud sageduste erinevus palju väiksem kui log
 
 ## Ühe seletava tunnusega mudel
 
-Selleks, et natuke paremini aru saada, mis logistilise regressiooni mudelis täpselt ikkagi toimub, laadime andmestiku `ade_peal.RData`. See kujutab endast selle kursuse tarbeks veidi manipuleeritud varianti keeleteaduse andmestikust, mida on kasutatud artiklis Klavan, Jane, Maarja-Liisa Pilvik & Kristel Uiboaed. 2015. The Use of Multivariate Statistical Classification Models for Predicting Constructional Choice in Spoken, Non-Standard Varieties of Estonian. SKY Journal of Linguistics, 28, 187−224. Artiklis uuriti eesti murrete korpuse andmete põhjal, millest sõltub see, kas kõneleja kasutab kohatähenduses alalütlevat käänet ehk *adessiivi* (nt *laual*) või kaassõna *peal* (nt *laua peal*).  Tegemist on niisiis binaarse (st kahe erineva väärtusega) uuritava tunnusega.  
+Selleks, et natuke paremini aru saada, mis logistilise regressiooni mudelis täpselt ikkagi toimub, laadime andmestiku `ade_peal.csv`. See kujutab endast selle kursuse tarbeks veidi manipuleeritud varianti keeleteaduse andmestikust, mida on kasutatud artiklis Klavan, Jane, Maarja-Liisa Pilvik & Kristel Uiboaed. 2015. The Use of Multivariate Statistical Classification Models for Predicting Constructional Choice in Spoken, Non-Standard Varieties of Estonian. SKY Journal of Linguistics, 28, 187−224. Artiklis uuriti eesti murrete korpuse andmete põhjal, millest sõltub see, kas kõneleja kasutab kohatähenduses alalütlevat käänet ehk *adessiivi* (nt __*laual*__) või kaassõna *peal* (nt __*laua peal*__).  Tegemist on niisiis binaarse (st kahe erineva väärtusega) uuritava tunnusega.  
 
 ```{r}
 ade_peal <- read.delim("data/ade_peal.csv", encoding = "UTF-8", stringsAsFactors = TRUE)
@@ -757,11 +792,13 @@ vcd::assocstats(table(ade_peal$cx, ade_peal$LM_mobiilsus))$cramer
 
 Ehkki *peal*-konstruktsioon tundub olevat nii liigutatavate kui ka staatiliste "kohtadega" (`LM`) sagedam, on staatiliste kohtade puhul kaassõna kasutus oluliselt vähem tõenäoline (nt *heinamaa peal*) kui liigutatavate kohtadega (nt *laua peal*).  
 
+<br>
+<br>
 
 
 ### Logistilise regressiooni mudel
 
-Teeme nüüd lihtsal logistilise regressiooni mudeli, et kontrollida, kas kohakonstruktsiooni valikut saab seletada koha/orientiiri liigutatavuse kaudu. Tegelikkuses on mudeli kasutamine kasulikum muidugi pigem siis, kui vaadata mitme seletava tunnuse mõju uuritava tunnuse varieerumisele.
+Teeme nüüd lihtsa logistilise regressiooni mudeli, et kontrollida, kas kohakonstruktsiooni valikut saab seletada koha/orientiiri liigutatavuse kaudu. Tegelikkuses on mudeli kasutamine kasulikum muidugi pigem siis, kui vaadata mitme seletava tunnuse mõju uuritava tunnuse varieerumisele.
 
 ```{r}
 # Logistilise regressiooni mudel
@@ -774,7 +811,12 @@ Mudelist ülevaate saamiseks kasutame jällegi käsku `summary()`.
 summary(m.glm)
 ```
 
-### Kuidas regressioonimudeli tulemust lugeda?
+## Kuidas regressioonimudeli tulemust lugeda?
+
+```{r}
+summary(m.glm)
+```
+
 
 Kuna regressioonimudel hindab uuritava tunnuse **ühe taseme esinemise tõenäosust** šansi logaritmi kaudu, siis peame kõigepealt vaatama, mida peab R sündmuse toimumiseks. Vaikimisi on selleks uuritava tunnuse tähestikulises järjekorras teine tase.
 
@@ -855,7 +897,7 @@ Selles mudelis on muutus seletavas tunnuses statistiliselt oluline, mis tähenda
 **5. AIC ehk Akaike Information Criterion** võimaldab hinnata mudeli headust võrdluses teiste mudelitega (väiksem arv on parem). Arvestab valimi suuruse ja mudelisse kaasatud parameetrite arvuga (nagu *adjusted R2* lineaarse regressiooni mudelis). Kui näiteks teeksime veel ühe mudeli, kuhu lisaksime ühe seletava tunnuse juurde, aga AIC väärtus ei läheks oluliselt väiksemaks, siis ei pruugi meie lisatud tunnusel olla uuritava tunnuse varieerumise seletamisel kuigi suur roll ja peaksime valima lihtsama (= vähemate seletavate tunnustega) mudeli.  
 
 
-### Joonised ja mõjude raporteerimine
+## Joonised ja mõjude raporteerimine
 
 ```{r}
 #library(ggeffects)
