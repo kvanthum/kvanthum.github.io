@@ -42,7 +42,7 @@ body {
 11. [Lineaarse regressiooni mudelid (1)](11-lineaarsed1.html)   
 12. [Lineaarse regressiooni mudelid (2)](12-lineaarsed2.html)  
 13. [Lineaarse regressiooni segamudelid](13-lineaarsed_sega.html)  
-14. <span class="vana">[Logistilise regressiooni mudelid (1)](14-logistilised1.html)</span>   
+14. [Logistilise regressiooni mudelid (1)](14-logistilised1.html)   
 15. <span class="vana">[Logistilise regressiooni mudelid (2)](15-logistilised2.html)</span>  
 16. <span class="vana">[Logistilise regressiooni mudelid (3) ja logistilise regressiooni segamudelid](16-logistilised3_sega.html)</span>   
 17. <span class="vana">[Tingimuslikud otsustuspuud](17-otsustuspuud.html)</span>  
