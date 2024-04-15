@@ -79,6 +79,18 @@ dat <- rbind(ade, peal_juhuvalim) # liida kaks andmestikku ridupidi uuesti kokku
 summary(dat)
 ```
 
+Lihtsam viis juhuvalimit võtta oleks kasutada `tidyverse`'i paketist funktsiooni `sample_n()`. NB! Kui jooksutada andmestiku saamiseks allolevat koodi, võib andmestik olla pisut erinev sellest, mida ülemise koodiga saab.   
+
+```{r, eval = F}
+set.seed(1)
+dat <- ade_peal %>%
+    group_by(cx) %>% # grupeeri vaatlused tunnuse cx järgi 
+    sample_n(size = 722, replace = F) %>% # võta kummastki grupist 722 juhuslikku vaatlust
+    ungroup() # kaota grupeering
+```
+
+
+
 
 ## Ülevaade andmetest
 
@@ -102,20 +114,28 @@ lapply(dat[,seletavad_kat], function(seletav_kat) table(seletav_kat, dat$cx))
 # Teeme korraga uuritava tunnuse joonised kõikide kat. seletavate tunnustega
 dat %>%
   select(cx, all_of(seletavad_kat)) %>% # vali uuritava ja kat. seletavate tunnuste tulbad
-  pivot_longer(., 2:length(.), # tee seletavate tunnuse põhjal laiast tabelist pikk
-               names_to = "tunnused", # kus tunnuste nimed lähevad ühte tulpa
+  pivot_longer(., 2:length(.), # tee seletavate tunnuste põhjal (al 2. tulbast) laiast tabelist pikk
+               names_to = "tunnused", # kus tunnuste tulbanimed lähevad ühte tulpa
                values_to = "väärtused") %>% # ja nende tasemed/väärtused teise
-  ggplot(aes(x = väärtused, # pane tulpdiagrammi x-teljele tunnuste väärtused
+  ggplot(aes(y = väärtused, # pane tulpdiagrammi y-teljele tunnuste väärtused
                fill = cx)) + # kuva täitevärviga uuritavat tunnust
   geom_bar(position = "fill") + # tee joonis suhteliste sagedustega
   stat_count(geom = "text", # lisa tekstina ka absoluutarvud
              aes(label = after_stat(count)), # tekstisildi jaoks loe kategooriate sagedused kokku
              position = position_fill(vjust = 0.5), # aseta sildid tulpade keskele
              colour = "grey40") + # värvi tekst halliks
-  facet_wrap("tunnused", scales = "free") + # tee iga tunnusega oma paneel
-  coord_flip() # keera joonis külili
+  facet_wrap("tunnused", scales = "free") # tee iga tunnusega oma paneel
 
 ```
+
+Sarnase asja tegemiseks võime kasutada ka olemasolevaid ggploti laiendusi, nt funktsiooni `ggbivariate()` paketist `GGally`.  
+
+```{r}
+# install.packages("GGally")
+library(GGally)
+ggbivariate(dat[,c("cx", seletavad_kat)], outcome = "cx")
+```
+
 
 Näeme, et uuritava tunnuse varieerumine toimub kõikide seletavate tunnuste kõikidel tasemetel. See tähendab, et ühelgi väärtusel ei ole *ade* või *peal* suhtes kategoorilist, teist varianti välistavat eelistust. Kui oleks, võiks see regressioonimudelis osutuda probleemiks.  
 Pane tähele, et uuritava tunnuse jaotumine mingite seletavate tunnuste põhjal on võinud tasakaalus valimis võrreldes algandmestikuga muutuda (nt konstruktsioonide kasutus murderühmades, kus Saarte murderühmas oli algselt rohkem *peal*-konstruktsioone, nüüd aga *ade*-konstruktsioone).  
@@ -141,7 +161,7 @@ ggplot(dat, aes(x = LM_pikkus_log, y = ifelse(cx == "peal", 1, 0))) +
 ```
 
 
-Andmetest kiire esmase ülevaate saamiseks on R-is ka erinevaid pakette, nt [`DataExplorer`](https://cran.r-project.org/web/packages/DataExplorer/vignettes/dataexplorer-intro.html), [`GGally`](https://ggobi.github.io/ggally/index.html) või [`Hmisc`](https://hbiostat.org/R/Hmisc/), mis hõlbustavad oluliselt andmeanalüütiku igapäevatööd.    
+Andmetest kiire esmase ülevaate saamiseks on R-is erinevaid pakette, nt [`DataExplorer`](https://cran.r-project.org/web/packages/DataExplorer/vignettes/dataexplorer-intro.html), [`GGally`](https://ggobi.github.io/ggally/index.html) või [`Hmisc`](https://hbiostat.org/R/Hmisc/), mis hõlbustavad oluliselt andmeanalüütiku igapäevatööd.    
 
 Samuti saab esmast kirjeldavat analüüsi küllalt kiiresti teha paketiga [`sjPlot`](https://strengejacke.github.io/sjPlot/reference/index.html), mida kasutame hiljem ka mudeli efektide visualiseerimiseks.  
 
@@ -280,7 +300,7 @@ anova(glm(cx ~ LM_pikkus_log + sõnajärg + TR_liik + LM_komplekssus + murderüh
 
 Kui tahaksime nt määrata ka, milline tunnus on kõige olulisem ja kasutada selleks *Deviance* tulpa, mis näitab, kui palju vähendab mingi tunnus seletamata varieerumist uuritavas tunnuses, siis sõltub tulemus sellest, mis järjekorras oleme tunnuseid mudelisse lisanud.  
 
-Seepärast on konfirmatoorses analüüsis parem kasutada **II tüüpi ANOVAt**, mis võrdleb iga tunnuse mõju koos kõikide teiste lisatavate tunnustega. Selleks on funktsioon `Anova()` paketist `car` või funktsioon `drop1`.    
+Seepärast on konfirmatoorses analüüsis parem kasutada **II tüüpi ANOVAt**, mis võrdleb iga tunnuse mõju koos kõikide teiste lisatavate tunnustega. Selleks on funktsioon `Anova()` paketist `car` või funktsioon `drop1`. III tüüpi ANOVAt, millest on varem ka juttu olnud, on kasulikum kasutada siis, kui mudelis on ka seletavate tunnuste vahelisi interaktsioone ehk koosmõjusid.    
 
 ```{r}
 car::Anova(mmax.glm)
@@ -598,7 +618,7 @@ d) Koefitsientide *p*-väärtusi.
 
 #### 3. Teeme kursuse küsimustiku andmete pealt mudeli, mis ennustab vastajate lemmikjooki sünniaasta, ülikoolis õpitud aastate arvu, kvantmeetodite kogemuse, lemmiklooma ja küsimustikule vastamise aasta järgi. Millised peamõjud tuleks mudelisse jätta?
 ```{r}
-load("data/kysimustik_2023.RData")
+load("data/kysimustik_2024.RData")
 kysimustik$aasta <- as.numeric(as.character(kysimustik$aasta))
 m <- glm(lemmikjook ~ synniaasta + kaua_opid + kogemused_kvant + lemmikloom + aasta, data = kysimustik, family = "binomial")
 car::Anova(m)
