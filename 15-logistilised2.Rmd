@@ -626,8 +626,9 @@ car::Anova(m)
 
 a) mitte ühtegi
 b) kogemused_kvant ja vastamise aasta
-c) kogemused_kvant, vastamise aasta ja lemmikloom
-d) kõik
+c) vastamise aasta  
+d) kogemused_kvant, vastamise aasta ja lemmikloom  
+e) kõik
 
 
 ## Järgmisel korral
