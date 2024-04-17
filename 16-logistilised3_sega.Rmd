@@ -53,7 +53,7 @@ dat <- rbind(ade, peal_juhuvalim) # liida kaks andmestikku ridupidi uuesti kokku
 Teeme sel korral sama mudeli, aga määrame kõigepealt kategoriaalsete tunnuste baastasemeteks nende kõige tüüpilisema (= sagedama) väärtuse ehk moodi.  
 
 ```{r}
-lapply(dat[,c("LM_mobiilsus", "LM_komplekssus", "tegusõna_klass", "murderühm")], # iga tulba/tunnuse kohta neljast
+sapply(dat[,c("LM_mobiilsus", "LM_komplekssus", "tegusõna_klass", "murderühm")], # iga tulba/tunnuse kohta neljast
        function(x) names(which.max(table(x)))) # leia selle tunnuse mood
 ```
 
@@ -76,7 +76,7 @@ plot_model(m5.glm,
            show.values = T, # näita koefitsientide väärtuseid
            value.offset = 0.3, # punktist veidi ülevalpool
            sort.est = T, # sorteeri koefitsiendid
-           p.adjust = "holm", # korrigeeri p-väärtuseid
+           p.adjust = "holm", # korrigeeri p-väärtuseid enam kui kahe tasemega kat. tunnuste võrdluseks
            title = "Baaskontekst:\nLM mobiilsus [staatiline], LM komplekssus [lihtsõna],\nLM pikkus log [0 ehk 1 silp], murderühm [Kesk]",
            wrap.title = 150) + # luba pealkirjas ühele reale kuni 150 tähemärki
   theme(plot.title = element_text(size = 12)) # muuda pealkirja teksti suurust ggplotiga 
@@ -84,15 +84,28 @@ plot_model(m5.glm,
 
 ```{r}
 # Visualiseerime peamõjusid
-plot_model(m5.glm, type = "pred") -> preds
-preds$LM_mobiilsus
-preds$LM_komplekssus
-preds$tegusõna_klass
+plot_model(m5.glm, type = "pred", terms = c("LM_mobiilsus"), axis.title = c("LM mobiilsus", "'peal' ennustatud tõenäosus"))
+plot_model(m5.glm, type = "pred", terms = c("LM_komplekssus"), axis.title = c("LM komplekssus", "'peal' ennustatud tõenäosus"))
+plot_model(m5.glm, type = "pred", terms = c("tegusõna_klass"), axis.title = c("Tegusõna klass", "'peal' ennustatud tõenäosus"))
 ```
+
+Võime paremaks võrdluseks määrata kõikidel ka y-telje 0 kuni 100 protsendini.
+
+```{r}
+plot_model(m5.glm, type = "pred", terms = c("LM_mobiilsus"), axis.title = c("LM mobiilsus", "'peal' ennustatud tõenäosus")) +
+  scale_y_continuous(limits = c(0, 1), labels = scales::percent)
+plot_model(m5.glm, type = "pred", terms = c("LM_komplekssus"), axis.title = c("LM komplekssus", "'peal' ennustatud tõenäosus")) +
+  scale_y_continuous(limits = c(0, 1), labels = scales::percent)
+plot_model(m5.glm, type = "pred", terms = c("tegusõna_klass"), axis.title = c("Tegusõna klass", "'peal' ennustatud tõenäosus")) +
+  scale_y_continuous(limits = c(0, 1), labels = scales::percent)
+```
+
 
 ```{r}
 # Visualiseerime interaktsiooni
 plot_model(m5.glm, type = "int", grid = T)
+plot_model(m5.glm, type = "int", grid = T) +
+  scale_y_continuous(limits = c(0, 1), labels = scales::percent)
 ```
 
 
@@ -372,7 +385,7 @@ Multikollineaarsust saab kontrollida funktsiooniga `vif()` paketist `car`. Lühe
 car::vif(m5.glm)
 ```
 
-GVIF tähistab fraasi *generalized VIF*, mis sobitab VIF-skoorid ka üldistatud lineaarsetele mudelitele ning mida näidatakse siis, kui tunnuste vabadusastmete arv on > 1. Multikollineaarsus peamõjude ja interaktsioonide vahel on ootuspärane ja üldiselt ka vältimatu, kuna VIF-skoorid mõõdavad seda, kas kaks tunnust seletavad (osaliselt) sama osa varieeruvusest, aga interaktsioon juba oma olemuselt sisaldabki ka peamõjusid.  
+GVIF tähistab fraasi *generalized VIF*, mis sobitab VIF-skoorid ka üldistatud lineaarsetele mudelitele ning mida näidatakse siis, kui tunnuste vabadusastmete arv on > 1. **Multikollineaarsus peamõjude ja interaktsioonide vahel on ootuspärane ja üldiselt ka vältimatu**, kuna VIF-skoorid mõõdavad seda, kas kaks tunnust seletavad (osaliselt) sama osa varieeruvusest, aga interaktsioon juba oma olemuselt sisaldabki ka peamõjusid.  
 Siin väljastatakse ka GVIF-skoorid, mis kohandavad skoore vabadusastmete arvuga. Neid peaksimegi pigem vaatama.  
 Näeme, et siin tugevat multikollineaarsust ei esine. Kui esineks, oleks ohutum ühest või teisest seletavast tunnusest loobuda. 
 
