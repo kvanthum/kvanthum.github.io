@@ -551,6 +551,8 @@ ggparty(puu9) +
 
 Nii nagu logistilises regressiooniski ennustab otsustuspuu sisuliselt igale teatud omadustega vaatlusele mingi uuritava tunnuse klassi (kat. uuritava tunnusega) või keskväärtuse (arv. uuritava tunnusega), mille põhjalt saab hinnata mudeli sobivust päris andmetega.
 
+<br>
+
 ### Kategoriaalne uuritav tunnus
 
 
@@ -622,6 +624,8 @@ Kuna meie C väärtus on veidi väiksem kui 0.7, võime paigutada mudeli eristus
 
 Kui uuritaval tunnusel on rohkem kui 2 klassi, on AUC kasutamine pisut keerukam. On pakutud, et sellisel juhul võib leida eraldi AUC-väärtused kõikide tunnuse klasside paaride vahel ning seejärel võtta nende aritmeetiline keskmine. Selleks on R-is eraldi funktsiooon [`multiclass.roc()`](https://www.rdocumentation.org/packages/pROC/versions/1.16.1/topics/multiclass.roc) paketist `pROC`.
 
+<br>
+<br>
 
 ### Arvuline uuritav tunnus
 
