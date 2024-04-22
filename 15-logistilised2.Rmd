@@ -638,4 +638,14 @@ e) kõik
 - Mudeli valideerimine
 - Segamudelid
 
+## Funktsioonide sõnastik
 
+- `car::Anova()` - leia seletavate tunnuste statistiline olulisus mudelis (type = "II", kui interaktsioone pole, ja type == "III", kui mudelis on ka interaktsioonid)  
+- `GGally::ggbivariate()` - anna ülevaade uuritava tunnuse jaotumisest kõikides seletavate tunnuste kategooriates  
+- `lapply()` - rakenda mingit funktsiooni igale listi liikmele (nt igale tulbale andmetabelis)  
+- `pchisq()` - arvuta terve logistilise regresiooni mudeli statistiline olulisus  
+- `rbind()` - liida mitu andmestikku, mil on ühesugused tulbanimed, ridupidi kokku üheks andmestikuks  
+- `sample()` - võta vektorist kindla suurusega juhuslik valim  
+- `sjPlot::plot_model()` - näita logistilise regressiooni mudeli koefitsiente või seletavate tunnuste mõjusid joonistel  
+- `sjPlot::tab_model()` - näita logistilise regressiooni mudeli koefitsiente ilusas HTML-vormingus tabelis  
+- `tidyverse::sample_n()` - võta andmestikust kindla suurusega juhuslik valim  

@@ -28,7 +28,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Regressioon vs. otsustuspuud 
 
-**Regressioonimudelite** puhul on võimalik hinnata ühe seletava tunnuse taseme/ühiku muutuse mõju uuritava tunnuse varieerumisele. Selles mõttes on regressioon lähim meetod kontrollitud katse tegemisele, kui tegelikult on kasutada ainult vaatlusandmed. Regressioonimudelid on **parameetrilised** mudelid, mis tähendab, et uute vaatluste väärtuste ennustamiseks piisab kindlate parameetrite hinnangute (nt regressioonikordaja ja selle standardviga) teadmisest. Näiteks lineaarses regressioonis, kus on 1 seletav tunnus, piisab vabaliikmest ja seletava tunnuse koefitsiendist selleks, et mingi kindlusega ennustada kõiki võimalikke väärtusi. Seda aga juhul, kui andmed vastavad kindlale jaotusele ning uuritavat tunnust saab näiteks ka päriselt ennustada lineaarse funktsiooni kaudu. Kui tegelikult ei ole uuritav tunnus kirjeldatav seletavate tunnuste lineaarse (st sirgjoonelise) kombinatsiooni kaudu, ei ennusta meie mudel tegelikult uuritava tunnuse väärtuseid populatsioonis kuigi hästi.  
+**Regressioonimudelite** puhul on võimalik hinnata ühe seletava tunnuse taseme/ühiku muutuse mõju uuritava tunnuse varieerumisele. Selles mõttes on regressioon lähim meetod kontrollitud katse tegemisele, kui tegelikult on kasutada ainult vaatlusandmed. Regressioonimudelid on **parameetrilised** mudelid, mis tähendab, et uute vaatluste väärtuste ennustamiseks piisab kindlate parameetrite hinnangute (nt regressioonikordaja ja selle standardvea) teadmisest. Näiteks lineaarses regressioonis, kus on 1 seletav tunnus, piisab vabaliikmest ja seletava tunnuse koefitsiendist selleks, et mingi kindlusega ennustada kõiki võimalikke väärtusi. Seda aga juhul, kui andmed vastavad kindlale jaotusele ning uuritavat tunnust saab näiteks ka päriselt ennustada lineaarse funktsiooni kaudu. Kui tegelikult ei ole uuritav tunnus kirjeldatav seletavate tunnuste lineaarse (st sirgjoonelise) kombinatsiooni kaudu, ei ennusta meie mudel tegelikult uuritava tunnuse väärtuseid populatsioonis kuigi hästi.  
 
 
 Puudused:  
@@ -84,8 +84,9 @@ Rekursiooni olemust näitlikustatakse sageli Sierpinski kolmnurga kaudu, kus üh
 
 Otsustuspuid on eriti viimase 10 aasta jooksul kasutatud palju ka keeleteaduses. Näiteks uurisid [Ruutma jt (2016)](https://keeljakirjandus.ee/ee/archives/25305) otsustuspuude abil, millest võiks sõltuda eesti murretes see, kas kaassõnad *läbi*, *mööda*, *vastu*, *üle* ja *ümber* paiknevad nimisõna ees (nt *ümber järve*) või järel (*kahe kilo ümber*).  
 
+<center>
 ![](imgs/ruutmaetal.jpg){width=60%}
-
+</center>
 Nad leidsid näiteks, et kui suhe, mida kaassõnafraas väljendab, märgib mingit *mõõdet* ehk kvantiteeti või ligikaudsust (*ta oli siis juba __seitsmekümne aasta ümber__*), kasutatakse kaassõna *ümber* eeskätt nimisõna järel, tagasõna ehk postpositsioonina.  
 Kui aga kaassõnafraas väljendab konkreetset ruumisuhet, sõltub kaassõna asend sellest, kas nimisõna, millega see koos esineb, viitab elusale või elutule referendile. Elusatega kasutatakse samuti pigem tagasõna (nt *loomad jooksid __mu ümber__*), elututega pigem eessõna (nt *need pandi __ümber vankri__*).  
 
@@ -425,7 +426,7 @@ names(valimised)
 Vaatame veel, mis saab siis, kui ühelgi seletaval tunnusel ei ole uuritava tunnuse seletamisel olulist rolli.
 
 ```{r}
-load("data/kysimustik_2023.RData")
+load("data/kysimustik_2024.RData")
 
 # Kategoriaalne uuritav tunnus
 puu7 <- ctree(lemmikloom ~ ., data = kysimustik)
@@ -505,9 +506,9 @@ plot(puu9,
 
 
 
-Lisaks `partykit`-paketi enda võimalustele on üsna värskelt välja tulnud ka pakett `ggparty`, mis on tehtud `ggplot2` laiendusena `partykit` paketi objektide visualiseerimiseks. Kui rohkem huvi, tasub selle kohta uurida nt [siit](https://cran.r-project.org/web/packages/ggparty/vignettes/ggparty-graphic-partying.html) või [siit](https://luisdva.github.io/rstats/plotting-recursive-partitioning-trees/).
+Lisaks `partykit`-paketi enda võimalustele on olemas ka pakett `ggparty`, mis on tehtud `ggplot2` laiendusena `partykit` paketi objektide visualiseerimiseks. Kui rohkem huvi, tasub selle kohta uurida nt [siit](https://cran.r-project.org/web/packages/ggparty/vignettes/ggparty-graphic-partying.html) või [siit](https://luisdva.github.io/rstats/plotting-recursive-partitioning-trees/).
 
-```{r}
+```{r, warning = FALSE, message=FALSE}
 # install.packages("ggparty")
 library(ggparty)
 
@@ -602,6 +603,12 @@ C-indeksi arvutamiseks vajame sellest tabelist ainult ühe klassi tõenäosusi (
 enn_probs <- predict(puu2, type = "prob")[,"peal"]
 head(enn_probs)
 
+# C-indeks
+library(pROC)
+auc(teg, enn_probs)
+
+# Või
+
 # Teisendame uuritava tunnuse tegelikud väärtused
 # samuti tõenäosusteks 0 ("ei") ja 1 ("jah")
 teg_probs <- ifelse(dat$cx == "peal", 1, 0)
@@ -609,10 +616,6 @@ teg_probs <- ifelse(dat$cx == "peal", 1, 0)
 library(Hmisc)
 # C-indeks
 somers2(enn_probs, teg_probs)
-
-# Või
-library(pROC)
-auc(teg, enn_probs)
 ```
 
 Kuna meie C väärtus on veidi väiksem kui 0.7, võime paigutada mudeli eristusvõime kehva ja rahuldava piirimaile. Ilmselt aitaks, kui oleksime oma *p*-väärtuste ja lõpusõlmede vaatluste arvuga natuke heldemad ega trimmiks puud nii rangelt. Teisalt võib see viia selleni, et meie puumudel hakkab ülesobitama ega tööta teistel valimitel eriti hästi.      
@@ -774,3 +777,12 @@ d) Kategoriaalse uuritava tunnuse puhul ennustatakse puu lehtedes tunnuse sageda
 ## Järgmisel korral
 
 - Juhumetsad (*random forests*)
+
+## Funktsioonide sõnastik
+
+- `ggparty::ggparty()` - joonista puumudel `ggplot2` võimalusi kasutades  
+- `Hmisc::somers2()` - leia binaarse kategoriaalse uuritava tunnusega puumudeli C-indeks/AUC  
+- `partykit::ctree()` - tee tingimusliku otsustuspuu mudel  
+- `partykit::sctest.constparty()` - küsi jagunemiseks proovitud seletavate tunnuste statistikuid ja p-väärtusi iga jagunemise sõlme kohta  
+- `predict()` - leia puumudeli ennustused igale konkreetsele andmestiku vaatlusele   
+- `pROC::auc()` - leia binaarse kategoriaalse uuritava tunnusega puumudeli C-indeks/AUC  

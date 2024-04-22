@@ -828,3 +828,19 @@ c) Jah, olulisel määral.
 ## Järgmisel korral
 
 - Tingimuslikud otsustuspuud
+
+
+## Funktsioonide sõnastik
+
+- `car::influencePlot()` - tuvasta andmestikust mudeli seisukohast ebatavalised vaatlused  
+- `car::vif()` - kontrolli seletavate tunnuste vahelist multikollineaarsust  
+- `Hmisc::somers2()` - leia binaarse kategoriaalse uuritava tunnusega mudeli C-indeks/AUC  
+- `lme4::allFit()` - leia sobiv segamudeli optimeerimise algoritm  
+- `lme4::glmer()` - tee logistilise regressiooni segamudel  
+- `lme4::ranef()` - küsi segamudelist välja juhuslikud mõjud  
+- `performance::check_collinearity()` - kontrolli seletavate tunnuste vahelist multikollineaarsust  
+- `performance::icc()` - leia juhuslike mõjude rühmasisese korrelatsiooni koefitsient  
+- `pROC::auc()` - leia binaarse kategoriaalse uuritava tunnusega mudeli C-indeks/AUC  
+- `rms::lrm()` - tee logistilise regressiooni mudel, mis annab väljundis rohkem infot kui `glm()`  
+- `rms::validate()` - valideeri logistilise regressiooni mudelit *bootstrap*-meetodiga  
+- `sapply()` - rakenda igale listi liikmele (nt igale andmetabeli tulbale) mingit funktsiooni ja tagasta vastused vektorina  

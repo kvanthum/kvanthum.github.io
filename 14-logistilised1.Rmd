@@ -992,3 +992,14 @@ c) cx ~ LM_mobiilsus, sest selle AIC on väiksem.
 - Mudelite võrdlemine ja optimaalse mudeli leidmine  
 - Mudeli mõjude visualiseerimine  
 - Mudeli headuse näitajad  
+
+
+## Funktsioonide sõnastik
+
+- `exp()` - teisenda logaritmitud šanss tavaliseks šansiks (või logaritmitud šansisuhe tavaliseks šansisuhteks)  
+- `ggeffects::ggpredict()` - ennusta uuritava tunnuse väärtust mingis tüüpilises seletavate tunnuste kontekstis  
+- `glm()` - tee logistilise regressiooni mudel  
+- `performance::check_model()` - kontrolli mudeli jääke jm eeldusi  
+- `plogis()` - teisenda logaritmitud šanss tõenäosuseks  
+- `predict()` - leia mudeli ennustused kas treeningandmestikul või testandmestikul (lisades argumendi `newdata`)  
+- `report::report_text()` - raporteeri mudeli tulemused tekstina  
