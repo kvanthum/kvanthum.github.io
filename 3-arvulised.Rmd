@@ -507,7 +507,9 @@ legend("topright",  # asend ülemises paremas nurgas
 
 1. Arvuta õppeaja keskmine, mediaan ja standardhälve.
 
-2. Arvuta samad asjad loomaeelistuse ja tee-kohvi eelistuse kaupa. Kasuta `tapply()` käsku. Kui on korraga kaks rühmitavat tunnust, siis `tapply()` käsul rühmitava tunnuse sisendiks võib olla list ja sellisel juhul on tulemuseks risttabel. Proovi umbes nii `tapply(kirjeldatav_tunnus, list(rühmitav1, rühmitav2), funktsioon)`.
+2. Arvuta õppeaja mediaan loomaeelistuse ja tee-kohvi eelistuse kaupa. Kasuta `tapply()` käsku. Kui on korraga kaks rühmitavat tunnust, siis `tapply()` käsul rühmitava tunnuse sisendiks võib olla list ja sellisel juhul on tulemuseks risttabel. Proovi umbes nii `tapply(kirjeldatav_tunnus, list(rühmitav1, rühmitav2), funktsioon)`.
+
+2a. Arvuta õppeaja keskmine ja standardhälve loomaeelistuse ja tee-kohvi eelistuse kaupa `tidyverse` funktsioonide abil. Rühmitamiseks kasuta käsku `group_by()` ning seejärel `summarise()`. Lisa ka vastanute arv käsuga `n()`.
 
 3. Joonista karpdiagramm (*boxplot*) õppeaja jaotusest tee-kohvi eelistuse kaupa. Värvi kastid kahe eri värviga.
 
