@@ -40,7 +40,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Kasutame esimeses praktikumis läbi viidud küsitluse andmestikku.
 
 ```{r}
-load("data/kysimustik_2024.RData")
+load("data/kysimustik_2025.RData")
 ```
 
 ## Aritmeetiline keskmine
@@ -86,7 +86,9 @@ Juhul, kui andmete hulgas on `NA` väärtusi, siis on tulemus ka `NA`, aga kui t
 Käsk `mean()` annab alati kogu sisendiks olevate väärtuste kohta ühe keskmise. Tihti on meil aga andmestikus mingi kategoriseeriv tunnus, mille alusel me tahaksime andmeid rühmitada ja saada iga rühma keskmist väärtust. Näiteks võime me tahta teada iga eriala keskmist õppimisaega. Selleks võime kõigepealt andmetest vastava alamosa (*subseti*) välja võtta ja `mean()` käsku ainult korraga ühele alamosale rakendada:
 
 ```{r, eval=F}
+# ajaloo eriala keskmine; tabel[read, tulp]
 mean(kysimustik[kysimustik$oppekava == "ajalugu", "kaua_opid"])
+# eesti ja soomeugri keskmine; tabel$tulp[read]
 mean(kysimustik$kaua_opid[kysimustik$oppekava == "eesti ja soome-ugri keeleteadus"])
 # ... jne
 ```
@@ -96,7 +98,7 @@ Kuna andmestikus on erinevaid õppekavasid `r length(unique(kysimustik$oppekava)
 ```{r, eval = F}
 for(i in levels(kysimustik$oppekava)){
     keskmine <- mean(kysimustik$kaua_opid[kysimustik$oppekava == i])
-    print(paste0("Õppekaval ", i, " keskmine õppimisaeg on ", keskmine, " aastat."))
+    print(paste0(i, " üliõpilased on keskmiselt õppinud ", keskmine, " aastat."))
 }
 ```
 
@@ -109,7 +111,7 @@ tapply(kysimustik$kaua_opid, kysimustik$oppekava, mean)
 ```
 
 
-Ja sama asja saab `tidyverse` ja `flextable` pakettidega. `tidyverse` paketist tuleb juttu ülejärgmises praktikumis, mistõttu siin pikemalt selle süntaksil ei peatu.
+Ja sama asja saab `tidyverse` paketiga. `tidyverse` paketist tuleb juttu ülejärgmises praktikumis, mistõttu siin pikemalt selle süntaksil ei peatu. R-i väljundis näeb tabel inetu välja, pakett `flextable` abil saab tabeli vormistada vahejoontega tabuleeritud tabelina.
 
 ```{r, message=F}
 library(tidyverse)
@@ -461,6 +463,14 @@ hist(kysimustik$synniaasta, # x-telje arvuline tunnus
 ```
 
 
+## Tihedusgraafik
+
+Tihedusgraafik näitab suhteliselt sarnaselt histogrammile andmete jaotust, aga absoluutsageduste asemel on y-teljel tõenäosuslik sagedus (vahemikus 0--1).
+
+```{r}
+plot(density(kysimustik$synniaasta))
+```
+
 
 ## Hajuvusdiagramm
 
@@ -528,5 +538,6 @@ legend("topright",  # asend ülemises paremas nurgas
 - `range()` - leiab haarde (miinimum- ja maksimumväärtused)  
 - `sd()` - arvutab arvulise tunnuse standardhälbe ehk keskmise erinevuse keskmisest  
 - `tapply(kirjeldatav_tunnus, rühmitav_tunnus, funktsioon)` - *apply* funktsioon, mis võimaldab mingit käsku rakendada vektorile mingi (nt mõnda eelnevatest) rühmitava tunnuse kaupa  
-- `var()` - arvutab arvulise tunnuse dispersiooni ehk hajuvuse  
+- `var()` - arvutab arvulise tunnuse dispersiooni ehk hajuvuse
+- `density()` - arvutab andmestiku tõenäosustiheduse. Tihedusgraafiku joonistamiseks pane sellele ümber `plot()`.
 
