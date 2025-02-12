@@ -128,3 +128,5 @@ nums("synniaasta", "karp", "Sünniaasta")
 nums("kaua_opid", "hist", "Õpitud aastaid")
 nums("kaua_opid", "tihedus", "Õpitud aastaid")
 nums("kaua_opid", "karp", "Õpitud aastaid")
+
+

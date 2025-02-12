@@ -30,7 +30,7 @@ body {
 <script src="search.js"></script>
 
 1. [Sissejuhatus](1-sissejuhatus.html)  
-2. <span class="vana">[Andmetüübid ja objektitüübid](2-andmetyybid_objektityybid.html)</span>  
+2. [Andmetüübid ja objektitüübid](2-andmetyybid_objektityybid.html)  
 3. <span class="vana">[Arvulised andmed ja nende visualiseerimine](3-arvulised.html)</span>
 4. <span class="vana">[Kategoriaalsed andmed ja nende visualiseerimine](4-kategoriaalsed.html)</span>  
 5. <span class="vana">[Pakett `ggplot2` andmete visualiseerimiseks](5-ggplot2.html)</span>  
