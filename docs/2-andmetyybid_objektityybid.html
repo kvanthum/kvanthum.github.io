@@ -1085,10 +1085,13 @@ salvestatud, siis neid andmestikke saab avada käsuga
 <strong><code>load()</code></strong>. Näiteks sellisel kujul on
 Moodle’is failis <em>kysimustik_2025.RData</em> korrastatud vastused
 küsimustikule, mida eelmises praktikumis täitsite. Lisaks on seal ka
-varasemate aastate vastused. Kui laadite RData andmestiku alla ja panete
-selle oma kursuse andmestike kausta (nt kausta nimega
-<code>andmestikud</code>, <code>andmed</code>, <code>data</code>
-vmt).</p>
+varasemate aastate vastused. Laadige RData andmestik alla ja pange see
+oma kursuse andmestike kausta (nt kausta nimega
+<code>andmestikud</code>, <code>andmed</code>, <code>data</code> vmt),
+<strong>muutke vastavalt ära ka faili teekonna nimi</strong> (nt
+<code>andmestikud/kysimustik_2025.RData</code>,
+<code>andmed/kysimustik_2025.RData</code>,
+<code>data/kysimustik_2025.RData</code>).</p>
 <div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/kysimustik_2025.RData&quot;</span>)</span></code></pre></div>
 <p>Selle käsurea rakendamisest justkui ei juhtugi midagi, aga töölauale
 tekkis objekt nimega <strong>kysimustik</strong>, mille klassiks on

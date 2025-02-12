@@ -621,7 +621,7 @@ Nagu näeme, saab R-is andmeid ka vektoritest `data.frame()` käsuga tabeliks ko
 
 <br>
 
-Kui andmestik on R-is korrastatud ja **RData** formaadis salvestatud, siis neid andmestikke saab avada käsuga **`load()`**. Näiteks sellisel kujul on Moodle'is failis *kysimustik_2025.RData* korrastatud vastused küsimustikule, mida eelmises praktikumis täitsite. Lisaks on seal ka varasemate aastate vastused. Kui laadite RData andmestiku alla ja panete selle oma kursuse andmestike kausta (nt kausta nimega `andmestikud`, `andmed`, `data` vmt).
+Kui andmestik on R-is korrastatud ja **RData** formaadis salvestatud, siis neid andmestikke saab avada käsuga **`load()`**. Näiteks sellisel kujul on Moodle'is failis *kysimustik_2025.RData* korrastatud vastused küsimustikule, mida eelmises praktikumis täitsite. Lisaks on seal ka varasemate aastate vastused. Laadige RData andmestik alla ja pange see oma kursuse andmestike kausta (nt kausta nimega `andmestikud`, `andmed`, `data` vmt), **muutke vastavalt ära ka faili teekonna nimi** (nt `andmestikud/kysimustik_2025.RData`, `andmed/kysimustik_2025.RData`, `data/kysimustik_2025.RData`).
 
 ```{r, echo=T}
 load("data/kysimustik_2025.RData")
