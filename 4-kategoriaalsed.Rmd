@@ -21,9 +21,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Eelmisel korral
 
-Eelmine kord tegelesime arvuliste andmete kirjeldamise ja visualiseerimisega ning kasutasime andmestikku failis `kysimustik_2024.RData`. 
+Eelmine kord tegelesime arvuliste andmete kirjeldamise ja visualiseerimisega ning kasutasime andmestikku failis `kysimustik_2025.RData`. 
 ```{r}
-load("data/kysimustik_2024.RData")
+load("data/kysimustik_2025.RData")
 ```
 
 
@@ -55,6 +55,7 @@ par(mfrow = c(1,1))
   - Millis(t)es sagedusklassi(de)s on kõige enam vaatlusi? 
   - Kas tunnuse jaotus on väiksemate või suuremate väärtuste suunas kaldu? 
   - Kas tunnusel on mitu "harja" ehk mitu populaarset sagedusklassi?     
+  
 ```{r, echo = F}
 hist(kysimustik$kaua_opid, main = "hist(kysimustik$kaua_opid)")
 ```
@@ -94,10 +95,10 @@ plot(kaua_opid ~ synniaasta, data = kysimustik, main = "plot(kaua_opid ~ synniaa
   * pirukas
   * tulpdiagramm
 
-Kasutame edasi andmestikku `kysimustik_2024.RData`.  
+Kasutame edasi andmestikku `kysimustik_2025.RData`.  
 
 ```{r, eval = F}
-load("data/kysimustik_2024.RData")
+load("data/kysimustik_2025.RData")
 ```
 
 ## Kuidas kirjeldada kategoriaalseid andmeid?
@@ -247,6 +248,7 @@ round(t.jook.prop*100, 2) # ümardame tulemused 2 komakohani
 ```
 
 Vaatame ka 2 kategoriaalse tunnuse risttabeli suhtelisi sagedusi ja kasutame argumenti `margin`, et kuvada neid ridade (`margin = 1`) või tulpade (`margin = 2`) lõikes.  
+
 ```{r, eval = FALSE}
 prop.table(t.jook.loom) # kõikide lahtrite summa = 1
 
@@ -485,22 +487,22 @@ Mida lähemal *v* on nullile, seda homogeensem on andmestik (kõige sagedasem v�
 
 Siin näitab variatsioonisuhte väärtus, et kõige populaarsem kategooria (*koer*) kirjeldab ära umbes poole kõikidest andmetest, aga ka muid loomi on piisavalt palju vastatud selleks, et need oleksid andmete kirjeldamisel olulised.  
 
-Variatsioonisuhe ei peegelda aga seda, kui palju neid teisi vastusevariante on, nt kas need 51% vastustest lähevad jagamisele kahe, kolme, nelja, kümne või kasvõi saja vastusevariandi vahel. 
+Variatsioonisuhe ei peegelda aga seda, kui palju neid teisi vastusevariante on, nt kas need 48% vastustest lähevad jagamisele kahe, kolme, nelja, kümne või kasvõi saja vastusevariandi vahel. 
 
-Praegusel juhul saabki maksimaalne variatsioonisuhe olla 0.75, sest kui jagada 104 vaatlust võrdselt 4 kategooriasse (= maksimaalne andmete hajuvus), on meil 4 moodi (igaühe sagedus 26) ja `1-(26/104) = 0.75`. Kohe, kui mõnda kategooriasse mõne teise arvelt vaatlusi juurde lisada (nt 26, 26, **27**, 25), muutub see moodiks ja variatsioonisuhe väheneb: `1-(27/104) = 0.74`.    
+Praegusel juhul saabki maksimaalne variatsioonisuhe olla 0.75, sest kui jagada 126 vaatlust võrdselt 4 kategooriasse (= maksimaalne andmete hajuvus), on meil 4 moodi (igaühe sagedus 31.5, ehkki päriselt peaks sagedus olema täisarv) ja `1-(31.5/126) = 0.75`. Kohe, kui mõnda kategooriasse mõne teise arvelt vaatlusi juurde lisada (nt 31, 31, **33**, 31), muutub see moodiks ja variatsioonisuhe väheneb: `1-(33/126) = 0.74`.    
 
 ```{r, echo = F, fig.width=15, fig.height=7, warning=FALSE, message=FALSE}
 library(tidyverse)
-c(26,26,26,26) -> cat4
-c(26,26,27,25) -> cat4_unb
-c(26,26,47,5) -> cat4_unb2
-c(1,1,103,1) -> cat4_unb3
+c(31.5,31.5,31.5,31.5) -> cat4
+c(31,31,33,31) -> cat4_unb
+c(31,31,59,5) -> cat4_unb2
+c(1,1,123,1) -> cat4_unb3
 data.frame(Lemmikloom = levels(kysimustik$lemmikloom), Sagedus = cat4) %>% 
   ggplot(aes(x = Lemmikloom, y = Sagedus)) + 
   geom_col(fill = c("red", "red", "red", "red")) +
   geom_text(aes(label = Sagedus), vjust = -1, size = 5) +
   labs(title = paste0("Variatsioonisuhe ", round(1-max(cat4)/sum(cat4), 2))) +
-  scale_y_continuous(limits = c(0, 104)) +
+  scale_y_continuous(limits = c(0, 126)) +
   theme_void() + 
   theme(axis.text.x = element_text(size = 14), plot.title = element_text(hjust = 0.5),
         plot.background = element_rect(color = "grey80")) -> p_cat4
@@ -509,7 +511,7 @@ data.frame(Lemmikloom = levels(kysimustik$lemmikloom), Sagedus = cat4_unb) %>%
   geom_col(fill = c("grey70", "grey70", "red", "grey70")) +
   geom_text(aes(label = Sagedus), vjust = -1, size = 5) +
   labs(title = paste0("Variatsioonisuhe ", round(1-max(cat4_unb)/sum(cat4_unb), 2))) +
-  scale_y_continuous(limits = c(0, 104)) +
+  scale_y_continuous(limits = c(0, 126)) +
   theme_void() + 
   theme(axis.text.x = element_text(size = 14), plot.title = element_text(hjust = 0.5),
         plot.background = element_rect(color = "grey80")) -> p_cat4_unb
@@ -518,7 +520,7 @@ data.frame(Lemmikloom = levels(kysimustik$lemmikloom), Sagedus = cat4_unb2) %>%
   geom_col(fill = c("grey70", "grey70", "red", "grey70")) +
   geom_text(aes(label = Sagedus), vjust = -1, size = 5) +
   labs(title = paste0("Variatsioonisuhe ", round(1-max(cat4_unb2)/sum(cat4_unb2), 2))) +
-  scale_y_continuous(limits = c(0, 104)) +
+  scale_y_continuous(limits = c(0, 126)) +
   theme_void() + 
   theme(axis.text.x = element_text(size = 14), plot.title = element_text(hjust = 0.5),
         plot.background = element_rect(color = "grey80")) -> p_cat4_unb2
@@ -527,7 +529,7 @@ data.frame(Lemmikloom = levels(kysimustik$lemmikloom), Sagedus = cat4_unb3) %>%
   geom_col(fill = c("grey70", "grey70", "red", "grey70")) +
   geom_text(aes(label = Sagedus), vjust = -1, size = 5) +
   labs(title = paste0("Variatsioonisuhe ", round(1-max(cat4_unb3)/sum(cat4_unb3), 2))) +
-  scale_y_continuous(limits = c(0, 104)) +
+  scale_y_continuous(limits = c(0, 126)) +
   theme_void() + 
   theme(axis.text.x = element_text(size = 14), plot.title = element_text(hjust = 0.5),
         plot.background = element_rect(color = "grey80")) -> p_cat4_unb3
@@ -537,32 +539,32 @@ gridExtra::grid.arrange(p_cat4, p_cat4_unb, p_cat4_unb2, p_cat4_unb3, ncol = 4)
 
 
 
-Kui meil oleks ainult 2 kategooriat (nt koera vastuseid 52 ja kaelkirjaku vastuseid 52), siis saaks maksimaalne variatsioonisuhe olla `1-(52/104) = 0.5`. Kui meil oleks 13 kategooriat ja igas kategoorias võrdselt vastuseid (8), saaks maksimaalne variatsioonisuhe olla aga tervelt `1-(8/104) = 0.92`. 
+Kui meil oleks ainult 2 kategooriat (nt koera vastuseid 63 ja kaelkirjaku vastuseid 63), siis saaks maksimaalne variatsioonisuhe olla `1-(63/126) = 0.5`. Kui meil oleks 14 kategooriat ja igas kategoorias võrdselt vastuseid (9), saaks maksimaalne variatsioonisuhe olla aga tervelt `1-(9/126) = 0.93`. 
 
 ```{r, echo = F, fig.width=15, fig.height=7, warning=FALSE, message=FALSE}
-c(52, 52) -> cat2
-rep(8, 13) -> cat13
+c(63, 63) -> cat2
+rep(9, 14) -> cat14
 data.frame(Lemmikloom = levels(kysimustik$lemmikloom)[c(3,2)], Sagedus = cat2) %>% 
   ggplot(aes(x = Lemmikloom, y = Sagedus)) + 
   geom_col(fill = c("red", "red")) +
   geom_text(aes(label = Sagedus), vjust = -1, size = 5) +
   labs(title = paste0("Variatsioonisuhe ", round(1-max(cat2)/sum(cat2), 2))) +
-  scale_y_continuous(limits = c(0, 104)) +
+  scale_y_continuous(limits = c(0, 126)) +
   theme_void() + 
   theme(axis.text.x = element_text(size = 14), plot.title = element_text(hjust = 0.5),
         plot.background = element_rect(color = "grey80")) -> p_cat2
 
-data.frame(Lemmikloom = c(levels(kysimustik$lemmikloom), "Kss", "Lhm", "Kru", "Jns", "Pdr", "Hnt", "Rbn", "Ilvs", "Sga"), Sagedus = cat13) %>% 
+data.frame(Lemmikloom = c(levels(kysimustik$lemmikloom), "Kss", "Lhm", "Kru", "Jns", "Pdr", "Hnt", "Rbn", "Ilvs", "Sga", "Lms"), Sagedus = cat14) %>% 
   ggplot(aes(x = Lemmikloom, y = Sagedus)) + 
-  geom_col(fill = rep("red", 13)) +
+  geom_col(fill = rep("red", 14)) +
   geom_text(aes(label = Sagedus), vjust = -1, size = 5) +
-  labs(title = paste0("Variatsioonisuhe ", round(1-max(cat13)/sum(cat13), 2))) +
-  scale_y_continuous(limits = c(0, 104)) +
+  labs(title = paste0("Variatsioonisuhe ", round(1-max(cat14)/sum(cat14), 2))) +
+  scale_y_continuous(limits = c(0, 126)) +
   theme_void() + 
   theme(axis.text.x = element_text(size = 14), plot.title = element_text(hjust = 0.5),
-        plot.background = element_rect(color = "grey80")) -> p_cat13
+        plot.background = element_rect(color = "grey80")) -> p_cat14
 
-gridExtra::grid.arrange(p_cat2, p_cat13, ncol = 2)
+gridExtra::grid.arrange(p_cat2, p_cat14, ncol = 2)
 ```
 
 
@@ -602,29 +604,29 @@ p_cat4_unb + labs(title = paste0("Hälve moodist ", round(4/(4-1)*(1-max(cat4_un
 p_cat4_unb2 + labs(title = paste0("Hälve moodist ", round(4/(4-1)*(1-max(cat4_unb2)/sum(cat4_unb2)), 2))) -> p2_cat4_unb2
 p_cat4_unb3 + labs(title = paste0("Hälve moodist ", round(4/(4-1)*(1-max(cat4_unb3)/sum(cat4_unb3)), 2))) -> p2_cat4_unb3
 p_cat2 + labs(title = paste0("Hälve moodist ", round(2/(2-1)*(1-max(cat2)/sum(cat2)), 2))) -> p2_cat2
-p_cat13 + labs(title = paste0("Hälve moodist ", round(13/(13-1)*(1-max(cat13)/sum(cat13)), 2))) -> p2_cat13
+p_cat14 + labs(title = paste0("Hälve moodist ", round(14/(14-1)*(1-max(cat14)/sum(cat14)), 2))) -> p2_cat14
 
-c(103,1) -> cat2_unb
+c(125,1) -> cat2_unb
 data.frame(Lemmikloom = levels(kysimustik$lemmikloom)[c(3,2)], Sagedus = cat2_unb) %>% 
   ggplot(aes(x = Lemmikloom, y = Sagedus)) + 
   geom_col(fill = c("red", "grey70")) +
   geom_text(aes(label = Sagedus), vjust = -1, size = 5) +
   labs(title = paste0("Hälve moodist ", round(2/(2-1)*(1-max(cat2_unb)/sum(cat2_unb)), 2))) +
-  scale_y_continuous(limits = c(0, 104)) +
+  scale_y_continuous(limits = c(0, 126)) +
   theme_void() + 
   theme(axis.text.x = element_text(size = 14), plot.title = element_text(hjust = 0.5),
         plot.background = element_rect(color = "grey80")) -> p2_cat2
 
-c(rep(1, 12), 92) -> cat13_unb
-data.frame(Lemmikloom = c(levels(kysimustik$lemmikloom), "Kss", "Lhm", "Kru", "Jns", "Pdr", "Hnt", "Rbn", "Ilvs", "Sga"), Sagedus = cat13_unb) %>% 
+c(rep(1, 13), 113) -> cat14_unb
+data.frame(Lemmikloom = c(levels(kysimustik$lemmikloom), "Kss", "Lhm", "Kru", "Jns", "Pdr", "Hnt", "Rbn", "Ilvs", "Sga", "Lms"), Sagedus = cat14_unb) %>% 
   ggplot(aes(x = Lemmikloom, y = Sagedus)) + 
-  geom_col(fill = c(rep("grey80", 12), "red")) +
+  geom_col(fill = c(rep("grey80", 13), "red")) +
   geom_text(aes(label = Sagedus), vjust = -1, size = 5) +
-  labs(title = paste0("Hälve moodist ", round(13/(13-1)*(1-max(cat13_unb)/sum(cat13_unb)), 2))) +
-  scale_y_continuous(limits = c(0, 104)) +
+  labs(title = paste0("Hälve moodist ", round(14/(14-1)*(1-max(cat14_unb)/sum(cat14_unb)), 2))) +
+  scale_y_continuous(limits = c(0, 126)) +
   theme_void() + 
   theme(axis.text.x = element_text(size = 14), plot.title = element_text(hjust = 0.5),
-        plot.background = element_rect(color = "grey80")) -> p2_cat13
+        plot.background = element_rect(color = "grey80")) -> p2_cat14
 
 
 grid.arrange(p2_cat4, p2_cat4_unb, p2_cat4_unb2, p2_cat4_unb3, ncol = 4)
@@ -635,7 +637,7 @@ grid.arrange(p2_cat4, p2_cat4_unb, p2_cat4_unb2, p2_cat4_unb3, ncol = 4)
 Sealjuures "karistab" mõõdik vähese valikuvõimaluse eest (vähemate klassidega on väiksem väärtus).  
 
 ```{r, echo = F, fig.width=15, fig.height=7, warning=FALSE, message=FALSE}
-grid.arrange(p2_cat2, p2_cat13, ncol = 2)
+grid.arrange(p2_cat2, p2_cat14, ncol = 2)
 ```
 
 
@@ -694,7 +696,7 @@ pie(table(kysimustik$kursuse_labimine))
 Tulpdiagramm (*bar chart*) kuvab tulpades kategoriaalse tunnuse tasemete sagedused. R-is on tulpdiagrammi funktsiooniks baasgraafika paketis **`barplot()`**.  
 
 ```{r, eval = FALSE}
-barplot(kysimustik$oppekava)
+barplot(kysimustik$kogemused_kvant)
 ```
 
 Mis juhtus?
