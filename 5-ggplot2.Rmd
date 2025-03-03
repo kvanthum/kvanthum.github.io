@@ -26,11 +26,11 @@ Pakett **`ggplot2`**:
 
 - võimaldab teha vähese vaevaga ilusaid jooniseid,  
 - toimib andmetabelitega ehk *data frame*'idega (!),  
-- töötab kihtide põhimõttel, lisatavate kihtide arv on lõpmatu,  
-- sisaldab funktsiooni `qplot()` ehk *quick plot*, mis on paketi vaste R-i baasgraafika funktsioonile `plot()`. Põhjalikumalt ja paindlikumalt on võimalik graafikuid kujundada funktsiooniga **`ggplot()`**.  
+- töötab kihtide põhimõttel, lisatavate kihtide arv on lõpmatu.  
+  
 
 ```{r, echo=FALSE, fig.width=20}
-load("data/kysimustik_2024.RData")
+load("data/kysimustik_2025.RData")
 library(ggplot2)
 ggplot(data = kysimustik, aes(x = aasta, fill = kogemused_kvant)) +
     geom_bar(show.legend = F) +
@@ -46,7 +46,10 @@ ggplot(data = kysimustik, aes(x = aasta, fill = kogemused_kvant)) +
 ggplot(data = kysimustik, aes(x = aasta, fill = kogemused_kvant)) + 
     geom_bar(fill = "transparent") +
     #scale_fill_manual(values = c("gold3", "steelblue4")) +
-    labs(x = "", y = "Vastajaid", fill = "", title = "Kogemused kvantitatiivsete meetoditega\nvastavalt aastale", caption = 'Kursuse "Kvantitatiivse andmeanalüüsi alused humanitaarteadlastele ja rakendustarkvara R"\nosalenute vastuste põhjal') -> p3
+    labs(x = "", y = "Vastajaid", fill = "", title = "Kogemused kvantitatiivsete meetoditega\nvastavalt aastale", caption = 'Kursuse "Kvantitatiivse andmeanalüüsi alused humanitaarteadlastele ja rakendustarkvara R"\nosalenute vastuste põhjal') +
+  theme(panel.background = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks =) -> p3
 
 ggplot(data = kysimustik, aes(x = aasta, fill = kogemused_kvant)) + 
     geom_bar(aes(y = 0), stat = "identity") +
@@ -103,7 +106,7 @@ library(ggplot2)
 ```
 
 
-Ggploti spikri leiad [siit](https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf), levinumad funktsioonid [siit](https://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html).  
+Ggploti spikri leiad [GitHubist](https://github.com/rstudio/cheatsheets/blob/master/data-visualization.pdf), levinumad funktsioonid ja rakendused lehelt [R Statistics](https://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html) või [R Charts](https://r-charts.com/ggplot2/).  
 
 Kasutame sel korral 2023. aasta riigikogu valimiste andmeid, mis on kraabitud lehelt https://rk2023.valimised.ee/et/detailed-voting-result/index.html. Lisaks oleme tabelisse lisanud kandidaatide vanuse, soo ja tähtkuju.    
 
@@ -199,6 +202,8 @@ ggplot(valimised,
 
 <span style="color: black;">Laadi RStudiosse eelmistes praktikumides kasutatud küsimustik. Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.</span>
 
+<br>
+<br>
 
 ## 2. kiht: graafiku tüüp (*geom*)  
 
@@ -229,7 +234,7 @@ ggplot(valimised,
 # et graafiku tüübiks on tulpdiagramm.
 ```
 
-**`geom_bar()`** on funktsioon, mis loeb kategoriaalse tunnuse tasemed vaikimisi kokku ja paneb y-teljele tasemete sagedused, ilma et peaksime sageduste leidmiseks esmalt nt `table()`-funktsiooni kasutama ja seda `data.frame`'iks teisendama.  
+**`geom_bar()`** on funktsioon, mis loeb kategoriaalse tunnuse tasemed vaikimisi kokku ja paneb y-teljele tasemete sagedused, ilma et peaksime sageduste leidmiseks esmalt nt `table()`-funktsiooni kasutama ja seda `data.frame`'iks teisendama (vrd nt baasgraafika `barplot()` funktsiooniga, mis nõuab sisendiks sagedustega `table`-objekti).  
 
 **Kui andmestikus oleks juba eraldi tulp sagedustega**, peaksime `aes()`-funktsioonis täpsustama selle tulba y-argumendi väärtusena (`y = sageduste_tulp`) ning kasutama `geom_bar()` funktsiooni sees argumenti `stat = "identity"` või kasutama `geom_bar()` asemel funktsiooni **`geom_col()`**.
 
@@ -254,7 +259,7 @@ ggplot(data.frame(table(valimised$sugu)),
   coord_polar(theta = "y")
 ```
 
-Sektordiagrammide jaoks on aga parem ggploti täiendav pakett [`ggtricks`](https://cran.r-project.org/web/packages/ggtricks/readme/README.html).
+Sektordiagrammide jaoks on aga parem ggploti täiendav pakett [`ggtricks`](https://cran.r-project.org/web/packages/ggtricks/readme/README.html), milles on funktsioon `geom_pie()`.  
 
 
 
@@ -266,7 +271,9 @@ ggplot() +
            aes(x = sugu))
 ```
 
-Selline vormistus on kasulik eriti siis, kui tahame kujutada samal graafikul erinevate andmestike või sama andmestiku erinevate alamhulkade tunnuseid (iga kujutusviisi jaoks tuleb teha eraldi `geom`-kiht). Näiteks võime samal graafikul kujutada lisaks eraldi **joonega** ainult mingi valimisnimekirja, nt sotsiaaldemokraatide mees- ja naiskandidaatide arvu. **`geom_line`** on nn kollektiivne *geom* ehk selle joonistamiseks kasutatakse mitme vaatluse andmeid (joont ei saa joonistada ainult 1 vaatluse põhjal). Selleks, et joon oleks tõmmatud üle kõikide kategooriate (siin mees- ja naiskandidaatide tulpade), kasutame `aes`-funktsiooni sees argumenti `group`.  
+Sellisel juhul ei eeldata, et iga lisatud kiht kasutab täpselt sama andmestikku ja samu tunnuseid, vaid iga kiht võib kasutada **erinevaid andmestikke** või **sama andmestiku erinevaid alamhulki**.  
+
+Näiteks võime samal graafikul kujutada lisaks eraldi **joonega** ainult mingi valimisnimekirja, nt sotsiaaldemokraatide mees- ja naiskandidaatide arvu. **`geom_line`** on nn kollektiivne *geom* ehk selle joonistamiseks kasutatakse mitme vaatluse andmeid (joont ei saa joonistada ainult 1 vaatluse põhjal). Selleks, et joon oleks tõmmatud üle kõikide kategooriate (siin mees- ja naiskandidaatide tulpade), kasutame `geom_line()` funktsiooni sees argumenti `group`.  
 
 Kui joone tõmbamiseks vajalikke vaatlusi ei grupeeri mingi andmestiku tunnus, võib `group`'i väärtus olla mis tahes konstant, nt 1, 500, "a", "konstant" vmt.  
 
@@ -279,14 +286,16 @@ ggplot() +
   geom_bar(data = valimised,
            aes(x = sugu)) +
   geom_line(data = valimised[valimised$nimekiri == "Sotsiaaldemokraatlik Erakond",],
-            aes(x = sugu, group = 1), # vaatame küll ainult sotside nimekirja kandidaate, aga neid omakorda edasi ei grupeeri ükski andmestiku tunnus (group = konstant)
+            aes(x = sugu), 
             stat = "count",
-            color = "tomato1")
+            color = "tomato1",
+            group = 1) # vaatame küll ainult sotside nimekirja kandidaate, aga neid omakorda edasi ei grupeeri ükski andmestiku tunnus (group = konstant)
 
 ```
 
 
-Kui aga tahta grupeerida vaatlusi mingi andmestiku tunnuse järgi (nt valimisnimekiri) ning näidata seega **kõiki** selle tunnuse alusel tekkivaid andmestiku alamosi korraga, tuleb `group` väärtuseks panna seesama andmestiku tunnus ise. Sel juhul ei tule iga tunnuse taseme kohta tekitada uut `geom`-kihti omaette alamandmestikuga (nt `valimised[valimised$nimekiri == "Sotsiaaldemokraatlik Erakond",]`, `valimised[valimised$nimekiri == "Eesti Reformierakond",]` jne). Kuvame näiteks kõikide erakondade mees- ja naiskandidaatide arvu üldiste tulpade peal eri värvi joontena.
+Kui aga tahta grupeerida vaatlusi mingi andmestiku tunnuse järgi (nt valimisnimekiri) ning näidata seega **kõiki** selle tunnuse alusel tekkivaid andmestiku alamosi korraga, tuleb `group`-argument liigutada `aes()` funktsiooni sisse ning argumendi väärtuseks panna seesama andmestiku tunnus ise.   
+Sel juhul ei tule iga tunnuse taseme kohta tekitada uut `geom`-kihti omaette alamandmestikuga (nt `valimised[valimised$nimekiri == "Sotsiaaldemokraatlik Erakond",]`, `valimised[valimised$nimekiri == "Eesti Reformierakond",]` jne). Kuvame näiteks kõikide erakondade mees- ja naiskandidaatide arvu üldiste tulpade peal eri värvi joontena.
 
 ```{r}
 ggplot() +
@@ -325,6 +334,9 @@ ggplot(valimised, aes(x = sugu)) +
 
 <span style="color: lightgrey;">Laadi RStudiosse eelmistes praktikumides kasutatud küsimustik. Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.</span>  
 <span style="color: black;">Kuva sünniaasta ja õpitud aastate arvu suhet hajuvusdiagrammil.</span>
+
+<br>
+<br>
 
 ## 3. kiht: tunnuste väljanägemine graafikul (*scale*)
 
@@ -436,6 +448,8 @@ Teiste meetoditega kategooriate sorteerimisest võib lugeda rohkem näiteks [sii
 Kuva sünniaasta ja õpitud aastate arvu suhet hajuvusdiagrammil.</span>  
 <span style="color: black;">Tähista erineva värviga need vastajad, kellel on kvantitatiivsete meetoditega kogemust, ja need, kellel ei ole. Kasuta kategooriate jaoks värve "grey45" ja "orange".</span>
 
+<br>
+<br>
 
 ## 4. kiht: selgitavad tekstid (*labs*)  
 
@@ -475,8 +489,10 @@ p <- ggplot(valimised, aes(y = nimekiri, fill = sugu)) +
 <span style="color: lightgrey;">Laadi RStudiosse eelmistes praktikumides kasutatud küsimustik. Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.  
 Kuva sünniaasta ja õpitud aastate arvu suhet hajuvusdiagrammil.  
 Tähista erineva värviga need vastajad, kellel on kvantitatiivsete meetoditega kogemust, ja need, kellel ei ole. Kasuta kategooriate jaoks värve "grey45" ja "orange".</span>    
-<span style="color: black;">Lisa graafikule pealkiri "Õpitud aastate seos sünniaastaga", alapealkiri "ja kokkupuutega kvantitatiivsete meetoditega" ning legendi pealkiri "Kogemused kvantitatiivsete meetoditega".</span>  
+<span style="color: black;">Lisa graafikule pealkiri "Õpitud aastate arv vastavalt sünniaastale", alapealkiri "ja kokkupuutele kvantitatiivsete meetoditega" ning legendi pealkiri "Kogemused kvantitatiivsete meetoditega".</span>  
 
+<br>
+<br>
 
 ## 5. kiht: graafiku üldine väljanägemine (*theme*)  
 
@@ -565,8 +581,11 @@ p + theme(axis.text = element_text(size = 12, color = "grey50"),
 <span style="color: lightgrey;">Laadi RStudiosse eelmistes praktikumides kasutatud küsimustik. Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.  
 Kuva sünniaasta ja õpitud aastate arvu suhet hajuvusdiagrammil.  
 Tähista erineva värviga need vastajad, kellel on kvantitatiivsete meetoditega kogemust, ja need, kellel ei ole. Kasuta kategooriate jaoks värve "grey45" ja "orange".  
-Lisa graafikule pealkiri "Õpitud aastate seos sünniaastaga", alapealkiri "ja kokkupuutega kvantitatiivsete meetoditega", sobivad x- ja y-telje pealkirjad ning legendi pealkiri "Kogemused kvantitatiivsete meetoditega".</span>  
+Lisa graafikule pealkiri "Õpitud aastate arv vastavalt sünniaastale", alapealkiri "ja kokkupuutele kvantitatiivsete meetoditega", sobivad x- ja y-telje pealkirjad ning legendi pealkiri "Kogemused kvantitatiivsete meetoditega".</span>  
 <span style="color: black;">Lisa graafikule teema, mis värviks graafiku tausta värviga "aliceblue" ning joondaks pealkirja ja alapealkirja keskele.</span>
+
+<br>
+<br>
 
 ## 6. kiht: paneelid (*facets*)
 
@@ -634,19 +653,50 @@ Joonist paneelideks jagav tunnus peab olema funktsioonis kas jutumärkides või 
 <span style="color: lightgrey;">Laadi RStudiosse eelmistes praktikumides kasutatud küsimustik. Loo `ggplot`'i kiht, kus x-teljel oleks sünniaasta ja y-teljel oleks õpitud aastate arv.  
 Kuva sünniaasta ja õpitud aastate arvu suhet hajuvusdiagrammil.  
 Tähista erineva värviga need vastajad, kellel on kvantitatiivsete meetoditega kogemust, ja need, kellel ei ole. Kasuta kategooriate jaoks värve "grey45" ja "orange".  
-Lisa graafikule pealkiri "Õpitud aastate seos sünniaastaga", alapealkiri "ja kokkupuutega kvantitatiivsete meetoditega", sobivad x- ja y-telje pealkirjad ning legendi pealkiri "Kogemused kvantitatiivsete meetoditega".   
+Lisa graafikule pealkiri "Õpitud aastate arv vastavalt sünniaastale", alapealkiri "ja kokkupuutele kvantitatiivsete meetoditega", sobivad x- ja y-telje pealkirjad ning legendi pealkiri "Kogemused kvantitatiivsete meetoditega".   
 Lisa graafikule teema, mis värviks graafiku tausta värviga "aliceblue" ning joondaks pealkirja ja alapealkirja keskele.</span>  
 <span style="color: black;">Näita erinevatel paneelidel tee- ja kohvijoojate vastuseid. Jaga kuvatavaid andmeid veel väiksemateks gruppideks vastavalt lemmikloomale. Võrdle `facet_wrap()` ja `facet_grid()` väljundeid. </span>
 
 <br>
-<br>
-<br>
+
 
 Võrdle tulemust ChatGPT pakutud koodiga:  
 
 ![](imgs/ggplot_prompt.png){width=60%}
-![](imgs/ggplot_chatgpt.png){width=60%}
+![](imgs/ggplot_chatgpt.png){width=70%}
 
+```{r, eval = F}
+# Laadi vajalikud paketid
+library(ggplot2)
+library(dplyr)
+
+# Laadi andmestik
+load("kysimustik_2025.RData")
+
+# Koosta graafik
+ggplot(kysimustik, aes(x = synniaasta, y = kaua_opid, color = kogemused_kvant)) +
+  geom_point(alpha = 0.7) +  # Hajuvusdiagramm
+  facet_wrap(~ lemmikjook) + # Tee- ja kohvijoojate eraldi paneelid
+  scale_color_manual(values = c("Jah" = "orange", "Ei" = "grey45")) +  # Värvid kategooriatele
+  labs(
+    title = "Õpitud aastate arv vastavalt sünniaastale",
+    subtitle = "ja kokkupuutele kvantitatiivsete meetoditega",
+    x = "Sünniaasta",
+    y = "Õpitud aastate arv",
+    color = "Kogemused kvantitatiivsete meetoditega"
+  ) +
+  theme_minimal(base_size = 14) +  # Minimaalne teema
+  theme(
+    plot.background = element_rect(fill = "aliceblue", color = NA),  # Taustavärv
+    plot.title = element_text(hjust = 0.5),  # Pealkiri keskele
+    plot.subtitle = element_text(hjust = 0.5)  # Alapealkiri keskele
+  )
+
+```
+
+
+<br>
+<br>
 
 ## Eelmiste kordade graafikud
 
@@ -761,7 +811,7 @@ ggplot(kysimustik,
   scale_x_continuous(breaks = seq(1970, 2000, 5)) + # y-skaala 1970-st 2000-ni 5-aastaste intervallidena
   labs(x = "Sünniaasta", 
        y = "Õpitud aastate arv", 
-       title = "Õpitud aastate seos sünniaastaga") +
+       title = "Õpitud aastate arv vastavalt sünniaastale") +
   theme_classic() +
   theme(panel.background = element_rect(color = "black"),
         axis.text.y = element_text(angle = 90, 
@@ -781,7 +831,7 @@ ggplot(kysimustik,
                      values = c("grey50", "orange")) + # kategooriate värvid
   labs(x = "Sünniaasta", 
        y = "Õpitud aastate arv", 
-       title = "Õpitud aastate seos sünniaastaga") +
+       title = "Õpitud aastate arv vastavalt sünniaastale") +
   theme_classic() +
   theme(panel.background = element_rect(color = "black"),
         axis.text.y = element_text(angle = 90, 
@@ -860,7 +910,7 @@ ggplot(kysimustik,
 
 ## Baasgraafika või ggplot2?
 
-Kumbki graafikapakett ei ole olemuslikult parem kui teine ja on suur tõenäosus, et joonist, mida saad teha ggplotis, saad teha ka baasgraafikas. Kummaga täpselt töötada, sõltub isiklikest eelistustest, harjumusest ja veidi ka sellest, milliseid graafikuid ja mille jaoks tüüpiliselt kasutatakse. Baasgraafikapaketiga saab enamasti kiiremini oma andmetest ülevaate, ggplot pakub veidi enam võimalusi nt rakendustes või veebilehtedel jooksvateks joonisteks ning on laialtlevinud andmeteaduses. Publitseerimiseks tuleb mõlema paketiga töötades joonistega pisut vaeva näha. Mõlemal paketil on ka terve hulk laiendusi, mis võimaldavad teha asju, millega pakett ise toime ei tule (nt 3D graafikud ggplotis). Asjad, milles ggplotil on siiski selge eelis, on nt legendid, grupeerimine ja paneelid (*facets*). Loe ka [siit](http://varianceexplained.org/r/why-I-use-ggplot2/).
+Kumbki graafikapakett ei ole olemuslikult parem kui teine ja on suur tõenäosus, et joonist, mida saad teha ggplotis, saad teha ka baasgraafikas (või hoopis mingi muu graafikapaketiga, nt `lattice`). Kummaga täpselt töötada, sõltub isiklikest eelistustest, harjumusest ja veidi ka sellest, milliseid graafikuid ja mille jaoks tüüpiliselt kasutatakse. Baasgraafikapaketiga saab enamasti kiiremini oma andmetest ülevaate, ggplot pakub veidi enam võimalusi nt rakendustes või veebilehtedel jooksvateks joonisteks ning on laialtlevinud andmeteaduses. Publitseerimiseks tuleb mõlema paketiga töötades joonistega pisut vaeva näha. Mõlemal paketil on ka terve hulk laiendusi, mis võimaldavad teha asju, millega pakett ise toime ei tule (nt 3D graafikud ggplotis). Asjad, milles ggplotil on siiski selge eelis, on nt legendid, grupeerimine ja paneelid (*facets*). Loe ka [siit](http://varianceexplained.org/r/why-I-use-ggplot2/).
 
 
 ## Ggploti lisamaterjale ja laiendusi
@@ -869,7 +919,42 @@ Kumbki graafikapakett ei ole olemuslikult parem kui teine ja on suur tõenäosus
 Väga põhjaliku ülevaate ggplotist ja selle laiendustest leiab nt lehelt <https://github.com/erikgahner/awesome-ggplot2>. 
 
 <br>
-Sobiva joonisetüübi valimisel on kindlasti abiks aga leht <https://www.data-to-viz.com/>.  
+Sobiva joonisetüübi valimisel on kindlasti abiks aga leht <https://www.data-to-viz.com/> ja juba mainitud <https://r-charts.com/>.  
+
+
+## Interaktiivsed graafikud ja plotly()
+
+Paketis `plotly` on funktsioon `ggplotly()`, mis võimaldab teha interaktiivseid graafikuid.  
+
+```{r, warning=FALSE, message=FALSE}
+# install.packages("plotly")
+library(plotly)
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Teeme esmalt tavalise ggploti graafiku ja salvestame selle mingisse objekti, nt nimega 'graafik1'
+ggplot() +
+  geom_bar(data = valimised, aes(x = sugu)) +
+  geom_line(data = valimised, aes(x = sugu, group = nimekiri, color = nimekiri),
+            stat = "count") -> graafik1
+
+# Paneme tehtud graafikuobjekti funktsiooni ggplotly() sisse
+# toolip-argumendis saame täpsustada, milliseid graafiku elemente hiirega joonisel liikudes näeb 
+ggplotly(graafik1, tooltip = c("y", "colour"))
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+ggplot(kysimustik, aes(x = synniaasta, y = kaua_opid, color = kogemused_kvant)) +
+  geom_point() +
+  scale_color_manual(values = c("grey45", "orange")) +
+  labs(title = "Õpitud aastate arv vastavalt sünniaastale", subtitle = "ja kokkupuutele kvantitatiivsete meetoditega", x = "Sünniaasta", y = "Õpitud aastate arv", color = "Kogemused\nkvantitatiivsete\nmeetoditega") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = "aliceblue")) -> graafik2
+
+ggplotly(graafik2, tooltip = "all")
+```
 
 
 ## Värvid ja värvipaletid
@@ -951,15 +1036,15 @@ rgb(84,255,159,maxColorValue = 255) # seagreen1
 rgb(34,139,34,maxColorValue = 255) # forestgreen
 ```
 
-Hex-värve saab kombineerida värvipaletiks lugematul hulgal veebilehtedel, nt [siin](https://coolors.co/). 
+Hex-värve saab kombineerida värvipaletiks lugematul hulgal veebilehtedel, nt lehel [Coolors](https://coolors.co/). 
 Oma värvipaletti saab seejärel R-is mingil joonisel kasutada.
 
 ```{r}
 # Erinevad viisid värvide täpsustamiseks
-minupalett <- c(rgb(147,78,78,maxColorValue = 255),
-                "#7faf90", 
-                "navyblue", 
-                "#8e7e24")
+minupalett <- c(rgb(147,78,78,maxColorValue = 255), # punakaspruun
+                "#7faf90", # tuhmroheline
+                "navyblue", # tumesinine
+                "#8e7e24") # tumekollane
 
 ggplot(data = kysimustik, 
        aes(x = aasta, fill = lemmikloom)) +
@@ -1001,7 +1086,7 @@ barplot(table(1:10), col = cm.colors(10), main = "cm.colors(10)")
 
 ### `RColorBrewer`
 
-```{r}
+```{r, fig.height=12}
 # install.packages("RColorBrewer")
 library(RColorBrewer)
 display.brewer.all() # valmis paletid
