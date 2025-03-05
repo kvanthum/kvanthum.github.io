@@ -58,22 +58,26 @@ valimised <- read.delim("data/kandidaadid_2023.csv")
 ```
 
 
+<br>
+<br>
+
 ## Torud  
 
 *Tidyverse*'i pakette ühendab sarnane kindlas järjekorras asjade tegemise loogika. Üks paketi oluline omadus on võimalus kasutada nn **torusid** ehk *pipe*'e (sümbol `%>%`), mille funktsioon tuleb tegelikult `tidyverse`'iga koos installitavast ja laaditavast paketist nimega `magrittr`.  
 Torud lubavad tõsta R-i n-ö pesastatud funktsioonidest funktsioone välja nende **käivitamise järjekorra alusel**, suunates iga eelmise käsu väljundi järgmisse käsku.  
-Kui R-i baaspaketis on kõige viimane käsk graafiliselt kõige esimene, siis torud lubavad teha neid asju loogilisemas järjekorras. Näiteks kui tahame 1) võtta tabelist kandidaatide soo tulba, 2) teha soo tunnuse väärtustest sagedustabeli, 3) leida absoluutsageduste põhjal suhtelised sagedused, siis oleks baaspaketi ja `tidyverse` paketi lahenduskäigud graafiliselt justkui peegelpildis.   
+Kui R-i baaspaketis on kõige viimane käsk graafiliselt kõige esimene, siis torud lubavad teha neid asju loogilisemas järjekorras. Näiteks kui tahame 1) võtta tabelist kandidaatide soo tulba, 2) teha soo tunnuse väärtustest sagedustabeli, 3) leida absoluutsageduste põhjal suhtelised sagedused, siis oleks baaspaketi ja `tidyverse`'i paketi lahenduskäigud graafiliselt justkui peegelpildis.   
 
 ```{r, eval = F}
 # Leia mees- ja naiskandidaatide suhtelised sagedused
 # baaspakett
 prop.table(table(valimised$sugu))
 
-# tidyverse
+# tidyverse'i torud
 valimised$sugu %>% table() %>% prop.table()
 
 # Kui saad teate 'could not find function "%>%"', tähendab see seda, 
 # et tidyverse'i pakett on ilmselt lihtsalt library(tidyverse) käsuga laadimata jäänud.
+
 ```
 
 Või kui tahaksime lahendada natuke keerulisemat ülesannet, nt leida kandidaatide ametinimetustes (vaba tekstiga tunnus) esinevad 50 sagedamat sõna, oleks baaspaketi käsk üpris keeruliselt loetav. 
@@ -83,12 +87,12 @@ Või kui tahaksime lahendada natuke keerulisemat ülesannet, nt leida kandidaati
 # baaspakett
 head(sort(table(gsub("[[:punct:]]", "", tolower(unlist(str_split(valimised$amet, " "))))), decreasing = T), 50) 
 
-# tidyverse
+# tidyverse'i torud
 valimised$amet %>% # võta valimiste andmestikust tulp "amet"
   str_split(" ") %>% # lõika ameti kirjeldused tühikute koha pealt sõnadeks
   unlist() %>% # tee sõnalistist tavaline vektor
   tolower() %>% # tee kõik vektori sõnad väiketähelisteks
-  gsub("[[:punct:]]", "", .) %>% # kustuta sõnade küljest kirjavahemärgid
+  gsub("[[:punct:]]", "", .) %>% # kustuta sõnade küljest kirjavahemärgid (= asenda mittemillegagi)
   table() %>% # tee puhastatud sõnadest sagedustabel
   sort(decreasing = T) %>% # sorteeri sagedustabel kahanevas järjekorras
   head(50) # võta sorteeritud tabelist esimesed 50 sõna
@@ -100,7 +104,7 @@ Lisame koodi ühe rea, mis jätaks ametinimetustest alles ainult viimase sõnavo
 # tidyverse
 valimised$amet %>% 
   str_split(" ") %>% 
-  lapply(., function(x) x[length(x)]) %>% # igast ametinimetusest võta ainult viimane sõnavorm
+  lapply(., function(sonad) sonad[length(sonad)]) %>% # igast ametinimetusest võta ainult viimane sõnavorm
   unlist() %>% 
   tolower() %>%
   gsub("[[:punct:]]", "", .) %>% 
@@ -124,13 +128,14 @@ gsub("^([^ ]+?) .*$", "\\1", valimised$nimi) |>
 
 # ei tööta
 valimised$nimi |>
-  gsub("^([^ ]+?) .*$", "\\1", .) %>%
+  gsub("^([^ ]+?) .*$", "\\1", .) |> # punkt viitab eelmise käsu väljundile (vektorile valimised$nimi)
   unique() |>
   length()
 ```
 
 Kumba või kas üldse kasutada on maitse küsimus, aga kui juba muid *tidyverse*'i funktsioone on vaja kasutada, tundub loogilisem kasutada ka vastavat toru `%>%`.  
 
+<br>
 
 ## Andmete filtreerimine ja valimine
 
@@ -265,14 +270,17 @@ valimised %>%
   filter(hääli_kokku > median(hääli_kokku))
 ```
 
+<br>
+<br>
+
 ## Harjutused
 
 **Harjutus 1**
 
 Leia valimiste andmestikust torusid kasutades mõne sind huvitava kandidaadi (või mitme kandidaadi) kontaktandmed.    
 
-1. Filtreeri andmetest nime tunnuse põhjal sobivad read.  
-2. Vali andmestikust ainult kandidaadi nime ja kogu kontaktandmete tulbad.  
+1. Filtreeri andmetest nime tunnuse põhjal sobivad **read**.  
+2. Vali andmestikust ainult kandidaadi nime ja kogu kontaktandmete **tulbad**.  
 
 ```{r, class.source = 'fold-hide', eval = F}
 valimised %>%
@@ -286,21 +294,29 @@ valimised %>%
 
 Laadi RStudiosse kursuse küsimustiku andmestik. Leia torusid kasutades, millisel aastal on olnud kursusel kõige rohkem kohvijoojaid. Ärme esialgu sellepärast muretseme, kui palju osalejaid mingil aastal üldse kursuselt läbi käis, ehkki see mõjutab oluliselt ka kohvijoojate absoluutarve.  
 
-1. Filtreeri andmetest ainult kohvijoojate read.  
-2. Võta välja ainult aasta tulp.  
+1. Filtreeri andmetest ainult kohvijoojate **read**.  
+2. Võta välja ainult aasta **tulp**.  
 3. Tee risttabel käsuga `table()`.  
 4. Leia moodi indeks käsuga `which.max()`.  
 5. Leia mood ise käsuga `names()`.  
 
 
 ```{r, class.source = 'fold-hide', eval = F}
-load("data/kysimustik_2023.RData")
+load("data/kysimustik_2025.RData")
 kysimustik %>% 
     filter(lemmikjook == "Kohv") %>%
     select(aasta) %>%
     table() %>%
     which.max() %>%
     names()
+
+# või
+kysimustik %>%
+    filter(lemmikjook == "Kohv") %>%
+    count(aasta) %>% # risttabeli asemel loe aastate read kokku funktsiooniga count()
+    filter(n == max(n)) %>% # filteeri ainult suurima sagedusega rida
+    pull(aasta) %>% # võta välja ainult aasta tulba väärtus
+    as.character() # muuda faktor tekstivektoriks
 ```
 
 
@@ -348,6 +364,10 @@ Kui tahame, et lisatud tulbad ka andmestikku alles jääksid, peame andmestiku k
 # kirjutame andmestiku "valimised" üle nii, et sinna on lisatud tulp paberhäälte arvuga
 valimised %>%
   mutate(hääli_paberil = hääli_kokku-e.hääli) -> valimised
+
+# või vastupidi järjekorras
+# valimised <- valimised %>%
+#   mutate(hääli_paberil = hääli-kokku-e.hääli)
 ```
 
 
@@ -373,7 +393,7 @@ valimised %>%
 
 **Harjutus 3**
 
-Näita joonisel, milline oli kandidaatide vanuste jaotus erakondades ning kas vanus mõjutas kuidagi ka (logaritmitud) häältesaaki.  
+Näita joonisel, milline oli kandidaatide vanuste jaotus erakondades ning kas vanus mõjutas kuidagi ka häältesaaki.  
 
 1. Tee ggplotiga all näidatud karpdiagramm. Punase vertikaalse joone saad funktsiooniga `geom_vline()`, mis tahab oma `aes()`-funktsiooni argumendiks `xintercept`'i ehk x-teljega lõikumise kohta. Selle väärtuseks peaks määrama terve andmestiku kandidaatide mediaanvanuse.      
 
@@ -464,7 +484,7 @@ valimised %>%
             perekonnanimesid = gsub("^.* ([^ ]+)$", "\\1", nimi) %>% unique() %>% length())
 ```
 
-Samad arvandmed saaksime tabelita kujul kätte ka ilma `summarise()`-funktsioonita.
+Samad arvandmed saaksime **tabelita kujul** kätte ka ilma `summarise()`-funktsioonita, ainult baaspaketti kasutades.
 
 ```{r, eval = F}
 nrow(valimised)
@@ -474,6 +494,7 @@ length(unique(gsub("^([^ ]+?) .*$", "\\1", valimised$nimi)))
 length(unique(gsub("^.* ([^ ]+)$", "\\1", valimised$nimi)))
 ```
 
+<br>
 
 Oluliselt kasulikumaks muutub `summarise()` funktsioon aga siis, kui seda kasutada koos funktsiooniga **`group_by()`**, mis grupeerib andmeid ühe või enama tunnuse põhjal ning laseb kokkuvõtteid teha iga grupi kohta eraldi.
 

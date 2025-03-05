@@ -922,7 +922,7 @@ Väga põhjaliku ülevaate ggplotist ja selle laiendustest leiab nt lehelt <http
 Sobiva joonisetüübi valimisel on kindlasti abiks aga leht <https://www.data-to-viz.com/> ja juba mainitud <https://r-charts.com/>.  
 
 
-## Interaktiivsed graafikud ja plotly()
+## Interaktiivsed graafikud ja plotly
 
 Paketis `plotly` on funktsioon `ggplotly()`, mis võimaldab teha interaktiivseid graafikuid.  
 
