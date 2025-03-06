@@ -33,7 +33,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Lisaks varem kasutatud küsimustikule kasutame üllatusküsimuste andmestikku.
 
 ```{r}
-load("data/kysimustik_2024.RData")
+load("data/kysimustik_2025.RData")
 load("data/yllatuskysimused_koneleja_keskmised.Rda")
 ```
 
@@ -56,23 +56,59 @@ data.frame(`Infokontekst` = c("Saad sõbra juures head veini. Tahad teada, mis v
     set_caption(caption = "Näide kontekstidest ja küsimustest.")
 ```
 
-Stiimulitena varieeriti 12 erinevat *mis*-küsimust ja 12 *mida*-küsimust. *Mis*-küsimused olid kõik struktuuriga *Mis NOOMEN see on?* ning *mida*-küsimused *Mida sa VERB?*. Kõik küsimused esitati kord info- ja kord üllatuskontekstis. Seega 2 x 2 x 12 = 48 stiimulit. Katseisikuid oli kokku 21 (kõik naised), seega kokku 1008 on andmestikus 1008 esitatud küsimust. Kõva häälega loetud küsimused salvestati ja mõõdeti lausungi kestust ja põhitooni.
+  - Stiimulitena varieeriti 12 erinevat **mis**-küsimust ja 12 **mida**-küsimust. *Mis*-küsimused olid kõik struktuuriga *Mis NOOMEN see on?* ning *mida*-küsimused *Mida sa VERB?*. 
+  - Kõik küsimused esitati kord info- ja kord üllatuskontekstis. Küsimuse tüüp on kodeeritud anmdestikus __ISQ__ -- *Information-Seeking Question* e infoküsimus ja __SQ__ -- *Surprise Question* e üllatusküsimus.
+  - Seega kokku oli katses 2 tüüpi x 2 küsisõna x 12 erinevat lauset = 48 stiimulit. 
+  - Katseisikuid oli kokku 21 (kõik naised), seega kokku on andmestikus 21 x 48 = 1008 vastust. 
+  - Kõva häälega loetud küsimused salvestati ja mõõdeti lausungi kestust ja põhitooni.
 
+```{r, warning=FALSE, message=F, echo=F}
+load("data/Est_SQ-ISQ_dataset_JLing.Rda")
+
+ylla_f0_confint <- data.frame()
+for(i in levels(dat$tyyp1)){
+    for(j in levels(dat$kysisona)){
+    ylla_f0_confint <- rbind(ylla_f0_confint,    
+                             apply(dat[dat$tyyp1 == i & dat$kysisona == j,paste0("f0_", 0:95)], 2, gmodels::ci, na.rm=T) %>% 
+                                 t() %>% data.frame() %>% 
+                                 add_rownames(., var="row") %>% 
+                                 mutate(t = as.numeric(gsub(".*_(\\d)","\\1",row)), aeg = t/100*mean(dat$phr_dur[dat$tyyp1==i & dat$kysisona ==j]), tyyp1 = i, kysisona = j)
+    )
+    }}
+dat %>% 
+    group_by(tyyp1, kysisona) %>% 
+    summarise(w1 = 0, 
+              w2 = mean(w_start_2-w_start_1), 
+              w3 = mean(w_start_3-w_start_1),
+              w4 = mean(w_start_4-w_start_1)) %>% 
+    pivot_longer(paste0("w",1:4), names_to = "sona", values_to = "aeg") %>% 
+    mutate(lev = as.numeric(tyyp1)) -> tmp
+tmp$sona <- rep(c("mis", "NOOMEN","see","on", "mida", "x", "sa","VERB"),2)
+
+
+(joonis <-  ylla_f0_confint %>% 
+    ggplot(aes(x = aeg, colour = tyyp1, fill = tyyp1))+
+    geom_line(aes(y = Estimate))+
+    geom_ribbon(aes(ymin = CI.lower, ymax = CI.upper), alpha = 0.5)+
+    geom_text(data = tmp, aes(x = aeg, y = 150+8^(lev-1), label = sona), size = 6, hjust = 0, show_guide = FALSE)+
+    facet_grid( "kysisona")+
+    labs(y = "Põhitoon (Hz)", x = "Aeg (s)", colour = "Küsimuse tüüp",  fill = "Küsimuse tüüp"))
+```
 
 
 ### Täisandmestikust koondandmestik
 
 **Seda kõike siin ei pea läbi tegema**, kui sul on Moodlist võimalik alla laadida koondandmestik valmis kujul (fail `yllatuskysimused_koneleja_keskmised.Rda`). Kui ei või kui tahad proovida kõik sammud järjest läbi, siis kogu andmestik on vabalt allalaetav [Open Science Framework'i repositooriumist](https://osf.io/knygh/). Sealt tuleks alla laadida fail `Est_SQ-ISQ_dataset_JLing.Rda`.
 
-```{r}
+```{r, eval=F}
 load("data/Est_SQ-ISQ_dataset_JLing.Rda")
 ```
 
 
 Sellisel kujul tuleme selle andmestiku juurde tagasi mõne nädala pärast, kui teeme tutvust segamudelitega. Kuna esialgu kasutame statistikuid, mis eeldavad sõltumatuid mõõtmisi (sellest räägime järgmises praktikumis), siis teisendame andmed sellisele kujule, et meil oleks igalt katseisikult üks keskmistatud mõõtmine iga katse konditsiooni kohta. Seda kõike siin ei pea läbi tegema, Moodle'ist leiab koondandmestiku valmis kujul. Võtame suurest andmestikust kaasa:
 
-- lausungi kestuse  
-- põhitooni keskmise 
+- lausungi kestuse
+- põhitooni keskmise
 - põhitooni ulatuse  
 - põhitooni kõrguse lausungi alguses  
 - põhitooni kõrguse lausungi lõpus  
