@@ -267,15 +267,27 @@ Kui nüüd kahe grupi keskmisi võrdleva testi *p*-väärtus oleks 0,03, siis t�
 
 ## Ühe- ja kahepoolsed hüpoteesid
 
-**Kahepoolne hüpotees**: kui tahame näidata seda, et keskmine on erinev mingist konstandist (nt populatsiooni keskmine) või ühe rühma keskmine on erinev teise rühma keskmisest.
+Ühe- või kahepoolne hüpotees sõltub sisuka ehk alternatiivse hüpoteesi H1 sõnastusest: kas kontrollitakse ainult erinevusi või on erinevustel eeldatud kindel suund.
+
+**Kahepoolne hüpotees** (*two-sided*, *two-tailed*) testib seda, kas (ühe rühma korral) rühma keskmine on erinev mingist konstandist (nt populatsiooni keskmine) või (kahe rühma korral) kas ühe rühma keskmine on erinev teise rühma keskmisest.
 
 - H0: keskmine = a VÕI keskmine1 = keskmine2
 - H1: keskmine ≠ a VÕI keskmine1 ≠ keskmine2
 
-Kui aga teooriast on teada, milline see erinevus peaks olema, siis saab kontrollida **ühepoolset hüpoteesi**. Sellisel juhul kontrollime seda, kas rühma keskmine on suurem kui populatsiooni keskmine. Või kahe rühma korral kas ühe rühma keskmine on suurem teise rühma keskmisest.
+Kahepoolne hüpotees on üldisem, lükates nullhüpoteesi igal juhul ümber siis, kui rühmad on erinevad, ükskõik kas üks on teisest suurem või väiksem.
+
+**Ühepoolne hüpotees** (*one-sided*, *one-tailed*) testib seda, kas (ühe rühma korral) rühma keskmine on suurem kui konstant või kas (kahe rühma korral) ühe rühnma keskmine on suurem kui teise rühma keskmine. Võimalust, et rühma keskmine on võrreldavast väiksem, ei kontrollita.
+
+- H0: keskmine <= a VÕI keskmine1 <= keskmine2
+- H1: keskmine > a VÕI keskmine1 > keskmine2
+
+Ühepoolne hüpotees võib olla teistpidi, et rühma keskmine on väiksem kui konstant või teise rühma keskmine:
 
 - H0: keskmine >= a VÕI keskmine1 >= keskmine2
 - H1: keskmine < a VÕI keskmine1 < keskmine2
+
+Seega ühepoolset hüpoteesi võiks rakendada juhul, kui teooriast on kindlasti teada, milline see erinevus peaks olema ja vastupidine võimalus ei ole võimalik või ei ole oluline.
+
 
 
 ### Näiteid: t-test (keskmiste võrdlemine)
