@@ -34,7 +34,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Kasutame juba tuttavaid andmestikke:
 
 ```{r}
-load("data/kysimustik_2024.RData")
+load("data/kysimustik_2025.RData")
 load("data/yllatuskysimused_koneleja_keskmised.Rda")
 kandidaadid <- read.delim("data/kandidaadid_2023.csv")
 ```
