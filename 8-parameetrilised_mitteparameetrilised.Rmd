@@ -252,9 +252,11 @@ tulemus <- t.test(ylla$f0_kesk_sem ~ ylla$tyyp1, var.equal = TRUE)
 ```
 
 Artikli tekstis tuleks lisaks **p-väärtusele** kirja panna ka **statistiku t väärtus** ja **vabadusastmete arv**. Näiteks APA stiilis võiks see välja näha nii:
-"T-test näitas, et rühmad on erinevad: t (`r round(tulemus$parameter, 1)`) = `r round(tulemus$statistic, 3)`; p = `r round(tulemus$p.value, 3)`."
+"T-test näitas, et rühmad on erinevad: t (`r round(tulemus$parameter, 1)`) = `r round(tulemus$statistic, 3)`; p < 0.001."
 
-Tihtipeale on ka kombeks p-väärtust näidata kategooriates suurem kui 0.05 (mitteoluline), väiksem kui 0.05, 0.01 või 0.001. Üldiselt üle kolme komakoha ei ole kombeks esitada.
+
+
+Tihtipeale on kombeks p-väärtust näidata kategooriates suurem kui 0.05 (mitteoluline), väiksem kui 0.05, 0.01 või 0.001. Üldiselt üle kolme komakoha ei ole kombeks esitada, nii et kui muidu võiks ka täpset p-väärtust esidada, siis käesoleva testi p-väärtust `r (tulemus$p.value)` ehk 0.0000000007 tuleks ikkagi esitada kui <0.001.
 
 On olemas ka pakette, mis testi tulemust sõnastada aitavad, näiteks:
 ```{r, warning=FALSE}
