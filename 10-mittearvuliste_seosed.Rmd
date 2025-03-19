@@ -40,7 +40,7 @@ Tegelikult on hii-ruut-testid terve testide pere, mille arvutamiseks kasutatakse
 
 **Kooskõlamäära testis** (*goodness of fit*) vaatleme mingi kategoriaalse tunnuse jaotumist ühes valimis ning testime, kas see valim võiks tulla populatsioonist, mille sama tunnuse jaotumise kohta on meil juba teadmine olemas. See testi liik on niisiis analoogne nt ühe valimiga t-testile, kus võrdleme valimi mingit arvulist näitajat (nt laste pikkused) populatsiooni omaga, otsustamaks, kui tõenäoline on, et valim on samast populatsioonist. Arvulise näitaja asemel on siin aga mingi kategoriaalse tunnuse väärtuste sagedused.    
 
-**Sõltumatuse testis** (*independence*) uurime kahe tunnuse vahelist seost samas valimis, **homogeensuse testis** (*homogeneity*) aga uurime, kas ühe tunnuse kategooriate proportsioonid on kahes sõltumatus valimis erinevad. See eristus võib aga kohati olla keeruline, kuna alati pole selge, mis hetkest peaks rääkima eraldi populatsioonidest/gruppidest. Testi tegemine käib mõlemal juhul samamoodi, ent erinevused tulenevad valimi moodustamisest ja testi tõlgendamisest.
+**Sõltumatuse testis** (*independence*) uurime kahe tunnuse vahelist seost samas valimis, **homogeensuse testis** (*homogeneity*) aga uurime, kas ühe tunnuse kategooriate proportsioonid on kahes sõltumatus valimis erinevad. See eristus võib aga kohati olla keeruline, kuna alati pole selge, mis hetkest peaks rääkima eraldi valimitest/gruppidest. Testi tegemine käib mõlemal juhul samamoodi, ent erinevused tulenevad valimi moodustamisest ja testi tõlgendamisest.
 
 <center>
 ![](imgs/hiiruudud.png){width=40%}
@@ -62,7 +62,7 @@ Uurime siin esmalt, kas vormi valik sõltub sellest, kas tegemist on pärisnime 
 # Koostame artiklis esitatud andmete põhjal
 # esmalt risttabeli.
 tab <- matrix(c(43, 77, 377, 343), # koosesinemise sagedused
-              nrow = 2, # mitmesse ritta sagedused jaotada?
+              ncol = 2, # mitmesse tulpa sagedused jaotada?
               dimnames = list(c("Lühike", "Pikk"), # tabeli ridade nimed
                               c("Pärisnimi", "Üldnimi"))) # tabeli tulpade nimed
 
@@ -71,23 +71,76 @@ tab
 
 Kui meil oleks vormikasutuse kohta põhjalikum andmestik, saaks risttabelit saaks mõistagi teha ka andmestiku tunnustest, nt `table(andmed$tunnus1, andmed$tunnus2)`.
 
-```{r, message=F, results = 'hold', warning=F}
-library(tidyverse)
 
-# teeme esmalt table-objektist data.frame-objekti
-df_pikk <- tab %>% # võtame table-tüüpi objekti
-  as.data.frame() %>% # teisendame selle data.frame-tüüpi objektiks
-  rownames_to_column(var = "Vorm") %>% # paneme pakutud reanimed tulpa "Vorm"
-  pivot_longer(cols = c("Pärisnimi", "Üldnimi"), # teeme laiast tabelist "pika", nii et võtame pärisnime ja üldnime tulbad,
-               names_to = "Liik", # paneme need tulbanimed ("Pärisnimi", "Üldnimi") pika tabeli tulpa "Liik" 
-               values_to = "Sagedus") %>% # tulpades olevad sagedused pika tabeli tulpa "Sagedus"
-  slice(rep(1:n(), times = Sagedus)) %>% # korda igat rida nii mitu korda kui on väärtus sama rea tulbas "Sagedus"
-  select(-Sagedus) # eemalda tulp "Sagedus"
-df_pikk
+Kui esitatud näide sind ei kõneta, võid teha tabeli ka mõne muu uurimuse põhjal, kus risttabelites sagedusi on raporteeritud. Näiteks
 
-table(df_pikk$Vorm, df_pikk$Liik)
+<br>
+<br>
+<center>
+<p>Annika Kängsepp (2024). [Käändevormide varieerumine ja seda mõjutavad tegurid kirjalikus keeles indefiniitpronoomeni *keegi* näitel](https://keeljakirjandus.ee/wp-content/uploads/2024/11/A.KANGSEPP.pdf). Keel ja Kirjandus 11, 1016-1037.</p>
+<p>Normingupäraste (*NP*, nt *kellelgi*) ja norminguvastaste (*NV*, nt *kellegil*) käändevormide jagunemine vastavalt teksti žanrile</p>
+![](imgs/10_kangsepp_artikkel.png){width=60%}
+</center>
+
+```{r, eval = F}
+tab <- matrix(c(227,184,239,551,434,165),
+              ncol = 3,
+              dimnames = list(c("NP", "NV"),
+                              c("Blogid", "Foorumid", "Perioodika")))
 ```
 
+<br>
+<br>
+
+<center>
+<p>Annaliisa Mäletjärv (2021). [Varjatud emotsioonide äratundmine näoväljendustest](https://sisu.ut.ee/wp-content/uploads/sites/561/maletjarv_annaliisa_uurimistoo.pdf). Uurimistöö.</p>
+<p>Videoklippidele antud hinnangud väljendatud emotsioonide kohta (ridades) ning tegelikud (uurija poolt määratud) emotsioonid (tulpades)</p>
+![](imgs/10_maletjarv_uurimistoo.PNG){width=60%}
+<!-- Veebipõhine katse, kus 27 vastajat hindasid videoklippide põhjal, millise emotsiooniga on tegemist-->
+</center>
+
+```{r, eval = F}
+tab <- matrix(c(301,489,345,397,373,285,
+                287,583,382,343,300,302,
+                264,564,344,378,310,332),
+              ncol = 3,
+              dimnames = list(c("Rõõm", "Kurbus", "Vastikus", "Hirm", "Üllatus", "Viha"),
+                              c("Rõõm", "Vastikus", "Hirm")))
+```
+
+<br>
+<br>
+
+
+<center>
+<p>Pille Markov (2019). [Intellektuaalne ja visuaalne realism laste joonistustes](https://dspace.ut.ee/bitstreams/ff20444f-d980-44d2-9288-990b502aafbb/download). Uurimistöö.</p>
+<p>Laste vanuserühmad ning valitud joonistamisstrateegia laste joonistuskatses</p>
+![](imgs/10_markov_uurimistoo.PNG){width=60%}
+<!-- Katse, milles paluti 5-8-aastastel lastel joonistada nende ees oleval pildil olevat inimest/inimesi, kusjuures mingitel fotodel olid inimesed seljaga diivani taga; osal fotodest oli näha kaht inimest, kellest üks seisab seljaga diivani taga, teine näoga pildistaja suunas; kolmas rühm fotosid kuvasid inimest täispikkuses. Intellektuaalne realism (laps teab midagi asjade kohta ja joonistab neid), visuaalne realism (jäetakse välja asju, mida teatakse, objektid hakkavad kattuma -> kolmemõõtmelisus) -->
+</center>
+```{r, eval = F}
+tab <- matrix(c(14,8,23,31),
+              ncol = 2,
+              dimnames = list(c("Noorem", "Vanem"),
+                              c("Intellektuaalne realism", "Visuaalne realism")))
+```
+<br>
+<br>
+
+
+<center>
+<p>Kai Tiitsaar (2010). [Hugo Treffneri Gümnaasiumi õpilaste käelisus](https://akadeemiake.ee/wp-content/uploads/2011/09/akadeemiake08.pdf#page=29). Akadeemiake 1(8), 29-50.</p>
+<p>Käelisus poiste ja tüdrukute hulgas</p>
+![](imgs/10_tiitsaar_kaelisus.PNG)
+</center>
+```{r, eval = F}
+tab <- matrix(c(15,18,199,13,7,241),
+              ncol = 2,
+              dimnames = list(c("Vasakukäelised", "Mõlemakäelised", "Paremakäelised"),
+                              c("Poisid", "Tüdrukud")))
+```
+<br>
+<br>
 
 
 Visualiseerime sagedusi.  
@@ -110,10 +163,11 @@ par(mfrow = c(1, 1)) # vii sätted uuesti algsele kujule
 
 Kui meil on kasutada ainult sagedustabel (st meil pole algandmeid, kus ridades on vaatlused ja tulpades on tunnused, nt `vorm` ja `nimelisus`), siis peame ggploti kasutamiseks sagedustabeli esmalt `data.frame` tüüpi tabeliks teisendama.  
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
 df <- tab %>% # võtame table-tüüpi objekti
   as.data.frame() %>% # teisendame selle data.frame-tüüpi objektiks
-  rownames_to_column(var = "Vorm") %>% # paneme pakutud reanimed tulpa "Vorm"
+  rownames_to_column(var = "Vorm") %>% # paneme reanimed tulpa "Vorm"
   pivot_longer(cols = c("Pärisnimi", "Üldnimi"), # teeme laiast tabelist "pika", nii et võtame pärisnime ja üldnime tulbad,
                names_to = "Liik", # paneme need tulbanimed ("Pärisnimi", "Üldnimi") pika tabeli tulpa "Liik" 
                values_to = "Sagedus")
@@ -151,13 +205,13 @@ Teoreetilised sagedused väljendavad kahe tunnuse kategooriate koosesinemiste sa
 Mida suurem on tegelike sageduste erinevus teoreetilistest sagedustest, seda suurem on ka hii-ruut-statistiku väärtus.
 
 ```{r}
-(tab2 <- addmargins(tab)) # lisame tabelile rea- ja veerusummad
+(tab_margins <- addmargins(tab)) # lisame tabelile rea- ja veerusummad
 ```
 
 ```{r}
 # Näiteks lühikese sisseütlevaga pärisnimede (kuhu? - Tartu) teoreetiline sagedus oleks
 # (reasumma*veerusumma/kogusumma)
-tab2["Lühike","Sum"]*tab2["Sum","Pärisnimi"]/tab2["Sum","Sum"]
+tab_margins["Lühike","Sum"]*tab_margins["Sum","Pärisnimi"]/tab_margins["Sum","Sum"]
 ```
 
 Teoreetilisi sagedusi ei pea aga ise käsitsi arvutama, need saab kätte ka hii-ruut-testi väljundist.  
@@ -177,7 +231,9 @@ chisq.test(tab)$expected # teoreetilised sagedused
 
 Uuritava andmestiku puhul ei ole tegelikult vaatluste sõltumatuse nõue täidetud, kuna korpuses ei ole igalt kõnelejalt ainult üks mingi sisseütlevas käändes sõna kasutuskord. See tähendab, et kõneleja/kirjutaja, kes on rohkem sisseütlevas käändes sõnu tarvitanud, mõjutab enam ka testi tulemusi. Keelekorpustega, kus pahatihti on ka keeruline tuvastada, kes täpselt kõneleja/kirjutaja on, vaatluste sõltumatuse nõuet sageli eiratakse, ent sellisel juhul võib alati küsida, kas ikka kirjeldame keelt üldiselt või mõne domineeriva keelekasutaja idiolekti.  
 
-Sageli viidatakse hii-ruut-testi eeldusena ka nn Cochrani reeglile, mille põhjal ei tohiks hii-ruut-testi tegemisel **ükski tegelik sagedus olla null** ega **ükski teoreetiline sagedus olla väiksem kui 5**. Nendele tingimustele on esitatud ka mööndusi, eriti keeleteaduses (nt [Stefanowitsch 2020](https://langsci-press.org/catalog/book/148): 177 või [Wallis 2021](https://www.routledge.com/Statistics-in-Corpus-Linguistics-Research-A-New-Approach/Wallis/p/book/9781138589384): 117), kuna reeglit peetakse liiga konservatiivseks. Klassikaliselt soovitatakse siiski sellistel juhtudel kasutada mõnd muud sarnast testi, nt [Fisheri testi või G-testi](https://kvanthum.github.io/10-mittearvuliste_seosed.html#fisheri-t%C3%A4pne-test-ja-g-test).
+Sageli viidatakse hii-ruut-testi eeldusena ka nn Cochrani reeglile, mille põhjal ei tohiks hii-ruut-testi tegemisel olla **oodatud sageduste hulgas 5st väiksemaid väärtusi enam kui 20% lahtrites** ning **ükski oodatud sagedus ei tohiks olla väiksem kui 1**. Nendele tingimustele on esitatud ka mööndusi, eriti keeleteaduses (nt [Stefanowitsch 2020](https://langsci-press.org/catalog/book/148): 177 või [Wallis 2021](https://www.routledge.com/Statistics-in-Corpus-Linguistics-Research-A-New-Approach/Wallis/p/book/9781138589384): 117), kuna reeglit peetakse liiga konservatiivseks. Klassikaliselt soovitatakse siiski sellistel juhtudel kasutada mõnd muud sarnast testi, nt [Fisheri testi või G-testi](https://kvanthum.github.io/10-mittearvuliste_seosed.html#fisheri-t%C3%A4pne-test-ja-g-test).
+
+**R-is annab hii-ruut-test annab hoiatuse juba siis, kui kuskil oodatud sageduste hulgas on väärtusi < 5.**  
 
 <br>
 <br>
@@ -223,6 +279,9 @@ Testi *p*-väärtus näitab niisiis, kui tõenäoline on selle vabadusastmete ar
 
 Tuleb aga silmas pidada, et mida suurem on vabadusastmete arv ehk mida rohkem kategooriaid kahel tunnusel kokku on, seda tõenäolisemalt hii-ruut-test sealt mõne olulise seose tuvastab. Samuti kipuvad andmed sellistes tabelites kategooriate vahel hajuma ning tegelike sageduste hulka satub palju nulle. Seepärast **ei soovitata teha hii-ruut-testi suurtel tabelitel, kus on palju ridu ja/või tulpasid**.  
 
+
+<br>
+<br>
 
 ## Harjutus 1
 
@@ -293,7 +352,7 @@ Näiteks lühikeses sisseütlevas käändes pärisnime standardiseeritud jääk 
 t$stdres
 ```
 
-Kui olulisuse nivoo on 0.05, siis on statistiliselt olulised need jäägid, mis on suuremad kui 1.96 või väiksemad kui -1.96 (tihti ümardatakse ka 2 ja -2). Vastava kriitilise väärtuse võib leida nt funktsiooniga `qnorm(1-olulisuse_nivoo/2)`.  
+Kui olulisuse nivoo on 0.05, siis on statistiliselt olulised need jäägid, mis on suuremad kui 1.96 või väiksemad kui -1.96 (tihti ümardatakse ka 2 ja -2). Vastava kriitilise väärtuse võib leida nt funktsiooniga `qnorm(1-olulisuse_nivoo/2)`. Need jäägid näitavad, millised on need risttabeli lahtrid, mis panustavad hii-ruut-testi statistiliselt olulisse tulemusse enim ning milles erinevus oodatud ja tegelike sageduste vahel on kõige märgatavam.    
 
 ```{r}
 barplot(t$stdres, 
@@ -317,6 +376,8 @@ t$stdres %>%
 ```
 
 
+<br>
+<br>
 
 ## Seose tugevuse hindamine
 
@@ -348,6 +409,11 @@ Suuremate (mitteruut)tabelite puhul võivad hakata kordajate väärtused erinema
 
 Tavaliselt kasutatakse 2x2 tabelist suuremate tabelite puhul Craméri V-d, sest see on võrreldav ka eri suurustega tabelite korral.
 
+Craméri V-d ja teisi seose tugevuse mõõdikuid saad arvutada ka näiteks pakettidega `lsr` või `effectsize`.  
+
+<br>
+<br>
+
 ## Kuidas hii-ruut-testi tulemust raporteerida
 
 Hii-ruut-testi tegemisel on tavaks esitada hii-ruut-statistiku väärtus koos vabadusastmete arvu ja vaatluste arvuga ning *p*-väärtus. Võib lisada ka info mõju suuruse kohta.  
@@ -363,7 +429,7 @@ Hii-ruut-testi tulemus on statistiliselt oluline: *X^2^*(1, N = 840) = 11.239, *
 
 ## Testi võimsus
 
-Ka hii-ruut-testi jaoks võib arvutada välja testi võimsuse, mis ütleb, kui suure tõenäosusega leiame sellise valimi suuruse, vabadusastmete arvu, mõju suuruse ja olulisuse nivoo korral olulise seose juhul, kui see tõesti olemas on.
+Ka hii-ruut-testi jaoks võib arvutada välja testi võimsuse, mis ütleb, kui suure tõenäosusega leiame sellise valimi suuruse, vabadusastmete arvu, mõju suuruse ja olulisuse nivoo korral olulise seose juhul, kui see tõesti olemas on. Testi võimsust tasub kontrollida eriti siis, kui saad testiga statistiliselt ebaolulise tulemuse.  
 
 ```{r, message=FALSE, warning=FALSE}
 library(pwr)
@@ -438,6 +504,8 @@ DescTools::GTest(tab2)
 
 [Vaata ka teisi kategoriaalsete andmete teste.](https://en.wikipedia.org/wiki/List_of_analyses_of_categorical_data)  
 
+<br>
+<br>
 
 ## Monte-Carlo simulatsioon
 
@@ -489,9 +557,12 @@ set.seed(1)
 chisq.test(tab2, simulate.p.value = TRUE, B = 3000)
 ```
 
+<br>
+<br>
+
 ## Järgmisel korral
 
-Järgmisel korral läheme kahe tunnuse vaheliste seoste hindamise juurest regressioonimudelite juurde, mis võimaldavad ühe tunnuse muutumist kirjeldada enamate tunnuste kaudu. **NB!** Järgmine praktikum alles ülejärgmisel nädalal (01.04)!
+Järgmisel korral läheme kahe tunnuse vaheliste seoste hindamise juurest regressioonimudelite juurde, mis võimaldavad ühe tunnuse muutumist kirjeldada enamate tunnuste kaudu. **NB!** Järgmine praktikum alles ülejärgmisel nädalal (31.03)!
 
 
 ## Funktsioonide sõnastik
