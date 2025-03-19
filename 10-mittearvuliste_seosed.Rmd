@@ -424,6 +424,9 @@ chisq.test(tab, correct = F)
 
 Hii-ruut-testi tulemus on statistiliselt oluline: *X^2^*(1, N = 840) = 11.239, *p* < 0.001. Craméri V on 0.12, mille põhjal on tegemist siiski nõrga seosega.  
 
+```{r}
+report::report_text(chisq.test(tab, correct = F))
+```
 
 
 
