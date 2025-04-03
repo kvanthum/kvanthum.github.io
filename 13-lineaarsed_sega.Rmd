@@ -42,7 +42,7 @@ Kui seni oleme tegelenud mudelitega, mis eeldavad sõltumatuid mõõtmisi, siis 
 - Juhuslik faktor on enamasti "müra", mis tuleks välja filtreerida. Juhuslikud faktorid võimaldavad korrigeerida regressioonimudeli fikseeritud mõjude koefitsiente, arvestades sellega, et iga üksik subjekt võib olla järjekindlalt teistest pisut erinev.
 
 
-## Juhuslik vabaliige ja kalle
+### Juhuslik vabaliige ja kalle
 
 __Juhuslik vabaliige__ (*random intercept*) tähendab seda, et lisaks keskmisele vabaliikmele korrigeeritakse seda iga juhusliku faktori taseme jaoks (nt iga indiviidi jaoks algaks koefitsientide võrdlemine natuke erinevalt baastasemelt).
 
@@ -54,9 +54,9 @@ __Juhuslik kalle__ (*random slope*) tähendaks, et lisaks fikseeritud faktori ef
 
 See näide lähtub artiklis Aare, K., & Lippus, P. (2017). Some gender patterns in Estonian dyadic conversations. J. E. Abrahamsen, J. Koreman, & W. van Dommelen (Toim), Nordic Prosody. Proceedings of the XIIth Conference, Trondheim 2016 (lk 29–38). Peter Lang. https://doi.org/10.13140/RG.2.2.17105.94568
 
-Selles uurimuses on vaadatud mitmeid üldiseid hääle kõrgust ja häälelaadi kirjeldavaid parameetreid seoses kõneleja soo ja vanuse ning vestluspartneri vastavate tunnustega. Korpus, mille põhjal on uurimus tehtud, sisaldab kahe kõneleja vaheliste vestluste salvestusi. Iga vestlus kestab umbes pool tundi ja iga vestluse iga osaleja kohta on salvestuse põhjal mõõdetud tema hääle põhitooni keskmist kõrgust (hertsides), põhitooni ulatust (pooltoonides), kui palju ta selle vestluse jooksul rääkis (% salvestuse ajast) ja kui palju tema hääl sel ajal kärises (% kõneldud ajast). Lisaks häälelaadile vaadati selles artiklis ka seda, kui palju kõneleja üldse vestluse jooksul rääkis. Leiti, et kõnes osalemine sõltus kõneleja soost (mehed räägivad rohkem), vestluspartneri soost (meestega räägitakse vähem) ja kõnelejate vanusevahest (endast vanematega räägitaske vähem).
+Selles uurimuses on vaadatud mitmeid üldiseid hääle kõrgust ja häälelaadi kirjeldavaid parameetreid seoses kõneleja soo ja vanuse ning vestluspartneri vastavate tunnustega. Korpus, mille põhjal on uurimus tehtud, sisaldab kahe kõneleja vaheliste vestluste salvestusi. Iga vestlus kestab umbes pool tundi ja iga vestluse iga osaleja kohta on salvestuse põhjal mõõdetud tema hääle põhitooni keskmist kõrgust (hertsides), põhitooni ulatust (pooltoonides), kui palju ta selle vestluse jooksul rääkis (% salvestuse ajast) ja kui palju tema hääl sel ajal kärises (% kõneldud ajast). Lisaks häälelaadile vaadati selles artiklis ka seda, kui palju kõneleja üldse vestluse jooksul rääkis. Leiti, et kõnes osalemine sõltus kõneleja soost (mehed räägivad rohkem), vestluspartneri soost (meestega räägitakse vähem) ja kõnelejate vanusevahest (endast vanematega räägitaske vähem). Vaata ka [vestluskalkulaatorit](https://suulinekeel.ut.ee/), mis mudeli efekte visualiseerib (kasutades plotly paketi interaktiivseid jooniseid).
 
-!["Aare Lippus 2017"](imgs/aare-lippus_2017_koneaeg.png)
+![](imgs/aare-lippus_2017_koneaeg.png)
 
 Täiskasvanud kõnelejate kõnetempo andmestik, mida kasutasime eelmises praktikumis, on natuke uuem variant sellest samast andmestikust.
 
@@ -272,9 +272,9 @@ Mittelineaarsete efektide puhul peaks vaatama edf kordajat: kui see on suurem ku
 ## Näide 2: vokaali kestus ja välde
 
 
-Kasutame teist andmestikku, mis on kogutud samast *eesti keele spontaanse kõne foneetilisest korpusest*, kasutatud artiklis Lippus, P., Asu, E. L., Teras, P., & Tuisk, T. (2013). Quantity-related variation of duration, pitch and vowel quality in spontaneous Estonian. Journal of Phonetics, 41(1), 17–28. https://doi.org/10.1016/j.wocn.2012.09.005
+Kasutame eelmistest praktikumidest tuttavat välteandmestikku, mis on pärit artiklist Lippus, P., Asu, E. L., Teras, P., & Tuisk, T. (2013). Quantity-related variation of duration, pitch and vowel quality in spontaneous Estonian. Journal of Phonetics, 41(1), 17–28. https://doi.org/10.1016/j.wocn.2012.09.005
 
-Selles töös uuriti eesti keele välte akustilisi tunnuseid. Andmestikus on info 1714 kahesilbilise sõna kohta, mõõdetud on häälikute kestust, põhitooni liikumist, vokaalikvaliteeti jms. Samuti on märgitud sõnade välde, fookusrõhk jms.
+Selles töös uuriti eesti keele välte akustilisi tunnuseid *eesti keele spontaanse kõne foneetilisest korpuse* põhjal. Andmestikus on info 1714 kahesilbilise sõna kohta, mõõdetud on häälikute kestust, põhitooni liikumist, vokaalikvaliteeti jms. Samuti on märgitud sõnade välde, fookusrõhk jms.
 
 Andmestik on saadaval DataDOI repositooriumis: http://dx.doi.org/10.15155/repo-16
 Loeme sisse otse veebilingilt.
@@ -316,12 +316,12 @@ boxplot(V1 ~ Quantity, data = dat2, subset = Struct == "cvcv",
 
 ### Kui me tahaks tavalist anovat või lineaarset mudelit ilma juhuslike efektideta
 
-Kui me tahaks rakendada selle andmestiku peal varasematest praktikumidest tuttavaid meetodeid ehk ilma juhuslike efektideta anovat või lineaarset mudelit, siis selle kuidagi saama kooskõlla eeldusega, et tegemist on sõltumatute mõõtmistega. Üks võimalus selleks on keskmistada nii, et näiteks iga kõneleja kohta oleks iga välte kohta üks mõõtmine. (Umbes nii on ka Lippus jt 2013 artiklis analüüs läbi viidud.)
+Eelmistes praktikumides kasutasime seda andmestikku tavalise lineaarse mudeliga ja et täita mudeli eeldusi, et tegemist on sõltumatute mõõtmistega, keskmistasime andmeid nii, et iga kõneleja kohta oleks iga seletava tunnuse taseme kohta üks väärtus. (Umbes nii on ka Lippus jt 2013 artiklis analüüs läbi viidud.)
 
 ```{r, message=F}
 dat2 %>% 
     filter(Struct == "cvcv") %>% 
-    group_by(SP, Quantity) %>% 
+    group_by(SP, Intonation, Quantity) %>% 
     summarise(V1 = mean(V1)) %>% 
     lm(V1 ~ Quantity, data = .) %>% 
     summary()
@@ -511,9 +511,22 @@ ranef(m3)
 sjPlot::plot_model(m3, type = "re", sort.est = T, grid = F)
 ```
 
+### Mitu juhuslikku vabaliiget ja kallet?
+
+Ühes mudelis võib olla ka mitu juhuslikku faktorit, millest mõnel on ka juhuslikud kalded ja teisel ei ole. Juhuslik kalle on võimalik faktorite kombinatsioonis, kus ühe juhusliku faktori tasemega esinevad erinevad fikseeritud faktori tasemed. Näiteks siin vokaalikestuse ja välte mudelis saaksime lisada vältele juhusliku kõneleja kalde (sest üks kõneleja on öelnud sõnu erinevates väldetes), aga sõna saab ainult juhusliku lõikepunktina lisada (sest üks sõnavorm on alati samas vältes).
+
+Siin näites saame ka hoiatuse *singulaarsuse* kohta, mis vihjab sellele, et mudel on liiga keerukas ja andmetes on varieerumine liiga väike.
+
+Samuti peab arvestama, et iga juhusliku efekti lisamine võtab fikseeritud efektidelt seletusjõudu vähemaks (siin näites seda küll ei juhtunud).
+
+```{r}
+m4 <- lmer(V1 ~ Quantity + (1+Quantity|SP) + (1|Word), data = dat2, subset = Struct == "cvcv", REML=F)
+anova(m3, m4)
+summary(m4)
+```
 
 
-Muidugi ühes mudelis võib olla ka mitu juhuslikku faktorit, millest mõnel on ka juhuslikud kalded ja teisel ei ole, aga peame ka arvestama, et iga juhusliku efekti lisamine võtab fikseeritud efektidelt seletusjõudu vähemaks.
+
 
 ## ANOVA segamudeliga
 
