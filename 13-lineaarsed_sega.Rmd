@@ -526,7 +526,21 @@ summary(m4)
 ```
 
 
+## Inkrementaalne modelleerimine segamudeliga
 
+Nagu tavalise lineaarse mudeli puhul, tuleks segamudeliga lähtuda Occami printsiibist ja valida optimaalselt lihtne aga kõige tugevama seletusjõuga mudel. Mudeli headuse näitamiseks peaks lähtuma
+
+- anova testiga mudeli jääkide võrdlemisest (võrreldes ühe faktori võrra erinevaid mudeleid)
+- võrdlema Akaike informatsioonikriteeriumit (AIC)
+- võrdlema pseudo-R-ruutu -- üldiselt segamudelitel pole R-ruutu (kuigi `mgcv` paketis GAM mudelil on). Sageli on selle asemel midagi R^2^ sarnast (*pseudo R^2^*), mis sarnaselet AIC-ile on number, mida sama andmestiku eri mudeliversioonide puhul saab võrrelda, aga mis ei ole tõlgendatav kui mudeli seletusjõu protsent.
+
+Erinevad mudeli headuse näitajad võivad pisut erinevaid tulemusi anda optimaalse mudeli valikul.
+
+```{r}
+AIC(m1, m2, m3, m4)
+```
+
+AIC põhjal on parim *m4* (selle AIC väärtus on kõige väiksem).
 
 ## ANOVA segamudeliga
 
