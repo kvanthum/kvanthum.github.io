@@ -255,9 +255,9 @@ Sama tulemuseni jõuame tegelikult siis, kui jagame tõenäosuste asemel absoluu
 
 ```{r}
 # Kogemuse omamise šanss
-70/34
+86/40
 # Teejoomise šanss
-43/61
+54/72
 ```
 
 
