@@ -26,8 +26,8 @@ knitr::opts_chunk$set(echo = TRUE)
 </center>
 
 ```{r}
-load("data/kysimustik_2024.RData")
-# Jätame välja ühe vaatluse
+load("data/kysimustik_2025.RData")
+# Jätame välja kaks vaatlust
 kysimustik2 <- droplevels(kysimustik[kysimustik$lemmikloom != "Mulle ei meeldi loomad",])
 
 mod <- lm(kaua_opid ~ synniaasta + kogemused_kvant + lemmikloom, data = kysimustik2)
@@ -50,9 +50,9 @@ Lineaarse mudeli väljundi **vabaliige** (*intercept*) näitab arvulise uuritava
 Lineaarse mudeli väljundi **koefitsiendid** (*coefficient*) ehk regressioonikordajad näitavad muutust arvulise uuritava tunnuse väärtuses, kui muuta seletava tunnuse väärtust (kas 1 ühiku võrra või 1 taseme võrra).    
 
 
-- Näiteks sellisele osalejale, kellel **ei ole kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus, ennustab mudel iga aastase kasvu kohta tema sünniaastas õpitud aastate arvu kahanemist `r abs(mod$coefficients[["synniaasta"]])` aasta võrra. Kui sellise osaleja sünniaasta oleks nt 1987, ennustaks mudel tema ülikoolis õpitud aastate arvuks `716.27254 + 1987 * (-0.35624)` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta']` aastat.  
-- Sama sünniaastaga osalejale, kellel **on kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus, ennustab mudel õpitud aastate arvuks aga `716.27254 + 1987 * (-0.35624) + 1.54848` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta'] + mod$coefficients['kogemused_kvantJah']` aastat.  
-- Sama sünniaastaga osalejale, kellel **on kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on koer, ennustab mudel õpitud aastate arvuks `716.27254 + 1987 * (-0.35624) + 1.54848 -2.34155` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta'] + mod$coefficients['kogemused_kvantJah'] + mod$coefficients['lemmikloomKoer']`. 
+- Näiteks sellisele osalejale, kellel **ei ole kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus, ennustab mudel iga aastase kasvu kohta tema sünniaastas õpitud aastate arvu kahanemist `r abs(mod$coefficients[["synniaasta"]])` aasta võrra. Kui sellise osaleja sünniaasta oleks nt 1987, ennustaks mudel tema ülikoolis õpitud aastate arvuks `663.11574 + 1987 * (-0.32946)` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta']` aastat.  
+- Sama sünniaastaga osalejale, kellel **on kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus, ennustab mudel õpitud aastate arvuks aga `663.11574 + 1987 * (-0.32946) + 1.12165` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta'] + mod$coefficients['kogemused_kvantJah']` aastat.  
+- Sama sünniaastaga osalejale, kellel **on kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on koer, ennustab mudel õpitud aastate arvuks `663.11574 + 1987 * (-0.32946) + 1.12165 -1.76387` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta'] + mod$coefficients['kogemused_kvantJah'] + mod$coefficients['lemmikloomKoer']`. 
 
 <br>
 Mudeli ennustusi konkreetsetele vaatlustele saame küsida ka funktsiooniga `predict()`, kui anname ette andmetabeli seletavate tunnuste väärtustega.  
@@ -98,6 +98,7 @@ ps+pk+pl
 - Mudelisse kaasatud tunnuste üldist statistilist olulisust saab hinnata II või III tüüpi ANOVAga (nt `car::Anova()`), vastavalt sellele, kas mudelis on olulisi interaktsioone (III) või mitte (II). Kui kasutada ainult ühe mudeli tunnuste olulisuse hindamiseks I tüüpi ANOVAt, sõltub tulemus tasakaalustamata andmestikus sellest, mis järjekorras tunnuseid mudelisse on lisatud.   
 
 <br>
+
 - Ka regressioonimudelite tulemusi saab lasta automaatselt raporteerida.  
 
 ```{r, warning=F, message=F}
@@ -137,7 +138,11 @@ check_model(mod)
 
 
 Mida komplekssem on mudel, seda keerulisemaks eelduste kontroll läheb (mistõttu jäetakse see oluline osa sageli tegemata).  
-- Loe ka nt Ako Sauga (2020). [Statistika õpik majanduseriala üliõpilastele](https://digikogu.taltech.ee/et/Item/bdcc647f-fa18-47c1-b499-99024f8bcc93). 
+
+Loe ka nt 
+
+- Ako Sauga (2020). [Statistika õpik majanduseriala üliõpilastele](https://digikogu.taltech.ee/et/Item/bdcc647f-fa18-47c1-b499-99024f8bcc93).  
+- Sügis jt (2024). [Praktiline andmeteadus. Kõrgkooliõpik](https://courses.cs.ut.ee/t/andmeteadus/Main/HomePage?action=download&upname=Praktiline_andmeteadus_ko%CC%83rgkoolio%CC%83pik.pdf).  
 
 ## Tänases praktikumis
 
@@ -818,7 +823,7 @@ summary(m.glm)
 ```
 
 
-Kuna regressioonimudel hindab uuritava tunnuse **ühe taseme esinemise tõenäosust** šansi logaritmi kaudu, siis peame kõigepealt vaatama, mida peab R sündmuse toimumiseks. Vaikimisi on selleks uuritava tunnuse tähestikulises järjekorras teine tase.
+Kuna regressioonimudel hindab uuritava tunnuse **ühe taseme esinemise tõenäosust** šansi logaritmi kaudu, siis peame kõigepealt vaatama, mida peab R **sündmuse toimumiseks**. Vaikimisi on selleks **uuritava tunnuse tähestikulises järjekorras teine tase**.
 
 ```{r}
 levels(ade_peal$cx)
@@ -828,7 +833,7 @@ Sündmuse toimumine (1) on niisiis *peal*-konstruktsiooni kasutus ja mittetoimum
 
 Läheme nüüd uuesti mudeli väljundi juurde.
 
-**1. Vabaliikme `(Intercept)` koefitsient** `r m.glm$coefficients[[1]]` näitab *peal*-konstruktsiooni esinemise **šansi logaritmi** (*logit*) tunnuse `LM_mobiilsus` baastaseme korral. Kategoriaalse seletava tunnuse baastase on vaikimisi tähestikulises järjekorras kõige esimene väärtus (`LM_mobiilsus` tunnuse puhul `liigutatav`, mitte `staatiline`). *Peal*-konstruktsiooni esinemise šansi logaritmi ennustatakse niisiis sellises kontekstis, kus kohasõna on mõtteliselt hõlpsasti liigutatav (nt *laud*). Logaritmitud šansi saab teisendada tavaliseks šansiks astendamise funktsiooniga `exp()`. Ehk kui logaritm alusel *e* (Euleri arv, umbes 2,71828) šansist on `r m.glm$coefficients[[1]]`, siis šanss on *e* astmes `r m.glm$coefficients[[1]]`. Vaikimisi kasutatakse niisiis naturaallogaritmi.    
+**1. Vabaliikme `(Intercept)` koefitsient** `r m.glm$coefficients[[1]]` näitab *peal*-konstruktsiooni esinemise **šansi logaritmi / logaritmitud šanssi** (*logit*) tunnuse `LM_mobiilsus` baastaseme korral. Kategoriaalse **seletava tunnuse baastase on vaikimisi tähestikulises järjekorras kõige esimene väärtus** (NB! vastupidi sellele, kuidas valitakse uuritava tunnuse baastase) (`LM_mobiilsus` tunnuse puhul `liigutatav`, mitte `staatiline`). *Peal*-konstruktsiooni esinemise šansi logaritmi ennustatakse niisiis sellises kontekstis, kus kohasõna on mõtteliselt hõlpsasti liigutatav (nt *laud*). Logaritmitud šansi saab teisendada tavaliseks šansiks astendamise funktsiooniga `exp()`. Ehk kui logaritm alusel *e* (Euleri arv, umbes 2,71828) šansist on `r m.glm$coefficients[[1]]`, siis šanss on *e* astmes `r m.glm$coefficients[[1]]`. Vaikimisi kasutatakse niisiis naturaallogaritmi.    
 
 ```{r}
 # peal-cx esinemise šanss kontekstis,
