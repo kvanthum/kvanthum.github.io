@@ -163,20 +163,6 @@ ggplot(dat, aes(x = LM_pikkus_log, y = ifelse(cx == "peal", 1, 0))) +
 
 Andmetest kiire esmase ülevaate saamiseks on R-is erinevaid pakette, nt [`DataExplorer`](https://cran.r-project.org/web/packages/DataExplorer/vignettes/dataexplorer-intro.html), [`GGally`](https://ggobi.github.io/ggally/index.html) või [`Hmisc`](https://hbiostat.org/R/Hmisc/), mis hõlbustavad oluliselt andmeanalüütiku igapäevatööd.    
 
-Samuti saab esmast kirjeldavat analüüsi küllalt kiiresti teha paketiga [`sjPlot`](https://strengejacke.github.io/sjPlot/reference/index.html), mida kasutame hiljem ka mudeli efektide visualiseerimiseks.  
-
-```{r, message = F, warning = F}
-#install.packages("sjPlot", dependencies = T)
-library(sjPlot)
-
-plot_grpfrq(dat$LM_mobiilsus, dat$cx, drop.empty = TRUE)
-
-dat %>%
-  group_by(cx) %>%
-  select(LM_mobiilsus) %>%
-  plot_stackfrq(show.n = T)
-```
-
 
 ## Ühe tunnusega mudel tasakaalus valimi põhjal
 
@@ -477,7 +463,10 @@ plot_model(mmax.glm,
 ```
 
 
-Lisaks üldiste mudeli väljundite kuvamisele saab joonisel näidata ka eraldi konkreetsete tunnuste mõjusid (nn *marginal effects*). `type = "pred"` kuvab näiteks peamõjusid, kusjuures y-teljel on nüüd protsentideks arvutatud esinemistõenäosused teiste seletavate tunnuste baastasemete kontekstis (**aga arvuliste tunnuste keskväärtuse korral!**). Võid kontrollida konteksti käsuga `ggeffects::ggpredict(mmax.glm, terms = "tegusõna_klass")`.  
+<br>
+<br>
+
+Lisaks üldiste mudeli väljundite kuvamisele saab joonisel näidata ka eraldi **konkreetsete tunnuste mõjusid** (nn *marginal effects*). `type = "pred"` kuvab näiteks peamõjusid, kusjuures y-teljel on nüüd protsentideks arvutatud esinemistõenäosused teiste seletavate tunnuste baastasemete kontekstis (**aga arvuliste tunnuste keskväärtuse korral!**). Võid kontrollida konteksti käsuga `ggeffects::ggpredict(mmax.glm, terms = "tegusõna_klass")`.  
 
 ```{r}
 plot_model(mmax.glm, 
@@ -496,6 +485,20 @@ plot_model(mmax.glm,
            show.data = T,
            jitter = 0.1) +
   theme(plot.title = element_text(hjust = 0.5)) # pealkiri joondatud keskele
+```
+
+Samu jooniseid võib teha ka ilma paketita `sjPlot`, kasutades lihtsalt funktsiooni  `ggpredict` paketist `ggeffects`.  
+
+```{r}
+library(ggeffects)
+plot(ggpredict(mmax.glm, terms = "tegusõna_klass"), 
+     show_data = T, 
+     jitter = 0.1)
+
+plot(ggpredict(mmax.glm, terms = "LM_pikkus_log"),
+     show_data = T,
+     jitter = 0.1) +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
@@ -531,20 +534,24 @@ car::Anova(m5.glm, type = "III")
 Kui mudelis on olulisi interaktsioone, võiks kasutada III tüüpi ANOVAt. Loe lähemalt [siit](https://www.r-bloggers.com/2011/03/anova-%E2%80%93-type-iiiiii-ss-explained/).  
 
 ```{r}
-tab_model(m5.glm, 
-          transform = NULL, # näita logaritmitud šansisuhteid
-          show.reflvl = T, # näita tunnuste baastasemeid
-          show.ci = F, # ära näita usaldusvahemikke
-          show.se = T, # näita koefitsiendi standardviga
-          show.aic = T, # näita mudeli AIC-d
-          use.viewer = F) # ära näita tabelit Vieweris, vaid eraldi brauseris
+summary(m5.glm)
 ```
 
-Kui mudelis on mingite tunnuste vahel oluline interaktsioon, ei saa mudeli peamõjusid enam üksinda tõlgendada. Nii tuleks pikkuse mõju tõlgendada mudelis `m5.glm` ainult koos murde mõjuga. Pikkusel (`LM_pikkus_log`) ei ole niisiis olulist mõju, **juhul kui** tegemist on Kesk-murderühmaga. Lõuna-murderühm (`murderühmLõuna`) ei erine oluliselt Kesk-murderühmast, **juhul kui** pikkuse logaritm on 0, aga silpide lisandudes muutub erinevus oluliseks (`LM_pikkus_log:murderühmLõuna`). Ranniku-murderühmaga (`murderühmRanniku`) on vastupidi: erinevus Kesk-murderühmaga on statistiliselt oluline **juhul kui** pikkuse logaritm on 0, aga silpide arvu kasvades midagi oluliselt ei muutu. Saarte-murderühm omakorda erineb Kesk-murderühmast mõlemal juhul: murded erinevad väga lühikeste sõnade puhul (mille pikkuse logaritm on 0), samuti erineb murretes pikkuse mõju, sest Kesk-murderühmas pikkuse lisandumine *peal*-konstruktsiooni esinemise šansse eriti ei mõjuta, Saarte-murderühmas aga muutub pikemate sõnadega *peal*-konstruktsiooni esinemine järjest tõenäolisemaks.     
+<br>
+
+Kui mudelis on mingite tunnuste vahel oluline interaktsioon, **ei saa mudeli peamõjusid enam üksinda tõlgendada**. Nii tuleks pikkuse mõju tõlgendada mudelis `m5.glm` ainult koos murde mõjuga.   
+
+- Pikkusel (`LM_pikkus_log`) ei ole niisiis olulist mõju, **juhul kui** tegemist on Kesk-murderühmaga.  
+- Lõuna-murderühm (`murderühmLõuna`) ei erine oluliselt Kesk-murderühmast, **juhul kui** pikkuse logaritm on 0, aga silpide lisandudes muutub erinevus oluliseks (`LM_pikkus_log:murderühmLõuna`).   
+- Ranniku-murderühmaga (`murderühmRanniku`) on vastupidi: erinevus Kesk-murderühmaga on statistiliselt oluline **juhul kui** pikkuse logaritm on 0, aga silpide arvu kasvades midagi oluliselt ei muutu.   
+- Saarte-murderühm omakorda erineb Kesk-murderühmast mõlemal juhul: murded erinevad väga lühikeste sõnade puhul (mille pikkuse logaritm on 0), samuti erineb murretes pikkuse mõju, sest Kesk-murderühmas pikkuse lisandumine *peal*-konstruktsiooni esinemise šansse eriti ei mõjuta, Saarte-murderühmas aga muutub pikemate sõnadega *peal*-konstruktsiooni esinemine järjest tõenäolisemaks.     
+
+Interaktsioone on alati hõlpsam tõlgendada graafikute abil.  
 
 ```{r}
+# visualiseeri interaktsiooni
 plot_model(m5.glm, type = "int")
-# või
+# või visualiseeri kaht interaktsioonis osalevat tunnust
 plot_model(m5.glm, type = "pred", terms = c("LM_pikkus_log", "murderühm"))
 ```
 
@@ -618,7 +625,7 @@ d) Koefitsientide *p*-väärtusi.
 
 #### 3. Teeme kursuse küsimustiku andmete pealt mudeli, mis ennustab vastajate lemmikjooki sünniaasta, ülikoolis õpitud aastate arvu, kvantmeetodite kogemuse, lemmiklooma ja küsimustikule vastamise aasta järgi. Millised peamõjud tuleks mudelisse jätta?
 ```{r}
-load("data/kysimustik_2024.RData")
+load("data/kysimustik_2025.RData")
 kysimustik$aasta <- as.numeric(as.character(kysimustik$aasta))
 m <- glm(lemmikjook ~ synniaasta + kaua_opid + kogemused_kvant + lemmikloom + aasta, data = kysimustik, family = "binomial")
 car::Anova(m)
@@ -626,7 +633,7 @@ car::Anova(m)
 
 a) mitte ühtegi
 b) kogemused_kvant ja vastamise aasta
-c) vastamise aasta  
+c) vastamise aasta ja sünniaasta  
 d) kogemused_kvant, vastamise aasta ja lemmikloom  
 e) kõik
 

@@ -833,7 +833,7 @@ Sündmuse toimumine (1) on niisiis *peal*-konstruktsiooni kasutus ja mittetoimum
 
 Läheme nüüd uuesti mudeli väljundi juurde.
 
-**1. Vabaliikme `(Intercept)` koefitsient** `r m.glm$coefficients[[1]]` näitab *peal*-konstruktsiooni esinemise **šansi logaritmi / logaritmitud šanssi** (*logit*) tunnuse `LM_mobiilsus` baastaseme korral. Kategoriaalse **seletava tunnuse baastase on vaikimisi tähestikulises järjekorras kõige esimene väärtus** (NB! vastupidi sellele, kuidas valitakse uuritava tunnuse baastase) (`LM_mobiilsus` tunnuse puhul `liigutatav`, mitte `staatiline`). *Peal*-konstruktsiooni esinemise šansi logaritmi ennustatakse niisiis sellises kontekstis, kus kohasõna on mõtteliselt hõlpsasti liigutatav (nt *laud*). Logaritmitud šansi saab teisendada tavaliseks šansiks astendamise funktsiooniga `exp()`. Ehk kui logaritm alusel *e* (Euleri arv, umbes 2,71828) šansist on `r m.glm$coefficients[[1]]`, siis šanss on *e* astmes `r m.glm$coefficients[[1]]`. Vaikimisi kasutatakse niisiis naturaallogaritmi.    
+**1. Vabaliikme `(Intercept)` koefitsient** `r m.glm$coefficients[[1]]` näitab *peal*-konstruktsiooni esinemise **šansi logaritmi / logaritmitud šanssi** (*logit*) tunnuse `LM_mobiilsus` baastaseme korral. Kategoriaalse **seletava tunnuse baastase on vaikimisi tähestikulises järjekorras kõige esimene väärtus** (NB! vastupidi sellele, kuidas valitakse uuritava tunnuse baastase) (`LM_mobiilsus` tunnuse puhul `liigutatav`, mitte `staatiline`). *Peal*-konstruktsiooni esinemise šansi logaritmi ennustatakse niisiis sellises kontekstis, kus kohasõna on mõtteliselt hõlpsasti liigutatav (nt *laud*). **Logaritmitud šansi saab teisendada tavaliseks šansiks astendamise funktsiooniga `exp()`, tõenäosuseks funktsiooniga `plogis()`**. Ehk kui logaritm alusel *e* (Euleri arv, umbes 2,71828) šansist on `r m.glm$coefficients[[1]]`, siis šanss on *e* astmes `r m.glm$coefficients[[1]]`. Vaikimisi kasutatakse niisiis naturaallogaritmi.    
 
 ```{r}
 # peal-cx esinemise šanss kontekstis,
@@ -851,7 +851,17 @@ Läheme nüüd uuesti mudeli väljundi juurde.
 
 *peal*-cx esinemise tõenäosus juhul, kui kohasõna referent on liigutatav objekt, on `r p_liigut`.
 
+Saame tõenäosuse leida ka funktsiooniga `plogis()`.  
+
+```{r}
+plogis(1.46353)
+```
+
+
+
 Kui seletav tunnus oleks arvuline, mitte kategoriaalne, väljendaks vabaliige sündmuse toimumise logaritmitud šanssi (hüpoteetilises) kontekstis, kus arvulise tunnuse väärtus oleks 0.  
+
+<br> 
 
 **2. Seletava tunnuse koefitsient** `r m.glm$coefficients[[2]]` näitab sündmuse toimumise šansi muutust **logaritmitud kordades** 1-ühikulise või ühe taseme muutuse puhul vastava seletava tunnuse väärtuses. Teisisõnu näitab see koefitsient **logaritmitud šansisuhet** ehk seda, mitu logaritmitud korda suurem on sündmuse toimumise šanss seletava tunnuse uue taseme korral. **Plussmärgiga koefitsiendid lisavad sündmuse toimumise šanssi (ühtlasi ka tõenäosust), miinusmärgiga vähendavad**. Negatiivne koefitsient siin viitab seega sellele, et sündmuse toimumise šanss väheneb seletava tunnuse taseme muutmisel.
 
@@ -865,6 +875,8 @@ Astendame esmalt selle koefitsiendi, et saada logaritmitud kordade asemel tegeli
 
 Seletava tunnuse astendatud koefitsient näitab siin niisiis, et kontekstis, kus kohasõna on staatiline (<i>lehm ammub <b>heinamaa</b> peal</i>), on *peal*-cx kasutamine ~0.28 korda "suurem" kui kontekstis, kus kohasõna viitab liigutatavale referendile (<i>lehm ammub <b>laua</b> peal</i>). See, et šansisuhe on < 1, näitab, et see arv, **mida** suhte arvutamisel jagame, on väiksem kui see arv, **millega** jagame. Seega peaks uue seletava tunnuse taseme korral (`LM_mobiilsus = "staatiline"`) *peal*-cx kasutamise šanss olema väiksem kui baastaseme korral (`LM_mobiilsus = "liigutatav"`).
 
+<br>
+
 Kontrollime, kas see on nii.  
 Teame juba *peal*-cx esinemise šanssi kontekstis, kus kohasõna viitab liigutatavale referendile. Selle saime kätte vabaliikme astendamise kaudu ja see on salvestatud objekti `P_liigut`.  
 Leiame nüüd *peal*-cx esinemise šansi kontekstis, kus kohasõna viitab staatilisele referendile. Selleks liidame vabaliikme ja seletava tunnuse koefitsiendid ning astendame tulemuse.
@@ -872,6 +884,7 @@ Leiame nüüd *peal*-cx esinemise šansi kontekstis, kus kohasõna viitab staati
 ```{r}
 # peal-cx esinemise šanss kontekstis,
 # kus kohasõna viitab staatilisele referendile
+# (enne astendamist liidame vabaliikmele koefitsiendi/koefitsientide väärtuse/väärtused)
 (P_staat <- exp(m.glm$coefficients[["(Intercept)"]] + m.glm$coefficients[["LM_mobiilsusstaatiline"]]))
 ```
 
@@ -892,12 +905,29 @@ Tavalisest **šansist** rääkides aga peame ütlema, et koefitsiendid tõstavad
 
 Üldiselt pole šansi ja šansisuhte terminite kasutamine tingimata vajalik, kui rääkida lihtsalt uuritava tunnuse ühe väärtuse esinemise tõenäosuse suurenemisest või vähenemisest ja mitte arvutada seda, kui mitu korda mingid šansid parajasti muutuvad.
 
-Muutuse suuna ütlevad ära koefitsientide ees olevad märgid ning kui šansisuhe kasvab, kasvavad ka sündmuse toimumise šansid ja tõenäosus ja vastupidi.
+Muutuse suuna ütlevad ära koefitsientide ees olevad märgid ning kui šansisuhe kasvab, kasvavad ka sündmuse toimumise šansid ja tõenäosus ja vastupidi.   
+
+Ka siin võime arvutada šansside asemel välja ka tõenäosused.  
+
+```{r}
+# "peal" kasutamise tõenäosus vabaliikme kontekstis (= kui LM_mobiilsus == "liigutatav")
+plogis(m.glm$coefficients[["(Intercept)"]])
+
+# "peal" kasutamise tõenäosus kontekstis, kus LM_mobiilsus == "staatiline" 
+plogis(m.glm$coefficients[["(Intercept)"]] + m.glm$coefficients[["LM_mobiilsusstaatiline"]])
+```
+
+
+<br>
 
 **3. Std. Error, z value ja Pr(>|z|)**. Waldi Z-statistiku (`z value`) väärtus on koefitsient (`Estimate`) jagatud standardveaga (`Std. Error`) ja see testib seda, kas koefitsient võiks olla vähemalt sama ekstreemse suurusega (s.t nullist erinev) ka populatsioonis, juhul kui kehtib nullhüpotees. Selle statistilist olulisust näitab *p*-väärtus (`Pr(>|z|)`), mis ütleb meile ühtlasi seda, kas antud tunnuse väärtus on statistiliselt oluliselt erinev tunnuse baastaseme väärtusest (uuritava tunnuse ennustamisel). Olulisuse nivoo on vaikimisi endiselt 0.05 ning tärnikeste tõlgendamine käib samamoodi nagu lineaarses regressioonis. Kui mingi koefitsiendi standardviga on väga suur, siis võib vastava parameetri hinnangut pidada ebamääraseks ning see võib isegi ainult natuke üksteisest erinevates valimites kõvasti varieeruda. Üldjuhul ei ole väga suure standardveaga koefitsiendid statistiliselt olulised ehk ei saa piisava kindlusega väita, et muutus mingis tunnuses tooks kaasa statistiliselt olulise muutuse sündmuse esinemise šanssides.   
 Selles mudelis on muutus seletavas tunnuses statistiliselt oluline, mis tähendab, et on oluline erinevus *peal*-konstruktsiooni kasutamise šanssides kontekstis, kus kohasõna viitab liigutatavale referendile, ja kontekstis, kus see viitab staatilisele referendile.  
 
+<br> 
+
 **4. _Null deviance_** näitab, kui suur oleks uuritava tunnuse varieerumise seletamata osa mudelis, kus ei ole ühtegi seletavat tunnust. Selle vabadusastmete arv (*degrees of freedom*) on enamasti vaatluste arv (*n*) - 1. **_Residual deviance_** näitab, kui suur on see seletamata osa, kui mudelis on need seletavad tunnused, mis seal parajasti on. Selle vabadusastmete arv sõltub mudelisse kaasatud tunnuste arvust ja kategoriaalsete tunnuste puhul ka tasemete arvust. Selles mudelis tuleb hinnata ainult ühe tunnuse ühe taseme mõju, seega lahutatakse n-st 1+1. Mida väiksem *Residual deviance* *Null Deviance*'ist on, seda parem, sest seda rohkem meie mudelisse lisatud seletavatel tunnustel uuritava tunnuse varieerumisega pistmist on.  
+
+<br>
 
 **5. AIC ehk Akaike Information Criterion** võimaldab hinnata mudeli headust võrdluses teiste mudelitega (väiksem arv on parem). Arvestab valimi suuruse ja mudelisse kaasatud parameetrite arvuga (nagu *adjusted R2* lineaarse regressiooni mudelis). Kui näiteks teeksime veel ühe mudeli, kuhu lisaksime ühe seletava tunnuse juurde, aga AIC väärtus ei läheks oluliselt väiksemaks, siis ei pruugi meie lisatud tunnusel olla uuritava tunnuse varieerumise seletamisel kuigi suur roll ja peaksime valima lihtsama (= vähemate seletavate tunnustega) mudeli.  
 
