@@ -115,7 +115,8 @@ Logistilises regressioonis ei pakuta meile R-ruutu, mille põhjal mudeli headust
 
 Publitseerimisel raporteeritakse pseudo-R-ruudust enam **klassifitseerimistäpsust** ja **C-indeksit/AUC-d**. Nendest järgmiseks pikemalt.  
 
-
+<br>
+<br>
 
 
 ### Klassifitseerimistäpsus
@@ -152,8 +153,8 @@ head(predict(m5.glm, type = "link"))
 Kui tahame saada mudeli klassifitseerimistäpsust, on meil vaja teada kolme arvu: 
 
 - Kõikide vaatluste arvu. 
-- Nende vaatluste hulka, kus ennustatud tõenäosus on > 0.5 JA tegelik väärtus andmestikus on `cx = "peal"`. Neid nimetatakse ka **tõeliselt positiivseteks** juhtudeks (*true positives, TP*).  
-- Nende vaatluste hulka, kus ennustatud tõenäosus on < 0.5 JA tegelik väärtus andmestikus on `cx = "ade"`. Neid nimetatakse **tõeliselt negatiivseteks** juhtudeks (*true negatives, TN*).  
+- Nende vaatluste hulka, kus ennustatud tõenäosus on > 0.5 JA tegelik väärtus andmestikus on `cx = "peal"`. Neid nimetatakse ka **tõeselt positiivseteks** juhtudeks (*true positives, TP*).  
+- Nende vaatluste hulka, kus ennustatud tõenäosus on < 0.5 JA tegelik väärtus andmestikus on `cx = "ade"`. Neid nimetatakse **tõeselt negatiivseteks** juhtudeks (*true negatives, TN*).  
 
 
 Vastavaid valesid ennustusi nimetatakse seega **valepositiivseteks** (*false positives, FP* - mudel ennustab > 0.5, tegelik vaatlus on "ade" ehk 0) ja **valenegatiivseteks** (*false negatives, FN* - mudel ennustab < 0.5, tegelik vaatlus on "peal" ehk 1).  
@@ -179,8 +180,8 @@ head(enn_bin)
 
 # tee tegelikest ja ennustatud binaarsetest 
 # väärtustest sagedustabel, kus on
-# tõeliselt positiivsed, valepositiivsed,
-# tõeliselt negatiivsed ja valenegatiivsed
+# tõeselt positiivsed, valepositiivsed,
+# tõeselt negatiivsed ja valenegatiivsed
 # juhud
 (klass_tabel <- table(teg, enn_bin))
 
@@ -190,7 +191,7 @@ head(enn_bin)
 # vaatlus oli "peal" ja ka mudel ennustas "peal" 
 # (= õigete ennustuste hulk), 
 # ning jaga tulemus vaatluste arvuga
-(klass_acc <- klass_tabel["ade","ade"]+klass_tabel["peal","peal"])/sum(klass_tabel)
+(klass_acc <- (klass_tabel["ade","ade"]+klass_tabel["peal","peal"])/sum(klass_tabel))
 # või
 # sum(diag(klass_tabel))/sum(klass_tabel)
 ```
@@ -222,6 +223,8 @@ lines(x = 0:1, y = 0:1, lty = "dashed", col = "red")
 
 Punane katkendjoon on nn ROC-kurv, millel asuvad näitajad siis, kui mudel ennustab juhuslikult "1"/"peal" või "0"/"ade", sest kui võtta mudelist välja kõik "peal" vaatlustele ennustatud tõenäosused ning kõik "ade" vaatlustele ennustatud tõenäosused, siis need tõenäosusjaotused kattuvad täielikult. Head näitajad on need, mis jäävad ROC-ruumis punasest diagonaalsest joonest ülespoole, sest need näitavad paremat klassifitseerimisvõimet kui juhuslik arvamine. Mida lähemal on täpp x-teljel 0-le ja y-teljel 1-le, seda paremini mudel vaatlusi klassifitseerib. Mida lähemal on täpp x-teljel 1-le ja y-teljel 0-le, seda halvemini mudel vaatlusi klassifitseerib (mudel ennustab alati vaatlusele "1" väärtust "0" ja vastupidi).
 
+<br>
+<br>
 
 
 ### C-indeks ehk AUC
@@ -441,6 +444,7 @@ Logistilise regressiooni jäägid aga ei pea olema normaaljaotusega! Seetõttu o
 ```{r}
 car::influencePlot(m5.glm)
 ```
+
 
 Kontrollida võiks andmestikust niisiis neid ridu, kus on korraga nt kas suur jääk ja suur Cooki kaugus või suur *hat*-väärtus ja suur Cooki kaugus, ja need andmestikust välja jätta, kui see on põhjendatud (alati ei ole).  
 

@@ -552,6 +552,7 @@ tehtud mudelite võrdlemiseks.</p>
 <p>Publitseerimisel raporteeritakse pseudo-R-ruudust enam
 <strong>klassifitseerimistäpsust</strong> ja
 <strong>C-indeksit/AUC-d</strong>. Nendest järgmiseks pikemalt.</p>
+<p><br> <br></p>
 <div id="klassifitseerimistäpsus" class="section level3">
 <h3>Klassifitseerimistäpsus</h3>
 <p>Iga vaatluse kohta andmestikus ennustab mudel mingi tõenäosuse,
@@ -613,12 +614,12 @@ kolme arvu:</p>
 <li>Kõikide vaatluste arvu.</li>
 <li>Nende vaatluste hulka, kus ennustatud tõenäosus on &gt; 0.5 JA
 tegelik väärtus andmestikus on <code>cx = &quot;peal&quot;</code>. Neid
-nimetatakse ka <strong>tõeliselt positiivseteks</strong> juhtudeks
+nimetatakse ka <strong>tõeselt positiivseteks</strong> juhtudeks
 (<em>true positives, TP</em>).<br />
 </li>
 <li>Nende vaatluste hulka, kus ennustatud tõenäosus on &lt; 0.5 JA
 tegelik väärtus andmestikus on <code>cx = &quot;ade&quot;</code>. Neid nimetatakse
-<strong>tõeliselt negatiivseteks</strong> juhtudeks (<em>true negatives,
+<strong>tõeselt negatiivseteks</strong> juhtudeks (<em>true negatives,
 TN</em>).</li>
 </ul>
 <p>Vastavaid valesid ennustusi nimetatakse seega
@@ -647,8 +648,8 @@ mudel ennustab &lt; 0.5, tegelik vaatlus on “peal” ehk 1).</p>
 ##  &quot;ade&quot;  &quot;ade&quot;  &quot;ade&quot; &quot;peal&quot; &quot;peal&quot; &quot;peal&quot;</code></pre>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="co"># tee tegelikest ja ennustatud binaarsetest </span></span>
 <span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a><span class="co"># väärtustest sagedustabel, kus on</span></span>
-<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a><span class="co"># tõeliselt positiivsed, valepositiivsed,</span></span>
-<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a><span class="co"># tõeliselt negatiivsed ja valenegatiivsed</span></span>
+<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a><span class="co"># tõeselt positiivsed, valepositiivsed,</span></span>
+<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a><span class="co"># tõeselt negatiivsed ja valenegatiivsed</span></span>
 <span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a><span class="co"># juhud</span></span>
 <span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a>(klass_tabel <span class="ot">&lt;-</span> <span class="fu">table</span>(teg, enn_bin))</span></code></pre></div>
 <pre><code>##       enn_bin
@@ -661,7 +662,7 @@ mudel ennustab &lt; 0.5, tegelik vaatlus on “peal” ehk 1).</p>
 <span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a><span class="co"># vaatlus oli &quot;peal&quot; ja ka mudel ennustas &quot;peal&quot; </span></span>
 <span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a><span class="co"># (= õigete ennustuste hulk), </span></span>
 <span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a><span class="co"># ning jaga tulemus vaatluste arvuga</span></span>
-<span id="cb39-7"><a href="#cb39-7" tabindex="-1"></a>(klass_acc <span class="ot">&lt;-</span> klass_tabel[<span class="st">&quot;ade&quot;</span>,<span class="st">&quot;ade&quot;</span>]<span class="sc">+</span>klass_tabel[<span class="st">&quot;peal&quot;</span>,<span class="st">&quot;peal&quot;</span>])<span class="sc">/</span><span class="fu">sum</span>(klass_tabel)</span></code></pre></div>
+<span id="cb39-7"><a href="#cb39-7" tabindex="-1"></a>(klass_acc <span class="ot">&lt;-</span> (klass_tabel[<span class="st">&quot;ade&quot;</span>,<span class="st">&quot;ade&quot;</span>]<span class="sc">+</span>klass_tabel[<span class="st">&quot;peal&quot;</span>,<span class="st">&quot;peal&quot;</span>])<span class="sc">/</span><span class="fu">sum</span>(klass_tabel))</span></code></pre></div>
 <pre><code>## [1] 0.6862881</code></pre>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a><span class="co"># või</span></span>
 <span id="cb41-2"><a href="#cb41-2" tabindex="-1"></a><span class="co"># sum(diag(klass_tabel))/sum(klass_tabel)</span></span></code></pre></div>
@@ -714,6 +715,7 @@ x-teljel 0-le ja y-teljel 1-le, seda paremini mudel vaatlusi
 klassifitseerib. Mida lähemal on täpp x-teljel 1-le ja y-teljel 0-le,
 seda halvemini mudel vaatlusi klassifitseerib (mudel ennustab alati
 vaatlusele “1” väärtust “0” ja vastupidi).</p>
+<p><br> <br></p>
 </div>
 <div id="c-indeks-ehk-auc" class="section level3">
 <h3>C-indeks ehk AUC</h3>
