@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '1-sissejuhatus.html'))})
-date: 10.02.2025 
+date: 09.02.2026 
 output: 
   html_document:
     theme: flatly
@@ -30,25 +30,25 @@ blockquote {
 
 ## Kursuse korraldusest
 
--   **E** 14.15-15.45, **K** 10.15-11.45.  
+-   **E** ja **K** 10.15-11.45.  
 -   Kokku 20 kohtumist.  
--   Toimumisnädalad 24-25, 27-29, 31-34, 37. See tähendab, et praktikume **EI** toimu 24. ja 26. veebruaril, 24. ja 26. märtsil, 28. ja 30. aprillil ning 5. ja 7. mail.  
+-   Toimumisnädalad 24-25, 27-29, 31-34, 37. See tähendab, et praktikume **EI** toimu 23. ja 25. veebruaril, 23. ja 25. märtsil, 27. ja 29. aprillil ning 4. ja 6. mail.  
 -   Kui vähegi võimalik, püüame kohtuda kohapeal. Jätame võimaluse osaleda ka Zoomi kaudu, ent praktikume ei salvestata.  
--   Kohalkäimine (sh virtuaalne) ei ole kohustuslik, küll aga tungivalt soovituslik. 
+-   Kohalkäimine (sh virtuaalne) ei ole kohustuslik, küll aga tungivalt soovituslik.  
 -   Kõik õppematerjalid on [Moodle](https://moodle.ut.ee/course/view.php?id=14049)'is ja sellel kursuse kodulehel.    
 -   Kursus on arvestuslik (arvestatud/mittearvestatud).  
--   Arvestuse saamiseks vajalik esitada **kõik** kursuse jooksul antud kodutööd ja lõpuprojekt.  
+-   Arvestuse saamiseks vajalik esitada tähtajaks **kõik** kursuse jooksul antud kodutööd ja lõpuprojekt.  
 -   3 kodutööd:  
-    -   Andmetüübid - tidyverse, tähtaeg **16.03.2025**.
-    -   Valim ja populatsioon - Mittearvuliste tunnuste vahelised seosed, tähtaeg **30.03.2025**.
-    -   Lineaarse regressiooni mudelid - Logistilise regressiooni segamudelid, tähtaeg **27.04.2025**.
--   Lõpuprojekt: iseseisev töö, milles kasutatakse mõnd kursusel käsitletud meetodit mõnel kursusel mitte kasutatud andmestikul. Peab sisaldama nii koodi, analüüsi kui ka järeldusi. Kokku u 5 lk. Kursuse viimasel nädalal saab enda projektist, sellega kaasnenud probleemidest jms-st lühidalt (u 5 minutit) ka teistele rääkida. Võib edasi arendada teiste ainete raames tehtud projekte, kui on selgelt välja toodud, mis analüüse olete selle aine põhjal lisanud ning kuidas need aitavad uuritavat nähtust kirjeldada ja seletada. Esitamise tähtaeg **09.05.2025**.  
+    -   Andmetüübid - tidyverse, tähtaeg **15.03.2026**.
+    -   Valim ja populatsioon - Mittearvuliste tunnuste vahelised seosed, tähtaeg **29.03.2026**.
+    -   Lineaarse regressiooni mudelid - Logistilise regressiooni segamudelid, tähtaeg **26.04.2026**.
+-   Lõpuprojekt: iseseisev töö, milles kasutatakse mõnd kursusel käsitletud meetodit mõnel enda valitud andmestikul. Peab sisaldama nii koodi, analüüsi kui ka järeldusi. Kokku u 5 lk. Kursuse viimasel nädalal saab enda projektist, sellega kaasnenud probleemidest jms-st lühidalt (u 5 minutit) ka teistele rääkida. Võib edasi arendada teiste ainete raames tehtud projekte, kui on selgelt välja toodud, mis analüüse olete selle aine põhjal lisanud ning kuidas need aitavad uuritavat nähtust kirjeldada ja seletada. Esitamise tähtaeg **08.05.2026**.  
 
 
 Selleks, et mõne nädala pärast kursuse materjalid pilla-palla kõiksugu salajastes kohtades laiali ei oleks ning et andmestike sisselugemine, jooniste salvestamine jms oleks võimalikult hõlbus, võiks kasutada selget kaustade ja failide struktuuri. Näiteks midagi sellist:  
 
 ```
-kvanthum2025  
+kvanthum2026  
     /materjalid  
         /praktikum1.html  
         /praktikum1.Rmd  
@@ -77,14 +77,108 @@ kvanthum2025
     /lõpuprojekt  
 ```
 
-## Kvantitatiivne andmeanalüüs humanitaarteadustes
 
-- Kvantitatiivne -> arvud: mõõtmis- ja **loendusandmed**    
-- Empiirilisus   
-- Suurtes andmehulkades orienteerumine   
-- Nähtuste kirjeldamine, koosesinemise mustrid ja põhjuslikud seosed  
+
+## Lugemismaterjali
+
+Selle kursuse aluseks on olnud põhiliselt õpikud 
+
+- Natalia Levshina (2015) "How to do Linguistics with R",  
+- Bodo Winter (2019) "Statistics for Linguists: An Introduction Using R".  
+
+<center>![](imgs/levshina.jpg){width=30%} ![](imgs/winter.jpg){width=30%}</center>
+
+<br>
+
+Õpikuid ja ülevaateid humanitaar- ja sotsiaalteaduste meetodite kohta aga ilmub üha enam. Springeri kirjastusel näiteks on sari [***"Quantitative Methods in the Humanities and Social Sciences"***](https://www.springer.com/series/11748?detailsPage=titles), mille alt on hetkeseisuga ilmunud juba tervelt 25 raamatut.  
+
+<center>![](imgs/springerseries.jpg){width=30%}</center>
+
+<br>
+
+Ajaloolasi võib huvitada ka näiteks Claire Lemercier & Claire Zalc (2019) [***"Quantitative Methods in the Humanities: An Introduction"***](https://www.upress.virginia.edu/title/5168) ja Charles H. Feinstein & Mark Thomas (2002) [***"Making History Count: A Primer in Quantitative Methods for Historians"***](https://www.cambridge.org/core/books/making-history-count/8A9D227F8ADF3BD048382D911A2C4A33).  
+
+<center>![](imgs/quanthuman.jpg){width=30%}
+![](imgs/feinstein_thomas.jpg){width=30%}</center>  
+
+
+<br>
+
+Eestikeelseid andmeteaduse ja statistika õpikuid:  
+
+- Elena Sügis, Ardi Tampuu, Anna Aljanaki, Mark Fišel, Meelis Kull (2024) [***"Praktiline andmeteadus"***](https://courses.cs.ut.ee/t/andmeteadus/)  
+- Ako Sauga (2017) [***"Statistika õpik majanduseriala üliõpilastele"***](https://digikogu.taltech.ee/et/item/76e80221-4d41-40e6-b395-a6ef16609482)  
+
+
+<center>![](imgs/praktand.png){width=30%}
+![](imgs/sauga.png){width=30%}</center>  
+
+
+## Andmed, vaatlused ja tunnused
+
+Andmeteks võib pidada **teavet**, mille põhjal saab teha järeldusi.  
+
+<!-- Vaatleja perspektiiv: andmed saavad andmeteks, kui neid millegi jaoks kasutatakse -->
+
+
+Andmeid võib koguda mõõtmise, vaatluse, päringute või analüüsi teel. Tüüpilised andmete saamise viisid on:  
+
+- introspektsioon (?)  
+- intervjuu  
+- küsitlused  
+- (teksti)kogud, korpused, andmebaasid jne    
+- katsed  
+- ... 
+
+
+<!--Pigem ka terminoloogiline küsimus: andmed vs. allikad, materjal vs. vaatlused-->
+
+<center>![](imgs/data.png){width=100%}</center>
+
+
+Andmeid võib jagada    
+- toorandmeteks ("toores" allikmaterjal, nt käsikirjad, intervjuude audiosalvestised),  
+- **töödeldud andmeteks** (puhastatud, struktureeritud, märgendatud, nt märgendatud tekstid, intervjuude transkriptsioonid),  
+- tuletatud andmeteks (nt sagedusloendid, mudelite väljundid, visualiseeringud).  
+
+<!-- toorandmed on andmed enne, kui neid on kasutatud mingiks analüüsiks või tõlgendamiseks; ei ole seotud ainult analoog-digitaal eristusega -->
+<!--Ka kvalitatiivsed-kvantitatiivsed, -->
+
+Sellel kursusel tegeleme põhiliselt küsitluste ja andmebaaside struktureeritud andmetega, mida hoitakse tabelkujul ning mille ridades olevaid **vaatlusi/andmepunkte** (ingl *observation*) iseloomustatakse teatud tulpades asuvate **tunnuste** (ingl *variable*) abil. Tabeli lahtrites omakorda on iga vaatluse iga tunnuse **väärtus** (ingl *value*).     
+
+<center>  
+![](imgs/var_obs_val.png)  
+<p>Wickham, Çetinkaya-Rundel, Grolemund (2023). <a href="https://r4ds.hadley.nz/">R for Data Science (2e)</a></p>
+</center>  
+
+<br>
+
+Näiteks võime iseloomustada inimesi nende pikkuse, kaalu, silmavärvi, hariduse jpm tunnuste põhjal. Sõnu jällegi võib iseloomustada nende graafilise pikkuse, silpide arvu, välte, tähendusklassi, sõnaliigi, sageduse jms tunnuste põhjal.  
+
+**Milliste tunnuste põhjal võiks iseloomustada luuletusi, ohvrikive, fotosid?**  
+
+<br>
+
+**Tunnused**/muutujad aitavad niisiis andmeid kirjeldada ja jagunevad **uuritavateks/sõltuvateks** tunnusteks (see, mida uurime ja mille kohta tahame midagi väita) ja **seletavateks/sõltumatuteks** tunnusteks (need, mille kaudu uuritavat tunnust iseloomustame). Inglise keeles viidatakse neile sageli vastavalt kui *dependent variable* / *response (variable)* / *outcome (variable)* ja *independent variable* / *predictor (variable)* / *explanatory variable*.  
+<br>
+Näiteks võime uuritava tunnusena käsitleda inimese kaalu ning seletavate tunnustena inimese pikkust, füüsilist aktiivsust (nt minutites nädalas), unetundide arvu jms. Sõnade puhul võib meil olla näiteks hüpotees, et sagedasemad sõnad on lühemad, mispuhul saame uuritavaks tunnuseks võtta sõna pikkuse ja seletavaks tunnuseks sõna sageduse. Kas võiks ka vastupidi?     
+
+**Mis on järgmistes näidetes uuritav ja mis seletav tunnus?**   
+
+- Kuidas mõjutavad sugu ja vanus erakondlikku eelistust?   
+- Kuidas sõltub hinnang oma söögitegemisoskusele programmeerimisoskusest?   
+
+<br>
+<br>
+
+Kui räägime kursuse kontekstis **kvantitatiivsest andmeanalüüsist**, siis  
+
+- kvantitatiivne -> arvud: mõõtmis- ja **loendusandmed**    
+- empiirilisus   
+- suurtes andmehulkades orienteerumine   
+- nähtuste kirjeldamine, koosesinemise mustrid ja põhjuslikud seosed  
     - <http://www.tylervigen.com/spurious-correlations>  
-- Sagedused, tõenäosused, varieerumise mudelid    
+- sagedused, tõenäosused, varieerumise mudelid    
 
 
 <br>
@@ -108,49 +202,24 @@ _________________________________________
 > *Although history is not an exact science, counting, comparing, classifying, and modeling are nevertheless useful methods for __measuring our degree of doubt or certainty, making our hypotheses explicit, and evaluating the influence of a phenomenon__.* ([Lemercier, Zalc 2019](https://www.jstor.org/stable/j.ctvbqs963))
 
 
-
-
-## Lugemismaterjali
-
-Selle kursuse aluseks on põhiliselt õpikud 
-
-- Natalia Levshina (2015) "How to do Linguistics with R",  
-- Bodo Winter (2019) "Statistics for Linguists: An Introduction Using R".  
-
-<center>![](imgs/levshina.jpg){width=30%} ![](imgs/winter.jpg){width=30%}</center>
-
-<br>
-
-Õpikuid ja ülevaateid humanitaar- ja sotsiaalteaduste meetodite kohta aga ilmub üha enam. Springeri kirjastusel näiteks on terve sari [***"Quantitative Methods in the Humanities and Social Sciences"***](https://www.springer.com/series/11748?detailsPage=titles), mille alt on hetkeseisuga ilmunud juba tervelt 23 raamatut.  
-
-<center>![](imgs/springerseries.jpg){width=30%}</center>
-
-<br>
-
-Ajaloolasi võib huvitada ka näiteks Claire Lemercier & Claire Zalc (2019) [***"Quantitative Methods in the Humanities: An Introduction"***](https://www.upress.virginia.edu/title/5168) ja Charles H. Feinstein & Mark Thomas (2002) [***"Making History Count: A Primer in Quantitative Methods for Historians"***](https://www.cambridge.org/core/books/making-history-count/8A9D227F8ADF3BD048382D911A2C4A33).  
-
-<center>![](imgs/quanthuman.jpg){width=30%}
-![](imgs/feinstein_thomas.jpg){width=30%}</center>  
-
-
-<br>
-
-Eestikeelseid andmeteaduse ja statistika õpikuid:  
-
-- Elena Sügis, Ardi Tampuu, Anna Aljanaki, Mark Fišel, Meelis Kull (2024) [***"Praktiline andmeteadus"***](https://courses.cs.ut.ee/t/andmeteadus/)  
-- Ako Sauga (2017) [***"Statistika õpik majanduseriala üliõpilastele"***](https://digikogu.taltech.ee/et/item/76e80221-4d41-40e6-b395-a6ef16609482)  
-
-
-<center>![](imgs/praktand.png){width=30%}
-![](imgs/sauga.png){width=30%}</center>  
+## Sellel kursusel  
 
 <!-- Tegeleme rakendusliku statistikaga, kirjeldava ja järeldavaga. Ei tegele stilomeetria, dimensioonide vähendamise tehnikatega -->
 
-
-## Sellel kursusel  
-
 <center>![](imgs/statskeem.png){width=100%}</center>
 
+<br>
+<br>
+
+Kursusel kasutame praktikumides ja kodutöödes erinevaid andmestikke (mille valik kohati küll tugevalt keeleteaduse poole kaldu). Selleks, et käsitletud analüüsietappe ja meetodeid veelgi paremini kinnistada, julgustame kursuse algusest peale rakendama õpitut kohe ka mõnel enda valitud andmestikul (vt ka ülesanne 1).    
+
+
+## Ülesanne 1
+
+Vaata ringi erinevates [Moodle'is lingitud](https://moodle.ut.ee/mod/linkset/view.php?id=1358840) andmehoidlates ehk repositooriumides ning püüa leida mõni enda valdkonnaga seotud või enda jaoks muidu huvitav tabelkujul vabalt kättesaadav struktureeritud andmestik, milles vaatlused on ridades ja tunnused tulpades.  
+Vormingutest võiks eelistada TXT-, CSV-, TSV-, XLSX-laiendiga faile.  
+
+Salvesta andmestik kausta `kvanthum2026/andmestikud`.  
 
 ## Miks R?
 
@@ -171,8 +240,6 @@ Eestikeelseid andmeteaduse ja statistika õpikuid:
 - RStudio kaudu palju lisavõimalusi (slaidid, dokumendid, interaktiivsed rakendused, veebilehed)   
 - Integreeritav teiste keskkondade ja programmeerimiskeeltega (nt Python)  
 
-R-iga seotud uudistega, pakettide ning funktsioonidega kursis olemiseks tasub silma peal hoida leheküljel [R-Bloggers](https://www.r-bloggers.com/).
-
 <!-- visualiseerimine parem kui Excelis, pikalt oli parem ka Pythonist-->  
 <!-- Excelil andmestiku suurusele limiit, suurte andmetega töötamisel muutub väga aeglaseks -->
 <!-- Excelis piiratud andmete puhastamise ja ümberstruktureerimise võimalused -->
@@ -187,6 +254,8 @@ RStudiost on praeguseks olemas nii lokaalne, töölauaversioon, millega meie tö
 <!-- praeguseks võimaldab juba kasutada ka teisi programmeerimiskeeli, nt Python -->
 
 Kasutame sel kursusel [R-i](https://www.r-project.org/) ja [RStudio](https://posit.co/download/rstudio-desktop/) viimaseid versioone (vastavalt R 4.4.2 ja RStudio 2024.12.0), ent probleemi ei tohiks tekkida ka veidi vanemate (nt viimase aasta jooksul installitud) versioonidega. 
+
+<center>![](imgs/rstudio_ui.png){width=100%}</center>
 
 
 ### Nippe ja trikke
@@ -229,7 +298,9 @@ OLULINE! Leia, kuidas klaviatuuril sisestada järgmisi sümboleid:
 
 ## Abi  
 
-Pakettide ja nende funktsioonide kohta leiab enamasti abi R-i enda abifailidest ja dokumentatsioonist.  
+Pakettide ja nende funktsioonide kohta leiab enamasti abi R-i enda abifailidest ja dokumentatsioonist (vt ka https://www.r-project.org/help.html).  
+
+Trüki RStudio konsooliaknasse:  
 
 `help(paste)`  
 `help(ggplot, package = "ggplot2")`  
@@ -264,37 +335,13 @@ Suuri keelemudeleid saab RStudios kasutada APIde kaudu ning selleks on vaja esma
 <center>![](imgs/chatgpt.png){width=100%}</center>
 
 
-
-
-## Ülesanne 1
-
-- Määrame RStudios enda kodukataloogiks kursuse kausta (nt `kvanthum2025`). Seda võib teha kas konsoolis käsuga `setwd()`, ülamenüüs `Session` -> `Set Working Directory` -> `Choose Directory...` või paneelil `File, Plots, Packages, Help...`.   
-- Teeme uue skripti (`File` -> `New File` -> `R Script`), kuhu sisestame alloleva koodijupi. Loodud funktsioon võtab kasutajalt sisendi ning teeb kõikide sisestatud sõnade esitähed suureks.  
-
-```{r, eval = FALSE}
-suured <- function(){
-    sisend <- readline(prompt = "Sisesta sõnad: ")
-    sonad <- unlist(strsplit(sisend, split = " "))
-    paste(toupper(substring(sonad, 1, 1)),
-          tolower(substring(sonad, 2)), 
-          sep = "", collapse = " ")
-}
-```
-
-- Salvestame skripti enda kodukausta skriptide kausta (nt `kvanthum2024/skriptid`) nimega *praktikum1_skript.R*. Paneme skriptifaili kinni.    
-- Trükime RStudio konsooli `source("skriptid/praktikum1_skript.R")` ning seejärel `suured()`. Vaatame, kas funktsioon annab sisestatud sõnade esisuurtähelised vasted.  
-
-Uurime ka abimaterjalidest, mida teevad funktsioonis kasutatud käsud `readline`, `unlist`, `strsplit`, `toupper`, `substring` ja `tolower`. Kirjutame nende kasutuse kohta lühikese kommentaari iga vastava skriptirea ette.  
-
-
 ## Ülesanne 2
 
 Teeme joonise R-i pakettide arvust läbi aastate.
 
 ```{r, eval = F}
 # Installime vajalikud paketid
-install.packages("rvest")
-install.packages("tidyverse")
+install.packages(setdiff(c("rvest", "tidyverse"), rownames(installed.packages())))
 
 # Laadime vajalikud paketid  
 library(rvest)
@@ -318,19 +365,27 @@ paketitabel %>%
 
 ## Ülesanne 3
 
-Võtame ühe Exceli faili (Ott Velsberg 2022, <https://avaandmed.eesti.ee/datasets/arvamuskusitlus-tehisintellekti-laiema-kasutuse-kohta-(12.202104.2022)>), salvestame selle kursuse andmestike kausta (nt `kvanthum2025/andmestikud`), impordime selle RStudiosse ning loome kiire ülevaate andmestiku tunnustest ja nende jaotumisest.
+Määrame RStudios enda kodukataloogiks kursuse kausta (nt `kvanthum2026`). Seda võib teha kas konsoolis käsuga `setwd()`, ülamenüüs `Session` -> `Set Working Directory` -> `Choose Directory...` või paneelil `File, Plots, Packages, Help...`.   
+
+
+
+
+Kui sul ei õnnestunud praegu ühtki sobivat andmestikku leida, siis kasuta etteantud Exceli faili (Ott Velsberg 2022, <https://avaandmed.eesti.ee/datasets/arvamuskusitlus-tehisintellekti-laiema-kasutuse-kohta-(12.202104.2022)>), salvestame selle kursuse andmestike kausta (nt `kvanthum2026/andmestikud`), impordime selle RStudiosse ning loome kiire ülevaate andmestiku tunnustest ja nende jaotumisest.
+
+Importimiseks vali 
 
 ```{r, eval = F}
 # Installime vajalikud paketid
 # Siin teeme esmalt loendi vajaminevatest pakettidest
 # ning seejärel installime paketid ainult juhul, kui need ei ole veel juba installitud pakettide nimekirjas
-paketid2 <- c("readxl", "Hmisc", "esquisse")
-sapply(paketid2, function(pakett) if(!pakett %in% installed.packages()) install.packages(pakett))
+install.packages(setdiff(c("readxl", "esquisse"), rownames(installed.packages())))
 
 # Laadime vajalikud paketid
 library(readxl)
-library(Hmisc)
 library(esquisse)
+
+# Teeme mõne joonise
+esquisser()
 
 # Loeme sisse Exceli andmestiku
 andmestik <- readxl::read_excel("andmestikud/Andmestik.xlsx")
@@ -338,10 +393,25 @@ andmestik <- readxl::read_excel("andmestikud/Andmestik.xlsx")
 # Vaatame tunnuste ülevaadet
 describe(andmestik)
 
-# Teeme mõne joonise
-esquisser()
+
 ```
 
+
+
+```{r}
+# esquisse
+install.packages("esquisse")
+library(esquisse)
+esquisser()
+
+```
+
+```{r}
+# EDA
+install.packages("explore")
+library(explore)
+andmestik |> explore()
+```
 
 
 ## Küsimustik

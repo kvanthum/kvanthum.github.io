@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '16-logistilised3_sega.html'))})
-date: 16.04.2025
+date: 15.04.2026
 output: 
   html_document:
     theme: flatly

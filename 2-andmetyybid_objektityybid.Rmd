@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
     rmarkdown::render(input_file,
       encoding=encoding,
       output_file=file.path(dirname(input_file), out_dir, '2-andmetyybid_objektityybid.html'))})
-date: 12.02.2025 
+date: 11.02.2026 
 output: 
   html_document:
     theme: flatly
@@ -19,44 +19,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 # Andmetüübid ja objektitüübid {.tabset .tabset-pills}
-
-## Vaatlused ja tunnused
-
-<!-- Mis on andmed? informatsioon kellegi või millegi kohta-->
-
-Tüüpilised andmete saamise viisid on:  
-
-- introspektsioon  
-- intervjuu  
-- küsitlused  
-- (teksti)kogud, korpused, andmebaasid jne    
-- katsed  
-- ... 
-
-Sellel kursusel tegeleme põhiliselt küsitluste ja andmebaaside struktureeritud andmetega, mida hoitakse tabelkujul ning mille ridades olevaid **vaatlusi** (ingl *observation*) iseloomustatakse teatud tulpades asuvate **tunnuste** (ingl *variable*) abil. Tabeli lahtrites omakorda on iga vaatluse iga tunnuse **väärtus** (ingl *value*).     
-
-<center>  
-![](imgs/var_obs_val.png)  
-<p>Wickham, Çetinkaya-Rundel, Grolemund (2023). <a href="https://r4ds.hadley.nz/">R for Data Science (2e)</a></p>
-</center>  
-
-<br>
-
-Näiteks võime iseloomustada inimesi nende pikkuse, kaalu, silmavärvi, hariduse jpm tunnuste põhjal. Sõnu jällegi võib iseloomustada nende graafilise pikkuse, silpide arvu, välte, tähendusklassi, sõnaliigi, sageduse jms tunnuste põhjal.  
-
-<br>
-
-**Tunnused**/muutujad aitavad niisiis andmeid kirjeldada ja jagunevad **uuritavateks/sõltuvateks** tunnusteks (see, mida uurime ja mille kohta tahame midagi väita) ja **seletavateks/sõltumatuteks** tunnusteks (need, mille kaudu uuritavat tunnust iseloomustame). Inglise keeles viidatakse neile sageli vastavalt kui *dependent variable* / *response (variable)* / *outcome (variable)* ja *independent variable* / *predictor (variable)* / *explanatory variable*.  
-<br>
-Näiteks võime uuritava tunnusena käsitleda inimese kaalu ning seletavate tunnustena inimese pikkust, füüsilist aktiivsust (nt minutites nädalas), unetundide arvu jms. Sõnade puhul võib meil olla näiteks hüpotees, et sagedasemad sõnad on lühemad, mispuhul saame uuritavaks tunnuseks võtta sõna pikkuse ja seletavaks tunnuseks sõna sageduse. Kas võiks ka vastupidi?     
-
-Mis on järgmistes näidetes uuritav ja mis seletav tunnus?   
-
-- Kuidas mõjutavad sugu ja vanus erakondlikku eelistust?   
-- Kuidas sõltub hinnang oma söögitegemisoskusele programmeerimisoskusest?   
-
-<br>
-<br>
 
 ## Tunnuste jagunemine
 
