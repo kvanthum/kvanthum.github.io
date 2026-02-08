@@ -33,7 +33,7 @@ blockquote {
 -   **E** ja **K** 10.15-11.45.  
 -   Kokku 20 kohtumist.  
 -   Toimumisnädalad 24-25, 27-29, 31-34, 37. See tähendab, et praktikume **EI** toimu 23. ja 25. veebruaril, 23. ja 25. märtsil, 27. ja 29. aprillil ning 4. ja 6. mail.  
--   Kui vähegi võimalik, püüame kohtuda kohapeal. Jätame võimaluse osaleda ka Zoomi kaudu, ent praktikume ei salvestata.  
+-   Kohtume kohapeal. Jätame võimaluse osaleda ka Zoomi kaudu, ent praktikume ei salvestata.  
 -   Kohalkäimine (sh virtuaalne) ei ole kohustuslik, küll aga tungivalt soovituslik.  
 -   Kõik õppematerjalid on [Moodle](https://moodle.ut.ee/course/view.php?id=14049)'is ja sellel kursuse kodulehel.    
 -   Kursus on arvestuslik (arvestatud/mittearvestatud).  
@@ -55,7 +55,7 @@ kvanthum2026
         /praktikum2.html 
         /praktikum2.Rmd  
         /...  
-    /andmestikud  
+    /data  
         /ykstekst.txt  
         /tabel12345.csv  
         /andmed.RData  
@@ -64,6 +64,9 @@ kvanthum2026
         /praktikum1_skript.R  
         /praktikum2_skript.R  
         /...  
+    /joonised
+        /joonis1.png
+        /joonis2.png
     /kodutööd  
         /kodutöö1  
             /kodutoo1.Rmd   
@@ -138,7 +141,7 @@ Andmeid võib koguda mõõtmise, vaatluse, päringute või analüüsi teel. Tü�
 
 Andmeid võib jagada    
 - toorandmeteks ("toores" allikmaterjal, nt käsikirjad, intervjuude audiosalvestised),  
-- **töödeldud andmeteks** (puhastatud, struktureeritud, märgendatud, nt märgendatud tekstid, intervjuude transkriptsioonid),  
+- töödeldud andmeteks (puhastatud, struktureeritud, märgendatud, nt märgendatud tekstid, intervjuude transkriptsioonid),  
 - tuletatud andmeteks (nt sagedusloendid, mudelite väljundid, visualiseeringud).  
 
 <!-- toorandmed on andmed enne, kui neid on kasutatud mingiks analüüsiks või tõlgendamiseks; ei ole seotud ainult analoog-digitaal eristusega -->
@@ -211,7 +214,7 @@ _________________________________________
 <br>
 <br>
 
-Kursusel kasutame praktikumides ja kodutöödes erinevaid andmestikke (mille valik kohati küll tugevalt keeleteaduse poole kaldu). Selleks, et käsitletud analüüsietappe ja meetodeid veelgi paremini kinnistada, julgustame kursuse algusest peale rakendama õpitut kohe ka mõnel enda valitud andmestikul (vt ka ülesanne 1).    
+Kursusel kasutame praktikumides ja kodutöödes erinevaid andmestikke (mille valik on kohati küll tugevalt keeleteaduse poole kaldu). Selleks, et käsitletud analüüsietappe ja meetodeid veelgi paremini kinnistada, julgustame kursuse algusest peale rakendama õpitut kohe ka mõnel enda valitud andmestikul (vt ka ülesanne 1).    
 
 
 ## Ülesanne 1
@@ -219,7 +222,7 @@ Kursusel kasutame praktikumides ja kodutöödes erinevaid andmestikke (mille val
 Vaata ringi erinevates [Moodle'is lingitud](https://moodle.ut.ee/mod/linkset/view.php?id=1358840) andmehoidlates ehk repositooriumides ning püüa leida mõni enda valdkonnaga seotud või enda jaoks muidu huvitav tabelkujul vabalt kättesaadav struktureeritud andmestik, milles vaatlused on ridades ja tunnused tulpades.  
 Vormingutest võiks eelistada TXT-, CSV-, TSV-, XLSX-laiendiga faile.  
 
-Salvesta andmestik kausta `kvanthum2026/andmestikud`.  
+Salvesta andmestik kausta `kvanthum2026/data`.  
 
 ## Miks R?
 
@@ -253,7 +256,7 @@ RStudiost on praeguseks olemas nii lokaalne, töölauaversioon, millega meie tö
 <!-- kohandatav kasutajaliides, sisse-ehitatud lisapaketid, koodi lõpetamine -->
 <!-- praeguseks võimaldab juba kasutada ka teisi programmeerimiskeeli, nt Python -->
 
-Kasutame sel kursusel [R-i](https://www.r-project.org/) ja [RStudio](https://posit.co/download/rstudio-desktop/) viimaseid versioone (vastavalt R 4.4.2 ja RStudio 2024.12.0), ent probleemi ei tohiks tekkida ka veidi vanemate (nt viimase aasta jooksul installitud) versioonidega. 
+Kasutame sel kursusel [R-i](https://www.r-project.org/) ja [RStudio](https://posit.co/download/rstudio-desktop/) viimaseid versioone (vastavalt R 4.5.2 ja RStudio 2026.01.0), ent probleemi ei tohiks tekkida ka veidi vanemate (nt viimase aasta jooksul installitud) versioonidega. 
 
 <center>![](imgs/rstudio_ui.png){width=100%}</center>
 
@@ -328,16 +331,18 @@ Kõiksugu praktikas ettetulevate probleemide korral aitab kõige paremini mõist
 
 ### Abi suurtelt keelemudelitelt
 
-Abi võib küsida põhimõtteliselt ka suurtelt keelemudelitelt (*Large Language Models* ehk LLM), nagu ChatGPT, Copilot, Claude, Llama jm. Muu hulgas on võimalik suuri keelemudeleid kasutada RStudios, näiteks paketiga [`gptstudio`](https://michelnivard.github.io/gptstudio/) (ja seda täiendava paketiga [`gpttools`](https://jameshwade.github.io/gpttools/)), [`RTutor`](https://github.com/gexijin/RTutor) või [`chattr`](https://mlverse.github.io/chattr/).    
+Abi võib küsida põhimõtteliselt ka suurtelt keelemudelitelt (*Large Language Models* ehk LLM), nagu ChatGPT, Copilot, Claude, Llama jm. Muu hulgas on võimalik suuri keelemudeleid kasutada RStudios, näiteks paketiga [`gptstudio`](https://michelnivard.github.io/gptstudio/) (ja seda täiendava paketiga [`gpttools`](https://jameshwade.github.io/gpttools/)), [`RTutor`](https://github.com/gexijin/RTutor) või [`chattr`](https://mlverse.github.io/chattr/). Võib kasutada ka laiema funktsionaalsusega ja uuemaid mudeleid kasutada võimaldavaid pakette [`ellmer`](https://github.com/tidyverse/ellmer) või [`gander`](https://simonpcouch.github.io/gander/).     
 
 Suuri keelemudeleid saab RStudios kasutada APIde kaudu ning selleks on vaja esmalt luua vastavat keelemudelit pakkuvas keskkonnas uus API võti (*API key*) ning seadistada see RStudios. Keelemudelite kasutamine APIde kaudu võib olla tasuline.  
 
 <center>![](imgs/chatgpt.png){width=100%}</center>
 
 
+<br>
+
 ## Ülesanne 2
 
-Teeme joonise R-i pakettide arvust läbi aastate.
+Teeme joonise R-i pakettide arvust läbi aastate. Selleks kopeeri allolevas plokis olev kood RStudio skripti ning jooksuta ridu kas eraldi või korraga.  
 
 ```{r, eval = F}
 # Installime vajalikud paketid
@@ -362,55 +367,73 @@ paketitabel %>%
   geom_text(aes(label = n), vjust = -0.2) # lisame ka arvud tekstina
 ```
 
+Salvesta kursuse skriptide kausta skriptifail (`File` -> `Save As`) ning 
+
 
 ## Ülesanne 3
 
 Määrame RStudios enda kodukataloogiks kursuse kausta (nt `kvanthum2026`). Seda võib teha kas konsoolis käsuga `setwd()`, ülamenüüs `Session` -> `Set Working Directory` -> `Choose Directory...` või paneelil `File, Plots, Packages, Help...`.   
 
+Püüa lugeda RStudiosse enda leitud andmestik, andes sellele RStudios nime `andmestik`. Kõige hõlpsam on seda teha, kasutades RStudio `Environment` jaotises (vaikimisi parem ülemine jaotis) **`Import Dataset`** tööriista. Samuti võid andmete sisselugemiseks kasutada erinevaid **`read`** käske (nt allpool), milles võib saada täpsustada näiteks, kas andmestikul on päiserida (`header`), mis sümbol eraldab tabeli välju/tulpasid (`sep`) ning mis on andmestiku kodeering (`encoding`).    
+
+```{r, eval = F}
+# CSV-failid
+andmestik <- read.table("data/andmestik.csv", header = TRUE, sep = "\t", encoding = "UTF-8")
+andmestik <- read.delim("data/andmestik.csv", encoding = "UTF-8")
+andmestik <- read.csv("data/andmestik.csv", sep = "\t", encoding = "UTF-8")
+andmestik <- read.csv2("data/andmestik.csv", sep = "\t", encoding = "UTF-8")
+
+# Exceli failid
+install.packages("readxl")
+library(readxl)
+andmestik <- read_excel("data/andmestik.xlsx")
+
+# SPSSi, SASi, STATA failid
+install.packages("haven")
+library(haven)
+andmestik <- read_sav("data/andmestik.sav") # SPSS
+andmestik <- read_sas("data/andmestik.sas7bdat") # SAS
+andmestik <- read_stata("data/andmestik.dta") # STATA
+
+# JSONi fail
+install.packages("jsonlite")
+library(jsonlite)
+andmestik <- fromJSON("data/andmestik.json")
+
+# XMLi fail
+install.packages("xml2")
+library(xml2)
+andmestik <- as.data.frame(read_xml("data/andmestik.xml"))
+```
 
 
+Veel üks hõlbus viis andmeid sisse lugeda on kopeerida kogu andmestik (Win `Ctrl+C`) ning kasutada seejärel käsku **`read.delim()`**, mille sulgude sees ütleb "clipboard", et andmed loetakse lõikepuhvrist, ning argumendiga `sep` tuleb öelda, mis sümbolit kasutatakse väljade/tulpade eraldamiseks (nt kas koma `,`, tabeldusklavhi ehk tabulaatorit `\t`, semikoolonit `;`, tühikut ` ` vm-d). Selline andmestiku R-i lugemine ei ole aga väga hästi korratav, kuna sel juhul ei jää skripti jälge sellest, millist faili on sisse loetud.    
 
-Kui sul ei õnnestunud praegu ühtki sobivat andmestikku leida, siis kasuta etteantud Exceli faili (Ott Velsberg 2022, <https://avaandmed.eesti.ee/datasets/arvamuskusitlus-tehisintellekti-laiema-kasutuse-kohta-(12.202104.2022)>), salvestame selle kursuse andmestike kausta (nt `kvanthum2026/andmestikud`), impordime selle RStudiosse ning loome kiire ülevaate andmestiku tunnustest ja nende jaotumisest.
+```{r, eval = F}
+andmestik <- read.delim("clipboard", sep = ",")
+```
 
-Importimiseks vali 
+
+Kui sul ei õnnestunud praegu ühtki sobivat andmestikku leida, siis kasuta etteantud faili `Pilot_Est_Aus.csv`. Andmestikus on andmed pilootuuringust ([Põder & Tammets 2025](https://zenodo.org/records/15401669)), milles taheti teada saada, kuidas erinevad koolitussekkumised mõjutavad Eesti ja Austria õpetajate usku oma võimesse kasutada digivahendeid tõhusalt õppetöös. Uuring põhineb enne–pärast mõõtmisega küsitlusel ning sisaldab enesetõhususe, koolituse kognitiivse aktiveerivuse ja osalejate taustatunnuste mõõdikuid. 
+
+Loome kiire ülevaate andmestiku tunnustest ja nende jaotumisest.
 
 ```{r, eval = F}
 # Installime vajalikud paketid
 # Siin teeme esmalt loendi vajaminevatest pakettidest
 # ning seejärel installime paketid ainult juhul, kui need ei ole veel juba installitud pakettide nimekirjas
-install.packages(setdiff(c("readxl", "esquisse"), rownames(installed.packages())))
+install.packages(setdiff(c("Hmisc", "esquisse"), rownames(installed.packages())))
 
 # Laadime vajalikud paketid
-library(readxl)
+library(Hmisc)
 library(esquisse)
-
-# Teeme mõne joonise
-esquisser()
-
-# Loeme sisse Exceli andmestiku
-andmestik <- readxl::read_excel("andmestikud/Andmestik.xlsx")
 
 # Vaatame tunnuste ülevaadet
 describe(andmestik)
 
-
-```
-
-
-
-```{r}
-# esquisse
-install.packages("esquisse")
-library(esquisse)
+# Teeme mõne joonise
 esquisser()
 
-```
-
-```{r}
-# EDA
-install.packages("explore")
-library(explore)
-andmestik |> explore()
 ```
 
 
