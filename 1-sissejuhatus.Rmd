@@ -32,7 +32,11 @@ blockquote {
 
 -   **E** ja **K** 10.15-11.45.  
 -   Kokku 20 kohtumist.  
--   Toimumisnädalad 24-25, 27-29, 31-34, 37. See tähendab, et praktikume **EI** toimu 23. ja 25. veebruaril, 23. ja 25. märtsil, 27. ja 29. aprillil ning 4. ja 6. mail.  
+-   Toimumisnädalad 24-25, 27-29, 31-34, 37. See tähendab, et praktikume **EI** toimu   
+    + 23. ja 25. veebruaril,  
+    + 23. ja 25. märtsil,  
+    + 27. ja 29. aprillil,   
+    + 4. ja 6. mail.    
 -   Kohtume kohapeal. Jätame võimaluse osaleda ka Zoomi kaudu, ent praktikume ei salvestata.  
 -   Kohalkäimine (sh virtuaalne) ei ole kohustuslik, küll aga tungivalt soovituslik.  
 -   Kõik õppematerjalid on [Moodle](https://moodle.ut.ee/course/view.php?id=14049)'is ja sellel kursuse kodulehel.    
@@ -119,7 +123,7 @@ Eestikeelseid andmeteaduse ja statistika õpikuid:
 
 ## Andmed, vaatlused ja tunnused
 
-Andmeteks võib pidada **teavet**, mille põhjal saab teha järeldusi.  
+Hästi lihtsalt öeldes võib andmeteks pidada **teavet**, mille põhjal saab teha järeldusi.  
 
 <!-- Vaatleja perspektiiv: andmed saavad andmeteks, kui neid millegi jaoks kasutatakse -->
 
@@ -138,8 +142,10 @@ Andmeid võib koguda mõõtmise, vaatluse, päringute või analüüsi teel. Tü�
 
 <center>![](imgs/data.png){width=100%}</center>
 
+<br>
 
 Andmeid võib jagada    
+
 - toorandmeteks ("toores" allikmaterjal, nt käsikirjad, intervjuude audiosalvestised),  
 - töödeldud andmeteks (puhastatud, struktureeritud, märgendatud, nt märgendatud tekstid, intervjuude transkriptsioonid),  
 - tuletatud andmeteks (nt sagedusloendid, mudelite väljundid, visualiseeringud).  
@@ -169,7 +175,9 @@ Näiteks võime uuritava tunnusena käsitleda inimese kaalu ning seletavate tunn
 **Mis on järgmistes näidetes uuritav ja mis seletav tunnus?**   
 
 - Kuidas mõjutavad sugu ja vanus erakondlikku eelistust?   
-- Kuidas sõltub hinnang oma söögitegemisoskusele programmeerimisoskusest?   
+- Kuidas sõltub teksti lugemiseks kulunud aeg lugeja sõnavara suurusest ja haridustasemest?    
+- Kuidas mõjutab raamatute müüginumbreid või kirjandusauhindade saamist raamatute kajastamise arv sotsiaalmeedias?  
+- Kuidas sõltub töötuse määrast ja sissetulekute ebavõrdsusest meeleavalduste arv?  
 
 <br>
 <br>
@@ -219,7 +227,8 @@ Kursusel kasutame praktikumides ja kodutöödes erinevaid andmestikke (mille val
 
 ## Ülesanne 1
 
-Vaata ringi erinevates [Moodle'is lingitud](https://moodle.ut.ee/mod/linkset/view.php?id=1358840) andmehoidlates ehk repositooriumides ning püüa leida mõni enda valdkonnaga seotud või enda jaoks muidu huvitav tabelkujul vabalt kättesaadav struktureeritud andmestik, milles vaatlused on ridades ja tunnused tulpades.  
+Vaata ringi erinevates [Moodle'is lingitud](https://moodle.ut.ee/mod/linkset/view.php?id=1358840) andmehoidlates ehk repositooriumides ning püüa leida mõni enda valdkonnaga seotud või enda jaoks muidu huvitav **tabelkujul** vabalt kättesaadav struktureeritud andmestik, milles **vaatlused on ridades ja tunnused tulpades**.  
+
 Vormingutest võiks eelistada TXT-, CSV-, TSV-, XLSX-laiendiga faile.  
 
 Salvesta andmestik kausta `kvanthum2026/data`.  
@@ -342,7 +351,7 @@ Suuri keelemudeleid saab RStudios kasutada APIde kaudu ning selleks on vaja esma
 
 ## Ülesanne 2
 
-Teeme joonise R-i pakettide arvust läbi aastate. Selleks kopeeri allolevas plokis olev kood RStudio skripti ning jooksuta ridu kas eraldi või korraga.  
+Teeme joonise R-i pakettide arvust läbi aastate. Selleks kopeerime allolevas plokis oleva koodi RStudio skriptiaknasse ning jooksutame käske kas ükshaaval või korraga.  
 
 ```{r, eval = F}
 # Installime vajalikud paketid
@@ -367,14 +376,14 @@ paketitabel %>%
   geom_text(aes(label = n), vjust = -0.2) # lisame ka arvud tekstina
 ```
 
-Salvesta kursuse skriptide kausta skriptifail (`File` -> `Save As`) ning 
+Salvestame skriptifaili kursuse skriptide kausta (`File` -> `Save As`) ning joonis jooniste kausta (failide-jooniste-pakettide paneelil `Plots` -> `Export` -> `Save as Image`).  
 
 
 ## Ülesanne 3
 
 Määrame RStudios enda kodukataloogiks kursuse kausta (nt `kvanthum2026`). Seda võib teha kas konsoolis käsuga `setwd()`, ülamenüüs `Session` -> `Set Working Directory` -> `Choose Directory...` või paneelil `File, Plots, Packages, Help...`.   
 
-Püüa lugeda RStudiosse enda leitud andmestik, andes sellele RStudios nime `andmestik`. Kõige hõlpsam on seda teha, kasutades RStudio `Environment` jaotises (vaikimisi parem ülemine jaotis) **`Import Dataset`** tööriista. Samuti võid andmete sisselugemiseks kasutada erinevaid **`read`** käske (nt allpool), milles võib saada täpsustada näiteks, kas andmestikul on päiserida (`header`), mis sümbol eraldab tabeli välju/tulpasid (`sep`) ning mis on andmestiku kodeering (`encoding`).    
+Püüame lugeda RStudiosse enda leitud andmestiku, andes sellele RStudios nime `andmestik` (`andmestik <- ...`). Kõige hõlpsam on seda teha, kasutades RStudio `Environment` jaotises (vaikimisi parem ülemine jaotis) **`Import Dataset`** tööriista. Samuti võib andmete sisselugemiseks kasutada erinevaid **`read`** käske (nt allpool), milles võib saada täpsustada näiteks, kas andmestikul on päiserida (`header`), mis sümbol eraldab tabeli välju/tulpasid (`sep`) ning mis on andmestiku kodeering (`encoding`).    
 
 ```{r, eval = F}
 # CSV-failid
@@ -395,26 +404,32 @@ andmestik <- read_sav("data/andmestik.sav") # SPSS
 andmestik <- read_sas("data/andmestik.sas7bdat") # SAS
 andmestik <- read_stata("data/andmestik.dta") # STATA
 
-# JSONi fail
+# JSONi failid
 install.packages("jsonlite")
 library(jsonlite)
 andmestik <- fromJSON("data/andmestik.json")
 
-# XMLi fail
+# XMLi failid
 install.packages("xml2")
 library(xml2)
 andmestik <- as.data.frame(read_xml("data/andmestik.xml"))
 ```
 
 
-Veel üks hõlbus viis andmeid sisse lugeda on kopeerida kogu andmestik (Win `Ctrl+C`) ning kasutada seejärel käsku **`read.delim()`**, mille sulgude sees ütleb "clipboard", et andmed loetakse lõikepuhvrist, ning argumendiga `sep` tuleb öelda, mis sümbolit kasutatakse väljade/tulpade eraldamiseks (nt kas koma `,`, tabeldusklavhi ehk tabulaatorit `\t`, semikoolonit `;`, tühikut ` ` vm-d). Selline andmestiku R-i lugemine ei ole aga väga hästi korratav, kuna sel juhul ei jää skripti jälge sellest, millist faili on sisse loetud.    
+Veel üks hõlbus viis andmeid R-i lugeda on teha kogu andmefaili sisu aktiivseks, kopeerida kogu andmestik (Win `Ctrl+C`) ning kasutada seejärel käsku **`read.delim()`**, mille sulgude sees ütleb **"clipboard"**, et andmed loetakse lõikepuhvrist, ning argumendiga `sep` tuleb öelda, mis sümbolit kasutatakse väljade/tulpade eraldamiseks (nt kas koma `,`, tabeldusklavhi ehk tabulaatorit `\t`, semikoolonit `;`, tühikut ` ` vm-d). Selline andmestiku R-i lugemine ei ole aga väga hästi korratav, kuna sel juhul ei jää skripti ega koodilogidesse jälge sellest, millist faili on sisse loetud.    
 
 ```{r, eval = F}
-andmestik <- read.delim("clipboard", sep = ",")
+andmestik <- read.delim("clipboard", sep = ",") # loeme lõikepuhvrist tabeli, milles tulpasid eraldab koma
 ```
 
 
 Kui sul ei õnnestunud praegu ühtki sobivat andmestikku leida, siis kasuta etteantud faili `Pilot_Est_Aus.csv`. Andmestikus on andmed pilootuuringust ([Põder & Tammets 2025](https://zenodo.org/records/15401669)), milles taheti teada saada, kuidas erinevad koolitussekkumised mõjutavad Eesti ja Austria õpetajate usku oma võimesse kasutada digivahendeid tõhusalt õppetöös. Uuring põhineb enne–pärast mõõtmisega küsitlusel ning sisaldab enesetõhususe, koolituse kognitiivse aktiveerivuse ja osalejate taustatunnuste mõõdikuid. 
+
+
+```{r, eval = F}
+andmestik <- read.csv("data/Pilot_Est_Aus.csv")
+```
+
 
 Loome kiire ülevaate andmestiku tunnustest ja nende jaotumisest.
 
