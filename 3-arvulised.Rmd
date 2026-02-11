@@ -40,7 +40,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Kasutame esimeses praktikumis läbi viidud küsitluse andmestikku.
 
 ```{r}
-load("data/kysimustik_2025.RData")
+load("data/kysimustik_2026.RData")
 ```
 
 ## Aritmeetiline keskmine
