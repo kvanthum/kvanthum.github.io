@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Andmetüübid ja objektitüübid {.tabset .tabset-pills}
 
-## Tunnuste jagunemine
+## Tunnuste jagunemine {.tabset .tabset-pills}
 
 See, et andmeanalüüs on *kvantitatiivne*, ei tähenda, et kõik andmed ise peaksid tingimata olema arvulised. Laiemalt jagunevadki tunnused __kvalitatiivseteks__ ja __kvantitatiivseteks__.  
 
@@ -29,7 +29,7 @@ See, et andmeanalüüs on *kvantitatiivne*, ei tähenda, et kõik andmed ise pea
     * __ordinaalsel e järjestusskaalal__: kategooriad on mingil alusel järjestatud, aga väärtuste vahe ei pruugi olla ühesugune. <br> Nt haridus (_alg-_/_põhi-_/_kesk-_/_kõrgharidus_), nõustumine (_ei nõustu üldse_ / _pigem ei nõustu_ / _pigem nõustun_ / _nõustun täielikult_).  
 <br>    
 - __Kvantitatiivsed__/arvulised:
-    * __intervalli- e vahemikskaalal__: esitab võrdseid erinevusi skaala punktide vahel. <br> Nt _temperatuur_.
+    * __intervalli- e vahemikskaalal__: esitab võrdseid erinevusi skaala punktide vahel. <br> Nt _temperatuur (Celsiuse või Fahrenheiti skaalal!)_.
     * __suhteskaalal__: nagu intervalliskaala, aga tähendusliku nullpunktiga. <br> Nt _sõnasagedused_, _sõnade graafilised/silbilised pikkused_, _reaktsiooniaeg_.  
     * kvantitatiivsed tunnuseid võib jagada ka  
         - __pidevateks__ e mõõdetavateks (temperatuur _kraadides_, pikkus _sentimeetrites_, reaktsioon _millisekundites_, valuutakurss _dollarites_, vanus _aastates_)  
@@ -62,7 +62,7 @@ Küsitluses, millele vastasid, olid järgmised küsimused. Millised neist on kva
 
 
 ```{r echo = FALSE}
-load("data/kysimustik_2025.RData")
+load("data/kysimustik_2026.RData")
 dat <- read.delim("data/kysimustik2021_taiend.txt", fileEncoding = "UTF-8")
 kyssad <- dat[1,]
 ```
@@ -81,8 +81,12 @@ Intervallskaala: Q2
 Suhteskaala: Q4
 -->
 
+<br>
+<br>
 
-## Nominaalskaalal tunnused
+
+
+### Nominaalskaalal tunnused
 
 ```{r, echo = F, message = F, fig.height = 14, fig.align='left'}
 library(ggplot2)
@@ -126,9 +130,9 @@ kategs <- function(tunnus, pealkiri, aspekt, loomad, ord, caption = ""){
         theme(aspect.ratio = 1/aspekt) -> p1
     if(loomad){
         p1 +
-            annotation_custom(rasterGrob(koer), xmin = 3.5, xmax = 4.5, ymin = 0.5, ymax = 3.5) +
-            annotation_custom(rasterGrob(kaelkirjak), xmin = 2.5, xmax = 3.5, ymin = 0.5, ymax = 3.5) +
-            annotation_custom(rasterGrob(glaucus), xmin = 1.5, xmax = 2.5, ymin = 0.5, ymax = 3.5)
+            annotation_custom(rasterGrob(koer), xmin = 3.5, xmax = 4.5, ymin = 0.5, ymax = 7.5) +
+            annotation_custom(rasterGrob(kaelkirjak), xmin = 2.5, xmax = 3.5, ymin = 0.5, ymax = 7.5) +
+            annotation_custom(rasterGrob(glaucus), xmin = 1.5, xmax = 2.5, ymin = 0.5, ymax = 7.5)
     }else{
         p1
     }
@@ -142,14 +146,14 @@ kategs("lemmikloom", "Vali loom", 2, T, F) -> p5
 ggarrange(p2, p3, p4, p5, ncol = 1)
 ```
 
-## Nominaalskaalal tunnused?
+### Nominaalskaalal tunnused?
 
 ```{r, echo = F, fig.height = 3, fig.width = 8, fig.align='left'}
 kategs("programmeerimisoskus", "Kirjelda oma programmeerimisoskusi", 2, F, F)
   
 ```
 
-## Ordinaalskaalal tunnused
+### Ordinaalskaalal tunnused
 
 ```{r echo = F, message = F, fig.width=7, fig.height = 5, fig.align='left'}
 kategs("kursuse_labimine", "Kui tõenäoline on, et läbid selle kursuse?", 3, F, T, "Skaala: 1 (kindlasti kukun läbi) - 5 (kindlasti saan läbi)") -> p6
@@ -158,7 +162,7 @@ kategs("soogitegemisoskus", "Hinda oma söögitegemisoskusi", 3, F, T, "Skaala: 
 ggarrange(p6, p7, ncol = 1)
 ```
 
-## Intervalliskaalal tunnused
+### Intervalliskaalal tunnused
 
 ```{r echo = F, message = F, fig.height = 9, fig.width = 8}
 nums <- function(tunnus, tyyp, pealkiri){
@@ -202,7 +206,8 @@ grid.arrange(p8, grid.arrange(p9, p10, p11, nrow = 1), ncol = 1, heights = c(0.7
 ```
 
 
-## Suhteskaalal tunnused
+### Suhteskaalal tunnused
+
 ```{r echo = F, message = F, fig.height = 3, fig.align='left'}
 nums("kaua_opid", "hist", "Õpitud aastaid") -> p12
 nums("kaua_opid", "tihedus", "Õpitud aastaid") -> p13
@@ -239,7 +244,7 @@ c <- b/(a^2)
 d <- "kass"
 ```
 
-Sellisel juhul ilmub objekt R-i keskkonda (*Environment* paneeli), aga konsooli teda ei trükita. Konsooli trükkimiseks saab kasutada lihtsalt objekti nime.  
+Kui omistame mingile objektile väärtuse, ilmub objekt R-i keskkonda (*Environment* paneeli), aga väärtust konsooli ei trükita. Konsooli trükkimiseks saab kasutada nüüd lihtsalt objekti nime.  
 
 ```{r}
 c
@@ -295,7 +300,7 @@ __Tekst__ (*character*) tuleb kirjutada jutumärkides (kas ühe- või kahekordse
 "Tartu" # see trükitakse konsooli, objekti ei teki
 pärisnimi <- "Tartu" # objektile 'pärisnimi' omistatakse väärtus "Tartu", aga midagi välja ei trükita
 üldnimi <- 'ülikool' # ühekordsed jutumärgid töötavad samaväärselt
-arv <- "104" # objektile 'arv' omistatakse tekstiväärtus "104"
+arv <- "394" # objektile 'arv' omistatakse tekstiväärtus "394"
 paste(pärisnimi, üldnimi, arv, sep= " ") # kleebime kolme objekti väärtused kokku (paste = kleebi)
 nchar(üldnimi) # leia objekti 'üldnimi' väärtuse tähemärkide arv (n = number, char = characters)
 substr(üldnimi, 4, 7) # võta välja objekti üldnimi väärtuse 4.-7. tähemärk (substr = substring)
@@ -391,10 +396,10 @@ __Objektiklass__ tähistab andmestruktuuri ehk seda, kuidas andmed objektis on *
 - **tabelid** (*data.frame*)  
     nt `data.frame(nimi = c("Anu", "Mart", "Sipsik"), pikkus = c(145, 160, 30), kaal = c(40, 58, 2))`, `as.data.frame(matrix(1:9, nrow = 3))`
 
-**Vektorid** on ühemõõtmelised objektid, mis võivad sisaldada ainult üht tüüpi elemente, nt ainult arve, ainult teksti või ainult tõeväärtuseid.  
-**Maatriksid** on kahemõõtmelised (= ridade ja tulpadega) objektid, mis võivad sisaldada ainult üht tüüpi elemente, nt ainult arve, ainult teksti või ainult tõeväärtuseid.   
-**Tabelid** on kahemõõtmelised objektid, mis võivad veergudes sisaldada erinevat tüüpi elemente (nt tekstivektoreid, arvuvektoreid, tõeväärtusvektoreid).  
-**Listid** on komplekssed, struktureerimata objektid, mis võivad sisaldada erinevat tüüpi elemente, sh tabeleid ja teisi liste, funktsioone jm.    
+**VEKTORID** on ühemõõtmelised objektid, mis võivad sisaldada **ainult üht tüüpi** elemente, nt ainult arve, ainult teksti või ainult tõeväärtuseid.  
+**MAATRIKSID** on kahemõõtmelised (= ridade ja tulpadega) objektid, mis võivad sisaldada **ainult üht tüüpi** elemente, nt ainult arve, ainult teksti või ainult tõeväärtuseid.   
+**TABELID** on kahemõõtmelised objektid, mis võivad veergudes sisaldada **erinevat tüüpi** elemente (nt tekstivektoreid, arvuvektoreid, tõeväärtusvektoreid).  
+**LISTID** on komplekssed, struktureerimata objektid, mis võivad sisaldada **erinevat tüüpi** elemente, sh tabeleid ja teisi liste, funktsioone jm.    
 
 <br>
 <p style="text-align: center;">![](imgs/r_data_structures.png){width=70%}</p>
@@ -436,7 +441,7 @@ Kui mõelda pisut etteruttavalt andmetabelite peale, siis põhimõtteliselt iga 
 
 <br>
 
-**Proovi nüüd nende loodud vektorite peal funktsiooni `length()`, mis ütleb, mitu väärtust vektoris on.**     
+**Proovi nüüd loodud vektorite peal funktsiooni `length()`, mis ütleb, mitu väärtust vektoris on.**     
 
 <br>
 
@@ -583,10 +588,10 @@ Nagu näeme, saab R-is andmeid ka vektoritest `data.frame()` käsuga tabeliks ko
 
 <br>
 
-Kui andmestik on R-is korrastatud ja **RData** formaadis salvestatud, siis neid andmestikke saab avada käsuga **`load()`**. Näiteks sellisel kujul on Moodle'is failis *kysimustik_2025.RData* korrastatud vastused küsimustikule, mida eelmises praktikumis täitsite. Lisaks on seal ka varasemate aastate vastused. Laadige RData andmestik alla ja pange see oma kursuse andmestike kausta (nt kausta nimega `andmestikud`, `andmed`, `data` vmt), **muutke vastavalt ära ka faili teekonna nimi** (nt `andmestikud/kysimustik_2025.RData`, `andmed/kysimustik_2025.RData`, `data/kysimustik_2025.RData`).
+Kui andmestik on R-is korrastatud ja **RData** formaadis salvestatud, siis neid andmestikke saab avada käsuga **`load()`**. Näiteks sellisel kujul on Moodle'is failis *kysimustik_2026.RData* korrastatud vastused küsimustikule, mida eelmises praktikumis täitsite. Lisaks on seal ka varasemate aastate vastused. Laadige RData andmestik alla ja pange see oma kursuse andmestike kausta (nt kausta nimega `andmestikud`, `andmed`, `data` vmt), **muutke vastavalt ära ka faili teekonna nimi** (nt `andmestikud/kysimustik_2026.RData`, `andmed/kysimustik_2026.RData`, `data/kysimustik_2026.RData`).
 
 ```{r, echo=T}
-load("data/kysimustik_2025.RData")
+load("data/kysimustik_2026.RData")
 ```
 
 Selle käsurea rakendamisest justkui ei juhtugi midagi, aga töölauale tekkis objekt nimega **kysimustik**, mille klassiks on `data.frame`.     
@@ -623,13 +628,13 @@ Kui andmetabel ei ole RData-formaadis (enamasti ei ole), saab selle sisselugemis
 **csv**- või **txt**-formaadis tabeleid saab lugeda näiteks järgmiste käskudega, mis erinevad põhiliselt selle poolest, millised on erinevate argumentide (nt `header`, `sep`) vaikeväärtused:     
 
 ```{r, eval = F}
-kysimustik_csv <- read.table("data/kysimustik_2025.csv", header = TRUE, sep = "\t", encoding = "UTF-8")
-kysimustik_csv <- read.delim("data/kysimustik_2025.csv", encoding = "UTF-8")
-kysimustik_csv <- read.csv("data/kysimustik_2025.csv", sep = "\t", encoding = "UTF-8")
-kysimustik_csv <- read.csv2("data/kysimustik_2025.csv", sep = "\t", encoding = "UTF-8")
+kysimustik_csv <- read.table("data/kysimustik_2026.csv", header = TRUE, sep = "\t", encoding = "UTF-8")
+kysimustik_csv <- read.delim("data/kysimustik_2026.csv", encoding = "UTF-8")
+kysimustik_csv <- read.csv("data/kysimustik_2026.csv", sep = "\t", encoding = "UTF-8")
+kysimustik_csv <- read.csv2("data/kysimustik_2026.csv", sep = "\t", encoding = "UTF-8")
 ```
 
-Failil `kysimustik_2025.csv` on tulbanimedega päis (`header`), tulpasid eraldavad tabulaatorid (`\t`) ning faili kodeering on UTF-8. Kuna funktsioonide vaikeväärtused on erinevad (näiteks `read.table()` eeldab vaikimisi, et tabelil ei ole tulbanimesid), peame eri funktsioonidega andmeid sisse lugedes täpsustama erinevaid asju, vastavalt oma andmestiku struktuurile.  
+Failil `kysimustik_2026.csv` on tulbanimedega päis (`header`), tulpasid eraldavad tabulaatorid (`\t`) ning faili kodeering on UTF-8. Kuna funktsioonide vaikeväärtused on erinevad (näiteks `read.table()` eeldab vaikimisi, et tabelil ei ole tulbanimesid), peame eri funktsioonidega andmeid sisse lugedes täpsustama erinevaid asju, vastavalt oma andmestiku struktuurile.  
 
 
 <p style="text-align: right;">![](imgs/q8.PNG){width=40%} ![](imgs/q9.PNG){width=40%}</p>
@@ -644,30 +649,30 @@ R-i saab erinevate pakettide abil laadida ka muus formaadis faile, näiteks Exce
 # Exceli failid
 # install.packages("readxl")
 library(readxl)
-kysimustik_xlsx <- read_excel("data/kysimustik_2025.xlsx")
+kysimustik_xlsx <- read_excel("data/kysimustik_2026.xlsx")
 ```
 
 ```{r, eval = F}
 # SPSSi, SASi, STATA failid
 # install.packages("haven")
 library(haven)
-kysimustik_sav <- read_sav("data/kysimustik_2025.sav") # SPSS
-kysimustik_sas7bdat <- read_sas("data/kysimustik_2025.sas7bdat") # SAS
-kysimustik_dta <- read_stata("data/kysimustik_2025.dta") # STATA
+kysimustik_sav <- read_sav("data/kysimustik_2026.sav") # SPSS
+kysimustik_sas7bdat <- read_sas("data/kysimustik_2026.sas7bdat") # SAS
+kysimustik_dta <- read_stata("data/kysimustik_2026.dta") # STATA
 ```
 
 ```{r, eval = F}
 # JSONi fail
 # install.packages("jsonlite")
 library(jsonlite)
-kysimustik_json <- fromJSON("data/kysimustik_2025.json")
+kysimustik_json <- fromJSON("data/kysimustik_2026.json")
 ```
 
 ```{r, eval = F}
 # XMLi fail
 # install.packages("xml2")
 library(xml2)
-kysimustik_xml <- as.data.frame(read_xml("data/kysimustik_2025.xml"))
+kysimustik_xml <- as.data.frame(read_xml("data/kysimustik_2026.xml"))
 ```
 
 
@@ -725,12 +730,9 @@ kysimustik[kysimustik$kogemused_kvant == "Jah",]$kaua_opid # "kaua_opid" tulba v
 5. Lisa objekti `kogemused` väärtus "Võib-olla" (kasuta funktsiooni `c()`). Mis juhtub? 
 
 
-## Lõpetuseks
+## Järgmisel korral
 
-Kui sul on tunne, et vajad pikemat sissejuhatust R-i alustesse, siis vaata [sissejuhatava kursuse materjale](https://kodu.ut.ee/~partel/r_andmestrukt.html) või uuri R-i paketti [Swirl](https://swirlstats.com/students.html).  
-
-
-Järgmises praktikumis arvulised andmed ja nende visualiseerimine.
+Arvulised andmed ja nende visualiseerimine.
 
 
 ## Funktsioonide sõnastik
