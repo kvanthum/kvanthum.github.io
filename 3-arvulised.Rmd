@@ -465,7 +465,7 @@ hist(kysimustik$synniaasta, # x-telje arvuline tunnus
 
 ## Tihedusgraafik
 
-Tihedusgraafik näitab suhteliselt sarnaselt histogrammile andmete jaotust, aga absoluutsageduste asemel on y-teljel tõenäosuslik sagedus (vahemikus 0--1).
+Tihedusgraafik näitab suhteliselt sarnaselt histogrammile andmete jaotust, aga absoluutsageduste asemel on y-teljel tõenäosuslik sagedus (vahemikus 0--lõpmatus).
 
 ```{r}
 plot(density(kysimustik$synniaasta))
