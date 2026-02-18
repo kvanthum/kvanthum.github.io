@@ -33,7 +33,7 @@ Arvuliste tunnuste (nt vanus, aasta, sõnasagedused jne) **kirjeldamiseks** kasu
   - Mis on hulga vaatluste mingi keskmine näitaja ja kui erinevad üksikud vaatlused sellest keskmisest on?   
 - **mediaani** `median(kysimustik$kaua_opid)`.  
   - Mis on hulga vaatluste tüüpiline näitaja?  
-- Keskmist, standardhälvet ja mediaani erinevates **gruppides** saab arvutada näiteks käsuga `tapply()`: `tapply(kysimustik$kaua_opid, kysimustik$lemmikjook, mean)`, `tapply(kysimustik$kaua_opid, list(kysimustik$lemmikjook, lemmikloom), mean)`
+- Keskmist, standardhälvet ja mediaani erinevates **gruppides** saab arvutada näiteks käsuga `tapply()`: `tapply(kysimustik$kaua_opid, kysimustik$lemmikjook, mean)`, `tapply(kysimustik$kaua_opid, list(kysimustik$lemmikjook, kysimustik$lemmikloom), mean)`
 
 
 Arvuliste tunnuste **visualiseerimiseks** kasutatakse põhiliselt   
