@@ -30,7 +30,7 @@ Pakett **`ggplot2`**:
   
 
 ```{r, echo=FALSE, fig.width=20}
-load("data/kysimustik_2025.RData")
+load("data/kysimustik_2026.RData")
 library(ggplot2)
 ggplot(data = kysimustik, aes(x = aasta, fill = kogemused_kvant)) +
     geom_bar(show.legend = F) +
@@ -148,7 +148,7 @@ Mõtleme andmestikus olevate tunnuste tüüpidele ning püüame lisandmooduliga 
 
 1. kandidaatide **vanuse** jaotumist (kui vanad olid kandidaadid?)   
 2. kandidaatide **vanuse** jaotumist vastavalt **valimisnimekirjale** (kui vanad olid erinevate nimekirjade kandidaadid?)   
-3. kandidaatide **vanuse** jaotumist vastavalt **vanusele** (kas meeskandidaadid olid vanemad kui naiskandidaadid?)  
+3. kandidaatide **vanuse** jaotumist vastavalt **soole** (kas meeskandidaadid olid vanemad kui naiskandidaadid?)  
 4. kandidaatide **soo** jaotumist (kui palju oli mehi ja naisi?)   
 5. kandidaatide **soo** jaotumist vastavalt **valimisnimekirjale** (kas mõnes erakonnas oli rohkem naisi?)  
 6. kandidaatide **häältesaagi** jaotumist (kui palju hääli saadi?)  
@@ -668,28 +668,33 @@ Võrdle tulemust ChatGPT pakutud koodiga:
 ```{r, eval = F}
 # Laadi vajalikud paketid
 library(ggplot2)
-library(dplyr)
 
 # Laadi andmestik
-load("kysimustik_2025.RData")
+load("kysimustik_2026.RData")
 
 # Koosta graafik
-ggplot(kysimustik, aes(x = synniaasta, y = kaua_opid, color = kogemused_kvant)) +
-  geom_point(alpha = 0.7) +  # Hajuvusdiagramm
+ggplot(kysimustik,
+       aes(x = synniaasta,
+           y = kaua_opid,
+           color = kogemused_kvant)) +
+  geom_point() + # Hajuvusdiagramm
   facet_wrap(~ lemmikjook) + # Tee- ja kohvijoojate eraldi paneelid
-  scale_color_manual(values = c("Jah" = "orange", "Ei" = "grey45")) +  # Värvid kategooriatele
+  scale_color_manual(
+    values = c("grey45", "orange"), # Värvid kategooriatele
+    name = "Kogemused kvantitatiivsete meetoditega"
+  ) +
   labs(
     title = "Õpitud aastate arv vastavalt sünniaastale",
     subtitle = "ja kokkupuutele kvantitatiivsete meetoditega",
     x = "Sünniaasta",
-    y = "Õpitud aastate arv",
-    color = "Kogemused kvantitatiivsete meetoditega"
+    y = "Õpitud aastate arv"
   ) +
-  theme_minimal(base_size = 14) +  # Minimaalne teema
+  theme_minimal() + # Minimaalne teema
   theme(
-    plot.background = element_rect(fill = "aliceblue", color = NA),  # Taustavärv
-    plot.title = element_text(hjust = 0.5),  # Pealkiri keskele
-    plot.subtitle = element_text(hjust = 0.5)  # Alapealkiri keskele
+    plot.background = element_rect(fill = "aliceblue", colour = NA), # Joonise taustavärv
+    panel.background = element_rect(fill = "aliceblue", colour = NA), # Paneelide taustavärv
+    plot.title = element_text(hjust = 0.5), # Pealkiri keskele
+    plot.subtitle = element_text(hjust = 0.5) # Alapealkiri keskele
   )
 
 ```
@@ -704,7 +709,7 @@ Kuna kohandatavaid graafiku elemente on ggplotis väga palju, on sellega võimal
 
 ### Karpdiagramm
 ```{r, echo = F}
-load("data/kysimustik_2023.RData")
+load("data/kysimustik_2026.RData")
 ```
 
 
@@ -790,7 +795,7 @@ ggplot(kysimustik,
 # Ülikoolis õpitud aastate hajuvusdiagramm
 ggplot(kysimustik, 
        aes(y = kaua_opid, 
-           x = seq_along(kaua_opid))) + # vektor, mis koosneb arvudest 1...80
+           x = seq_along(kaua_opid))) + # vektor, mis koosneb arvudest 1...151
   geom_point(shape = 1, # punktide kuju
              size = 1.5) + # punktide suurus
   labs(x = "Index") + # x-telje pealkiri
@@ -851,7 +856,7 @@ ggplot(kysimustik,
   geom_bar(fill = "grey70", 
            color = "black") +
   labs(y = "", x = "") +
-  scale_y_continuous(breaks = seq(0, 50, 10)) +
+  scale_y_continuous(breaks = seq(0, 100, 10)) +
   theme_classic() + 
   theme(axis.line.x = element_blank(), # kustuta x-telje joon
         axis.text.y = element_text(angle = 90, # y-telje tekst 90-kraadise kaldega
@@ -867,7 +872,7 @@ ggplot(kysimustik,
   geom_bar(position = "dodge", # kategooriad kõrvuti tulpadena
            color = "black") + # tulpade piirjoon must
   scale_x_discrete(drop = FALSE) + # jäta alles vastusteta kategooriad
-  scale_y_continuous(breaks = seq(0, 20, 5)) + # y-teljel väärtused 0st 20ni viiese sammuga
+  scale_y_continuous(breaks = seq(0, 100, 5)) + # y-teljel väärtused 0st 100ni viiese sammuga
   scale_fill_manual(values = c("grey35", "orange"), # määra käsitsi kogemused_kvant kategooriate värvid
                     name = "Kogemusi kvantmeetoditega") + # nimeta legend ümber
   labs(x = "Kursuse läbimise tõenäosus", 
@@ -939,7 +944,7 @@ ggplot() +
             stat = "count") -> graafik1
 
 # Paneme tehtud graafikuobjekti funktsiooni ggplotly() sisse
-# toolip-argumendis saame täpsustada, milliseid graafiku elemente hiirega joonisel liikudes näeb 
+# toolip-argumendis saame täpsustada, milliseid graafiku elemente hiirega joonisel liikudes näeb
 ggplotly(graafik1, tooltip = c("y", "colour"))
 ```
 
