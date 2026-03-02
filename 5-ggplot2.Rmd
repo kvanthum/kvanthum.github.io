@@ -46,7 +46,7 @@ ggplot(data = kysimustik, aes(x = aasta, fill = kogemused_kvant)) +
 ggplot(data = kysimustik, aes(x = aasta, fill = kogemused_kvant)) + 
     geom_bar(fill = "transparent") +
     #scale_fill_manual(values = c("gold3", "steelblue4")) +
-    labs(x = "", y = "Vastajaid", fill = "", title = "Kogemused kvantitatiivsete meetoditega\nvastavalt aastale", caption = 'Kursuse "Kvantitatiivse andmeanalüüsi alused humanitaarteadlastele ja rakendustarkvara R"\nosalenute vastuste põhjal') +
+    labs(x = "", y = "Vastajaid", title = "Kogemused kvantitatiivsete meetoditega\nvastavalt aastale", caption = 'Kursuse "Kvantitatiivse andmeanalüüsi alused humanitaarteadlastele ja rakendustarkvara R"\nosalenute vastuste põhjal') +
   theme(panel.background = element_blank(),
         axis.text = element_blank(),
         axis.ticks =) -> p3
