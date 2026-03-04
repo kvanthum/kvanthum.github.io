@@ -302,7 +302,7 @@ Laadi RStudiosse kursuse küsimustiku andmestik. Leia torusid kasutades, millise
 
 
 ```{r, class.source = 'fold-hide', eval = F}
-load("data/kysimustik_2025.RData")
+load("data/kysimustik_2026.RData")
 kysimustik %>% 
     filter(lemmikjook == "Kohv") %>%
     select(aasta) %>%
