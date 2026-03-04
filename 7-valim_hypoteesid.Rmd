@@ -32,8 +32,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Lisaks varem kasutatud küsimustikule kasutame üllatusküsimuste andmestikku.
 
-```{r}
-load("data/kysimustik_2025.RData")
+```{r andmed}
+load("data/kysimustik_2026.RData")
 load("data/yllatuskysimused_koneleja_keskmised.Rda")
 ```
 
@@ -46,7 +46,7 @@ Asu, Eva Liina, Heete Sahkai & Pärtel Lippus. 2024. The prosody of surprise que
 
 Katse viidi läbi nii, et katseisikutele näidati kõigepealt ekraanil lühikest olukorrakirjeldust ja seejärel paluti lugeda kõva häälega küsimus nii, nagu see sobiks kirjeldatud situatsiooni.
 
-```{r, echo=F, message=F}
+```{r ylla-naited, echo=F, message=F}
 library(tidyverse)
 library(flextable)
 data.frame(`Infokontekst` = c("Saad sõbra juures head veini. Tahad teada, mis vein see on, et seda järgmisel korral külalistele pakkuda.", "Su kolleeg on kutsutud ühte gümnaasiumisse ettekannet pidama. Sa tahad teada, mis teemal ta ettekande teeb."),
@@ -62,7 +62,7 @@ data.frame(`Infokontekst` = c("Saad sõbra juures head veini. Tahad teada, mis v
   - Katseisikuid oli kokku 21 (kõik naised), seega kokku on andmestikus 21 x 48 = 1008 vastust. 
   - Kõva häälega loetud küsimused salvestati ja mõõdeti lausungi kestust ja põhitooni.
 
-```{r, warning=FALSE, message=F, echo=F}
+```{r ylla-joonis, warning=FALSE, message=F, echo=F}
 load("data/Est_SQ-ISQ_dataset_JLing.Rda")
 
 ylla_f0_confint <- data.frame()
@@ -90,7 +90,7 @@ tmp$sona <- rep(c("mis", "NOOMEN","see","on", "mida", "x", "sa","VERB"),2)
     ggplot(aes(x = aeg, colour = tyyp1, fill = tyyp1))+
     geom_line(aes(y = Estimate))+
     geom_ribbon(aes(ymin = CI.lower, ymax = CI.upper), alpha = 0.5)+
-    geom_text(data = tmp, aes(x = aeg, y = 150+8^(lev-1), label = sona), size = 6, hjust = 0, show_guide = FALSE)+
+    geom_text(data = tmp, aes(x = aeg, y = 150+8^(lev-1), label = sona), size = 6, hjust = 0, show.legend = FALSE)+
     facet_grid( "kysisona")+
     labs(y = "Põhitoon (Hz)", x = "Aeg (s)", colour = "Küsimuse tüüp",  fill = "Küsimuse tüüp"))
 ```
