@@ -34,7 +34,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Kasutame juba tuttavaid andmestikke:
 
 ```{r}
-load("data/kysimustik_2025.RData")
+load("data/kysimustik_2026.RData")
 load("data/yllatuskysimused_koneleja_keskmised.Rda")
 kandidaadid <- read.delim("data/kandidaadid_2023.csv")
 ```
@@ -217,16 +217,16 @@ mean(ylla$f0_kesk_sem[ylla$tyyp1=="SQ"])
 
 *95 percent confidence interval* väljundis näitab, et 95-s juhuslikus valimis 100-st jääks nende kahe grupi keskmiste vahe ehk `r t.test(ylla$f0_kesk_sem ~ ylla$tyyp1)$estimate[1]-t.test(ylla$f0_kesk_sem ~ ylla$tyyp1)$estimate[2]` näidatud vahemikku `r t.test(ylla$f0_kesk_sem ~ ylla$tyyp1)$conf.int[1]` ja `r t.test(ylla$f0_kesk_sem ~ ylla$tyyp1)$conf.int[2]` vahele. Kui kahe grupi keskmised üksteisest oluliselt ei erineks, siis jääks usaldusvahemikku ka väärtus 0 (nulli saab ju siis, kui lahutada ühest keskmisest teine keskmine, mis on sama suur kui esimene).
 
-### Hajuvuse testimine
+## Hajuvuse testimine
 
-Vaikimisi teeb R sellise t-testi, mis eeldab, et kahe grupi hajuvus ei ole võrdne ehk dispersioonid ei ole võrdsed (*Welch Two Sample t-test*), mis on tihtipeale tõsi. Dispersioon mäletatavasti on standardhälbe ruut, see näitab seda, kui suur on keskmiselt rühmasisene varieerumine.
+**Kas kahe rühma sees on varieerumine sama suur?** Vaikimisi teeb R Welchi t-testi (*Welch Two Sample t-test*), mis eeldab, et kahe grupi hajuvus ei ole võrdne ehk dispersioonid ei ole võrdsed, mis on tihtipeale tõsi. Dispersioon mäletatavasti on standardhälbe ruut, see näitab seda, kui suur on keskmiselt rühmasisene varieerumine.
 
 ```{r}
 var(ylla[ylla$tyyp1 == "ISQ","f0_kesk_sem"])
 var(ylla[ylla$tyyp1 == "SQ","f0_kesk_sem"])
 ```
 
-Dispersioonide erinevust saab kontrollida F-testiga (R-is `var.test()`), kus F-statistik on kahe grupi dispersioonide jagatis.
+**Dispersioonide erinevust saab kontrollida F-testiga** (R-is `var.test()`), kus F-statistik on kahe grupi dispersioonide jagatis.
 
 ```{r}
 var.test(ylla$f0_kesk_sem ~ ylla$tyyp1)
@@ -238,6 +238,7 @@ Kui *p* > 0.05, siis jääb kehtima nullhüpotees, et kahe dispersiooni suhe/jag
 
 Dispersiooni peaks kontrollima sama andmestikuga, millega t-testi teeme, st kui jaotuse normaliseerimiseks on andmed logaritminud, siis peaks ka dispersiooni testi sisendis logaritmima, muidu ei ole logaritmimist siin ka vaja.
 
+**Kui aga rühmade vahel on võrdne dispersioon**, siis peaks t-testist valima versiooni, mis eeldab võrdset varieerumist
 Kuna F-test näitaks, et gruppide dispersioon on sarnane (*p* > 0.05), siis saab teha võrdsete dispersioonidega t-testi (`var.equal = TRUE`).
 
 ```{r}

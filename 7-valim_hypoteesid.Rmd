@@ -133,7 +133,9 @@ save(ylla, file = "data/yllatuskysimused_koneleja_keskmised.Rda")
 
 ## Valim ja populatsioon
 
-**Populatsiooni** ehk **üldkogumi** moodustavad uurimisobjekti kõik esindajad. Enamasti on populatsioon nii suur ja raskesti kättesaadav, et ei ole võimalik uurida kogu populatsiooni. Näiteks kui uurime inimkäitumist, siis populatsioon on kogu inimkond, kui uurime eesti keelt, siis kõik eesti keele kõnelejad ja kõik, mis nad iganes räägivad, või kõik eesti keeles kirjutatud tekstid. Sõltuvalt uurimisküsimustest võib muidugi ka populatsioon olla hoomatavam: näiteks kui uurime Anton Hansen Tammsaare loomingut, siis kogu populatsiooni moodustavad kõik tema teosed.
+**Populatsiooni** ehk **üldkogumi** moodustavad uurimisobjekti kõik esindajad. Enamasti on populatsioon nii suur ja raskesti kättesaadav, et ei ole võimalik uurida kogu populatsiooni. Näiteks kui uurime inimkäitumist üldiselt, siis populatsioon on kogu inimkond; kui uurime eesti keelt, siis on populatsiooniks kõik eesti keele kõnelejad ja kõik, mis nad iganes räägivad, või kõik eesti keeles kirjutatud tekstid. 
+
+Sõltuvalt uurimisküsimustest võib muidugi ka populatsioon olla hoomatavam: näiteks kui uurime Anton Hansen Tammsaare loomingut, siis kogu populatsiooni moodustavad kõik tema teosed (mida praeguseks on lõplik hulk).
 
 **Valim** on mingite kriteeriumite alusel tehtud valik uurimisobjektidest, mis uuringus vaatluse alla võetakse ja mille omadusi kogu populatsioonile laiendatakse.
 
@@ -141,9 +143,9 @@ save(ylla, file = "data/yllatuskysimused_koneleja_keskmised.Rda")
 
 - **Üldkogum** ehk **populatsioon**: objektide hulk, kelle/mille kohta soovitakse järeldusi teha.
 - Plussid:
-    + täpne info.
+    + täpne info kõigi populatsiooni esindajate kohta.
 - Miinused:
-    + töömahukas,
+    + töömahukas (sageli mastaabi tõttu teostamatu),
     + kallis,
     + mahukuse tõttu võivad kumuleeruda vead,
     + piiratud sisu.
@@ -165,19 +167,22 @@ save(ylla, file = "data/yllatuskysimused_koneleja_keskmised.Rda")
 
 Valimi põhjal saadud tulemused peaksid olema võimalikult lähedased neile, mida võiksime saada kogu üldkogumit mõõtes.
 
-- Näiteks kui uurida leibkondade elujärge, peavad olema valimisse kaasatud kõik leibkonnatüübid.
+- Näiteks kui uurida leibkondade elujärge, peavad olema valimisse kaasatud kõik leibkonnatüübid. Või kui näiteks uurida eesti kirjandust, peavad olema valimis erinevad kirjanikud ja erinevad kirjandusžanrid.
 
 Valimi suuruse määrab ülesanne, mida tahetakse lahendada.
  
 **Lihtne juhuvalim**: igal üldkogumi objektil on võrdne tõenäosus sattuda valimisse.
 
 - Parim variant, aga võib olla liiga töömahukas.
+- Peab kuidagi tagama, et kõigil populatsiooni liikmetel oleks võrdne võimalus valimisse sattuda. Rahvastiku uurimisel on näiteks võimalik rahvastikuregistrist küsida juhuslik hulk inimeste kontaktandmeid.
 
 **Kihtvalim**: üldkogum jagatakse mingi tunnuse alusel kihtideks, igas kihis rakendadakse mingit valikumeetodit (nt juhuvalikut). Valim vastab selle valitud tunnuse alusel üldkogumis valitsevale proportsioonile.
 
+- Näiteks rahvaloenduse andmetel teame, kui palju on erineva haridustasemega mehi ja naisi Eesti eri piirkondades ja valimi moodustame nii, et nende tunnuste jaotus oleks sarnane.
+
 **Esindusvalim**: valim koostatakse nii, et erinevate võimalike tunnuste proportsioonid on võrdsed.
 
-- Näiteks inimese pikkust uurides võetakse valimisse sama arv mehi ja naisi, noortest vanadeni, igast uuritava üldkogumi piirkonnast jne;
+- Näiteks võetakse valimisse sama arv mehi ja naisi igast vanuserühmast, igast uuritava üldkogumi piirkonnast jne;
 - lihtsam kui juhuvalik;
 - on oht, et mingid olulised tunnused jäävad arvestamata.
 
@@ -236,7 +241,7 @@ H1: tõestamist vajav hüpotees
 
 Uurime enamasti populatsiooni, ent mõõdame üldjuhul valimit. Mingi parameetri hinnang valimis on **statistik**. Statistikameetodite abil ei saa väiteid tõestada absoluutselt kindlasti, alati jääb teatav eksimise võimalus ja juhuslikkusest tulenev eksimus.
 
-```{r, echo=FALSE}
+```{r tyypvead, echo=FALSE}
 library(knitr)
 tab = matrix(c("I tüüpi viga",  "Kõik hästi", "Kõik hästi", "II tüüpi viga"), ncol=2, byrow=T)
 rownames(tab) <- c("Lükkad H0 tagasi", "Võtad H0 vastu")
