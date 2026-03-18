@@ -22,12 +22,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Tänases praktikumis
 
 - hii-ruut-test  
+- mitmese testimise probleem  
 - seose tugevuse hindamine  
+- testi võimsus  
 - Fisheri täpne test  
 - Monte-Carlo simulatsioon  
 
 
-## Hii-ruut-test
+## Hii-ruut-test  
 
 Hii-ruut-test on statistiline test, millega saab hinnata kahe kategoriaalse tunnuse sõltuvust. Test töötab **risttabeliga**, milles on lihtsagedused (mitte suhtelised ega normaliseeritud sagedused).
 
@@ -47,6 +49,11 @@ Tegelikult on hii-ruut-testid terve testide pere, mille arvutamiseks kasutatakse
 </center>
 
 Selles praktikumis keskendume sõltumatuse testile, kus uurime kahe tunnuse omavahelise seose olemasolu: **kas ühe tunnuse väärtuste teadmine aitab ennustada teise tunnuse väärtust** (*chi-square test of independence*)?    
+
+
+### Andmed {.tabset .tabset-pills} 
+
+#### Näide 1
 
 Vaatleme näitena andmeid Ann Siimani artiklist ["Ainsuse sisseütleva vormi valiku seos morfosüntaktiliste ja semantiliste tunnustega - materjali ning meetodi sobivus korpusanalüüsiks"](http://www.kirj.ee/public/ESA/2015/esa_61_2015_207_232.pdf) (2015), kus ta kasutas hii-ruut-testi, et selgitada välja, millest sõltub sisseütleva käände kasutuses see, kas kasutatakse lühikest sisseütleva käände vormi ehk **aditiivi** (*majja*) või pikka sisseütleva käände vormi ehk **illatiivi** (*majasse*).  
 
@@ -72,10 +79,13 @@ tab
 Kui meil oleks vormikasutuse kohta põhjalikum andmestik, saaks risttabelit saaks mõistagi teha ka andmestiku tunnustest, nt `table(andmed$tunnus1, andmed$tunnus2)`.
 
 
-Kui esitatud näide sind ei kõneta, võid teha tabeli ka mõne muu uurimuse põhjal, kus risttabelites sagedusi on raporteeritud. Näiteks
+Kui esitatud näide sind ei kõneta, võid teha tabeli ka mõne muu uurimuse põhjal, kus risttabelites sagedusi on raporteeritud.   
 
 <br>
 <br>
+
+#### Näide 2
+
 <center>
 <p>Annika Kängsepp (2024). [Käändevormide varieerumine ja seda mõjutavad tegurid kirjalikus keeles indefiniitpronoomeni *keegi* näitel](https://keeljakirjandus.ee/wp-content/uploads/2024/11/A.KANGSEPP.pdf). Keel ja Kirjandus 11, 1016-1037.</p>
 <p>Normingupäraste (*NP*, nt *kellelgi*) ja norminguvastaste (*NV*, nt *kellegil*) käändevormide jagunemine vastavalt teksti žanrile</p>
@@ -91,6 +101,8 @@ tab <- matrix(c(227,184,239,551,434,165),
 
 <br>
 <br>
+
+#### Näide 3
 
 <center>
 <p>Annaliisa Mäletjärv (2021). [Varjatud emotsioonide äratundmine näoväljendustest](https://sisu.ut.ee/wp-content/uploads/sites/561/maletjarv_annaliisa_uurimistoo.pdf). Uurimistöö.</p>
@@ -111,6 +123,7 @@ tab <- matrix(c(301,489,345,397,373,285,
 <br>
 <br>
 
+#### Näide 4
 
 <center>
 <p>Pille Markov (2019). [Intellektuaalne ja visuaalne realism laste joonistustes](https://dspace.ut.ee/bitstreams/ff20444f-d980-44d2-9288-990b502aafbb/download). Uurimistöö.</p>
@@ -127,6 +140,7 @@ tab <- matrix(c(14,8,23,31),
 <br>
 <br>
 
+#### Näide 5
 
 <center>
 <p>Kai Tiitsaar (2010). [Hugo Treffneri Gümnaasiumi õpilaste käelisus](https://akadeemiake.ee/wp-content/uploads/2011/09/akadeemiake08.pdf#page=29). Akadeemiake 1(8), 29-50.</p>
@@ -142,6 +156,8 @@ tab <- matrix(c(15,18,199,13,7,241),
 <br>
 <br>
 
+
+### Andmete visualiseerimine
 
 Visualiseerime sagedusi.  
 
@@ -193,6 +209,10 @@ library(patchwork)
 p1 + p2
 ```
 
+<br>
+<br>
+
+### Tegelikud ja oodatud sagedused
 
 Hii-ruut-test põhineb tegelike ja teoreetiliste sageduste võrdlemisel.   
 
@@ -223,20 +243,23 @@ chisq.test(tab)$expected # teoreetilised sagedused
 <br>
 <br>
 
-**Hii-ruut-testi eeldused**:
 
-- Valim on üldkogumist juhuslikult valitud.
-- Vaatlused on sõltumatud.  
+### Hii-ruut-testi eeldused  
+
+- Valim on üldkogumist juhuslikult valitud.  
+- Vaatlused on sõltumatud.   
 - Iga vaatlus peab sobima risttabelis täpselt ainult ühte lahtrisse (st iga uuritava tunnuse ainult ühte kategooriasse).  
 
 Uuritava andmestiku puhul ei ole tegelikult vaatluste sõltumatuse nõue täidetud, kuna korpuses ei ole igalt kõnelejalt ainult üks mingi sisseütlevas käändes sõna kasutuskord. See tähendab, et kõneleja/kirjutaja, kes on rohkem sisseütlevas käändes sõnu tarvitanud, mõjutab enam ka testi tulemusi. Keelekorpustega, kus pahatihti on ka keeruline tuvastada, kes täpselt kõneleja/kirjutaja on, vaatluste sõltumatuse nõuet sageli eiratakse, ent sellisel juhul võib alati küsida, kas ikka kirjeldame keelt üldiselt või mõne domineeriva keelekasutaja idiolekti.  
 
-Sageli viidatakse hii-ruut-testi eeldusena ka nn Cochrani reeglile, mille põhjal ei tohiks hii-ruut-testi tegemisel olla **oodatud sageduste hulgas 5st väiksemaid väärtusi enam kui 20% lahtrites** ning **ükski oodatud sagedus ei tohiks olla väiksem kui 1**. Nendele tingimustele on esitatud ka mööndusi, eriti keeleteaduses (nt [Stefanowitsch 2020](https://langsci-press.org/catalog/book/148): 177 või [Wallis 2021](https://www.routledge.com/Statistics-in-Corpus-Linguistics-Research-A-New-Approach/Wallis/p/book/9781138589384): 117), kuna reeglit peetakse liiga konservatiivseks. Klassikaliselt soovitatakse siiski sellistel juhtudel kasutada mõnd muud sarnast testi, nt [Fisheri testi või G-testi](https://kvanthum.github.io/10-mittearvuliste_seosed.html#fisheri-t%C3%A4pne-test-ja-g-test).
+Sageli viidatakse hii-ruut-testi eeldusena ka nn Cochrani reeglile, mille põhjal ei tohiks hii-ruut-testi tegemisel olla **oodatud sageduste hulgas 5st väiksemaid väärtusi enam kui 20% lahtrites** ning **ükski oodatud sagedus ei tohiks olla väiksem kui 1**. Nendele tingimustele on esitatud ka mööndusi, eriti keeleteaduses (nt [Stefanowitsch 2020](https://langsci-press.org/catalog/book/148): 177 või [Wallis 2021](https://www.routledge.com/Statistics-in-Corpus-Linguistics-Research-A-New-Approach/Wallis/p/book/9781138589384): 117), kuna reeglit peetakse liiga konservatiivseks. Klassikaliselt soovitatakse siiski sellistel juhtudel kasutada mõnd muud sarnast testi, nt [Fisheri testi või G-testi](https://kvanthum.github.io/10-mittearvuliste_seosed.html#fisheri-t%C3%A4pne-test-ja-g-test).   
 
 **R-is annab hii-ruut-test annab hoiatuse juba siis, kui kuskil oodatud sageduste hulgas on väärtusi < 5.**  
 
 <br>
 <br>
+
+### Hii-ruut-test
 
 Sõnastame hüpoteesid.
 
@@ -297,46 +320,91 @@ chisq.test(andmed$tunnus1, andmed$tunnus2)
 Seejärel loe sisse 2023. aasta valimiste andmestik, jäta välja üksikkandidaatide andmed ning kontrolli, kas on statistiliselt oluline seos **soo** ja **valimisnimekirja** vahel.   
 
 
+## Mitmese testimise probleem  
+
+Kui harjutuses 1 vaatlesime esmalt, kas kvantitatiivsete meetodite **kogemuse omamine** sõltub lemmikjoogist, ning seejärel, kas **kogemuse omamine** sõltub programmeerimisoskusest, siis testime tegelikult samade andmete põhjal mitut hüpoteesi ning lubame iga testi puhul nullhüpoteesi ümberlükkamisel teatud eksimismäära (nt 0,05 = 5-protsendiline eksimismäär). Mitme testi tegemisel need eksimismäärad aga kumuleeruvad. Seda nimetatakse **mitmese testimise probleemiks** (*multiple testing*, *multiple comparisons*): mida rohkem teste või võrdlusi teha, seda rohkem kasvab võimalus leida vähemalt üht statistiliselt olulist seost pelgalt juhuse teel.  
+  
+Probleemi aitab kvantifitseerida nt nn **katseviisilise vea mõõdik** (*Family-Wise Error Rate*, FWER), mille arvutamiseks on vaja teada olulisuse nivood (*α*) ning testide/võrdluste arvu (*m*):  
+
+$$
+FWER = 1 - (1-α)^m
+$$
+Näiteks kahe testi tegemisel oleks FWER `1-(1-0.05)^2=0.0975`, kolme puhul `1-(1-0.05)^3=0.142625`, kahekümne testi tegemisel aga juba `1-(1-0.05)^20=0.6415`. See tähendab, et tõenäosus teha vähemalt ühe testi/võrdluse puhul nn esimest tüüpi viga (lükkame nullhüpoteesi ümber, ehkki see tegelikult kehtib) oleks vastavalt 9,75%, 14,2% ja 64,15%.    
+
+Mitmese testimise probleemi aitab lahendada kas α ja/või p-väärtuste kohandamine võrdluste arvuga vastavaks.   
+
+**Olulisuse nivoo** kohandamisel nn **Bonferroni parandusega** jagatakse olulisuse nivoo (nt 0,05) läbi testide/võrdluste arvuga (*m*) ning iga testi/võrdluse p-väärtus peab jääma alla kohandatud olulisuse nivoo, selleks et võiksime väita, et tegu on statistiliselt olulise seosega. Näiteks kui teeme kaks testi, siis peab testide p-väärtus olema väiksem kui `0.05/2=0.025`; kui teeme 20 testi, siis peab p-väärtus olema väiksem kui `0.05/20=0.0025`.  
+
+```{r, eval = F}
+load("data/kysimustik_2026.RData")
+chisq.test(kysimustik$kogemused_kvant, kysimustik$lemmikjook) # > 0.025, ei ole oluline
+chisq.test(kysimustik$kogemused_kvant, kysimustik$programmeerimisoskus) # < 0.025, on oluline
+```
+
+Bonferroni parandust peetakse vahel liiga konservatiivseks. Seetõttu on sagedamini kasutusel **Holmi-Bonferroni parandus**, mis ei kohanda olulisuse nivood kõikidele testidele ühtmoodi, vaid   
+
+- järjestab kõikide testide p-väärtused kasvavas järjekorras,  
+- jagab olulisuse nivoo *α* läbi järjest leebemalt:  
+  + kõige väiksema p-väärtusega testi jaoks: tehtavate võrdluste/testide arvuga (*m*), *α = α/m*,  
+  + järgmiseks kõige väiksema p-väärtusega testi jaoks: *α = α/(m-1)*,   
+  + järgmiseks kõige väiksema p-väärtusega testi jaoks: *α = α/(m-2)*,  
+  + jne, kuni kõige suurema p-väärtusega testi jaoks jagame olulisuse nivoo läbi 1-ga: *α = α/1*.  
+
+```{r}
+library(tidyverse)
+testide_p <- c(0.01, 0.0645, 0.045, 0.235, 0.4363, 0.06, 0.0003)
+a_kohandused <- 0.05/length(testide_p):1
+data.frame(testide_p = sort(testide_p), 
+           a_kohandus = a_kohandused) %>% 
+  mutate(oluline = ifelse(testide_p < a_kohandus, TRUE, FALSE))
+```
+
+
+```{r, eval = F}
+load("data/kysimustik_2026.RData")
+# teiseks kõige väiksem p-väärtus: α = α/(m-1) = 0.05/(2-2) = 0.05
+chisq.test(kysimustik$kogemused_kvant, kysimustik$lemmikjook) # > 0.05, ei ole oluline
+
+# kõige väiksem p-väärtus: α = α/m = 0.05/2 = 0.025
+chisq.test(kysimustik$kogemused_kvant, kysimustik$programmeerimisoskus) # < 0.025, on oluline
+```
+
+
+R-is võime aga **kohandada ka p-väärtusi** otse, kasutades nt funktsiooni `p.adjust()`.     
+
+```{r}
+p.adjust(p = c(0.2354, 0.001185, 0.049), method = "holm", n = 3)
+```
+
+<br>
+
+Lisaks Bonferroni ja Holmi-Bonferroni parandusele on olemas ka teisi (nt Scheffe test, Tukey test). On ka selliseid meetodeid, mis ei lähtu mitte katseviisilisest veast (FWER), vaid hoopis nn **valeavastusmäärast** (*False Discovery Rate*, FDR), mis näitab, kui suur on statistiliselt oluliste seoste hulgas selliste juhtude oodatav osakaal, milles hülgame nullhüpoteesi ekslikult.  
+
+<br>
+<br>
 
 ## Hii-ruut-testi jäägid
 
-Hii-ruut-test ise ütleb lihtsalt, et kahe kategoriaalse tunnuse vahel on statistiliselt oluline seos, aga ei ütle midagi selle kohta, milline see seos on. Seepärast oleks kasulik vaadata Pearsoni jääkide abil, millised erinevused tegelike ja oodatud sageduste vahel on suuremad. Pearsoni jääke arvutatakse valemiga $\frac{(o-e)}{\sqrt{e}}$.
+Hii-ruut-test ise ütleb lihtsalt, et kahe kategoriaalse tunnuse vahel on statistiliselt oluline seos, aga ei ütle midagi selle kohta, milline see seos on. Seepärast oleks kasulik vaadata Pearsoni jääkide abil, millised erinevused tegelike ja oodatud sageduste vahel on suuremad. Nn Pearsoni jääke arvutatakse valemiga $\frac{(o-e)}{\sqrt{e}}$.
 
 ```{r}
 # Näiteks lühikese sisseütlevaga pärisnimede jääk on
 (t$observed["Lühike", "Pärisnimi"]-t$expected["Lühike", "Pärisnimi"])/sqrt(t$expected["Lühike", "Pärisnimi"])
 ```
+
 ```{r}
 # Jäägid saab kätte ka testi väljundist
 t$residuals
+
+# Jääkide ruutude summa ongi hii-ruut-statistik
+sum(t$residuals^2)
 ```
 
 Kui jääk on positiivne, on tegelik sagedus suurem kui oodatud ja konkreetne tunnuste kombinatsioon esineb sagedamini kui marginaalsageduste põhjal võiks oletada. Kui jääk on negatiivne, on tegelik sagedus väiksem kui oodatud. Näiteks pärisnimed esinevad oodatust harvemini lühikeses sisseütlevas käändes (nt *läksin Tartu*).
 
-Teeme jääkide graafiku.
-
-```{r}
-barplot(t$residuals, 
-        beside = TRUE, 
-        legend = TRUE,
-        ylab = "Pearsoni jäägid")
-```
-
-```{r, warning=F, message=F}
-# ggplotiga
-jaak_pikk <- t$residuals %>%
-  as.data.frame() %>%
-  rownames_to_column(var = "Vorm") %>%
-  pivot_longer(cols = c("Pärisnimi", "Üldnimi"), names_to = "Liik", values_to = "Jääk")
-
-ggplot(jaak_pikk) +
-  geom_col(aes(x = Liik, fill = Vorm, y = Jääk), position = "dodge")
-
-```
-
 Mida suurem on Pearsoni jäägi absoluutväärtus, seda enam on tõenäoliselt konkreetne lahter statistiliselt olulise hii-ruut-statistiku väärtusesse panustanud.
 
-Selleks aga, et näha, millised jäägid esindavad **olulist** erinevust oodatud sagedustest, vaatame **standardiseeritud jääke**. Standardiseeritud jäägid R-i hii-ruut-testi kontekstis (ka Pearsoni jäägid on põhimõtteliselt standardiseeritud) väljendavad erinevust tegeliku ja oodatud sageduse vahel, mis on jagatud mitte ruutjuurega oodatud sagedustest (nagu tavaliste Pearsoni jääkide puhul), vaid ruutjuurega avaldisest, kus korrutatakse oodatud sagedused, 1 - oodatud sageduste osakaal ridade summast ja 1 - oodatud sageduste osakaal tulpade summast. Need on tuntud ka kui *adjusted residuals*.  
+Selleks aga, et näha, millised jäägid esindavad **olulist** erinevust oodatud sagedustest, vaatame **standardiseeritud Pearsoni jääke**. Standardiseeritud jäägid R-i hii-ruut-testi kontekstis (ka tavalised Pearsoni jäägid on põhimõtteliselt standardiseeritud) väljendavad erinevust tegeliku ja oodatud sageduse vahel, mis on jagatud mitte ruutjuurega oodatud sagedustest (nagu tavaliste Pearsoni jääkide puhul), vaid ruutjuurega avaldisest, kus korrutatakse oodatud sagedused, 1 - oodatud sageduste osakaal ridade summast ja 1 - oodatud sageduste osakaal tulpade summast. Need on tuntud ka kui *adjusted residuals*.  
 
 Näiteks lühikeses sisseütlevas käändes pärisnime standardiseeritud jääk oleks 
 
@@ -354,28 +422,6 @@ t$stdres
 
 Kui olulisuse nivoo on 0.05, siis on statistiliselt olulised need jäägid, mis on suuremad kui 1.96 või väiksemad kui -1.96 (tihti ümardatakse ka 2 ja -2). Vastava kriitilise väärtuse võib leida nt funktsiooniga `qnorm(1-olulisuse_nivoo/2)`. Need jäägid näitavad, millised on need risttabeli lahtrid, mis panustavad hii-ruut-testi statistiliselt olulisse tulemusse enim ning milles erinevus oodatud ja tegelike sageduste vahel on kõige märgatavam.    
 
-```{r}
-barplot(t$stdres, 
-        beside = TRUE, 
-        legend = TRUE,
-        ylab = "Kohandatud Pearsoni jäägid")
-abline(h = 1.96, col = "red", lty = "dashed")
-abline(h = -1.96, col = "red", lty = "dashed")
-```
-
-```{r}
-# ggplotiga
-t$stdres %>%
-  as.data.frame() %>%
-  rownames_to_column(var = "Vorm") %>%
-  pivot_longer(., cols = c("Pärisnimi", "Üldnimi"), names_to = "Liik", values_to = "Std_jääk") %>%
-  ggplot() +
-  geom_col(aes(x = Liik, fill = Vorm, y = Std_jääk), position = "dodge") +
-  geom_hline(aes(yintercept = 1.96), col = "red", linetype = "dashed") +
-  geom_hline(aes(yintercept = -1.96), col = "red", linetype = "dashed")
-```
-
-
 <br>
 <br>
 
@@ -383,7 +429,14 @@ t$stdres %>%
 
 Kategoriaalsete tunnuste vahelise seose tugevust saab mõõta näiteks Craméri V või φ-kordaja abil.  
 
-```{r}
+
+```{r, message=FALSE, warning=FALSE}
+# install.packages("effectsize")
+library(effectsize)
+
+cramers_v(tab)
+phi(tab)
+
 # install.packages("vcd")
 library(vcd)
 
@@ -409,7 +462,6 @@ Suuremate (mitteruut)tabelite puhul võivad hakata kordajate väärtused erinema
 
 Tavaliselt kasutatakse 2x2 tabelist suuremate tabelite puhul Craméri V-d, sest see on võrreldav ka eri suurustega tabelite korral.
 
-Craméri V-d ja teisi seose tugevuse mõõdikuid saad arvutada ka näiteks pakettidega `lsr` või `effectsize`.  
 
 <br>
 <br>
@@ -446,11 +498,33 @@ pwr.chisq.test(w = w, N = N, df = df, sig.level = 0.05)
 
 Siin näiteks on tõenäosus, et me **ei tee teist tüüpi viga** (ütleme, et seost ei ole, kui tegelikult on), ~92%. See on päris hea.   
 
+Võimsuse analüüsiga saab ka otsustada, kui palju andmeid on vaja selleks, et leida teatud olulisuse nivool ning kindla võimsusega mingi soovitud suurusega mõju.  
+
+```{r, message = FALSE, warning = FALSE}
+# library(pwr)
+w <- 0.5 # tugev mõju
+df <- 1
+power <- 0.9
+
+pwr.chisq.test(w = w, df = df, power = power, sig.level = 0.05)
+
+# võrdle
+w <- 0.1 # nõrk mõju
+
+pwr.chisq.test(w = w, df = df, power = power, sig.level = 0.05)
+
+```
+
+Kuna tugevamat mõju (*w*) on lihtsam andmetest tuvastada, on selleks vaja ka vähem vaatlusi. Väikese (aga olulise) mõju tuvastamiseks on aga jällegi vaja rohkem vaatlusi.  
+
+<br>
+<br>
+
 ## Harjutus 2
 
 Leia, millised soo ja valimisnimekirja kombinatsioonid panustavad kõige enam hii-ruut-testi tulemusse (standardiseeritud **jäägid**), kui tugev on **seos** soo ja valimisnimekirja vahel ning milline on testi **võimsus**.  
 
-Kontrolli seejärel, kas äkki tuli küsimustiku andmete põhjal seos lemmikjoogi ja kvantitatiivsete meetodite kogemuse vahel ebaoluline seetõttu, et testi võimsus polnud piisav.  
+Kontrolli seejärel, kas äkki tuli küsimustiku andmete põhjal seos lemmikjoogi ja kvantitatiivsete meetodite kogemuse vahel ebaoluline seetõttu, et testi võimsus polnud selle andmehulga jaoks piisav.  
 
 
 
@@ -501,6 +575,7 @@ fisher.test(valimised$nimekiri, valimised$sugu, workspace = 100000000000)
 G-test on hii-ruut-testile väga sarnane, ent selle valem statistiku arvutamiseks on pisut erinev: $G = 2\sum_i O_i log(\frac{O_i}{E_i})$.
 
 ```{r}
+# install.packages("DescTools")
 DescTools::GTest(tab2)
 ```
 
@@ -565,7 +640,7 @@ chisq.test(tab2, simulate.p.value = TRUE, B = 3000)
 
 ## Järgmisel korral
 
-Järgmisel korral läheme kahe tunnuse vaheliste seoste hindamise juurest regressioonimudelite juurde, mis võimaldavad ühe tunnuse muutumist kirjeldada enamate tunnuste kaudu. **NB!** Järgmine praktikum alles ülejärgmisel nädalal (31.03)!
+Järgmisel korral läheme kahe tunnuse vaheliste seoste hindamise juurest regressioonimudelite juurde, mis võimaldavad ühe tunnuse muutumist kirjeldada enamate tunnuste kaudu. **NB!** Järgmine praktikum alles ülejärgmisel nädalal (30.03)!
 
 
 ## Funktsioonide sõnastik
