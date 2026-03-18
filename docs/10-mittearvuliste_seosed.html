@@ -923,30 +923,14 @@ nivoo läbi 1-ga: <em>α = α/1</em>.</li>
 ## 7    0.4363 0.050000000   FALSE</code></pre>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/kysimustik_2026.RData&quot;</span>)</span>
 <span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="co"># teiseks kõige väiksem p-väärtus: α = α/(m-1) = 0.05/(2-2) = 0.05</span></span>
-<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="fu">chisq.test</span>(kysimustik<span class="sc">$</span>kogemused_kvant, kysimustik<span class="sc">$</span>lemmikjook) <span class="co"># &gt; 0.05, ei ole oluline</span></span></code></pre></div>
-<pre><code>## 
-##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
-## 
-## data:  kysimustik$kogemused_kvant and kysimustik$lemmikjook
-## X-squared = 1.4082, df = 1, p-value = 0.2354</code></pre>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># kõige väiksem p-väärtus: α = α/m = 0.05/2 = 0.025</span></span>
-<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="fu">chisq.test</span>(kysimustik<span class="sc">$</span>kogemused_kvant, kysimustik<span class="sc">$</span>programmeerimisoskus) <span class="co"># &lt; 0.025, on oluline</span></span></code></pre></div>
-<pre><code>## Warning in chisq.test(kysimustik$kogemused_kvant,
-## kysimustik$programmeerimisoskus): Chi-squared approximation may be incorrect</code></pre>
-<pre><code>## 
-##  Pearson&#39;s Chi-squared test
-## 
-## data:  kysimustik$kogemused_kvant and kysimustik$programmeerimisoskus
-## X-squared = 15.907, df = 3, p-value = 0.001185</code></pre>
-<p>R-is võime aga kohandada ka p-väärtusi otse, kasutades nt funktsiooni
-<code>p.adjust()</code>.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>p.adjust.methods</span></code></pre></div>
-<pre><code>## [1] &quot;holm&quot;       &quot;hochberg&quot;   &quot;hommel&quot;     &quot;bonferroni&quot; &quot;BH&quot;        
-## [6] &quot;BY&quot;         &quot;fdr&quot;        &quot;none&quot;</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="fu">p.adjust</span>(<span class="at">p =</span> <span class="fl">0.001185</span>, <span class="at">method =</span> <span class="st">&quot;holm&quot;</span>, <span class="at">n =</span> <span class="dv">2</span>)</span></code></pre></div>
-<pre><code>## [1] 0.00237</code></pre>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a><span class="fu">p.adjust</span>(<span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.2354</span>, <span class="fl">0.001185</span>), <span class="at">method =</span> <span class="st">&quot;holm&quot;</span>, <span class="at">n =</span> <span class="dv">2</span>)</span></code></pre></div>
-<pre><code>## [1] 0.23540 0.00237</code></pre>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="fu">chisq.test</span>(kysimustik<span class="sc">$</span>kogemused_kvant, kysimustik<span class="sc">$</span>lemmikjook) <span class="co"># &gt; 0.05, ei ole oluline</span></span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a><span class="co"># kõige väiksem p-väärtus: α = α/m = 0.05/2 = 0.025</span></span>
+<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a><span class="fu">chisq.test</span>(kysimustik<span class="sc">$</span>kogemused_kvant, kysimustik<span class="sc">$</span>programmeerimisoskus) <span class="co"># &lt; 0.025, on oluline</span></span></code></pre></div>
+<p>R-is võime aga <strong>kohandada ka p-väärtusi</strong> otse,
+kasutades nt funktsiooni <code>p.adjust()</code>.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">p.adjust</span>(<span class="at">p =</span> <span class="fu">c</span>(<span class="fl">0.2354</span>, <span class="fl">0.001185</span>, <span class="fl">0.049</span>), <span class="at">method =</span> <span class="st">&quot;holm&quot;</span>, <span class="at">n =</span> <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## [1] 0.235400 0.003555 0.098000</code></pre>
 <p><br></p>
 <p>Lisaks Bonferroni ja Holmi-Bonferroni parandusele on olemas ka teisi
 (nt Scheffe test, Tukey test). On ka selliseid meetodeid, mis ei lähtu
@@ -955,6 +939,7 @@ mitte katseviisilisest veast (FWER), vaid hoopis nn
 FDR), mis näitab, kui suur on statistiliselt oluliste seoste hulgas
 selliste juhtude oodatav osakaal, milles hülgame nullhüpoteesi
 ekslikult.</p>
+<p><br> <br></p>
 </div>
 <div id="hii-ruut-testi-jäägid" class="section level2">
 <h2>Hii-ruut-testi jäägid</h2>
@@ -963,16 +948,16 @@ on statistiliselt oluline seos, aga ei ütle midagi selle kohta, milline
 see seos on. Seepärast oleks kasulik vaadata Pearsoni jääkide abil,
 millised erinevused tegelike ja oodatud sageduste vahel on suuremad. Nn
 Pearsoni jääke arvutatakse valemiga <span class="math inline">\(\frac{(o-e)}{\sqrt{e}}\)</span>.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="co"># Näiteks lühikese sisseütlevaga pärisnimede jääk on</span></span>
-<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a>(t<span class="sc">$</span>observed[<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pärisnimi&quot;</span>]<span class="sc">-</span>t<span class="sc">$</span>expected[<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pärisnimi&quot;</span>])<span class="sc">/</span><span class="fu">sqrt</span>(t<span class="sc">$</span>expected[<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pärisnimi&quot;</span>])</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="co"># Näiteks lühikese sisseütlevaga pärisnimede jääk on</span></span>
+<span id="cb30-2"><a href="#cb30-2" tabindex="-1"></a>(t<span class="sc">$</span>observed[<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pärisnimi&quot;</span>]<span class="sc">-</span>t<span class="sc">$</span>expected[<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pärisnimi&quot;</span>])<span class="sc">/</span><span class="fu">sqrt</span>(t<span class="sc">$</span>expected[<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pärisnimi&quot;</span>])</span></code></pre></div>
 <pre><code>## [1] -2.194691</code></pre>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a><span class="co"># Jäägid saab kätte ka testi väljundist</span></span>
-<span id="cb40-2"><a href="#cb40-2" tabindex="-1"></a>t<span class="sc">$</span>residuals</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="co"># Jäägid saab kätte ka testi väljundist</span></span>
+<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a>t<span class="sc">$</span>residuals</span></code></pre></div>
 <pre><code>##        Pärisnimi    Üldnimi
 ## Lühike -2.194691  0.8959787
 ## Pikk    2.194691 -0.8959787</code></pre>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a><span class="co"># Jääkide ruutude summa ongi hii-ruut-statistik</span></span>
-<span id="cb42-2"><a href="#cb42-2" tabindex="-1"></a><span class="fu">sum</span>(t<span class="sc">$</span>residuals<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="co"># Jääkide ruutude summa ongi hii-ruut-statistik</span></span>
+<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a><span class="fu">sum</span>(t<span class="sc">$</span>residuals<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
 <pre><code>## [1] 11.23889</code></pre>
 <p>Kui jääk on positiivne, on tegelik sagedus suurem kui oodatud ja
 konkreetne tunnuste kombinatsioon esineb sagedamini kui
@@ -995,15 +980,15 @@ osakaal ridade summast ja 1 - oodatud sageduste osakaal tulpade summast.
 Need on tuntud ka kui <em>adjusted residuals</em>.</p>
 <p>Näiteks lühikeses sisseütlevas käändes pärisnime standardiseeritud
 jääk oleks</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a>(teg <span class="ot">&lt;-</span> tab[<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pärisnimi&quot;</span>]) <span class="co"># tegelik sagedus</span></span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a>(teg <span class="ot">&lt;-</span> tab[<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pärisnimi&quot;</span>]) <span class="co"># tegelik sagedus</span></span></code></pre></div>
 <pre><code>## [1] 43</code></pre>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a>(ood <span class="ot">&lt;-</span> <span class="fu">sum</span>(tab[<span class="st">&quot;Lühike&quot;</span>,]) <span class="sc">*</span> <span class="fu">sum</span>(tab[,<span class="st">&quot;Pärisnimi&quot;</span>]) <span class="sc">/</span> <span class="fu">sum</span>(tab)) <span class="co"># oodatud sagedus</span></span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a>(ood <span class="ot">&lt;-</span> <span class="fu">sum</span>(tab[<span class="st">&quot;Lühike&quot;</span>,]) <span class="sc">*</span> <span class="fu">sum</span>(tab[,<span class="st">&quot;Pärisnimi&quot;</span>]) <span class="sc">/</span> <span class="fu">sum</span>(tab)) <span class="co"># oodatud sagedus</span></span></code></pre></div>
 <pre><code>## [1] 60</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a>(std <span class="ot">&lt;-</span> ood <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> ood<span class="sc">/</span><span class="fu">sum</span>(tab[<span class="st">&quot;Lühike&quot;</span>,])) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> ood<span class="sc">/</span><span class="fu">sum</span>(tab[,<span class="st">&quot;Pärisnimi&quot;</span>]))) <span class="co"># korrutis</span></span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a>(std <span class="ot">&lt;-</span> ood <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> ood<span class="sc">/</span><span class="fu">sum</span>(tab[<span class="st">&quot;Lühike&quot;</span>,])) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> ood<span class="sc">/</span><span class="fu">sum</span>(tab[,<span class="st">&quot;Pärisnimi&quot;</span>]))) <span class="co"># korrutis</span></span></code></pre></div>
 <pre><code>## [1] 25.71429</code></pre>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a>(teg<span class="sc">-</span>ood)<span class="sc">/</span><span class="fu">sqrt</span>(std)</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a>(teg<span class="sc">-</span>ood)<span class="sc">/</span><span class="fu">sqrt</span>(std)</span></code></pre></div>
 <pre><code>## [1] -3.352445</code></pre>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" tabindex="-1"></a>t<span class="sc">$</span>stdres</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a>t<span class="sc">$</span>stdres</span></code></pre></div>
 <pre><code>##        Pärisnimi   Üldnimi
 ## Lühike -3.352445  3.352445
 ## Pikk    3.352445 -3.352445</code></pre>
@@ -1020,30 +1005,25 @@ erinevus oodatud ja tegelike sageduste vahel on kõige märgatavam.</p>
 <h2>Seose tugevuse hindamine</h2>
 <p>Kategoriaalsete tunnuste vahelise seose tugevust saab mõõta näiteks
 Craméri V või φ-kordaja abil.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="co"># install.packages(&quot;effectsize&quot;)</span></span>
-<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a><span class="fu">library</span>(effectsize)</span>
-<span id="cb54-3"><a href="#cb54-3" tabindex="-1"></a></span>
-<span id="cb54-4"><a href="#cb54-4" tabindex="-1"></a><span class="fu">cramers_v</span>(tab)</span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a><span class="co"># install.packages(&quot;effectsize&quot;)</span></span>
+<span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a><span class="fu">library</span>(effectsize)</span>
+<span id="cb46-3"><a href="#cb46-3" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" tabindex="-1"></a><span class="fu">cramers_v</span>(tab)</span></code></pre></div>
 <pre><code>## Cramer&#39;s V (adj.) |       95% CI
 ## --------------------------------
 ## 0.11              | [0.05, 1.00]
 ## 
 ## - One-sided CIs: upper bound fixed at [1.00].</code></pre>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a>effectsize<span class="sc">::</span><span class="fu">phi</span>(tab)</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a><span class="fu">phi</span>(tab)</span></code></pre></div>
 <pre><code>## Phi (adj.) |       95% CI
 ## -------------------------
 ## 0.11       | [0.05, 1.00]
 ## 
 ## - One-sided CIs: upper bound fixed at [1.00].</code></pre>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a><span class="co"># install.packages(&quot;vcd&quot;)</span></span>
-<span id="cb58-2"><a href="#cb58-2" tabindex="-1"></a><span class="fu">library</span>(vcd)</span></code></pre></div>
-<pre><code>## Loading required package: grid</code></pre>
-<pre><code>## 
-## Attaching package: &#39;vcd&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:effectsize&#39;:
-## 
-##     oddsratio</code></pre>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a><span class="fu">assocstats</span>(tab)</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="co"># install.packages(&quot;vcd&quot;)</span></span>
+<span id="cb50-2"><a href="#cb50-2" tabindex="-1"></a><span class="fu">library</span>(vcd)</span>
+<span id="cb50-3"><a href="#cb50-3" tabindex="-1"></a></span>
+<span id="cb50-4"><a href="#cb50-4" tabindex="-1"></a><span class="fu">assocstats</span>(tab)</span></code></pre></div>
 <pre><code>##                     X^2 df   P(&gt; X^2)
 ## Likelihood Ratio 11.373  1 0.00074531
 ## Pearson          11.239  1 0.00080101
@@ -1091,7 +1071,7 @@ väärtus koos vabadusastmete arvu ja vaatluste arvuga ning
 <p>Hii-ruut-testi tulemus on statistiliselt oluline:
 <em>X<sup>2</sup></em>(1, N = 840) = 11.239, <em>p</em> &lt; 0.001.
 Craméri V on 0.12, mille põhjal on tegemist siiski nõrga seosega.</p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" tabindex="-1"></a>report<span class="sc">::</span><span class="fu">report_text</span>(<span class="fu">chisq.test</span>(tab, <span class="at">correct =</span> F))</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a>report<span class="sc">::</span><span class="fu">report_text</span>(<span class="fu">chisq.test</span>(tab, <span class="at">correct =</span> F))</span></code></pre></div>
 <pre><code>## In the report() function, for htest objects, you can try providing the
 ##   data argument manually, e.g., report(x, data = data).</code></pre>
 <pre><code>## Effect sizes were labelled following Funder&#39;s (2019) recommendations.
@@ -1107,12 +1087,12 @@ Craméri V on 0.12, mille põhjal on tegemist siiski nõrga seosega.</p>
 vabadusastmete arvu, mõju suuruse ja olulisuse nivoo korral olulise
 seose juhul, kui see tõesti olemas on. Testi võimsust tasub kontrollida
 eriti siis, kui saad testiga statistiliselt ebaolulise tulemuse.</p>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" tabindex="-1"></a><span class="fu">library</span>(pwr)</span>
-<span id="cb68-2"><a href="#cb68-2" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">assocstats</span>(tab)<span class="sc">$</span>cramer <span class="co"># mõju suurus (siin Craméri V) </span></span>
-<span id="cb68-3"><a href="#cb68-3" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="fu">sum</span>(tab) <span class="co"># vaatluste arv</span></span>
-<span id="cb68-4"><a href="#cb68-4" tabindex="-1"></a>df <span class="ot">&lt;-</span> t<span class="sc">$</span>parameter <span class="co"># hii-ruut-testi vabadusastmete arv (t &lt;- chisq.test(tab))</span></span>
-<span id="cb68-5"><a href="#cb68-5" tabindex="-1"></a></span>
-<span id="cb68-6"><a href="#cb68-6" tabindex="-1"></a><span class="fu">pwr.chisq.test</span>(<span class="at">w =</span> w, <span class="at">N =</span> N, <span class="at">df =</span> df, <span class="at">sig.level =</span> <span class="fl">0.05</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a><span class="fu">library</span>(pwr)</span>
+<span id="cb56-2"><a href="#cb56-2" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">assocstats</span>(tab)<span class="sc">$</span>cramer <span class="co"># mõju suurus (siin Craméri V) </span></span>
+<span id="cb56-3"><a href="#cb56-3" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="fu">sum</span>(tab) <span class="co"># vaatluste arv</span></span>
+<span id="cb56-4"><a href="#cb56-4" tabindex="-1"></a>df <span class="ot">&lt;-</span> t<span class="sc">$</span>parameter <span class="co"># hii-ruut-testi vabadusastmete arv (t &lt;- chisq.test(tab))</span></span>
+<span id="cb56-5"><a href="#cb56-5" tabindex="-1"></a></span>
+<span id="cb56-6"><a href="#cb56-6" tabindex="-1"></a><span class="fu">pwr.chisq.test</span>(<span class="at">w =</span> w, <span class="at">N =</span> N, <span class="at">df =</span> df, <span class="at">sig.level =</span> <span class="fl">0.05</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Chi squared power calculation 
 ## 
@@ -1129,12 +1109,12 @@ päris hea.</p>
 <p>Võimsuse analüüsiga saab ka otsustada, kui palju andmeid on vaja
 selleks, et leida teatud olulisuse nivool ning kindla võimsusega mingi
 soovitud suurusega mõju.</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" tabindex="-1"></a><span class="co"># library(pwr)</span></span>
-<span id="cb70-2"><a href="#cb70-2" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="co"># tugev mõju</span></span>
-<span id="cb70-3"><a href="#cb70-3" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb70-4"><a href="#cb70-4" tabindex="-1"></a>power <span class="ot">&lt;-</span> <span class="fl">0.9</span></span>
-<span id="cb70-5"><a href="#cb70-5" tabindex="-1"></a></span>
-<span id="cb70-6"><a href="#cb70-6" tabindex="-1"></a><span class="fu">pwr.chisq.test</span>(<span class="at">w =</span> w, <span class="at">df =</span> df, <span class="at">power =</span> power, <span class="at">sig.level =</span> <span class="fl">0.05</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a><span class="co"># library(pwr)</span></span>
+<span id="cb58-2"><a href="#cb58-2" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="co"># tugev mõju</span></span>
+<span id="cb58-3"><a href="#cb58-3" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb58-4"><a href="#cb58-4" tabindex="-1"></a>power <span class="ot">&lt;-</span> <span class="fl">0.9</span></span>
+<span id="cb58-5"><a href="#cb58-5" tabindex="-1"></a></span>
+<span id="cb58-6"><a href="#cb58-6" tabindex="-1"></a><span class="fu">pwr.chisq.test</span>(<span class="at">w =</span> w, <span class="at">df =</span> df, <span class="at">power =</span> power, <span class="at">sig.level =</span> <span class="fl">0.05</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Chi squared power calculation 
 ## 
@@ -1145,10 +1125,10 @@ soovitud suurusega mõju.</p>
 ##           power = 0.9
 ## 
 ## NOTE: N is the number of observations</code></pre>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" tabindex="-1"></a><span class="co"># võrdle</span></span>
-<span id="cb72-2"><a href="#cb72-2" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fl">0.1</span> <span class="co"># nõrk mõju</span></span>
-<span id="cb72-3"><a href="#cb72-3" tabindex="-1"></a></span>
-<span id="cb72-4"><a href="#cb72-4" tabindex="-1"></a><span class="fu">pwr.chisq.test</span>(<span class="at">w =</span> w, <span class="at">df =</span> df, <span class="at">power =</span> power, <span class="at">sig.level =</span> <span class="fl">0.05</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" tabindex="-1"></a><span class="co"># võrdle</span></span>
+<span id="cb60-2"><a href="#cb60-2" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fl">0.1</span> <span class="co"># nõrk mõju</span></span>
+<span id="cb60-3"><a href="#cb60-3" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="#cb60-4" tabindex="-1"></a><span class="fu">pwr.chisq.test</span>(<span class="at">w =</span> w, <span class="at">df =</span> df, <span class="at">power =</span> power, <span class="at">sig.level =</span> <span class="fl">0.05</span>)</span></code></pre></div>
 <pre><code>## 
 ##      Chi squared power calculation 
 ## 
@@ -1162,6 +1142,7 @@ soovitud suurusega mõju.</p>
 <p>Kuna tugevamat mõju (<em>w</em>) on lihtsam andmetest tuvastada, on
 selleks vaja ka vähem vaatlusi. Väikese (aga olulise) mõju tuvastamiseks
 on aga jällegi vaja rohkem vaatlusi.</p>
+<p><br> <br></p>
 </div>
 <div id="harjutus-2" class="section level2">
 <h2>Harjutus 2</h2>
@@ -1189,28 +1170,28 @@ tegemist.</p>
 Siiman 2015: 215
 </p>
 </center>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" tabindex="-1"></a>tab2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">6</span>, <span class="dv">389</span>, <span class="dv">391</span>, <span class="dv">25</span>, <span class="dv">19</span>), </span>
-<span id="cb74-2"><a href="#cb74-2" tabindex="-1"></a>               <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">ncol =</span> <span class="dv">4</span>, </span>
-<span id="cb74-3"><a href="#cb74-3" tabindex="-1"></a>               <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pikk&quot;</span>), </span>
-<span id="cb74-4"><a href="#cb74-4" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;Arvsõna&quot;</span>, <span class="st">&quot;Asesõna&quot;</span>, <span class="st">&quot;Nimisõna&quot;</span>, <span class="st">&quot;Omadussõna&quot;</span>)))</span>
-<span id="cb74-5"><a href="#cb74-5" tabindex="-1"></a></span>
-<span id="cb74-6"><a href="#cb74-6" tabindex="-1"></a>tab2</span></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a>tab2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">6</span>, <span class="dv">389</span>, <span class="dv">391</span>, <span class="dv">25</span>, <span class="dv">19</span>), </span>
+<span id="cb62-2"><a href="#cb62-2" tabindex="-1"></a>               <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">ncol =</span> <span class="dv">4</span>, </span>
+<span id="cb62-3"><a href="#cb62-3" tabindex="-1"></a>               <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pikk&quot;</span>), </span>
+<span id="cb62-4"><a href="#cb62-4" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;Arvsõna&quot;</span>, <span class="st">&quot;Asesõna&quot;</span>, <span class="st">&quot;Nimisõna&quot;</span>, <span class="st">&quot;Omadussõna&quot;</span>)))</span>
+<span id="cb62-5"><a href="#cb62-5" tabindex="-1"></a></span>
+<span id="cb62-6"><a href="#cb62-6" tabindex="-1"></a>tab2</span></code></pre></div>
 <pre><code>##        Arvsõna Asesõna Nimisõna Omadussõna
 ## Lühike       4       2      389         25
 ## Pikk         4       6      391         19</code></pre>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" tabindex="-1"></a>(t2 <span class="ot">&lt;-</span> <span class="fu">chisq.test</span>(tab2))</span></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" tabindex="-1"></a>(t2 <span class="ot">&lt;-</span> <span class="fu">chisq.test</span>(tab2))</span></code></pre></div>
 <pre><code>## Warning in chisq.test(tab2): Chi-squared approximation may be incorrect</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
 ## data:  tab2
 ## X-squared = 2.8233, df = 3, p-value = 0.4197</code></pre>
-<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" tabindex="-1"></a>t2<span class="sc">$</span>expected</span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" tabindex="-1"></a>t2<span class="sc">$</span>expected</span></code></pre></div>
 <pre><code>##        Arvsõna Asesõna Nimisõna Omadussõna
 ## Lühike       4       4      390         22
 ## Pikk         4       4      390         22</code></pre>
 <p>Neli oodatud sagedust on &lt; 5.</p>
-<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" tabindex="-1"></a><span class="fu">fisher.test</span>(tab2)</span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" tabindex="-1"></a><span class="fu">fisher.test</span>(tab2)</span></code></pre></div>
 <pre><code>## 
 ##  Fisher&#39;s Exact Test for Count Data
 ## 
@@ -1226,12 +1207,13 @@ mistõttu ei tööta test väga suurte andmestikega.<br />
 Argumendiga <code>workspace</code> võib anda algoritmile juurde
 lisamälu, ent see võib teha aeglaseks kõik muud protsessid teie
 arvutis.</p>
-<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" tabindex="-1"></a>valimised <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">&quot;data/kandidaadid_2023.csv&quot;</span>)</span>
-<span id="cb83-2"><a href="#cb83-2" tabindex="-1"></a><span class="fu">fisher.test</span>(valimised<span class="sc">$</span>nimekiri, valimised<span class="sc">$</span>sugu, <span class="at">workspace =</span> <span class="dv">100000000000</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" tabindex="-1"></a>valimised <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">&quot;data/kandidaadid_2023.csv&quot;</span>)</span>
+<span id="cb71-2"><a href="#cb71-2" tabindex="-1"></a><span class="fu">fisher.test</span>(valimised<span class="sc">$</span>nimekiri, valimised<span class="sc">$</span>sugu, <span class="at">workspace =</span> <span class="dv">100000000000</span>)</span></code></pre></div>
 <p>G-test on hii-ruut-testile väga sarnane, ent selle valem statistiku
 arvutamiseks on pisut erinev: <span class="math inline">\(G = 2\sum_i
 O_i log(\frac{O_i}{E_i})\)</span>.</p>
-<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" tabindex="-1"></a>DescTools<span class="sc">::</span><span class="fu">GTest</span>(tab2)</span></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" tabindex="-1"></a><span class="co"># install.packages(&quot;DescTools&quot;)</span></span>
+<span id="cb72-2"><a href="#cb72-2" tabindex="-1"></a>DescTools<span class="sc">::</span><span class="fu">GTest</span>(tab2)</span></code></pre></div>
 <pre><code>## 
 ##  Log likelihood ratio (G-test) test of independence without correction
 ## 
@@ -1250,13 +1232,13 @@ Selle käigus seotakse testi <em>p</em>-väärtus lahti eeldusest, et
 hii-ruut-statistik on pärit pidevast hii-ruut-jaotusest, kus kahe
 tunnuse vaheline seos muutub statistiliselt oluliseks kindla
 vabadusastmete arvu ja sellele vastava statistiku väärtuse korral.</p>
-<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" tabindex="-1"></a><span class="fu">chisq.test</span>(tab2, <span class="at">simulate.p.value =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" tabindex="-1"></a><span class="fu">chisq.test</span>(tab2, <span class="at">simulate.p.value =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with simulated p-value (based on 2000
 ##  replicates)
 ## 
 ## data:  tab2
-## X-squared = 2.8233, df = NA, p-value = 0.4393</code></pre>
+## X-squared = 2.8233, df = NA, p-value = 0.4418</code></pre>
 <p>Monte-Carlo simulatsioonis tehakse risttabeli oodatud sageduste
 põhjal mitu (nt 2000) juhuslikku “tegelike sagedustega” tabelit,
 varieerides iga kord pisut tõenäosust, millega mingi tunnuste
@@ -1265,47 +1247,47 @@ on aga ikkagi küllalt lähedal oodatud sagedustega tabelile (ehk
 tabelile, mille põhjal kahe tunnuse vahel ei tohiks olla mingit
 seost).</p>
 <p>Näiteks kui oodatud sagedustega tabel näeb välja selline:</p>
-<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" tabindex="-1"></a><span class="fu">chisq.test</span>(tab2)<span class="sc">$</span>expected</span></code></pre></div>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" tabindex="-1"></a><span class="fu">chisq.test</span>(tab2)<span class="sc">$</span>expected</span></code></pre></div>
 <pre><code>## Warning in chisq.test(tab2): Chi-squared approximation may be incorrect</code></pre>
 <pre><code>##        Arvsõna Asesõna Nimisõna Omadussõna
 ## Lühike       4       4      390         22
 ## Pikk         4       4      390         22</code></pre>
 <p>siis kolm juhuslikult genereeritud tabelit võiksiv välja näha umbes
 sellised:</p>
-<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" tabindex="-1"></a>(ts1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">368</span>,<span class="dv">410</span>,<span class="dv">19</span>,<span class="dv">29</span>), <span class="at">nrow=</span> <span class="dv">2</span>, </span>
-<span id="cb91-2"><a href="#cb91-2" tabindex="-1"></a>               <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pikk&quot;</span>), </span>
-<span id="cb91-3"><a href="#cb91-3" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;Arvsõna&quot;</span>, <span class="st">&quot;Asesõna&quot;</span>, <span class="st">&quot;Nimisõna&quot;</span>, <span class="st">&quot;Omadussõna&quot;</span>))))</span></code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" tabindex="-1"></a>(ts1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">368</span>,<span class="dv">410</span>,<span class="dv">19</span>,<span class="dv">29</span>), <span class="at">nrow=</span> <span class="dv">2</span>, </span>
+<span id="cb79-2"><a href="#cb79-2" tabindex="-1"></a>               <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pikk&quot;</span>), </span>
+<span id="cb79-3"><a href="#cb79-3" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;Arvsõna&quot;</span>, <span class="st">&quot;Asesõna&quot;</span>, <span class="st">&quot;Nimisõna&quot;</span>, <span class="st">&quot;Omadussõna&quot;</span>))))</span></code></pre></div>
 <pre><code>##        Arvsõna Asesõna Nimisõna Omadussõna
 ## Lühike       3       1      368         19
 ## Pikk         6       4      410         29</code></pre>
-<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" tabindex="-1"></a>(ts2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">8</span>,<span class="dv">5</span>,<span class="dv">3</span>,<span class="dv">7</span>,<span class="dv">383</span>,<span class="dv">381</span>,<span class="dv">25</span>,<span class="dv">28</span>), <span class="at">nrow=</span> <span class="dv">2</span>, </span>
-<span id="cb93-2"><a href="#cb93-2" tabindex="-1"></a>               <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pikk&quot;</span>),</span>
-<span id="cb93-3"><a href="#cb93-3" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;Arvsõna&quot;</span>, <span class="st">&quot;Asesõna&quot;</span>, <span class="st">&quot;Nimisõna&quot;</span>, <span class="st">&quot;Omadussõna&quot;</span>))))</span></code></pre></div>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" tabindex="-1"></a>(ts2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">8</span>,<span class="dv">5</span>,<span class="dv">3</span>,<span class="dv">7</span>,<span class="dv">383</span>,<span class="dv">381</span>,<span class="dv">25</span>,<span class="dv">28</span>), <span class="at">nrow=</span> <span class="dv">2</span>, </span>
+<span id="cb81-2"><a href="#cb81-2" tabindex="-1"></a>               <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pikk&quot;</span>),</span>
+<span id="cb81-3"><a href="#cb81-3" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;Arvsõna&quot;</span>, <span class="st">&quot;Asesõna&quot;</span>, <span class="st">&quot;Nimisõna&quot;</span>, <span class="st">&quot;Omadussõna&quot;</span>))))</span></code></pre></div>
 <pre><code>##        Arvsõna Asesõna Nimisõna Omadussõna
 ## Lühike       8       3      383         25
 ## Pikk         5       7      381         28</code></pre>
-<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" tabindex="-1"></a>(ts3 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">394</span>,<span class="dv">395</span>,<span class="dv">21</span>,<span class="dv">21</span>), <span class="at">nrow=</span> <span class="dv">2</span>, </span>
-<span id="cb95-2"><a href="#cb95-2" tabindex="-1"></a>               <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pikk&quot;</span>), </span>
-<span id="cb95-3"><a href="#cb95-3" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;Arvsõna&quot;</span>, <span class="st">&quot;Asesõna&quot;</span>, <span class="st">&quot;Nimisõna&quot;</span>, <span class="st">&quot;Omadussõna&quot;</span>))))</span></code></pre></div>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" tabindex="-1"></a>(ts3 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">394</span>,<span class="dv">395</span>,<span class="dv">21</span>,<span class="dv">21</span>), <span class="at">nrow=</span> <span class="dv">2</span>, </span>
+<span id="cb83-2"><a href="#cb83-2" tabindex="-1"></a>               <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;Lühike&quot;</span>, <span class="st">&quot;Pikk&quot;</span>), </span>
+<span id="cb83-3"><a href="#cb83-3" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;Arvsõna&quot;</span>, <span class="st">&quot;Asesõna&quot;</span>, <span class="st">&quot;Nimisõna&quot;</span>, <span class="st">&quot;Omadussõna&quot;</span>))))</span></code></pre></div>
 <pre><code>##        Arvsõna Asesõna Nimisõna Omadussõna
 ## Lühike       3       3      394         21
 ## Pikk         2       1      395         21</code></pre>
-<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" tabindex="-1"></a><span class="co"># jne</span></span></code></pre></div>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" tabindex="-1"></a><span class="co"># jne</span></span></code></pre></div>
 <p>Juhuslikult genereeritud tabelite põhjal leitakse
 hii-ruut-statistikud (kui on 2000 kordust, siis 2000 statistiku
 väärtust), kasutades esialgse tabeli oodatud sagedusi.</p>
-<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" tabindex="-1"></a>hiid <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb98-2"><a href="#cb98-2" tabindex="-1"></a>  <span class="fu">sum</span>(((ts1<span class="sc">-</span>t2<span class="sc">$</span>expected)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>t2<span class="sc">$</span>expected),</span>
-<span id="cb98-3"><a href="#cb98-3" tabindex="-1"></a>  <span class="fu">sum</span>(((ts2<span class="sc">-</span>t2<span class="sc">$</span>expected)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>t2<span class="sc">$</span>expected),</span>
-<span id="cb98-4"><a href="#cb98-4" tabindex="-1"></a>  <span class="fu">sum</span>(((ts3<span class="sc">-</span>t2<span class="sc">$</span>expected)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>t2<span class="sc">$</span>expected)</span>
-<span id="cb98-5"><a href="#cb98-5" tabindex="-1"></a>)</span>
-<span id="cb98-6"><a href="#cb98-6" tabindex="-1"></a>hiid</span></code></pre></div>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" tabindex="-1"></a>hiid <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb86-2"><a href="#cb86-2" tabindex="-1"></a>  <span class="fu">sum</span>(((ts1<span class="sc">-</span>t2<span class="sc">$</span>expected)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>t2<span class="sc">$</span>expected),</span>
+<span id="cb86-3"><a href="#cb86-3" tabindex="-1"></a>  <span class="fu">sum</span>(((ts2<span class="sc">-</span>t2<span class="sc">$</span>expected)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>t2<span class="sc">$</span>expected),</span>
+<span id="cb86-4"><a href="#cb86-4" tabindex="-1"></a>  <span class="fu">sum</span>(((ts3<span class="sc">-</span>t2<span class="sc">$</span>expected)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>t2<span class="sc">$</span>expected)</span>
+<span id="cb86-5"><a href="#cb86-5" tabindex="-1"></a>)</span>
+<span id="cb86-6"><a href="#cb86-6" tabindex="-1"></a>hiid</span></code></pre></div>
 <pre><code>## [1] 8.403030 9.128788 3.946037</code></pre>
 <p>Lõpuks arvutatakse nende kordade osakaal simuleeritud tabelitest,
 mille puhul leitud hii-ruut-statistik oli sama suur või suurem kui algse
 (ilma pidevusparanduseta) testi statistik 2.82331. See osakaal ongi
 testi <em>p</em>-väärtus.</p>
-<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" tabindex="-1"></a><span class="fu">chisq.test</span>(tab2, <span class="at">correct =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" tabindex="-1"></a><span class="fu">chisq.test</span>(tab2, <span class="at">correct =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## Warning in chisq.test(tab2, correct = FALSE): Chi-squared approximation may be
 ## incorrect</code></pre>
 <pre><code>## 
@@ -1313,8 +1295,8 @@ testi <em>p</em>-väärtus.</p>
 ## 
 ## data:  tab2
 ## X-squared = 2.8233, df = 3, p-value = 0.4197</code></pre>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb103-2"><a href="#cb103-2" tabindex="-1"></a><span class="fu">chisq.test</span>(tab2, <span class="at">simulate.p.value =</span> <span class="cn">TRUE</span>, <span class="at">B =</span> <span class="dv">3000</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb91-2"><a href="#cb91-2" tabindex="-1"></a><span class="fu">chisq.test</span>(tab2, <span class="at">simulate.p.value =</span> <span class="cn">TRUE</span>, <span class="at">B =</span> <span class="dv">3000</span>)</span></code></pre></div>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with simulated p-value (based on 3000
 ##  replicates)
