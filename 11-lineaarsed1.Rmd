@@ -487,6 +487,14 @@ Tukey testi väljund annab paarikaupa võrdluses:
 - korrigeeritud p-väärtuse
 
 
+## Kruskal–Wallise test
+
+Nagu t-test, on ka ANOVA parameetriline test, st eeldab andmetelt normaaljaotust. Kui normaaljaotuse tingimus ei ole täidetud (ja andmestik on väiksem kui 30 mõõtmist rühma kohta) ning rühmi on rohkem kui kaks, võib kasutada Kruskal–Wallise testi.
+
+```{r}
+kruskal.test(V1~Quantity, data=dat2)
+```
+
 
 ## Kordamisküsimused
 

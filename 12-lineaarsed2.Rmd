@@ -513,7 +513,7 @@ Ja lõpetuseks teeme paar rehkendust selle mudeli põhjal:
 
 Kui efekte visualiseerida, siis võiks joonistada eraldi paneelid kaaskõneleja kõnetempo ja kaaskõneleja vanusega, sest need on mudelis ainult peamõjudena, kuid kõneleja soo ja vanuse vahel on interaktsioon, seetõttu neid võiks näidata ühel paneelil.
 
-```{r, message = T}
+```{r, message = F}
 partneri_tempo <- ggplot(fonkorp2, aes(y = konetempo, x = kaaskoneleja_konetempo))+
     geom_point()+
     geom_smooth(method = "lm")

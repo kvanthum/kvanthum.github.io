@@ -1227,6 +1227,19 @@ kasutama käsku aov().</p>
 <li>korrigeeritud p-väärtuse</li>
 </ul>
 </div>
+<div id="kruskalwallise-test" class="section level2">
+<h2>Kruskal–Wallise test</h2>
+<p>Nagu t-test, on ka ANOVA parameetriline test, st eeldab andmetelt
+normaaljaotust. Kui normaaljaotuse tingimus ei ole täidetud (ja
+andmestik on väiksem kui 30 mõõtmist rühma kohta) ning rühmi on rohkem
+kui kaks, võib kasutada Kruskal–Wallise testi.</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" tabindex="-1"></a><span class="fu">kruskal.test</span>(V1<span class="sc">~</span>Quantity, <span class="at">data=</span>dat2)</span></code></pre></div>
+<pre><code>## 
+##  Kruskal-Wallis rank sum test
+## 
+## data:  V1 by Quantity
+## Kruskal-Wallis chi-squared = 71.337, df = 2, p-value = 3.23e-16</code></pre>
+</div>
 <div id="kordamisküsimused" class="section level2">
 <h2>Kordamisküsimused</h2>
 <p>Kordamisküsimuste testi saad teha moodlis, seal näed peale vastamist
