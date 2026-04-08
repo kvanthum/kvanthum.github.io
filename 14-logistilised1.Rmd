@@ -26,7 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 </center>
 
 ```{r}
-load("data/kysimustik_2025.RData")
+load("data/kysimustik_2026.RData")
 # Jätame välja kaks vaatlust
 kysimustik2 <- droplevels(kysimustik[kysimustik$lemmikloom != "Mulle ei meeldi loomad",])
 
@@ -50,9 +50,9 @@ Lineaarse mudeli väljundi **vabaliige** (*intercept*) näitab arvulise uuritava
 Lineaarse mudeli väljundi **koefitsiendid** (*coefficient*) ehk regressioonikordajad näitavad muutust arvulise uuritava tunnuse väärtuses, kui muuta seletava tunnuse väärtust (kas 1 ühiku võrra või 1 taseme võrra).    
 
 
-- Näiteks sellisele osalejale, kellel **ei ole kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus, ennustab mudel iga aastase kasvu kohta tema sünniaastas õpitud aastate arvu kahanemist `r abs(mod$coefficients[["synniaasta"]])` aasta võrra. Kui sellise osaleja sünniaasta oleks nt 1987, ennustaks mudel tema ülikoolis õpitud aastate arvuks `663.11574 + 1987 * (-0.32946)` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta']` aastat.  
-- Sama sünniaastaga osalejale, kellel **on kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus, ennustab mudel õpitud aastate arvuks aga `663.11574 + 1987 * (-0.32946) + 1.12165` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta'] + mod$coefficients['kogemused_kvantJah']` aastat.  
-- Sama sünniaastaga osalejale, kellel **on kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on koer, ennustab mudel õpitud aastate arvuks `663.11574 + 1987 * (-0.32946) + 1.12165 -1.76387` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta'] + mod$coefficients['kogemused_kvantJah'] + mod$coefficients['lemmikloomKoer']`. 
+- Näiteks sellisele osalejale, kellel **ei ole kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus, ennustab mudel iga aastase kasvu kohta tema sünniaastas õpitud aastate arvu kahanemist `r abs(mod$coefficients[["synniaasta"]])` aasta võrra. Kui sellise osaleja sünniaasta oleks nt 1987, ennustaks mudel tema ülikoolis õpitud aastate arvuks `649.40718 + 1987 * (-0.32269)` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta']` aastat.  
+- Sama sünniaastaga osalejale, kellel **on kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on glaucus atlanticus, ennustab mudel õpitud aastate arvuks aga `649.40718 + 1987 * (-0.32269) + 1.08449` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta'] + mod$coefficients['kogemused_kvantJah']` aastat.  
+- Sama sünniaastaga osalejale, kellel **on kogemusi** kvantitatiivsete meetoditega ja kelle lemmikloom on koer, ennustab mudel õpitud aastate arvuks `649.40718 + 1987 * (-0.32269) + 1.08449 -1.27974` ehk `r mod$coefficients['(Intercept)'] + 1987 * mod$coefficients['synniaasta'] + mod$coefficients['kogemused_kvantJah'] + mod$coefficients['lemmikloomKoer']`. 
 
 <br>
 Mudeli ennustusi konkreetsetele vaatlustele saame küsida ka funktsiooniga `predict()`, kui anname ette andmetabeli seletavate tunnuste väärtustega.  
@@ -69,7 +69,7 @@ predict(mod,
 Kategoriaalse seletava tunnuse puhul, millel on > 2 taset ja seega > 1 koefitsienti, hindavad kõik koefitsiendid muutust **võrreldes baastasemega** ega ütle midagi koefitsientide omavahelise suhte kohta. Näiteks hindavad kõik tunnuse `lemmikloom` koefitsiendid muutust võrreldes glaucus atlanticusega.  
 <br>
 Erinevuse **suunda** võrreldes baastasemega näitab koefitsiendi märk: kui koefitsient on positiivne, siis uuritava tunnuse ennustatud väärtus kasvab, kui koefitsient on negatiivne, siis kahaneb.  
-Erinevuse **statistilist olulisust** näitavad koefitsientide *p*-väärtused. Kui koefitsiendi *p*-väärtus on > 0.05, ei ole statistiliselt olulist erinevust **võrreldes baaskontekstiga** (mis ei tähenda tingimata, et erinevus ei oleks oluline mingite teiste väärtuste vahel). Näiteks on ennustatud õpitud aastate arv oluliselt erinev osalejal, kelle hüpoteetiline sünniaasta on 0, ja osalejal, kelle hüpoteetiline sünniaasta on 1. Samuti on ennustatud õpitud aastate arv oluliselt erinev osalejal, kelle lemmikloom on glaucus atlanticus, ja osalejal, kelle lemmikloom on koer (aga me ei tea, kas ka näiteks kaelkirjaku ja koera vahel).  
+Erinevuse **statistilist olulisust** näitavad koefitsientide *p*-väärtused. Kui koefitsiendi *p*-väärtus on > 0.05, ei ole statistiliselt olulist erinevust **võrreldes baaskontekstiga** (mis ei tähenda tingimata, et erinevus ei oleks oluline mingite teiste väärtuste vahel). Näiteks on ennustatud õpitud aastate arv oluliselt erinev osalejal, kelle hüpoteetiline sünniaasta on 0, ja osalejal, kelle hüpoteetiline sünniaasta on 1. Õpitud aastate arv aga ei erine oluliselt nende hulgas, kellel ei ole kvantitatiivsete meetoditega kogemusi (vabaliikme kontekst), ning nende hulgas, kellel on. Samuti ei õpitud aastate arv nende vastajate puhul, kelle lemmikloom on glaucus atlanticus (vabaliikme kontekst), nendest, kelle lemmikloom on kaelkirjak või koer, ent me ei tea seda, kas kaelkirjaku ja koera vahel võib olla statistiliselt olulisi erinevusi.  
 
 
 Tasemete omavahelist erinevust saab hinnata *post-hoc* testide või jooniste abil.  
@@ -255,9 +255,9 @@ Sama tulemuseni jõuame tegelikult siis, kui jagame tõenäosuste asemel absoluu
 
 ```{r}
 # Kogemuse omamise šanss
-86/40
+104/47
 # Teejoomise šanss
-54/72
+67/84
 ```
 
 
@@ -330,6 +330,7 @@ Kui __*P = p/(1-p)*__, siis __*p = P/(1+P)*__.
 <br>
 
 **Logit** ehk *šansi logaritm* on - nagu nimigi viitab - logaritmitud šanss. Selle kaudu hinnatakse logistilises regressioonis uuritava tunnuse ennustatud väärtust mingi seletavate tunnuste kombinatsiooni korral. Kui tõenäosus võib varieeruda nullist üheni [0,1] ja šanss nullist lõpmatuseni [0,∞], siis šansi logaritm võib varieeruda **miinus lõpmatusest pluss lõpmatuseni [-∞,∞]**. See on oluline omadus logistilise regressiooni mudelis!
+
 
 
 ### Võtame veel ühe näite.
