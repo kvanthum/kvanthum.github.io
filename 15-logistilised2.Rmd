@@ -625,7 +625,7 @@ d) Koefitsientide *p*-väärtusi.
 
 #### 3. Teeme kursuse küsimustiku andmete pealt mudeli, mis ennustab vastajate lemmikjooki sünniaasta, ülikoolis õpitud aastate arvu, kvantmeetodite kogemuse, lemmiklooma ja küsimustikule vastamise aasta järgi. Millised peamõjud tuleks mudelisse jätta?
 ```{r}
-load("data/kysimustik_2025.RData")
+load("data/kysimustik_2026.RData")
 kysimustik$aasta <- as.numeric(as.character(kysimustik$aasta))
 m <- glm(lemmikjook ~ synniaasta + kaua_opid + kogemused_kvant + lemmikloom + aasta, data = kysimustik, family = "binomial")
 car::Anova(m)
@@ -633,8 +633,8 @@ car::Anova(m)
 
 a) mitte ühtegi
 b) kogemused_kvant ja vastamise aasta
-c) vastamise aasta ja sünniaasta  
-d) kogemused_kvant, vastamise aasta ja lemmikloom  
+c) ainult sünniaasta  
+d) kogemused_kvant, vastamise aasta ja sünniaasta  
 e) kõik
 
 
