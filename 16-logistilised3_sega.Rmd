@@ -411,7 +411,7 @@ check_collinearity(m5.glm)
 
 ### Jäägid
 
-Logistilise regressiooni mudeli jäägid (*deviance residuals*) näitavad erinevust vaatlustele ennustatud tõenäosuse (0 kuni 1) ja nende tõelise väärtuse (1 või 0) vahel. Jääkide arvutamiseks kasutatakse valemit `sqrt(-2*log(ennustatud))`, kui vaatluse väärtus on 1 (siin: "peale") ja valemit `-sqrt(-2*log(1-ennustatud))`, kui vaatluse väärtus on 0 (siin: "ade"). Näiteks:  
+Logistilise regressiooni mudeli jäägid (*deviance residuals*) näitavad erinevust vaatlustele ennustatud tõenäosuse (0-1) ja nende tõelise väärtuse (0 või 1) vahel. Jääkide arvutamiseks kasutatakse valemit `sqrt(-2*log(ennustatud))`, kui vaatluse väärtus on 1 (siin: "peale") ja valemit `-sqrt(-2*log(1-ennustatud))`, kui vaatluse väärtus on 0 (siin: "ade"). Näiteks:  
 
 ```{r}
 (t <- m5.glm$y[1]) # esimese rea vaatlus (adessiiv ehk 0)
@@ -550,7 +550,8 @@ tab_model(m5.glm,
           show.reflvl = T, 
           p.adjust = "holm", 
           title = "(AUC = 0.746, null deviance = 2001.809)", 
-          string.stat = "z")
+          string.stat = "z",
+          use.viewer = F)
 ```
 
 <br> 
@@ -585,7 +586,7 @@ m1.glmer <- glmer(cx ~ LM_mobiilsus + LM_komplekssus + tegusõna_klass + LM_pikk
 
 Kui saame teate, et *Model failed to converge*, tähendab see seda, et mudeli algoritm ei suutnud mudeli parameetreid optimaalselt hinnata, mudeli tulemusi ei saa usaldada ja neid ei peaks nt publikatsioonides raporteerima. See võib juhtuda näiteks siis, kui mudel on andmete hulka arvestades liiga kompleksne või kui andmestikus on mingeid erindeid, mis parameetrite hindamist oluliselt raskendavad. Ent vahel võib olukorda parandada see, kui vahetada mudeli optimeerimise algoritmi. Sobiva leidmiseks võib kasutada näiteks funktsiooni `allFit()`. Funktsioon tuleb samuti paketist `lme4`, ent lisaks võidakse nõuda, et installitakse ka paketid `optimx` ja `dfoptim`.         
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
 #install.packages(c("optimx", "dfoptim"))
 allFit(m1.glmer, verbose = F) -> allfits
 summary(allfits)$which.OK
@@ -609,7 +610,7 @@ See tähendab, et näiteks `LM_mobiilsusliigutatav` koefitsient näitab šanssid
 
 ```{r}
 # Võrdleme mudeleid
-tab_model(m5.glm, m1.glmer, show.aic = T)
+tab_model(m5.glm, m1.glmer, show.aic = T, use.viewer = FALSE)
 ```
 
 Tundub, et AIC läheb väiksemaks ning parameetrite hinnangutes ja statistilises olulises erilisi muutuseid ei toimu. Võib-olla võiks kaaluda kohafraasi pikkuse ja murderühma interaktsiooni väljajätmist, kuna seal kaoksid pärast Bonferroni või Holmi-Bonferroni parandusi statistiliselt olulised erinevused. Jätame selle praegu siiski mudelisse alles.    
