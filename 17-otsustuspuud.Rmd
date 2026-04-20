@@ -28,7 +28,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Regressioon vs. otsustuspuud 
 
-**Regressioonimudelite** puhul on võimalik hinnata ühe seletava tunnuse taseme/ühiku muutuse mõju uuritava tunnuse varieerumisele. Selles mõttes on regressioon lähim meetod kontrollitud katse tegemisele, kui tegelikult on kasutada ainult vaatlusandmed. Regressioonimudelid on **parameetrilised** mudelid, mis tähendab, et uute vaatluste väärtuste ennustamiseks piisab kindlate parameetrite hinnangute (nt regressioonikordaja ja selle standardvea) teadmisest. Näiteks lineaarses regressioonis, kus on 1 seletav tunnus, piisab vabaliikmest ja seletava tunnuse koefitsiendist selleks, et mingi kindlusega ennustada kõiki võimalikke väärtusi. Seda aga juhul, kui andmed vastavad kindlale jaotusele ning uuritavat tunnust saab näiteks ka päriselt ennustada lineaarse funktsiooni kaudu. Kui tegelikult ei ole uuritav tunnus kirjeldatav seletavate tunnuste lineaarse (st sirgjoonelise) kombinatsiooni kaudu, ei ennusta meie mudel tegelikult uuritava tunnuse väärtuseid populatsioonis kuigi hästi.  
+**Regressioonimudelite** puhul on võimalik hinnata ühe seletava tunnuse taseme/ühiku muutuse mõju uuritava tunnuse varieerumisele. Juhul, kui kasutada on ainult vaatlusandmed (nt korpusest), on regressioon lähim meetod kontrollitud katse tegemisele. Regressioonimudelid on **parameetrilised** mudelid, mis tähendab, et uute vaatluste väärtuste ennustamiseks piisab kindlate parameetrite hinnangute (nt regressioonikordaja ja selle standardvea) teadmisest. Näiteks lineaarses regressioonis, kus on 1 seletav tunnus, piisab vabaliikmest ja seletava tunnuse koefitsiendist selleks, et mingi kindlusega ennustada kõiki võimalikke väärtusi. Seda aga juhul, kui andmed vastavad kindlale jaotusele ning uuritavat tunnust saab näiteks ka päriselt ennustada lineaarse funktsiooni kaudu. Kui tegelikult ei ole uuritav tunnus kirjeldatav seletavate tunnuste lineaarse (st sirgjoonelise) kombinatsiooni kaudu, ei ennusta meie mudel tegelikult uuritava tunnuse väärtuseid populatsioonis kuigi hästi.  
 
 
 Puudused:  
@@ -434,14 +434,14 @@ names(valimised)
 Vaatame veel, mis saab siis, kui ühelgi seletaval tunnusel ei ole uuritava tunnuse seletamisel olulist rolli.
 
 ```{r}
-load("data/kysimustik_2025.RData")
+load("data/kysimustik_2026.RData")
 
 # Kategoriaalne uuritav tunnus
 puu7 <- ctree(lemmikloom ~ ., data = kysimustik)
 plot(puu7)
 
 # Arvuline uuritav tunnus
-puu8 <- ctree(kaua_opid ~ kogemused_kvant + lemmikjook + kursuse_labimine, 
+puu8 <- ctree(kaua_opid ~ kogemused_kvant + lemmikjook + lemmikjook + aasta, 
               data = kysimustik)
 plot(puu8)
 ```
